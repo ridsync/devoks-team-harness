@@ -1,0 +1,31 @@
+{
+  "_note": "레거시 참조용입니다. setup.sh 가 각 plugin.json 의 mcpServers 선언에서 ~/.claude.json 을 자동으로 구성합니다.",
+  "mcpServers": {
+    "chrome-devtools-attach": {
+      "command": "npx",
+      "args": [
+        "chrome-devtools-mcp@latest",
+        "--browserUrl",
+        "http://127.0.0.1:9269"
+      ],
+      "type": "stdio",
+      "_comment": "devoks-browser 스킬 필수. Chrome을 --remote-debugging-port=9269 로 실행해야 함."
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "type": "stdio",
+      "_comment": "라이브러리 문서 조회 (선택). devoks-feature/code 스킬에서 사용."
+    },
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "serena@latest",
+        "--project",
+        "/path/to/your/project"
+      ],
+      "type": "stdio",
+      "_comment": "심볼 단위 코드 편집. devoks-code 커맨드 권장. --project 경로를 실제 프로젝트 경로로 교체."
+    }
+  }
+}

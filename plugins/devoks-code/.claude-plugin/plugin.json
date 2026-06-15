@@ -1,0 +1,24 @@
+{
+  "name": "devoks-code",
+  "version": "1.0.0",
+  "description": "DevOks 코드 품질 — 코드리뷰(범위·브랜치), 리팩토링, 모듈분석 커맨드",
+  "author": { "name": "ridsync" },
+  "dependencies": ["devoks-core"],
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "type": "stdio"
+    },
+    "codegraph": {
+      "command": "npx",
+      "args": ["-y", "codegraph-mcp@latest"],
+      "type": "stdio"
+    },
+    "serena": {
+      "command": "uvx",
+      "args": ["serena@latest", "--project", "{{PROJECT_PATH}}"],
+      "type": "stdio"
+    }
+  }
+}

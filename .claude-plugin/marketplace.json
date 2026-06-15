@@ -1,0 +1,37 @@
+{
+  "name": "devoks",
+  "description": "DevOks 팀 Claude Code 하네스 — 코드리뷰·기능개발·Git 워크플로우",
+  "owner": { "name": "ridsync" },
+  "plugins": [
+    {
+      "name": "devoks-core",
+      "source": "./plugins/devoks-core",
+      "description": "기본 원칙 컨텍스트 (Agent Principles, Project Convention, Memory Policy)",
+      "dependencies": []
+    },
+    {
+      "name": "devoks-git",
+      "source": "./plugins/devoks-git",
+      "description": "Git 커밋·이슈·PR 워크플로우",
+      "dependencies": ["devoks-core"]
+    },
+    {
+      "name": "devoks-feature",
+      "source": "./plugins/devoks-feature",
+      "description": "기능개발·UI·검증 워크플로우 (FRD/PLAN/실행 스킬 포함)",
+      "dependencies": ["devoks-core"]
+    },
+    {
+      "name": "devoks-code",
+      "source": "./plugins/devoks-code",
+      "description": "코드리뷰·리팩토링·모듈분석",
+      "dependencies": ["devoks-core"]
+    },
+    {
+      "name": "devoks-browser",
+      "source": "./plugins/devoks-browser",
+      "description": "Chrome DevTools MCP 연결 + Visual Diff 검증",
+      "dependencies": ["devoks-core"]
+    }
+  ]
+}
