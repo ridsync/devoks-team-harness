@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "devoks-core@devoks": true,
+    "devoks-git@devoks": true,
+    "devoks-feature@devoks": true
+  }
+}

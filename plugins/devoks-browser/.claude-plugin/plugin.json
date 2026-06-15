@@ -1,0 +1,24 @@
+{
+  "name": "devoks-browser",
+  "version": "1.0.0",
+  "description": "DevOks 브라우저 도구 — Chrome DevTools MCP 연결, Visual Diff 검증 스킬",
+  "author": { "name": "ridsync" },
+  "dependencies": ["devoks-core"],
+  "mcpServers": {
+    "chrome-devtools-attach": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest", "--browserUrl", "http://127.0.0.1:9269"],
+      "type": "stdio"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "type": "stdio"
+    }
+  },
+  "settings": {
+    "permissions": {
+      "allow": ["mcp__chrome-devtools-attach__*"]
+    }
+  }
+}

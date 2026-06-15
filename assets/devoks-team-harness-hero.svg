@@ -1,0 +1,199 @@
+<svg width="1280" height="420" viewBox="0 0 1280 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">DevOks Team Harness</title>
+  <desc id="desc">DevOks 플러그인 하네스 — core · feature · code · git · browser 노드를 연결한 플러그인 맵.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#071510"/>
+      <stop offset="0.55" stop-color="#0c1e18"/>
+      <stop offset="1" stop-color="#081813"/>
+    </linearGradient>
+    <linearGradient id="emerald" x1="0" y1="0" x2="1280" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#047857"/>
+      <stop offset="0.5" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="logoRing" x1="580" y1="113" x2="700" y2="237" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="300" y1="0" x2="980" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6ee7b7"/>
+      <stop offset="0.5" stop-color="#ecfdf5"/>
+      <stop offset="1" stop-color="#6ee7b7"/>
+    </linearGradient>
+    <filter id="ambientGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="24" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="logoGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" stroke="#10b981" stroke-opacity="0.055" stroke-width="1"/>
+    </pattern>
+    <clipPath id="cr"><rect width="1280" height="420" rx="16"/></clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="420" fill="url(#bg)" rx="16"/>
+  <rect width="1280" height="420" fill="url(#grid)" clip-path="url(#cr)"/>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="1280" height="3.5" fill="url(#emerald)" rx="2"/>
+
+  <!-- Ambient center glow -->
+  <ellipse cx="640" cy="175" rx="360" ry="155" fill="#10b981" opacity="0.04" filter="url(#ambientGlow)"/>
+
+  <!-- "plugin harness" badge -->
+  <rect x="548" y="14" width="184" height="28" rx="14" fill="#0a1f17" stroke="#10b981" stroke-opacity="0.45" stroke-width="1"/>
+  <circle cx="572" cy="28" r="5" fill="#10b981"/>
+  <text x="586" y="33"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+    font-size="13" font-weight="600" fill="#a7f3d0">plugin harness</text>
+
+  <!-- ─── CONNECTOR LINES ─── -->
+  <!-- core → center (right edge x=292, cy=175 → circle edge 578,175) -->
+  <line x1="292" y1="175" x2="578" y2="175"
+    stroke="#10b981" stroke-width="1.2" opacity="0.3" stroke-dasharray="7 5"/>
+  <!-- feature → center (right edge x=478, cy=112 → ~580,159) -->
+  <line x1="478" y1="112" x2="580" y2="159"
+    stroke="#34d399" stroke-width="1.2" opacity="0.3" stroke-dasharray="7 5"/>
+  <!-- code → center (right edge x=478, cy=248 → ~581,193) -->
+  <line x1="478" y1="248" x2="581" y2="193"
+    stroke="#059669" stroke-width="1.2" opacity="0.3" stroke-dasharray="7 5"/>
+  <!-- git → center (left edge x=802, cy=112 → 700,159) -->
+  <line x1="802" y1="112" x2="700" y2="159"
+    stroke="#34d399" stroke-width="1.2" opacity="0.3" stroke-dasharray="7 5"/>
+  <!-- browser → center (left edge x=802, cy=248 → 699,193) -->
+  <line x1="802" y1="248" x2="699" y2="193"
+    stroke="#059669" stroke-width="1.2" opacity="0.3" stroke-dasharray="7 5"/>
+
+  <!-- ─── CENTER D LOGO ─── -->
+  <g filter="url(#logoGlow)">
+    <circle cx="640" cy="175" r="62" fill="#071510" stroke="url(#logoRing)" stroke-width="3.5"/>
+  </g>
+  <!-- Stylised "D" -->
+  <text x="641" y="200" text-anchor="middle"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+    font-size="58" font-weight="900" fill="#ecfdf5" letter-spacing="-2">D</text>
+  <!-- Arc: top-left sweep -->
+  <path d="M 595 134 A 62 62 0 0 1 640 113"
+    stroke="#6ee7b7" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.88"/>
+  <!-- Arc: bottom-right sweep -->
+  <path d="M 685 216 A 62 62 0 0 1 640 237"
+    stroke="#10b981" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.88"/>
+
+  <!-- ─── PLUGIN NODES ─── -->
+
+  <!-- devoks-core (left, x=150, cy=175) -->
+  <rect x="150" y="149" width="142" height="52" rx="13"
+    fill="#071510" stroke="#10b981" stroke-width="1.5"/>
+  <circle cx="186" cy="175" r="16" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+  <!-- plus icon -->
+  <path d="M180 175H192M186 169V181"
+    stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="209" y="170"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#d1fae5">devoks</text>
+  <text x="209" y="187"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#10b981">core</text>
+
+  <!-- devoks-feature (upper-left, x=336, cy=112) -->
+  <rect x="336" y="86" width="142" height="52" rx="13"
+    fill="#071510" stroke="#34d399" stroke-width="1.5"/>
+  <circle cx="372" cy="112" r="16" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+  <!-- checkmark icon -->
+  <path d="M364 112L370 118L381 104"
+    stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="395" y="107"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#d1fae5">devoks</text>
+  <text x="395" y="124"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#34d399">feature</text>
+
+  <!-- devoks-code (lower-left, x=336, cy=248) -->
+  <rect x="336" y="222" width="142" height="52" rx="13"
+    fill="#071510" stroke="#0d9488" stroke-width="1.5"/>
+  <circle cx="372" cy="248" r="16" fill="#042f2e" stroke="#0d9488" stroke-width="1.5"/>
+  <!-- code brackets icon -->
+  <path d="M366 242L360 248L366 254"
+    stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M378 242L384 248L378 254"
+    stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="395" y="243"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#d1fae5">devoks</text>
+  <text x="395" y="260"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#0d9488">code</text>
+
+  <!-- devoks-git (upper-right, x=802, cy=112) -->
+  <rect x="802" y="86" width="142" height="52" rx="13"
+    fill="#071510" stroke="#34d399" stroke-width="1.5"/>
+  <circle cx="838" cy="112" r="16" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+  <!-- git branch icon -->
+  <circle cx="833" cy="107" r="3.5" fill="#6ee7b7"/>
+  <circle cx="843" cy="117" r="3.5" fill="#6ee7b7"/>
+  <path d="M833 110.5V117C833 117 836 120.5 843 120.5"
+    stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <text x="861" y="107"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#d1fae5">devoks</text>
+  <text x="861" y="124"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#34d399">git</text>
+
+  <!-- devoks-browser (lower-right, x=802, cy=248) -->
+  <rect x="802" y="222" width="142" height="52" rx="13"
+    fill="#071510" stroke="#059669" stroke-width="1.5"/>
+  <circle cx="838" cy="248" r="16" fill="#064e3b" stroke="#059669" stroke-width="1.5"/>
+  <!-- eye icon -->
+  <path d="M829 248C833 242.5 843 242.5 847 248C843 253.5 833 253.5 829 248Z"
+    stroke="#6ee7b7" stroke-width="2.2" fill="none"/>
+  <circle cx="838" cy="248" r="3.5" fill="#6ee7b7"/>
+  <text x="861" y="243"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#d1fae5">devoks</text>
+  <text x="861" y="260"
+    font-family="Inter, -apple-system, system-ui, sans-serif"
+    font-size="12.5" font-weight="700" fill="#059669">browser</text>
+
+  <!-- ─── TITLE ─── -->
+  <text x="640" y="330" text-anchor="middle"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="46" font-weight="800" letter-spacing="-0.5"
+    fill="url(#titleGrad)">DevOks Team Harness</text>
+
+  <!-- ─── SUBTITLE ─── -->
+  <text x="640" y="360" text-anchor="middle"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="15.5" font-weight="400" letter-spacing="0.2"
+    fill="#6ee7b7">Claude Code 플러그인 모음 — 코드리뷰 · 기능개발 · Git 워크플로우 · 브라우저 검증</text>
+
+  <!-- ─── TAG PILLS ─── -->
+  <rect x="490" y="377" width="74" height="22" rx="11"
+    fill="#071510" stroke="#10b981" stroke-width="0.8"/>
+  <text x="527" y="392" text-anchor="middle"
+    font-family="monospace" font-size="10.5" fill="#34d399">#review</text>
+
+  <rect x="574" y="377" width="60" height="22" rx="11"
+    fill="#071510" stroke="#10b981" stroke-width="0.8"/>
+  <text x="604" y="392" text-anchor="middle"
+    font-family="monospace" font-size="10.5" fill="#34d399">#git</text>
+
+  <rect x="644" y="377" width="92" height="22" rx="11"
+    fill="#071510" stroke="#10b981" stroke-width="0.8"/>
+  <text x="690" y="392" text-anchor="middle"
+    font-family="monospace" font-size="10.5" fill="#34d399">#workflow</text>
+
+  <rect x="746" y="377" width="56" height="22" rx="11"
+    fill="#071510" stroke="#10b981" stroke-width="0.8"/>
+  <text x="774" y="392" text-anchor="middle"
+    font-family="monospace" font-size="10.5" fill="#34d399">#MCP</text>
+
+  <!-- Bottom accent bar -->
+  <rect x="0" y="416.5" width="1280" height="3.5" fill="url(#emerald)" rx="2" opacity="0.45"/>
+</svg>

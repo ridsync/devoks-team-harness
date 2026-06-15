@@ -1,0 +1,7 @@
+{
+  "name": "devoks-core",
+  "version": "1.0.0",
+  "description": "DevOks 기본 원칙 컨텍스트 — Agent Principles, Project Convention, Memory Policy를 스킬로 로드",
+  "author": { "name": "ridsync" },
+  "dependencies": []
+}
