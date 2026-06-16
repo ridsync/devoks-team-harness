@@ -1,6 +1,5 @@
 ---
-name: frd-author
-description: 거친 기능 아이디어나 FRD 초안을 받아, EARS Acceptance Criteria·Contract(파라미터/상태전이)·Resource 체크리스트·Edge Case·Testing Strategy를 갖춘 정련된 FRD.md로 완성한다. "FRD 초안 정리해줘", "기능 요구서 다듬기", "요구사항을 EARS로 정형화", "AC/Contract 정리", "스펙 문서 작성" 같은 요청에서 사용한다. FRD→PLAN→실행 전체를 한 번에 돌리려면 devoks-feature:feature-workflow-runner, 작성 후 작업 분해는 devoks-feature:plan-author 를 쓴다.
+description: 거친 기능 아이디어나 FRD 초안을 받아, EARS Acceptance Criteria·Contract(파라미터/상태전이)·Resource 체크리스트·Edge Case·Testing Strategy를 갖춘 정련된 FRD.md로 완성한다. "FRD 초안 정리해줘", "기능 요구서 다듬기", "요구사항을 EARS로 정형화", "AC/Contract 정리", "스펙 문서 작성" 같은 요청에서 사용한다. FRD→PLAN→실행 전체를 한 번에 돌리려면 devoks-feature:feature-workflow-runner, 작성 후 작업 분해는 devoks-feature:feature-plan-author 를 쓴다.
 metadata:
   author: ridsync
   version: 1.0.0
@@ -8,13 +7,13 @@ metadata:
 
 # frd-author — FRD 정련 (Phase 1)
 
-거친 초안을 검증 가능한 FRD로 만든다. `devoks:feature-workflow-runner` 의 **Phase 1만** 단독 실행하는 얇은 스킬이다.
+거친 초안을 검증 가능한 FRD로 만든다. `devoks-feature:feature-workflow-runner` 의 **Phase 1만** 단독 실행하는 얇은 스킬이다.
 공유 자산/레퍼런스는 통합 스킬 디렉터리를 그대로 참조한다(중복 정의 금지, SSOT).
 
 ## 호출 방법
 
 ```
-/devoks:frd-author [frd=<초안 경로 또는 본문>] [out=<산출물 디렉터리>]
+/devoks-feature:feature-frd-author [frd=<초안 경로 또는 본문>] [out=<산출물 디렉터리>]
 ```
 
 - `out` 기본값 = `.claude/workspace/{feature-name}-{date}/`. 산출물 = `<out>/FRD.md`. → `../devoks-feature-workflow-runner/references/output-location.md`

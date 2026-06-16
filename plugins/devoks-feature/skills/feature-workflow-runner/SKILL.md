@@ -1,6 +1,5 @@
 ---
-name: feature-workflow-runner
-description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-feature:frd-author / devoks-feature:plan-author / devoks-feature:plan-executor 를 쓴다.
+description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-feature:feature-frd-author / devoks-feature:feature-plan-author / devoks-feature:feature-plan-executor 를 쓴다.
 metadata:
   author: ridsync
   version: 1.0.0
@@ -22,7 +21,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 ## 호출 방법
 
 ```
-/devoks:feature-workflow-runner [frd=<FRD 초안 경로 또는 본문>] [out=<산출물 디렉터리>]
+/devoks-feature:feature-workflow-runner [frd=<FRD 초안 경로 또는 본문>] [out=<산출물 디렉터리>]
 ```
 
 - `frd` 없으면 현재 대화에서 초안을 받는다.
@@ -88,7 +87,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 1. PLAN을 읽어 미완 Task와 의존성 그래프를 파악, 세션 Task/Todo 목록을 PLAN에 맞춰 구성한다.
 2. **선행이 모두 `[x]`인 Task**를 골라 착수(세션 도구 in_progress). `[P]` Task는 함께 진행 가능.
-3. **작업 브랜치 준비(최초 1회)** — 첫 구현 착수 직전, `main`이면 의미론적 이름(`타입/슬러그`, Conventional Commits — `devoks:git-commit-msg` 규칙)의 작업 브랜치생성·체크아웃한다. `main`이 아니면 진행 여부를 한 줄로 확인. 브랜치 생성·체크아웃까지만(커밋·푸시·PR 제외).
+3. **작업 브랜치 준비(최초 1회)** — 첫 구현 착수 직전, `main`이면 의미론적 이름(`타입/슬러그`, Conventional Commits — `devoks-git:git-commit-msg` 규칙)의 작업 브랜치생성·체크아웃한다. `main`이 아니면 진행 여부를 한 줄로 확인. 브랜치 생성·체크아웃까지만(커밋·푸시·PR 제외).
 4. 각 Task: 관련 코드 읽기 → 기존 패턴 재사용해 구현 → **관련 테스트/린트 실행**으로 검증.
    - 로직 Task는 테스트를 동반한다(AC ID를 테스트 설명에 박아 양방향 추적).
 5. **검증 통과 후에만** PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `in-progress`로(첫 착수 시).
@@ -108,7 +107,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 - 이미 정련된 FRD가 있으면 Phase 1을 건너뛰고 Phase 2부터.
 - 이미 PLAN이 있으면 Phase 3(실행)부터 — PLAN 체크박스 상태로 재개 지점을 정한다.
-- 단계만 따로 돌리려면 분리 스킬: `devoks:frd-author`(1) / `devoks:plan-author`(2) / `devoks:plan-executor`(3).
+- 단계만 따로 돌리려면 분리 스킬: `devoks-feature:feature-frd-author`(1) / `devoks-feature:feature-plan-author`(2) / `devoks-feature:feature-plan-executor`(3).
 
 ## 프로젝트 규칙 정합
 

@@ -40,7 +40,7 @@ gh api user --jq '.login'
 
 ## 2. Figma MCP
 
-`devoks-new-ui-draft`, `devoks-feature-workflow-runner`, `devoks-visual-diff-verification` 에 필요합니다.
+`devoks-feature:new-ui-draft`, `devoks-feature:feature-workflow-runner`, `devoks-browser:browser-visual-diff` 에 필요합니다.
 
 ### 설치
 
@@ -70,7 +70,7 @@ Figma 계정 연결은 최초 도구 호출 시 브라우저 OAuth 플로우로 
 
 ## 3. Chrome DevTools MCP
 
-`devoks-chrome-devtools-mcp-attach` 스킬과 `devoks-data-verification` (browser 환경)에 필요합니다.
+`devoks-browser:browser-devtools` 스킬과 `devoks-feature:data-verification` (browser 환경)에 필요합니다.
 
 ### 3-1. 플러그인 설치 (스킬 파일 로딩)
 
@@ -122,7 +122,7 @@ mcp__chrome-devtools-attach__*
 
 ## 4. Playwright MCP
 
-`devoks-visual-diff-verification`의 라이브 렌더 캡처 기본 도구입니다.
+`devoks-browser:browser-visual-diff`의 라이브 렌더 캡처 기본 도구입니다.
 
 ### 설치
 

@@ -108,13 +108,21 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 
 | Skill | Invoke | Plugin |
 |-------|--------|--------|
-| `devoks-frd-author` | `/devoks-frd-author` | devoks-feature |
-| `devoks-plan-author` | `/devoks-plan-author` | devoks-feature |
-| `devoks-plan-executor` | `/devoks-plan-executor` | devoks-feature |
-| `devoks-feature-workflow-runner` | `/devoks-feature-workflow-runner` | devoks-feature |
-| `devoks-data-verification` | `/devoks-data-verification` | devoks-feature |
-| `devoks-chrome-devtools-mcp-attach` | `/devoks-chrome-devtools-mcp-attach` | devoks-browser |
-| `devoks-visual-diff-verification` | `/devoks-visual-diff-verification` | devoks-browser |
+| `frd-author` | `/devoks-feature:frd-author` | devoks-feature |
+| `plan-author` | `/devoks-feature:plan-author` | devoks-feature |
+| `plan-executor` | `/devoks-feature:plan-executor` | devoks-feature |
+| `feature-workflow-runner` | `/devoks-feature:feature-workflow-runner` | devoks-feature |
+| `data-verification` | `/devoks-feature:data-verification` | devoks-feature |
+| `code-review` | `/devoks-code:code-review` *(agent-internal only)* | devoks-code |
+| `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
+| `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
+
+## Available Agents
+
+| Agent | Plugin | Delegated by |
+|-------|--------|--------------|
+| `code-reviewer` | devoks-code | `code-review-general`, `code-review-diff-branch` commands |
+| `browser-visual-diff-capture` | devoks-browser | `browser-visual-diff` skill (Phase 1–4) |
 
 ---
 
@@ -124,27 +132,27 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 
 | Command | Description |
 |---------|-------------|
-| `/devoks-git-commit-msg` | Generate Conventional Commits message |
-| `/devoks-git-create-issue` | Create a GitHub issue |
-| `/devoks-git-pull-request` | Create a PR (CODEOWNERS-based reviewer assignment) |
+| `/devoks-git:git-commit-msg` | Generate Conventional Commits message |
+| `/devoks-git:git-create-issue` | Create a GitHub issue |
+| `/devoks-git:git-pull-request` | Create a PR (CODEOWNERS-based reviewer assignment) |
 
 ### devoks-feature
 
 | Command | Description |
 |---------|-------------|
-| `/devoks-new-feature-draft` | Spec-driven feature implementation |
-| `/devoks-new-feature-github-issue` | GitHub issue-driven feature implementation |
-| `/devoks-new-feature-verify` | Pre/post implementation checklist + coverage verification |
-| `/devoks-new-ui-draft` | Figma → code UI implementation |
+| `/devoks-feature:new-feature-draft` | Spec-driven feature implementation |
+| `/devoks-feature:new-feature-github-issue` | GitHub issue-driven feature implementation |
+| `/devoks-feature:new-feature-verify` | Pre/post implementation checklist + coverage verification |
+| `/devoks-feature:new-ui-draft` | Figma → code UI implementation |
 
 ### devoks-code
 
 | Command | Description |
 |---------|-------------|
-| `/devoks-code-review-general` | Scoped code review |
-| `/devoks-code-review-diff-branch` | Branch diff code review |
-| `/devoks-code-refactoring` | Structure, contract, and quality refactoring |
-| `/devoks-code-analyze-module` | Module / business logic analysis |
+| `/devoks-code:code-review-general` | Scoped code review |
+| `/devoks-code:code-review-diff-branch` | Branch diff code review |
+| `/devoks-code:code-refactoring` | Structure, contract, and quality refactoring |
+| `/devoks-code:code-analyze-module` | Module / business logic analysis |
 
 ---
 
@@ -174,8 +182,8 @@ devoks-team-harness/
 │   │   └── refs/                      # SSOT: code-review, engineering-principles, git-convention, workflow
 │   ├── devoks-git/commands/           # Git commands (3)
 │   ├── devoks-feature/                # feature dev (4 commands + 5 skills)
-│   ├── devoks-code/commands/          # code quality (4)
-│   └── devoks-browser/skills/         # browser tools (2)
+│   ├── devoks-code/                   # code quality (4 commands + 1 skill + 1 agent)
+│   └── devoks-browser/               # browser tools (2 skills + 1 agent)
 ├── shared/
 │   ├── setup/claude.json.template     # ~/.claude.json MCP config template
 │   └── templates/CLAUDE.md.project.template

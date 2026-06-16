@@ -1,5 +1,4 @@
 ---
-name: chrome-devtools-mcp-attach
 description: "이미 실행 중인 Chrome 브라우저(--remote-debugging-port=9269)에 Chrome DevTools MCP로 즉시 연결해 개발 및 디버깅을 수행한다. 브라우저 콘솔 확인, JS 평가, 네트워크 요청 검사, 스크린샷, 페이지 상태 분석 등이 필요할 때 반드시 이 스킬을 사용한다. 키워드: 콘솔 에러, console error, 브라우저 디버깅, 화면 확인, 스크린샷, 네트워크 요청, evaluate, DOM 검사, 라이브 앱 확인, live app, localhost 확인."
 ---
 

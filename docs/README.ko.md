@@ -109,13 +109,21 @@ cd /path/to/your-project
 
 | 스킬 | 호출 | 플러그인 |
 |------|------|---------|
-| `devoks-frd-author` | `/devoks-frd-author` | devoks-feature |
-| `devoks-plan-author` | `/devoks-plan-author` | devoks-feature |
-| `devoks-plan-executor` | `/devoks-plan-executor` | devoks-feature |
-| `devoks-feature-workflow-runner` | `/devoks-feature-workflow-runner` | devoks-feature |
-| `devoks-data-verification` | `/devoks-data-verification` | devoks-feature |
-| `devoks-chrome-devtools-mcp-attach` | `/devoks-chrome-devtools-mcp-attach` | devoks-browser |
-| `devoks-visual-diff-verification` | `/devoks-visual-diff-verification` | devoks-browser |
+| `frd-author` | `/devoks-feature:frd-author` | devoks-feature |
+| `plan-author` | `/devoks-feature:plan-author` | devoks-feature |
+| `plan-executor` | `/devoks-feature:plan-executor` | devoks-feature |
+| `feature-workflow-runner` | `/devoks-feature:feature-workflow-runner` | devoks-feature |
+| `data-verification` | `/devoks-feature:data-verification` | devoks-feature |
+| `code-review` | `/devoks-code:code-review` *(에이전트 내부 전용)* | devoks-code |
+| `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
+| `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
+
+## 사용 가능한 에이전트
+
+| 에이전트 | 플러그인 | 위임 주체 |
+|---------|---------|---------|
+| `code-reviewer` | devoks-code | `code-review-general`, `code-review-diff-branch` 커맨드 |
+| `browser-visual-diff-capture` | devoks-browser | `browser-visual-diff` 스킬 (Phase 1~4) |
 
 ---
 
@@ -125,27 +133,27 @@ cd /path/to/your-project
 
 | 커맨드 | 설명 |
 |--------|------|
-| `/devoks-git-commit-msg` | Conventional Commits 커밋 메시지 생성 |
-| `/devoks-git-create-issue` | GitHub 이슈 생성 |
-| `/devoks-git-pull-request` | PR 생성 (CODEOWNERS 기반 리뷰어 할당) |
+| `/devoks-git:git-commit-msg` | Conventional Commits 커밋 메시지 생성 |
+| `/devoks-git:git-create-issue` | GitHub 이슈 생성 |
+| `/devoks-git:git-pull-request` | PR 생성 (CODEOWNERS 기반 리뷰어 할당) |
 
 ### devoks-feature
 
 | 커맨드 | 설명 |
 |--------|------|
-| `/devoks-new-feature-draft` | 스펙 기반 기능 구현 |
-| `/devoks-new-feature-github-issue` | GitHub 이슈 기반 기능 구현 |
-| `/devoks-new-feature-verify` | 구현 전후 체크리스트 + 커버리지 검증 |
-| `/devoks-new-ui-draft` | Figma → 코드 UI 구현 |
+| `/devoks-feature:new-feature-draft` | 스펙 기반 기능 구현 |
+| `/devoks-feature:new-feature-github-issue` | GitHub 이슈 기반 기능 구현 |
+| `/devoks-feature:new-feature-verify` | 구현 전후 체크리스트 + 커버리지 검증 |
+| `/devoks-feature:new-ui-draft` | Figma → 코드 UI 구현 |
 
 ### devoks-code
 
 | 커맨드 | 설명 |
 |--------|------|
-| `/devoks-code-review-general` | 범위 지정 코드리뷰 |
-| `/devoks-code-review-diff-branch` | 브랜치 diff 기반 코드리뷰 |
-| `/devoks-code-refactoring` | 구조·계약·품질 리팩토링 |
-| `/devoks-code-analyze-module` | 모듈/비즈니스 로직 분석 |
+| `/devoks-code:code-review-general` | 범위 지정 코드리뷰 |
+| `/devoks-code:code-review-diff-branch` | 브랜치 diff 기반 코드리뷰 |
+| `/devoks-code:code-refactoring` | 구조·계약·품질 리팩토링 |
+| `/devoks-code:code-analyze-module` | 모듈/비즈니스 로직 분석 |
 
 ---
 
@@ -175,8 +183,8 @@ devoks-team-harness/
 │   │   └── refs/                      # SSOT: code-review, engineering-principles, git-convention, workflow
 │   ├── devoks-git/commands/           # Git 커맨드 (3개)
 │   ├── devoks-feature/                # 기능개발 (커맨드 4개 + 스킬 5개)
-│   ├── devoks-code/commands/          # 코드 품질 (4개)
-│   └── devoks-browser/skills/         # 브라우저 도구 (2개)
+│   ├── devoks-code/                   # 코드 품질 (커맨드 4개 + 스킬 1개 + 에이전트 1개)
+│   └── devoks-browser/               # 브라우저 도구 (스킬 2개 + 에이전트 1개)
 ├── shared/
 │   ├── setup/claude.json.template     # ~/.claude.json MCP 설정 템플릿
 │   └── templates/CLAUDE.md.project.template

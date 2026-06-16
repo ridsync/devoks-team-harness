@@ -10,8 +10,8 @@ description: 요구사항을 체크리스트로 구조화하고 구현 충실도
 
 | 모드 | 호출 | 시점 | 목적 |
 |------|------|------|------|
-| **체크리스트 생성** | `/devoks-new-feature-verify --checklist` | 구현 시작 전 | 요구사항 추출 → 구현 목표 체크리스트 생성 |
-| **구현 검증** (기본) | `/devoks-new-feature-verify` | 구현 완료 후 | 체크리스트 + diff traceability → 커버리지 갭 보고 |
+| **체크리스트 생성** | `/devoks-feature:new-feature-verify --checklist` | 구현 시작 전 | 요구사항 추출 → 구현 목표 체크리스트 생성 |
+| **구현 검증** (기본) | `/devoks-feature:new-feature-verify` | 구현 완료 후 | 체크리스트 + diff traceability → 커버리지 갭 보고 |
 
 `$ARGUMENTS` 로 요구사항 문서 경로를 직접 지정할 수 있다. 미지정 시 자동 탐색한다.
 
@@ -171,7 +171,7 @@ S4에서 추출한 각 요구사항 항목에 대해:
 
 ## 🚀 다음 단계
 - 위 체크리스트를 기준으로 구현을 진행한다.
-- 구현 완료 후 `/devoks-new-feature-verify` (구현 검증 모드)로 커버리지를 확인한다.
+- 구현 완료 후 `/devoks-feature:new-feature-verify` (구현 검증 모드)로 커버리지를 확인한다.
 ```
 
 ---
@@ -271,9 +271,9 @@ S4에서 추출한 각 요구사항 항목에 대해:
 ## 참고
 
 - **권장 워크플로우**:
-  1. 구현 전 → `/devoks-new-feature-verify --checklist` — 구현 목표 체크리스트 확보
-  2. 구현 후 → `/devoks-new-feature-verify` — 커버리지 갭 검증
-  3. 코드 품질 → `/devoks-code-review-diff-branch` — 별개로 병행 실행
+  1. 구현 전 → `/devoks-feature:new-feature-verify --checklist` — 구현 목표 체크리스트 확보
+  2. 구현 후 → `/devoks-feature:new-feature-verify` — 커버리지 갭 검증
+  3. 코드 품질 → `/devoks-code:code-review-diff-branch` — 별개로 병행 실행
 - **체크리스트 저장 위치**: `.claude/workspace/checklists/<feature-name>.md` — 브랜치명 그대로 파일명 사용
 - **요구사항 문서 기본 위치**: `doc/workspace/` (PRD, 워크플로우), `.claude/plans/` (구현 플랜)
 - **프로젝트 원칙**: `.claude/refs/engineering-principles.md`, `.claude/rules/agent-principles.md`

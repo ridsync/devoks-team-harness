@@ -27,7 +27,7 @@
 
 `final.snapshot` 외에, 저장소 실제 값을 `evaluate_script` 로 앱 API/`localStorage` 에서 직접 읽어 교차 확인할 수 있다.
 
-> 이 프로젝트(Aware)의 Chrome 디버그 연결 규칙은 메모리 `project_chrome_debug_skill` 와 스킬 `devoks-chrome-devtools-mcp-attach` 참조(포트·도구 prefix 규칙).
+> 이 프로젝트(Aware)의 Chrome 디버그 연결 규칙은 메모리 `project_chrome_debug_skill` 와 스킬 `devoks-browser:browser-devtools` 참조(포트·도구 prefix 규칙).
 
 ## server (백엔드/Node/API 서버)
 
