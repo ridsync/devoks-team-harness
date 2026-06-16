@@ -1,6 +1,5 @@
 ---
-name: plan-author
-description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)로 만든다. 요구사항을 단일·검증가능·증분 Task로 쪼개고, TASK-ID·`[P]` 병렬 마커·`file:`·`traces:`를 부여하며, PR 단위로 그룹핑하고 의존성 그래프와 Definition of Done을 작성한다. 모든 REQ/AC/CTR/EDGE가 traces로 커버되는지(누락 0) 검증한다. "FRD를 작업으로 분해해줘", "PLAN 짜줘", "태스크/PR 나눠줘", "스펙→태스크 분해", "작업 계획 세워줘" 같은 요청에서 사용한다. 분해 후 실행은 devoks-feature:plan-executor, 전체 흐름은 devoks-feature:feature-workflow-runner.
+description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)로 만든다. 요구사항을 단일·검증가능·증분 Task로 쪼개고, TASK-ID·`[P]` 병렬 마커·`file:`·`traces:`를 부여하며, PR 단위로 그룹핑하고 의존성 그래프와 Definition of Done을 작성한다. 모든 REQ/AC/CTR/EDGE가 traces로 커버되는지(누락 0) 검증한다. "FRD를 작업으로 분해해줘", "PLAN 짜줘", "태스크/PR 나눠줘", "스펙→태스크 분해", "작업 계획 세워줘" 같은 요청에서 사용한다. 분해 후 실행은 devoks-feature:feature-plan-executor, 전체 흐름은 devoks-feature:feature-workflow-runner.
 metadata:
   author: ridsync
   version: 1.0.0
@@ -8,13 +7,13 @@ metadata:
 
 # plan-author — PLAN 작성 (Phase 2)
 
-FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다. `devoks:feature-workflow-runner` 의 **Phase 2만** 단독 실행한다.
+FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다. `devoks-feature:feature-workflow-runner` 의 **Phase 2만** 단독 실행한다.
 공유 자산/레퍼런스는 통합 스킬 디렉터리를 참조한다(SSOT).
 
 ## 호출 방법
 
 ```
-/devoks:plan-author [frd=<FRD.md 경로>] [out=<산출물 디렉터리>]
+/devoks-feature:feature-plan-author [frd=<FRD.md 경로>] [out=<산출물 디렉터리>]
 ```
 
 - `out` 기본값 = FRD.md가 있는 워크스페이스(`.claude/workspace/{feature-name}-{date}/`). 산출물 = `<out>/PLAN.md`. → `../devoks-feature-workflow-runner/references/output-location.md`

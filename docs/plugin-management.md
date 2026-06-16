@@ -228,8 +228,8 @@ claude plugin validate ./plugins/<plugin> --strict
 # 2. plugin.json 버전 bump (patch/minor/major)
 #    예: "1.0.0" → "1.0.1"
 
-# 3. 커밋 (devoks-git-commit-msg 커맨드 활용)
-/devoks-git-commit-msg
+# 3. 커밋 (devoks-git:git-commit-msg 커맨드 활용)
+/devoks-git:git-commit-msg
 
 # 4. GitHub push
 git push origin main

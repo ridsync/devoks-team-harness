@@ -1,5 +1,4 @@
 ---
-name: code-review
 description: code-reviewer 에이전트가 호출하는 코드리뷰 실행 엔진. mode(general|diff-branch)와 scope를 입력받아 코드 수집 → 자동화 선행검증 → C.L.E.A.R./Layered/Checklist/심각도 분류 리뷰 → 포맷된 리포트 생성까지 수행한다. 메인 루프에서 직접 실행하지 않고 code-reviewer 에이전트를 통해서만 사용한다.
 metadata:
   author: ridsync
