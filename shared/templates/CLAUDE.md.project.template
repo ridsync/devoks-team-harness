@@ -6,11 +6,23 @@
 
 ## Overview
 
-**[앱 이름]** — [한 줄 설명]
+**[앱 이름]** — [한 줄 설명: 무엇을, 누구를 위해, 어떤 환경에서 동작하는지].
+
+주요 기능: [기능 1], [기능 2], [기능 3]. [Framework / 런타임 버전] 기반으로 개발되었습니다.
 
 ## Role & Expertise
 
-[에이전트의 역할과 전문 영역을 여기에 기술하세요]
+[에이전트 역할 정의 — 어떤 계층·도메인에서 작업하는 시니어 엔지니어인지. 예: "하드웨어 경계에서 작업하는 시니어 풀스택 엔지니어 — React/Capacitor 프론트엔드, STM32 UDP 통신, AWS IoT Shadow, PouchDB/SQLite 코드베이스 전반"]
+
+---
+
+## Domain Glossary
+
+| 용어 | 의미 |
+|------|------|
+| [Term1] | [설명] |
+| [Term2] | [설명] |
+| [Term3] | [설명] |
 
 ---
 
@@ -18,36 +30,115 @@
 
 | 영역 | 기술 |
 |------|------|
-| Framework | [예: React 19, Vite 6] |
-| Language | [예: TypeScript] |
-| UI | [예: Ant Design, MUI] |
-| State | [예: Zustand, Context API] |
+| Framework | [예: React 19, Vite 6, Capacitor 7] |
+| Language | [예: JavaScript (JSX) / TypeScript] |
+| UI | [예: Ant Design 6, Ionic React 8] |
+| Styling | [예: Ant Design token + inline style objects] |
+| State | [예: React Context API (Provider chain)] |
+| Routing | [예: React Router 7] |
+| HTTP | [예: Custom ApiController (Fetch API)] |
+| Realtime | [예: MQTT, WebSocket] |
+| Local DB | [예: PouchDB, SQLite] |
+| i18n | [예: i18next + react-i18next] |
+| Test | [예: Vitest, @testing-library/react, happy-dom] |
+| Lint | [예: ESLint 9 (flat config) + Prettier] |
+
+---
+
+## Architecture
+
+### [핵심 의존관계 — 예: Provider 체인]
+
+`[진입점 파일]` 가 SSOT — **[의존관계 순서 변경은 해당 파일에서만]** 한다.
+
+| 모듈 | 필요한 것 | 제공하는 것 |
+|------|----------|------------|
+| `[Module1]` | — | [제공 컨텍스트] |
+| `[Module2]` | [Module1] | [제공 컨텍스트] |
+| `[Module3]` | [Module2] | [제공 컨텍스트] |
+
+### 데이터 저장소 결정
+
+```
+저장할 데이터가 무엇인가?
+├─ [데이터 유형 1]  →  [저장소] ([SSOT 파일])
+├─ [데이터 유형 2]  →  [저장소]
+└─ [데이터 유형 3]  →  [저장소]
+```
 
 ---
 
 ## Directory Structure
 
-`src/` 기준:
+`[루트 기준 경로]/` 기준:
 
 ```
 src/
-├─ [디렉토리 구조를 여기에 기술]
+├─ [dir1]/     # [역할 설명]
+├─ [dir2]/     # [역할 설명]
+│   └─ [sub]/  # [역할 설명]
+├─ [dir3]/     # [역할 설명]
+└─ [dir4]/     # [역할 설명]
 ```
+
+### Quick Navigation
+
+| 작업 | 진입점 | 경로 |
+|------|--------|------|
+| [작업 1] | `[파일명]` | `[경로]` |
+| [작업 2] | `[파일명]` | `[경로]` |
+| [작업 3 — SSOT] | SSOT | `[경로]` |
 
 ---
 
 ## Commands
 
+모든 명령어는 `[실행 디렉터리]` 에서 실행.
+
 ```bash
 # 개발
-npm run dev          # [포트]
+npm run dev        # [포트] — [설명]
 
 # 빌드
-npm run build
+npm run build      # [설명]
+
+# 린트 / 포맷
+npm run lint
+npm run lint:fix
+npm run format
 
 # 테스트
-npm run test
+npm run test:run   # 1회 실행
+npm run test       # watch 모드
 ```
+
+---
+
+## Code Exploration & Edit Tooling
+
+도구는 의도에 맞춰 판단해 선택한다. 아래는 강제 매핑이 아니라 **우선 고려 기준**이다.
+
+- **구조 파악·탐색** (심볼 검색, 호출관계, 참조 추적, 영향범위, 파일구조)
+  → 사전 인덱싱 그래프(**CodeGraph**)를 우선 고려. 반환 소스는 이미 읽은 것으로 취급, grep 재검증 지양.
+- **심볼 단위 정밀 읽기·편집** (단건 body 치환/삽입, rename)
+  → **Serena**를 우선 고려 (LSP가 편집 경계에 정확).
+- **구조 패턴 일괄 검색 + 대량 리라이트(코드모드)** (동일 AST 패턴 N건 치환, deprecated prop 제거 등)
+  → **ast-grep**를 우선 고려 (`ast-grep run -p '<pattern>' -r '<rewrite>'`). 단건은 Serena, 동일 패턴 다건은 ast-grep.
+- **명령 출력·로그·대용량 파일/문서, 검증** (lint/test/build)
+  → **context-mode**를 우선 고려 (raw 바이트를 컨텍스트에 안 올림).
+- 정확한 파일 경로가 이미 있고 단순 확인이면 내장 Read/Bash로 충분하면 그대로 쓴다. **과잉 라우팅 금지.**
+- 도구 실패·과도한 지연 시 자유롭게 fallback한다. 각 도구 설명과 충돌하면 도구 설명을 따른다.
+
+---
+
+## UI Guidelines
+
+**SSOT:** `[DESIGN.md 또는 스타일 가이드 경로]` 가 이 프로젝트 UI의 **코드 구현 계약** (원칙, 토큰·레이어 SSOT, 터치, 컴포넌트 규칙, Known Gaps 등)이다. 절차·품질 기준·상세 스펙은 해당 문서에만 두고, 여기서는 중복하지 않는다.
+
+- 컴포넌트 구현·스타일 수정·디자인 반영 등 **모든 UI 작업**은 코드 작성 **전에** 해당 가이드를 읽고, 구현·리뷰는 그 문서를 따른다.
+- 문서에 없는 브랜드/계층/패턴 확정이나 예외가 필요하면 디자인 시스템 오너와 협의한다.
+
+> [DESIGN.md가 없는 프로젝트는 이 섹션을 삭제하거나 실제 가이드 경로로 교체하세요]
 
 ---
 
@@ -57,6 +148,8 @@ npm run test
 .env*
 *.pem
 *.key
+*.keystore / *.jks
+[프로젝트별 민감 파일 추가]
 ```
 
 ---
@@ -64,3 +157,5 @@ npm run test
 ## Reference Docs
 
 - `README.md` — 프로젝트 전체 안내
+- `[doc/architecture/PROJECT_GUIDE.md]` — 아키텍처 및 모듈 상세
+- `[DESIGN.md]` — 디자인 시스템 (코드 구현 SSOT)

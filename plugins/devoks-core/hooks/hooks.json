@@ -1,0 +1,17 @@
+{
+  "description": "DevOks 기본 원칙·참조 문서를 프로젝트 .claude/rules·.claude/refs 로 동기화 (네이티브 자동 로딩 활성화)",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/sync-context.sh",
+            "args": []
+          }
+        ]
+      }
+    ]
+  }
+}
