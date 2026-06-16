@@ -1,6 +1,6 @@
 ---
 name: visual-diff-verification
-description: Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올린다. Figma MCP 로 노드 캡처 → Chrome DevTools MCP(폴백 Playwright) 로 라이브 캡처 → multimodal 시각 diff → 프로젝트 디자인 가이드 정합성 검증 → 토큰/레이아웃 상수 미세 조정 → 임시 패치 회수 → 프로젝트 검증 명령 실행. Figma 비교 / 시각 diff / 픽셀 퍼펙트 / UI 충실도 / Figma vs 실제 렌더 키워드에서 호출.
+description: Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올린다. Phase 0(슬롯 합의·Chrome 연결 확인) → Phase 1~4를 visual-diff-capture 에이전트에 위임(캡처·시각diff·디자인가이드 정합성 검증 결과를 충실도 리포트로 수령) → Phase 5(미세조정) → Phase 6(회수+검증). Figma 비교 / 시각 diff / 픽셀 퍼펙트 / UI 충실도 / Figma vs 실제 렌더 키워드에서 호출.
 metadata:
   author: ridsync
   version: 1.0.0
@@ -8,11 +8,14 @@ metadata:
 
 # visual-diff-verification
 
-Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올리는 6 Phase 워크플로우.
+Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올리는 워크플로우.
+
+**Phase 1~4의 실제 실행 주체는 `visual-diff-capture` 에이전트이다.**  
+스크린샷·멀티모달 바이트는 에이전트 컨텍스트에 격리되고, 메인 루프에는 **충실도 리포트만** 리턴된다.
 
 ## 필요 MCP
 
-이 Skill 을 실행하려면 다음 MCP 가 활성화되어 있어야 한다.
+Phase 1~4는 `visual-diff-capture` 에이전트가 수행하며, 에이전트가 아래 MCP를 로드한다.
 
 | MCP | 역할 | 필수 여부 |
 |-----|------|----------|
@@ -20,24 +23,14 @@ Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올리는
 | Chrome DevTools MCP (`mcp__plugin_chrome-devtools-mcp_chrome-devtools__*`) | 라이브 렌더 캡처 (**기본 도구**) | **필수** |
 | Playwright MCP (`mcp__playwright__*`) | 라이브 렌더 캡처 (폴백 도구) | Chrome DevTools MCP 불가 시 사용 |
 
-### ToolSearch 로드 순서 (규칙)
+### ToolSearch 로드 순서 (에이전트 내부 규칙)
 
-> ⚠️ **캡처 도구는 반드시 아래 순서대로 로드하고 시도한다. 순서를 건너뛰는 것은 규칙 위반이다.**
+> ⚠️ **캡처 도구는 반드시 아래 순서대로 로드하고 시도한다. 에이전트가 이 규칙을 준수한다.**
 
-1. **Chrome DevTools MCP 스키마를 먼저 로드한다:**
-   ```
-   ToolSearch("select:mcp__plugin_chrome-devtools-mcp_chrome-devtools__list_pages,mcp__plugin_chrome-devtools-mcp_chrome-devtools__navigate_page,mcp__plugin_chrome-devtools-mcp_chrome-devtools__wait_for,mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_screenshot")
-   ```
+1. **Chrome DevTools MCP 스키마를 먼저 로드한다.**
 2. **디버깅 가능한 Chrome 브라우저 연결 상태를 사전 확인한다** (`list_pages` 호출):
-   - 페이지 목록이 반환되면 → 연결 성공, 캡처 진행.
-   - 연결 실패(오류/빈 결과)이면 → **사용자에게 1줄로 요청**: `"Chrome 브라우저를 --remote-debugging-port=9222 옵션으로 실행해 주세요."`  진행은 사용자 확인 후 재시도.
-3. **Chrome DevTools MCP로 캡처를 수행한다.** 성공하면 Playwright MCP 로드 불필요.
-4. **Chrome DevTools MCP 호출이 실패(오류/타임아웃/tool not found)한 경우에만** Playwright MCP 스키마를 로드한다:
-   ```
-   ToolSearch("select:mcp__playwright__browser_navigate,mcp__playwright__browser_wait_for,mcp__playwright__browser_take_screenshot")
-   ```
-5. Playwright로 전환할 때는 **사용자에게 한 줄 이유를 명시**한다.
-   - 예: `"Chrome DevTools MCP 호출 실패(오류: xxx) → Playwright MCP로 폴백합니다."`
+   - 연결 실패 → 에이전트가 리포트에 "Chrome DevTools MCP 연결 실패" 기록 → 이 스킬(메인 루프)에서 사용자에게 1줄 요청: `"Chrome 브라우저를 --remote-debugging-port=9222 옵션으로 실행해 주세요."` 후 재시도.
+3. **Chrome DevTools MCP 호출이 실패한 경우에만** Playwright MCP로 폴백.
 
 ## 호출 방법
 
@@ -77,9 +70,9 @@ Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올리는
 - **Token first** — 임의 hex/rgba 가 아닌 프로젝트 토큰 SSOT(`<TokenSSOT>`) / z-index SSOT(`<ZIndexSSOT>`) 를 우선 참조.
 - **Touch target** — `<DesignGuide>` 에 명시된 minimum touch size 를 따른다. 명시가 없으면 Android 48dp / iOS 44pt 권장(WCAG 2.5.5).
 - **Baseline viewport 기준 비교** — `<BaselineViewport>` 에서 비교. Figma frame 크기가 다르면 비례 스케일 변환 후 비교 (`references/figma-capture.md` §스케일 변환 참조).
-- **Dev server 직접 기동 금지** — Skill 은 이미 실행 중인 dev server 를 사용한다. URL/포트 불확실 시 1줄 확인 후 진행.
+- **Dev server 직접 기동 금지** — 이미 실행 중인 dev server 를 사용한다. URL/포트 불확실 시 1줄 확인 후 진행.
 - **신규 토큰 정의 금지** — 본 Skill 은 검증 + 미세 조정 전용. 신규 토큰 도입은 사용자 결정 사항(별도 PR).
-- **임시 패치는 반드시 회수** — Phase 6 에서 `git restore` 로 완전히 되돌린다.
+- **임시 패치는 반드시 회수** — 에이전트가 캡처 직후 `git restore` 로 회수한다. Phase 6 에서 잔존 여부 재확인.
 
 ---
 
@@ -94,69 +87,26 @@ Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올리는
 
 ---
 
-## Phase 1 — Figma reference 캡처
+## Phase 1~4 — 캡처·시각 diff·가이드 검증 (에이전트 위임)
 
-```
-mcp__plugin_figma_figma__get_screenshot(nodeId=<FigmaNodeId>, fileKey=<FigmaFileKey>)
-→ 저장: figma_<screen>.png  (상대 경로, workspace root)
-```
+> ⚠️ **실행 주체는 `visual-diff-capture` 에이전트이다.**  
+> 스크린샷·멀티모달 바이트는 에이전트 컨텍스트에 격리되고, 메인 루프에는 충실도 리포트만 리턴된다.
 
-- `mcp__plugin_figma_figma__get_metadata(nodeId, fileKey)` → 좌표/사이즈/색상/폰트 수집.
-- (옵션) `mcp__plugin_figma_figma__get_design_context(nodeId, fileKey)` → 코드 힌트.
-- 권한 오류 발생 시 사용자에게 1줄 확인 후 재시도.
-- 상세는 `references/figma-capture.md` 참조.
+Phase 0에서 확정된 슬롯 값으로 `visual-diff-capture` 에이전트를 호출한다:
 
----
+- **전달 슬롯**: `<FigmaFileKey>`, `<FigmaNodeId>`, `<DevServerURL>`, `<LiveRoute>`,
+  `<ComponentPath>`, `<DesignGuide>`, `<TokenSSOT>`, `<ZIndexSSOT>`, `<BaselineViewport>`
+- **에이전트 수행 내용**:
+  - Phase 1 — Figma reference 캡처 (`references/figma-capture.md` 참조)
+  - Phase 2 — 라이브 렌더 캡처 (`references/live-capture.md`, `references/state-patch-pattern.md` 참조)
+  - Phase 3 — Multimodal 시각 diff (`references/diff-checklist.md` 참조)
+  - Phase 4 — 프로젝트 디자인 가이드 정합성 검증 (`references/design-guide-mapping.md` 참조)
+- **리턴값**: 차이 목록·토큰/상수 후보·Phase 5 미세조정 대상을 담은 **충실도 리포트**
 
-## Phase 2 — 라이브 렌더 캡처
+에이전트가 리포트를 리턴하면 그대로 수령한다.
 
-> ⚠️ **이 Phase 진입 시 캡처 도구 로드 순서를 반드시 지킨다 → `필요 MCP § ToolSearch 로드 순서` 참조.**  
-> Playwright MCP를 Chrome DevTools MCP보다 먼저 로드하거나 기본 도구로 선택하는 것은 **규칙 위반**이다.
-
-1. `<DevServerURL>` 가용성 확인. 미확인 시 사용자에게 1줄 확인. **Skill 은 dev server 를 기동하지 않는다.**
-2. **Chrome 브라우저 연결 사전 확인** (`list_pages` 호출):
-   - 연결 실패 시 사용자에게 `"Chrome 브라우저를 --remote-debugging-port=9222 옵션으로 실행해 주세요."` 요청 → 확인 후 재시도.
-3. 특정 화면 진입이 필요하면 `references/state-patch-pattern.md` 의 임시 패치 적용.
-4. **기본 도구 (Chrome DevTools MCP)**:
-   ```
-   mcp__plugin_chrome-devtools-mcp_chrome-devtools__list_pages()
-   → select_page 또는 new_page
-   → navigate_page(url=<DevServerURL>/<LiveRoute>)
-   → wait_for(text=<화면 식별 텍스트>, timeout=5000)
-   → take_screenshot(filename=render_<screen>.png)
-   ```
-5. **폴백 (Playwright MCP)** — Chrome DevTools MCP 실패 시에만:
-   ```
-   mcp__playwright__browser_navigate(url=<DevServerURL>/<LiveRoute>)
-   mcp__playwright__browser_wait_for(text=<화면 식별 텍스트>, timeout=5000)
-   mcp__playwright__browser_take_screenshot(filename=render_<screen>.png)
-   ```
-6. 상세는 `references/live-capture.md` 참조.
-
----
-
-## Phase 3 — Multimodal 시각 diff
-
-1. `figma_<screen>.png` 와 `render_<screen>.png` 를 Claude multimodal 로 함께 읽는다.
-2. 다음 차원을 비교:
-   - **좌표 / 사이즈 / spacing** — 절대 px 값이 아닌 비율로 비교 (Figma frame 크기 차이 보정).
-   - **색상** — hex 값 + 시각 색조 비교.
-   - **타이포그래피** — font-weight / font-size / font-family / line-height.
-   - **장식 요소** — 아이콘 유무 / 테두리 / 그림자 / dot 크기.
-3. `references/diff-checklist.md` 템플릿에 결과를 기입한다.
-
----
-
-## Phase 4 — 프로젝트 디자인 가이드 정합성 검증
-
-1. Phase 3 에서 발견된 hex 색상을 `<DesignGuide>` / `<TokenSSOT>` 의 토큰 표와 매핑 시도.
-   - 매핑 가능 → "토큰 사용 권장" 항목으로 기록.
-   - 미매핑 hex 가 2개 이상 반복 → "신규 토큰 후보" 또는 "Known Gaps 후보" 로 메모.
-2. z-index 가 직접 숫자로 쓰여 있고 `<ZIndexSSOT>` 가 존재하면 → 상수화 후보로 메모.
-3. `<BaselineViewport>` 에서 primary action(CTA 버튼 등)이 fold 밖으로 밀리지 않는지 확인.
-4. 상세 매핑 규칙은 `references/design-guide-mapping.md` 참조.
-
-> `<DesignGuide>` 가 없는 경우 WCAG 2.5.5 / Material Design / Apple HIG 기준을 폴백으로 사용한다.
+**예외 처리**: 에이전트 리포트에 "Chrome DevTools MCP 연결 실패"가 포함된 경우,
+사용자에게 1줄로 요청한다: `"Chrome 브라우저를 --remote-debugging-port=9222 옵션으로 실행해 주세요."` → 확인 후 에이전트 재시도.
 
 ---
 
@@ -171,11 +121,11 @@ mcp__plugin_figma_figma__get_screenshot(nodeId=<FigmaNodeId>, fileKey=<FigmaFile
 
 ## Phase 6 — 회수 + 검증
 
-1. 임시 패치 회수:
+1. 임시 패치 회수 (에이전트가 캡처 직후 회수했으나 잔존 여부 재확인):
    ```bash
    git restore <패치된 파일>
    ```
-2. 잔존 패치 확인:
+2. 잔존 패치 확인 (에이전트 리포트에 잔존 기록이 있으면 반드시 포함):
    ```bash
    grep -r "TEMP-VISUAL-VERIFY" .
    ```
@@ -198,10 +148,10 @@ mcp__plugin_figma_figma__get_screenshot(nodeId=<FigmaNodeId>, fileKey=<FigmaFile
 
 ## Reference 파일 목록
 
-| 파일 | 내용 |
-|------|------|
-| `references/figma-capture.md` | Figma MCP 3개 도구 사용 가이드 + URL 파싱 + 스케일 변환 |
-| `references/live-capture.md` | Playwright/Chrome DevTools MCP 캡처 가이드 + 충돌 해결 |
-| `references/diff-checklist.md` | 화면 카테고리별 시각 diff 체크리스트 템플릿 |
-| `references/state-patch-pattern.md` | 임시 state 강제 진입 패턴 + git restore 회수 |
-| `references/design-guide-mapping.md` | 프로젝트 디자인 가이드 ↔ Figma 메타데이터 매핑 가이드 |
+| 파일 | 내용 | 참조 주체 |
+|------|------|---------|
+| `references/figma-capture.md` | Figma MCP 3개 도구 사용 가이드 + URL 파싱 + 스케일 변환 | visual-diff-capture 에이전트 |
+| `references/live-capture.md` | Playwright/Chrome DevTools MCP 캡처 가이드 + 충돌 해결 | visual-diff-capture 에이전트 |
+| `references/diff-checklist.md` | 화면 카테고리별 시각 diff 체크리스트 템플릿 | visual-diff-capture 에이전트 |
+| `references/state-patch-pattern.md` | 임시 state 강제 진입 패턴 + git restore 회수 | visual-diff-capture 에이전트 |
+| `references/design-guide-mapping.md` | 프로젝트 디자인 가이드 ↔ Figma 메타데이터 매핑 가이드 | visual-diff-capture 에이전트 |
