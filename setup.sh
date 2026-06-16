@@ -37,10 +37,10 @@ mkdir -p \
 echo "[2/4] 파일 복사 중..."
 
 echo "  rules/"
-cp -f "$SCRIPT_DIR/shared/rules/"*.md "$CLAUDE_DIR/rules/"
+cp -f "$SCRIPT_DIR/plugins/devoks-core/rules/"*.md "$CLAUDE_DIR/rules/"
 
 echo "  refs/"
-cp -f "$SCRIPT_DIR/shared/refs/"*.md "$CLAUDE_DIR/refs/"
+cp -f "$SCRIPT_DIR/plugins/devoks-core/refs/"*.md "$CLAUDE_DIR/refs/"
 
 echo "  commands/ (git)"
 cp -f "$SCRIPT_DIR/plugins/devoks-git/commands/"*.md "$CLAUDE_DIR/commands/"

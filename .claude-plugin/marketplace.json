@@ -6,7 +6,7 @@
     {
       "name": "devoks-core",
       "source": "./plugins/devoks-core",
-      "description": "기본 원칙 컨텍스트 (Agent Principles, Project Convention, Memory Policy)",
+      "description": "기본 원칙 자동 로딩 — SessionStart 훅이 rules(원칙)·refs(참조) 문서를 프로젝트 .claude/에 동기화",
       "dependencies": []
     },
     {
