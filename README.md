@@ -1,65 +1,68 @@
 # DevOks Team Harness
 
-DevOks 팀 Claude Code 하네스 — 코드리뷰·기능개발·Git 워크플로우 플러그인 모음.
+Claude Code harness for the DevOks team — plugins for code review, feature development, and Git workflows.
 
-> **의존성 및 MCP 설치 가이드**: [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)  
-> **플러그인 관리 가이드** (생성·검증·배포): [`docs/plugin-management.md`](docs/plugin-management.md)
+> **MCP & dependency setup**: [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)  
+> **Plugin management** (create, validate, deploy): [`docs/plugin-management.md`](docs/plugin-management.md)
+> **한국어 문서**: [docs/README.ko.md](docs/README.ko.md)
 
-![DevOks Team Harness plugin map](assets/devoks-team-harness-hero.svg)
-
----
-
-## 플러그인 구성
-
-| 플러그인 | 내용 | 필수 여부 |
-|---------|------|----------|
-| `devoks-core` | 기본 원칙 컨텍스트 (Agent Principles, Project Convention, Memory Policy) | **필수** |
-| `devoks-git` | Git 커밋·이슈·PR 워크플로우 커맨드 | 권장 |
-| `devoks-feature` | 기능개발 워크플로우 (FRD·PLAN·실행 스킬, UI 구현, 검증) | 권장 |
-| `devoks-code` | 코드리뷰·리팩토링·모듈분석 커맨드 | 권장 |
-| `devoks-browser` | Chrome DevTools MCP 연결 + Visual Diff 검증 | 선택 |
+![DevOks Team Harness plugin map](assets/devoks-harness-engineering-final.png)
 
 ---
 
-## 빠른 시작 (최소 의존성)
+## Plugin Overview
+
+| Plugin | Contents | Required |
+|--------|----------|----------|
+| `devoks-core` | Core principles & reference docs — SessionStart hook syncs `rules/` and `refs/` into the project `.claude/` for native auto-loading | **Required** |
+| `devoks-git` | Git commit, issue, and PR workflow commands | Recommended |
+| `devoks-feature` | Feature development workflow (FRD/PLAN/execution skills, UI implementation, verification) | Recommended |
+| `devoks-code` | Code review, refactoring, and module analysis commands | Recommended |
+| `devoks-browser` | Chrome DevTools MCP attach + Visual Diff verification | Optional |
+
+All plugins except `devoks-core` declare a dependency on `devoks-core` in the marketplace catalog.
+
+---
+
+## Quick Start (Minimum Dependencies)
 
 ```bash
-# 필수: gh CLI 설치
+# Required: install gh CLI
 brew install gh && gh auth login
 
-# 1. 마켓플레이스 등록 (최초 1회)
+# 1. Register marketplace (once)
 /plugin marketplace add ridsync/devoks-team-harness
 
-# 2. 설치
+# 2. Install plugins
 /plugin install devoks-core@devoks
 /plugin install devoks-git@devoks
 /plugin install devoks-feature@devoks
 /plugin install devoks-code@devoks
 ```
 
-전체 의존성 설치는 → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
+Full dependency setup → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
 
 ---
 
-## 플러그인 설치 (Claude Code 플러그인 시스템)
+## Plugin Installation (Claude Code Plugin System)
 
-### 1단계: 마켓플레이스 등록 (최초 1회)
+### Step 1: Register marketplace (once)
 
 ```bash
 /plugin marketplace add ridsync/devoks-team-harness
 ```
 
-### 2단계: 플러그인 설치
+### Step 2: Install plugins
 
 ```bash
-/plugin install devoks-core@devoks           # 필수
-/plugin install devoks-git@devoks            # Git 워크플로우
-/plugin install devoks-feature@devoks        # 기능개발
-/plugin install devoks-code@devoks           # 코드 품질
-/plugin install devoks-browser@devoks        # 브라우저 도구 (선택)
+/plugin install devoks-core@devoks           # required — auto-syncs rules & refs on session start
+/plugin install devoks-git@devoks            # Git workflow
+/plugin install devoks-feature@devoks        # feature development
+/plugin install devoks-code@devoks           # code quality
+/plugin install devoks-browser@devoks        # browser tools (optional)
 ```
 
-### 3단계: 업데이트
+### Step 3: Update
 
 ```bash
 /plugin marketplace update devoks
@@ -67,24 +70,44 @@ brew install gh && gh auth login
 
 ---
 
-## 폴백 설치 (setup.sh)
+## Fallback Installation (`setup.sh`)
+
+Use when the plugin system is unavailable — copies commands, skills, rules, and refs directly into `.claude/`.
 
 ```bash
 git clone https://github.com/ridsync/devoks-team-harness.git
 cd /path/to/your-project
 /path/to/devoks-team-harness/setup.sh
 
-# 업데이트
+# update
 /path/to/devoks-team-harness/setup.sh --update
 ```
 
+> **Note:** `setup.sh` copies static files but does not run the `devoks-core` SessionStart hook. Re-run `setup.sh --update` after pulling harness changes to refresh rules and refs.
+
 ---
 
-## 사용 가능한 스킬
+## How `devoks-core` Context Sync Works
 
-| 스킬 | 호출 | 플러그인 |
-|------|------|---------|
-| `devoks-core-rules` | `/devoks-core-rules` | devoks-core |
+On session start (`startup`, `resume`, `clear`, `compact`), the `devoks-core` hook runs `sync-context.sh` and:
+
+1. Copies bundled `plugins/devoks-core/rules/*.md` → `.claude/rules/`
+2. Copies bundled `plugins/devoks-core/refs/*.md` → `.claude/refs/`
+3. Idempotently appends `.claude/rules/` and `.claude/refs/` to `.gitignore` (generated artifacts; plugin bundle is SSOT)
+
+| Type | Files | Role |
+|------|-------|------|
+| **rules** | `agent-principles`, `project-convention`, `memory-policy` | Always-on agent behavior |
+| **refs** | `code-review`, `engineering-principles`, `git-convention`, `workflow` | On-demand reference docs |
+
+No slash command is needed — Claude Code loads `.claude/rules/` natively.
+
+---
+
+## Available Skills
+
+| Skill | Invoke | Plugin |
+|-------|--------|--------|
 | `devoks-frd-author` | `/devoks-frd-author` | devoks-feature |
 | `devoks-plan-author` | `/devoks-plan-author` | devoks-feature |
 | `devoks-plan-executor` | `/devoks-plan-executor` | devoks-feature |
@@ -95,77 +118,82 @@ cd /path/to/your-project
 
 ---
 
-## 사용 가능한 커맨드
+## Available Commands
 
 ### devoks-git
-| 커맨드 | 설명 |
-|--------|------|
-| `/devoks-git-commit-msg` | Conventional Commits 커밋 메시지 생성 |
-| `/devoks-git-create-issue` | GitHub 이슈 생성 |
-| `/devoks-git-pull-request` | PR 생성 (CODEOWNERS 기반 리뷰어 할당) |
+
+| Command | Description |
+|---------|-------------|
+| `/devoks-git-commit-msg` | Generate Conventional Commits message |
+| `/devoks-git-create-issue` | Create a GitHub issue |
+| `/devoks-git-pull-request` | Create a PR (CODEOWNERS-based reviewer assignment) |
 
 ### devoks-feature
-| 커맨드 | 설명 |
-|--------|------|
-| `/devoks-new-feature-draft` | 스펙 기반 기능 구현 |
-| `/devoks-new-feature-github-issue` | GitHub 이슈 기반 기능 구현 |
-| `/devoks-new-feature-verify` | 구현 전후 체크리스트 + 커버리지 검증 |
-| `/devoks-new-ui-draft` | Figma → 코드 UI 구현 |
+
+| Command | Description |
+|---------|-------------|
+| `/devoks-new-feature-draft` | Spec-driven feature implementation |
+| `/devoks-new-feature-github-issue` | GitHub issue-driven feature implementation |
+| `/devoks-new-feature-verify` | Pre/post implementation checklist + coverage verification |
+| `/devoks-new-ui-draft` | Figma → code UI implementation |
 
 ### devoks-code
-| 커맨드 | 설명 |
-|--------|------|
-| `/devoks-code-review-general` | 범위 지정 코드리뷰 |
-| `/devoks-code-review-diff-branch` | 브랜치 diff 기반 코드리뷰 |
-| `/devoks-code-refactoring` | 구조·계약·품질 리팩토링 |
-| `/devoks-code-analyze-module` | 모듈/비즈니스 로직 분석 |
+
+| Command | Description |
+|---------|-------------|
+| `/devoks-code-review-general` | Scoped code review |
+| `/devoks-code-review-diff-branch` | Branch diff code review |
+| `/devoks-code-refactoring` | Structure, contract, and quality refactoring |
+| `/devoks-code-analyze-module` | Module / business logic analysis |
 
 ---
 
-## 의존성 요약
+## Dependency Summary
 
-| 플러그인 | 필수 | 선택 |
-|---------|------|------|
+| Plugin | Required | Optional |
+|--------|----------|----------|
 | devoks-core | — | — |
 | devoks-git | `gh` CLI | — |
 | devoks-feature | `gh` CLI | Figma MCP, context-mode MCP |
 | devoks-code | CodeGraph MCP, Serena MCP | context-mode MCP |
 | devoks-browser | Chrome DevTools MCP + `~/.claude.json` | Playwright MCP, Figma MCP |
 
-전체 설치 가이드 → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
+Full setup guide → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
 
 ---
 
-## 디렉토리 구조
+## Directory Structure
 
 ```
 devoks-team-harness/
-├── .claude-plugin/marketplace.json    # 마켓플레이스 카탈로그
+├── .claude-plugin/marketplace.json    # marketplace catalog
 ├── plugins/
-│   ├── devoks-core/skills/            # devoks-core-rules 스킬 (Agent Principles 등)
-│   ├── devoks-git/commands/           # Git 커맨드 (3개)
-│   ├── devoks-feature/                # 기능개발 (커맨드 4개 + 스킬 5개)
-│   ├── devoks-code/commands/          # 코드 품질 (4개)
-│   └── devoks-browser/skills/         # 브라우저 도구 (2개)
+│   ├── devoks-core/
+│   │   ├── hooks/                     # SessionStart → sync-context.sh
+│   │   ├── rules/                     # SSOT: agent-principles, project-convention, memory-policy
+│   │   └── refs/                      # SSOT: code-review, engineering-principles, git-convention, workflow
+│   ├── devoks-git/commands/           # Git commands (3)
+│   ├── devoks-feature/                # feature dev (4 commands + 5 skills)
+│   ├── devoks-code/commands/          # code quality (4)
+│   └── devoks-browser/skills/         # browser tools (2)
 ├── shared/
-│   ├── rules/                         # SSOT: agent-principles, project-convention, memory-policy
-│   ├── refs/                          # SSOT: code-review, engineering-principles, git-convention, workflow
-│   ├── setup/claude.json.template     # ~/.claude.json MCP 설정 템플릿
+│   ├── setup/claude.json.template     # ~/.claude.json MCP config template
 │   └── templates/CLAUDE.md.project.template
 ├── docs/
-│   ├── mcp-setup-guide.md             # MCP 의존성 설치 가이드
-│   └── plugin-management.md           # 플러그인 생성·검증·배포 워크플로우
-├── setup.sh                           # 폴백 설치 스크립트
+│   ├── README.ko.md                   # Korean README
+│   ├── mcp-setup-guide.md             # MCP dependency setup
+│   └── plugin-management.md           # plugin create · validate · deploy workflow
+├── setup.sh                           # fallback install script
 └── README.md
 ```
 
-> `shared/rules/` 와 `shared/refs/` 가 SSOT입니다. 규칙 변경 시 이 파일들과 `plugins/devoks-core/skills/devoks-core-rules/SKILL.md` 를 함께 수정하고 커밋하세요.
+> `plugins/devoks-core/rules/` and `plugins/devoks-core/refs/` are the SSOT for team principles and reference docs. Edit those files and commit — the SessionStart hook (or `setup.sh`) propagates them to each project's `.claude/`.
 
 ---
 
-## 기여 방법
+## Contributing
 
-1. 이 저장소를 fork 합니다.
-2. `shared/rules/`, `shared/refs/`, 또는 플러그인 파일을 수정합니다.
-3. PR을 올립니다.
-4. 머지 후 팀원은 `/plugin marketplace update devoks` 로 갱신합니다.
+1. Fork this repository.
+2. Edit `plugins/devoks-core/rules/`, `plugins/devoks-core/refs/`, or plugin files.
+3. Open a PR.
+4. After merge, teammates run `/plugin marketplace update devoks` to refresh.

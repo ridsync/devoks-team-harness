@@ -1,5 +1,5 @@
 ---
-name: devoks:visual-diff-verification
+name: visual-diff-verification
 description: Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올린다. Figma MCP 로 노드 캡처 → Chrome DevTools MCP(폴백 Playwright) 로 라이브 캡처 → multimodal 시각 diff → 프로젝트 디자인 가이드 정합성 검증 → 토큰/레이아웃 상수 미세 조정 → 임시 패치 회수 → 프로젝트 검증 명령 실행. Figma 비교 / 시각 diff / 픽셀 퍼펙트 / UI 충실도 / Figma vs 실제 렌더 키워드에서 호출.
 metadata:
   author: ridsync

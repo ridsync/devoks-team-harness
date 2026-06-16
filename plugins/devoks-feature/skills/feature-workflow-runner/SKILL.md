@@ -1,6 +1,6 @@
 ---
-name: devoks:feature-workflow-runner
-description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks:frd-author / devoks:plan-author / devoks:plan-executor 를 쓴다.
+name: feature-workflow-runner
+description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-feature:frd-author / devoks-feature:plan-author / devoks-feature:plan-executor 를 쓴다.
 metadata:
   author: ridsync
   version: 1.0.0

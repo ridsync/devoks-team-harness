@@ -1,6 +1,6 @@
 ---
-name: devoks:plan-executor
-description: PLAN.md(작업 분해)를 받아 각 태스크를 의존성 순서대로 단계 실행하고 진행 상태를 추적한다. 선행이 끝난 Task부터 구현 → 관련 테스트/린트 실행으로 검증 → PLAN 체크박스 `[x]`·frontmatter status 갱신. PLAN.md를 진행 SSOT로 삼아 세션이 끊겨도 재개 가능. "PLAN대로 진행해줘", "태스크 단계 실행", "작업 계획 따라 구현", "PLAN 체크리스트 진행", "다음 태스크 이어서" 같은 요청에서 사용한다. 구현 착수 전 `main`이면 작업 브랜치를 생성·체크아웃한다. 커밋·푸시·PR 생성은 하지 않는다(별도 도구·사용자 명시 요청). 전체 흐름은 devoks:feature-workflow-runner.
+name: plan-executor
+description: PLAN.md(작업 분해)를 받아 각 태스크를 의존성 순서대로 단계 실행하고 진행 상태를 추적한다. 선행이 끝난 Task부터 구현 → 관련 테스트/린트 실행으로 검증 → PLAN 체크박스 `[x]`·frontmatter status 갱신. PLAN.md를 진행 SSOT로 삼아 세션이 끊겨도 재개 가능. "PLAN대로 진행해줘", "태스크 단계 실행", "작업 계획 따라 구현", "PLAN 체크리스트 진행", "다음 태스크 이어서" 같은 요청에서 사용한다. 구현 착수 전 `main`이면 작업 브랜치를 생성·체크아웃한다. 커밋·푸시·PR 생성은 하지 않는다(별도 도구·사용자 명시 요청). 전체 흐름은 devoks-feature:feature-workflow-runner.
 metadata:
   author: ridsync
   version: 1.0.0
