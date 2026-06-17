@@ -39,7 +39,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
    ```
 2. **Chrome DevTools MCP 스키마 로드**:
    ```
-   ToolSearch("select:mcp__plugin_chrome-devtools-mcp_chrome-devtools__list_pages,mcp__plugin_chrome-devtools-mcp_chrome-devtools__navigate_page,mcp__plugin_chrome-devtools-mcp_chrome-devtools__wait_for,mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_screenshot")
+   ToolSearch("select:mcp__chrome-devtools-attach__list_pages,mcp__chrome-devtools-attach__navigate_page,mcp__chrome-devtools-attach__wait_for,mcp__chrome-devtools-attach__take_screenshot")
    ```
 3. Chrome DevTools MCP 실패 시에만 Playwright MCP 로드:
    ```

@@ -9,6 +9,12 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/hooks/sync-context.sh",
             "args": []
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/check-mcp.sh",
+            "args": [],
+            "timeout": 5
           }
         ]
       }
