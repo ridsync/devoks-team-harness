@@ -91,9 +91,9 @@ git diff --stat
 # SomeWizardPage.jsx 의 초기 state 를 STEPS.RESULT_PASS 로 변경
 
 # 2. Playwright 로 캡처
-mcp__playwright__browser_navigate(url=http://localhost:3000/some-wizard)
-mcp__playwright__browser_wait_for(text="보정이 완료되었습니다")
-mcp__playwright__browser_take_screenshot(filename=render_result_pass.png)
+mcp__plugin_playwright_playwright__browser_navigate(url=http://localhost:3000/some-wizard)
+mcp__plugin_playwright_playwright__browser_wait_for(text="보정이 완료되었습니다")
+mcp__plugin_playwright_playwright__browser_take_screenshot(filename=render_result_pass.png)
 
 # 3. 즉시 회수
 git restore src/pages/SomeWizardPage.jsx

@@ -3,12 +3,5 @@
   "version": "1.0.0",
   "description": "DevOks Git 워크플로우 — Conventional Commits 커밋·이슈·PR 커맨드",
   "author": { "name": "ridsync" },
-  "dependencies": ["devoks-core"],
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
-      "type": "stdio"
-    }
-  }
+  "dependencies": ["devoks-core"]
 }

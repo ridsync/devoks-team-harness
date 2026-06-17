@@ -158,6 +158,8 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 
 ## Dependency Summary
 
+> DevOks plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-mcp.sh`) detects missing servers each session and prints install guidance. **Exception:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
+
 | Plugin | Required | Optional |
 |--------|----------|----------|
 | devoks-core | — | — |
