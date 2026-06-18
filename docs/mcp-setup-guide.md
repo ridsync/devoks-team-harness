@@ -15,6 +15,18 @@ DevOks 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 
 ---
 
+## 빠른 설치 (`/devoks-setup-mcp`)
+
+`devoks-core`의 `/devoks-setup-mcp` 커맨드를 실행하면 누락된 권장 MCP를 현재 상태에 맞춰 한 번에 설치한다.
+
+- **자동(shell)**: context7·codegraph·serena 를 `claude mcp add --scope user`로 설치(serena는 현재 프로젝트 경로 자동 적용).
+- **안내(플러그인)**: figma·playwright 는 prefix 일치를 위해 `/plugin install` 경로를 안내한다(자동 설치하지 않음).
+- 이미 설정된 항목은 건너뛰고, 전역 설정 변경 전 실행 명령을 보여주고 확인받는다.
+
+수동 설치가 필요하거나 각 서버의 세부 옵션·인증·초기화가 궁금하면 아래 절을 참고한다.
+
+---
+
 ## 의존성 매트릭스
 
 | 플러그인 / 스킬 | 필수 | 선택 |
