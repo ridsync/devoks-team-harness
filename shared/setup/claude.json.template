@@ -1,5 +1,5 @@
 {
-  "_note": "레거시 참조용입니다. setup.sh 가 각 plugin.json 의 mcpServers 선언에서 ~/.claude.json 을 자동으로 구성합니다.",
+  "_note": "수동 참조용 예시입니다. 플러그인은 공유 MCP를 번들하지 않으므로 user scope에 1회 설치해야 합니다. 자동 설치는 /devoks-setup-mcp 커맨드를, 방식·prefix 규칙은 docs/mcp-setup-guide.md 를 참고하세요.",
   "mcpServers": {
     "chrome-devtools-attach": {
       "command": "npx",
