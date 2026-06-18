@@ -6,7 +6,7 @@ description: GitHub 이슈 본문을 SSOT로 기능을 설계·구현한다.
 
 ## Overview
 
-GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 패턴에 맞게 기능을 설계·구현한다. [`devoks-new-feature-draft.md`](devoks-new-feature-draft.md)와 동일하게 **요구 정리 → 설계·승인 → 로컬 브랜치 생성 → 구현 → 마무리** 순서를 따른다. 본 Command에는 **제품·도메인 전용 용어·스택**을 넣지 않는다.
+GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 패턴에 맞게 기능을 설계·구현한다. `/devoks-feature:new-feature-draft`와 동일하게 **요구 정리 → 설계·승인 → 로컬 브랜치 생성 → 구현 → 마무리** 순서를 따른다. 본 Command에는 **제품·도메인 전용 용어·스택**을 넣지 않는다.
 
 ## 입력
 
@@ -18,7 +18,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 | **owner/repo#번호** | 예: `my-org/my-app#42` |
 | **이슈 본문 전체** | API·CLI 없이 붙여넣기만 가능한 경우 |
 
-`owner` / `repo`는 `git remote get-url origin`으로 파싱한다. 실패 시 사용자에게 직접 묻는다. ([`devoks-git-create-issue.md`](devoks-git-create-issue.md)의 저장소 식별과 동일한 패턴)
+`owner` / `repo`는 `git remote get-url origin`으로 파싱한다. 실패 시 사용자에게 직접 묻는다. (`/devoks-git:git-create-issue`의 저장소 식별과 동일한 패턴)
 
 ### 이슈 본문 가져오기 (우선순위)
 
@@ -44,7 +44,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 
 1. YAML 프론트매터(`---` … `---`)가 있으면 제거한 뒤 파싱한다.
 2. 본문을 `^### ` 로 시작하는 줄로 분할해 섹션 맵을 만든다.
-3. `### Additional Context` 안에 [`devoks-git-create-issue.md`](devoks-git-create-issue.md)에서 정의한 선택 소제목이 있으면 하위 필드로 매핑한다: `#### 배경 및 문제 정의`, `#### 범위`, `#### 범위 밖`, `#### 영향 파일`, `#### 미결정 사항`. 없으면 “미사용”으로 두고 상위 섹션 전체만 사용한다.
+3. `### Additional Context` 안에 `/devoks-git:git-create-issue`에서 정의한 선택 소제목이 있으면 하위 필드로 매핑한다: `#### 배경 및 문제 정의`, `#### 범위`, `#### 범위 밖`, `#### 영향 파일`, `#### 미결정 사항`. 없으면 “미사용”으로 두고 상위 섹션 전체만 사용한다.
 4. **인용 블록**: `Additional Context` 등에 `>` 로 시작하는 줄이 있으면, 파싱용으로 **선행 `>\s?` 를 제거한 정규화 복사본**을 만들어 요약·갭 분석에 쓴다(원문 보존이 필요하면 별도 유지).
 
 ### 대체 템플릿
@@ -77,7 +77,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 
 ### UI 전용 Command와 조합
 
-저장소에 UI 구현 전용 절차 파일이 있으면(예: `devoks-new-ui-draft.md`), 이슈에 그 절차와 병행한다고 적거나, Agent 실행 시 해당 파일을 `@`로 **함께 첨부**하도록 안내한다. 본 파일에는 도구명·스택을 나열하지 않는다.
+저장소에 UI 구현 전용 절차 파일이 있으면(예: `/devoks-feature:new-ui-draft`), 이슈에 그 절차와 병행한다고 적거나, Agent 실행 시 해당 파일을 `@`로 **함께 첨부**하도록 안내한다. 본 파일에는 도구명·스택을 나열하지 않는다.
 
 ---
 
@@ -131,9 +131,9 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 
 ### 4. 로컬 작업 브랜치 생성
 
-구현(코드 작성)에 들어가기 **직전**에, 이슈 목적과 [`devoks-git-commit-msg.md`](devoks-git-commit-msg.md)의 Conventional Commits **타입**에 맞는 로컬 브랜치를 만든다.
+구현(코드 작성)에 들어가기 **직전**에, 이슈 목적과 `/devoks-git:git-commit-msg`의 Conventional Commits **타입**에 맞는 로컬 브랜치를 만든다.
 
-- **타입**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore` 중 이슈 성격에 가장 가까운 것을 고른다(상세는 `devoks-git-commit-msg.md`의 Rules).
+- **타입**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore` 중 이슈 성격에 가장 가까운 것을 고른다(상세는 `/devoks-git:git-commit-msg`의 Rules).
 - **이름 패턴**: `타입/이슈번호-간단-슬러그` — 이슈 번호는 GitHub 이슈 `n`을 사용하고, 슬러그는 **kebab-case**·짧게(예: `feat/42-partner-etc-page`).
 - **기준 브랜치**: 원격 기본 브랜치(예: `main`) 최신을 기준으로 분기한다(`git fetch` 후 `git checkout -b …` 등 저장소 관례에 맞게).
 - **범위**: 브랜치 생성·체크아웃만 수행한다. **커밋·푸시**는 사용자가 명시적으로 요청할 때만 한다(아래 **금지·주의**).
@@ -186,7 +186,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 - [ ] 갭 표 작성; 차단 시 사용자 보완 후 재파싱
 - [ ] UI 범위 시 디자인 참조·연결 이슈 확인
 - [ ] 설계 작성 후 사용자 승인
-- [ ] 구현 전 `devoks-git-commit-msg.md` 타입에 맞는 로컬 브랜치 생성(`타입/이슈번호-슬러그`)
+- [ ] 구현 전 `/devoks-git:git-commit-msg` 타입에 맞는 로컬 브랜치 생성(`타입/이슈번호-슬러그`)
 - [ ] `.claude/CLAUDE.md` / `.claude/rules/` / `.claude/refs/` 원본 참조
 - [ ] 린트·import 정리
 - [ ] 구현 요약 및 추후 작업 안내
