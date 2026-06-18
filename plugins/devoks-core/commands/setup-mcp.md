@@ -60,10 +60,13 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
    - `/plugin install`은 대화형 Claude Code 명령이므로 shell로 자동 실행하지 말고, 위 명령을 그대로 안내한다.
    - figma는 최초 도구 호출 시 브라우저 OAuth로 인증된다.
 
-5. **chrome-devtools-attach (devoks-browser 전용)**
-   - 이 서버는 `devoks-browser` 플러그인이 이미 번들한다(`:9269` attach 고유 설정).
-   - devoks-browser를 쓰는 경우 별도 user 설치가 불필요함을 안내하고, Chrome 디버그 실행
-     (`--remote-debugging-port=9269`)은 `docs/mcp-setup-guide.md` 3절을 참조하게 한다.
+5. **chrome-devtools-attach (visual-diff·data-verify 필수 — figma·playwright와 동일하게 플러그인 경로)**
+   - 이 서버는 `devoks-browser` 플러그인이 번들한다(`:9269` attach 고유 설정, prefix `mcp__chrome-devtools-attach__*`).
+   - **`claude mcp add`로 깔지 않는다.** 같은 서버가 플러그인 번들 + user scope에 이중 등록되면
+     동일한 `:9269` 디버그 포트에 두 인스턴스가 동시에 attach를 시도해 충돌한다.
+   - 감지 결과(`claude mcp list`에 `chrome-devtools-attach` 부재, 또는 SessionStart 훅 경고)로 **누락이면**
+     다음을 안내한다: `/plugin install devoks-browser@devoks`. 이미 devoks-browser가 설치돼 있으면 별도 작업 불필요.
+   - Chrome 디버그 실행(`--remote-debugging-port=9269`)은 `docs/mcp-setup-guide.md` 3절을 참조하게 한다.
 
 6. **결과 보고**
    - 설치가 끝나면 `claude mcp list`를 다시 실행해 최종 상태를 요약한다.
