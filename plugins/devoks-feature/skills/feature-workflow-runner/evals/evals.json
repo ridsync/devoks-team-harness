@@ -1,0 +1,65 @@
+{
+  "skill_name": "devoks-feature:feature-workflow-runner",
+  "notes": "FRD→PLAN 생성 단계의 객관 품질을 검증한다. 입력은 거친 기능 초안, 기대 산출물은 추적 가능하고 PR로 분리된 PLAN.md. 산출물 문서는 기본 워크스페이스 .claude/workspace/{feature-name}-{date}/ 에 저장되어야 한다. 실행(Phase 3) 단계는 정성 리뷰로 별도 처리한다. files 가 빈 케이스는 본문 초안만으로 평가한다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "saved-filter-views-frd-to-plan",
+      "prompt": "다음 기능 초안을 FRD로 정련한 뒤 추적 가능한 PLAN으로 분해해줘.\n\n초안: \"목록 화면에서 자주 쓰는 필터 조합을 '뷰'로 저장하고 다시 적용할 수 있게 하고 싶어요. 저장한 뷰는 팀원과 공유도 되면 좋겠고요. 저장된 뷰의 필터 키가 더 이상 스키마에 없으면 화면이 깨지지 않게 처리해주세요. 사용자당 저장 뷰 개수는 제한이 있으면 좋겠어요.\"",
+      "expected_output": "기본 워크스페이스 .claude/workspace/{feature-name}-{date}/ 아래 FRD.md·PLAN.md 생성. FRD는 REQ/AC(EARS)·CTR·EDGE 포함. PLAN은 TASK-ID·[P]·file:·traces: 를 가진 Task들이 2개 이상 PR 그룹으로 분리되고, 모든 AC/CTR/EDGE가 어떤 traces에 등장(누락 0), 의존성 그래프와 DoD 포함.",
+      "files": [],
+      "assertions": [
+        { "text": "산출물이 기본 워크스페이스 .claude/workspace/{feature-name}-{date}/ 아래에 생성된다(별도 경로 지정 없이)" },
+        { "text": "FRD.md 와 PLAN.md 두 산출물이 생성된다" },
+        { "text": "FRD의 AC는 EARS 형식(WHEN/IF/WHILE ... THE SYSTEM SHALL)을 따른다" },
+        { "text": "정상 경로 AC와 예외 경로(IF) AC가 모두 존재한다" },
+        { "text": "PLAN의 모든 Task가 file: 와 traces: 필드를 가진다" },
+        { "text": "TASK-ID 가 TASK-\\d+ 규칙을 따른다" },
+        { "text": "최소 하나의 [P] 병렬 마커가 의존성 그래프와 모순 없이 사용된다" },
+        { "text": "Task가 2개 이상 PR 그룹으로 분리되고 PR 간 의존이 단방향이다" },
+        { "text": "FRD의 모든 AC/CTR/EDGE ID가 어떤 Task traces에 1회 이상 등장한다(누락 0)" },
+        { "text": "PLAN에 mermaid 의존성 그래프와 Definition of Done 섹션이 있다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "bulk-export-frd-to-plan",
+      "prompt": "아래 초안으로 FRD를 정련하고 PLAN을 작성해줘.\n\n초안: \"리포트 목록을 CSV/XLSX로 내보내기. 선택한 항목만 또는 전체 내보내기 둘 다 지원. 항목이 5천 건을 넘으면 비동기로 처리하고 완료되면 다운로드 링크를 알림으로 보냄. 내보내기 중 실패하면 재시도하거나 부분 결과를 받을지 선택. 동시에 진행 가능한 내보내기 작업 수에 상한.\"",
+      "expected_output": "out/FRD.md, out/PLAN.md 생성. 동기/비동기 분기, 실패 재시도/부분결과, 동시 작업 상한이 CTR/EDGE로 분리되고, PLAN에서 동기 경로 PR과 비동기 경로 PR로 합리적으로 분리되며 추적 누락 0.",
+      "files": [],
+      "assertions": [
+        { "text": "FRD.md 와 PLAN.md 두 산출물이 생성된다" },
+        { "text": "동시 작업 상한·임계값(5천 건 등) 수치가 AC 본문이 아니라 CTR 파라미터로 분리된다" },
+        { "text": "실패 재시도/부분 결과 같은 예외가 EDGE 또는 IF AC로 명시된다" },
+        { "text": "PLAN이 동기/비동기 등 합리적 축으로 2개 이상 PR로 분리된다" },
+        { "text": "FRD의 모든 AC/CTR/EDGE ID가 어떤 Task traces에 1회 이상 등장한다(누락 0)" },
+        { "text": "각 Task가 단일 관심사이며 file: 경로를 가진다" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "underspecified-draft-asks-before-assuming",
+      "prompt": "이 초안으로 FRD/PLAN 만들어줘: \"알림 설정 화면 만들기.\"",
+      "expected_output": "초안이 과소명세라 핵심 미정 슬롯(어떤 알림 채널, 어떤 이벤트, 저장 위치, 권한 등)을 추측하지 않고 사용자에게 한 번에 모아 확인한다. 확인 전이라면 임의로 PLAN을 확정하지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "과소명세된 빈 슬롯을 임의로 채우지 않고 사용자에게 확인 질문을 모아서 한다" },
+        { "text": "추측으로 REQ/AC를 지어내 PLAN을 성급히 확정하지 않는다" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "shared-task-queue-design-spec",
+      "prompt": "아래 초안으로 FRD를 정련하고 PLAN을 작성해줘.\n\n초안: \"여러 화면에서 백그라운드 작업(예: 업로드)을 큐에 넣고, 화면을 옮겨다녀도 진행 상태가 유지되며, 실패하면 자동 재시도하는 공용 작업 큐가 필요해요. 새 상태 컨테이너와 화면마다 재사용할 진행 표시 컴포넌트가 있어야 할 것 같고, 동시 실행 수에는 상한이 있으면 좋겠어요.\"",
+      "expected_output": "복잡도 임계(신규 상태 컨테이너·공유 컴포넌트·새 재시도 패턴·다수 화면 영향)를 넘으므로 FRD §4 Design Spec이 채워진다: 컴포넌트 구조(진행 표시 컴포넌트 트리·책임·상태 소유 위치), 적용 패턴(DSN — 상태 컨테이너 재사용/재시도 정책 등), 모듈/레이어 배치. 설계 공백은 추측으로 메우지 않고 합리적 설계안을 먼저 제안한 뒤 확인한다. 동시 실행 상한·재시도 횟수는 CTR로, 실패/재시도는 EDGE 또는 IF AC로 분리되고, PLAN의 모든 AC/CTR/EDGE가 traces로 커버된다(누락 0).",
+      "files": [],
+      "assertions": [
+        { "text": "복잡도 임계 초과 기능이므로 FRD §4에 컴포넌트 구조·적용 패턴·모듈/레이어 배치가 채워진다" },
+        { "text": "설계 공백을 추측으로 확정하지 않고 합리적 설계안을 먼저 제안한 뒤 사용자 확인을 받는다(요구 누락의 '묻기만'과 구분)" },
+        { "text": "설계 결정에 DSN-xxx ID가 부여되고 PLAN Task traces에서 인용 가능하다" },
+        { "text": "DSN은 커버리지 누락 0 강제 대상이 아니며, AC/CTR/EDGE는 모두 어떤 Task traces에 등장한다(누락 0)" },
+        { "text": "동시 실행 상한·재시도 횟수 등 수치가 AC 본문이 아니라 CTR 파라미터로 분리된다" }
+      ]
+    }
+  ]
+}

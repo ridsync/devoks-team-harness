@@ -28,7 +28,7 @@ description: 지정된 모듈·기능의 비즈니스 로직을 분석하고 구
 이 커맨드 문서를 **지칭·인용·안내**할 때는 경로와 파일명이 **한 번에 열리도록** 마크다운 링크로 쓴다. 파일명만 단독으로 쓰거나 백틱만 쓰지 않는다.
 
 - **형식**: `[표시 이름](저장소 루트 기준 상대 경로)`
-- **고정 예시**: [`devoks-code-analyze-module`](.claude/commands/devoks-code-analyze-module.md)
+- **고정 예시**: `/devoks-code:code-analyze-module`
 - **표시 이름**: `code-analyze-module` 또는 `코드·비즈니스 로직 분석 (code-analyze-module)` 등 맥락에 맞게 선택한다.
 
 PR 설명, 이슈, 다른 `.md` 규칙/문서, 채팅에서 이 지침을 가리킬 때 위 링크 형식을 우선한다.

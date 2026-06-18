@@ -16,17 +16,17 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 /devoks-feature:feature-plan-author [frd=<FRD.md 경로>] [out=<산출물 디렉터리>]
 ```
 
-- `out` 기본값 = FRD.md가 있는 워크스페이스(`.claude/workspace/{feature-name}-{date}/`). 산출물 = `<out>/PLAN.md`. → `../devoks-feature-workflow-runner/references/output-location.md`
+- `out` 기본값 = FRD.md가 있는 워크스페이스(`.claude/workspace/{feature-name}-{date}/`). 산출물 = `<out>/PLAN.md`. → `../feature-workflow-runner/references/output-location.md`
 - PLAN은 워크스페이스에 저장하되, 각 Task의 `file:`은 항상 **프로젝트 본래 코드 위치**를 가리킨다(워크스페이스 아님).
 
 ## 절차
 
-1. **골격 로드** — `../devoks-feature-workflow-runner/assets/PLAN.template.md` 형식을 따른다.
+1. **골격 로드** — `../feature-workflow-runner/assets/PLAN.template.md` 형식을 따른다.
 2. **Approach·Resource** — §1 구현 방식·PR 분리 방침, §2 Resource Check(FRD §6에서 가져옴).
-3. **Task 분해** — 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면)`[P]`, `file:`, `traces:` 부여. → `../devoks-feature-workflow-runner/references/task-pr-splitting.md`
+3. **Task 분해** — 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면)`[P]`, `file:`, `traces:` 부여. → `../feature-workflow-runner/references/task-pr-splitting.md`
 4. **PR 그룹핑** — 독립 가치/위험/리뷰 부담 기준으로 PR 묶기. PR 간 의존은 단방향.
 5. **그래프·DoD** — §4 mermaid 의존성 그래프(사이클 금지), §5 Definition of Done.
-6. **커버리지 검증(누락 0)** — FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검. → `../devoks-feature-workflow-runner/references/traceability.md` 의 comm 스크립트.
+6. **커버리지 검증(누락 0)** — FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검. → `../feature-workflow-runner/references/traceability.md` 의 comm 스크립트.
 7. **작성** — 누락이 없을 때만 `<out>/PLAN.md` 작성. 있으면 담당 Task 추가 후 재검증.
 
 ## 완료 기준
@@ -36,4 +36,4 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 - 1개 이상 PR생성. PR2개 이상일 경우 PR 그룹, PR 간 의존 단방향 준수.
 - 커버리지 점검 출력 공백(누락 0), DoD 섹션 존재.
 
-> 형식이 헷갈리면 `../devoks-feature-workflow-runner/references/example-walkthrough.md` 참고.
+> 형식이 헷갈리면 `../feature-workflow-runner/references/example-walkthrough.md` 참고.
