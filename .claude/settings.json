@@ -1,9 +1,9 @@
 {
   "enabledPlugins": {
-    "devoks-core@devoks": true,
     "devoks-git@devoks": true,
     "devoks-code@devoks": true,
+    "devoks-feature@devoks": true,
     "devoks-browser@devoks": true,
-    "devoks-feature@devoks": true
+    "devoks-core@devoks": true
   }
 }
