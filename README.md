@@ -14,7 +14,7 @@ Claude Code harness for the DevOks team — plugins for code review, feature dev
 
 | Plugin | Contents | Required |
 |--------|----------|----------|
-| `devoks-core` | Core principles & reference docs — SessionStart hook syncs `rules/` and `refs/` into the project `.claude/` for native auto-loading | **Required** |
+| `devoks-core` | Core principles & reference docs — SessionStart hook syncs `rules/` and `refs/` into the project `.claude/` (git-tracked; no longer gitignored) for native auto-loading | **Required** |
 | `devoks-git` | Git commit, issue, and PR workflow commands | Recommended |
 | `devoks-feature` | Feature development workflow (FRD/PLAN/execution skills, UI implementation, verification) | Recommended |
 | `devoks-code` | Code review, refactoring, and module analysis commands | Recommended |
@@ -55,7 +55,7 @@ Full dependency setup → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
 ### Step 2: Install plugins
 
 ```bash
-/plugin install devoks-core@devoks           # required — auto-syncs rules & refs on session start
+/plugin install devoks-core@devoks           # required — syncs rules & refs on session start
 /plugin install devoks-git@devoks            # Git workflow
 /plugin install devoks-feature@devoks        # feature development
 /plugin install devoks-code@devoks           # code quality
@@ -91,9 +91,10 @@ cd /path/to/your-project
 
 On session start (`startup`, `resume`, `clear`, `compact`), the `devoks-core` hook runs `sync-context.sh` and:
 
-1. Copies bundled `plugins/devoks-core/rules/*.md` → `.claude/rules/`
-2. Copies bundled `plugins/devoks-core/refs/*.md` → `.claude/refs/`
-3. Idempotently appends `.claude/rules/` and `.claude/refs/` to `.gitignore` (generated artifacts; plugin bundle is SSOT)
+1. Copies bundled `plugins/devoks-core/rules/*.md` → `.claude/rules/` (overwrites when the bundle changed)
+2. Copies bundled `plugins/devoks-core/refs/*.md` → `.claude/refs/` (overwrites when the bundle changed)
+
+**Policy:** The plugin bundle is the SSOT for these rules/refs, so the hook keeps each project's copy in sync with the bundle. It only copies the bundled files — project-specific files in those folders (e.g. `pitfalls.md`) are never touched. The hook does **not** modify `.gitignore`; projects track and commit `.claude/rules/` and `.claude/refs/` in git.
 
 | Type | Files | Role |
 |------|-------|------|
@@ -197,7 +198,7 @@ devoks-team-harness/
 └── README.md
 ```
 
-> `plugins/devoks-core/rules/` and `plugins/devoks-core/refs/` are the SSOT for team principles and reference docs. Edit those files and commit — the SessionStart hook (or `setup.sh`) propagates them to each project's `.claude/`.
+> `plugins/devoks-core/rules/` and `plugins/devoks-core/refs/` are the SSOT for team principles and reference docs. Edit those files and commit — the SessionStart hook (or `setup.sh`) syncs them into each project's `.claude/`. Projects keep these copies git-tracked (the hook does not gitignore them).
 
 ---
 
