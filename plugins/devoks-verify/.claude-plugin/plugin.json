@@ -1,0 +1,7 @@
+{
+  "name": "devoks-verify",
+  "version": "1.0.0",
+  "description": "DevOks 검증 — 요구사항 체크리스트·구현 충실도 검증, 데이터 흐름 정합성 검증",
+  "author": { "name": "ridsync" },
+  "dependencies": ["devoks-core"]
+}
