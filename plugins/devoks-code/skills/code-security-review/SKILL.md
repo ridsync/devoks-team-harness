@@ -1,11 +1,14 @@
 ---
-description: 리포지토리·의존성·위협 수준의 전용 보안 검증 패스. 의존성 취약점, 시크릿 하드코딩, 인증·인가 경계 우회, 인젝션/XSS/SSRF, 민감 데이터 노출·안전하지 않은 설정을 점검하고 심각도별 리포트를 만든다. "보안 점검", "보안 검토", "취약점 스캔", "시크릿 노출 확인", "security review", "security audit", "의존성 취약점" 요청에서 사용한다. 변경분 단위 경량 보안 체크는 devoks-code:code-review에 포함되어 있으며, 이 스킬은 그와 별개의 깊은 전수 패스다.
+description: code-security-reviewer 에이전트가 호출하는 보안 검증 실행 엔진. scope를 입력받아 의존성 취약점·시크릿 하드코딩·인증인가 경계 우회·인젝션/XSS/SSRF·민감 데이터 노출·안전하지 않은 설정을 repo 전수로 점검하고 심각도별 리포트를 생성한다. 메인 루프에서 직접 실행하지 않고 code-security-reviewer 에이전트를 통해서만 사용한다(진입은 /devoks-code:code-security-review 커맨드). 변경분 단위 경량 보안 체크는 devoks-code:code-review에 포함된 별개 기능이다.
 metadata:
   author: ridsync
   version: 1.0.0
 ---
 
-# code-security-review — 전용 보안 검증
+# code-security-review — 전용 보안 검증 (엔진)
+
+**호출 주체:** `code-security-reviewer` 에이전트 (subagent 안에서 실행)  
+**진입:** `/devoks-code:code-security-review` 커맨드 → 에이전트 위임. **메인 루프 직접 호출 금지.**
 
 리포지토리·의존성·위협 수준의 **깊은 보안 전용 패스**를 수행한다.
 
@@ -31,13 +34,11 @@ metadata:
 
 ---
 
-## 호출 방법
+## 입력 파라미터
 
-```
-/devoks-code:code-security-review [scope=<경로>]
-```
-
-- `scope` 미지정 시 전체 repo. 메인 루프에서 직접 호출 가능. 대용량 컨텍스트 격리가 필요하면 subagent 경유 호출.
+| 파라미터 | 타입 | 설명 |
+|---------|------|------|
+| `scope` | 경로 (전체 repo면 `.`) | 커맨드에서 이미 확정된 검증 대상 |
 
 ---
 

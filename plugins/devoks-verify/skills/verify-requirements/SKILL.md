@@ -1,19 +1,41 @@
 ---
-description: 요구사항을 체크리스트로 구조화하고 구현 충실도를 검증한다.
+description: 요구사항을 체크리스트로 구조화하고 구현 충실도를 검증한다. 구현 전 요구사항을 [REQ-카테고리-번호] ID로 추출해 체크리스트를 만들고(checklist 모드), 구현 후 diff와 대조해 커버리지 갭을 심각도별로 보고한다(verify 모드). "요구사항 검증", "구현 충실도 확인", "요구사항 체크리스트", "스펙 커버리지", "구현이 요구를 만족하는지", "requirement verification", "spec compliance" 요청에서 사용한다. 데이터 흐름 정합성은 devoks-verify:verify-data-flow, 코드 품질 리뷰는 devoks-code:code-review-diff-branch 를 쓴다.
+metadata:
+  author: ridsync
+  version: 1.0.0
 ---
 
-# 기능 구현 검증 (New Feature Verify)
-
-## Overview
+# verify-requirements — 요구사항 체크리스트·구현 충실도 검증
 
 기능 구현 전 **요구사항을 체크리스트로 구조화**하고, 구현 완료 후 **코드와 요구사항의 충실도를 체계적으로 검증**한다. 두 단계가 동일한 추적 ID(`[REQ-카테고리-번호]`)를 공유해 사전-사후가 연결된 하나의 검증 워크플로우를 구성한다.
 
-| 모드 | 호출 | 시점 | 목적 |
-|------|------|------|------|
-| **체크리스트 생성** | `/devoks-feature:new-feature-verify --checklist` | 구현 시작 전 | 요구사항 추출 → 구현 목표 체크리스트 생성 |
-| **구현 검증** (기본) | `/devoks-feature:new-feature-verify` | 구현 완료 후 | 체크리스트 + diff traceability → 커버리지 갭 보고 |
+---
 
-`$ARGUMENTS` 로 요구사항 문서 경로를 직접 지정할 수 있다. 미지정 시 자동 탐색한다.
+## 범위 (중요)
+
+**한다:**
+- 요구사항 문서에서 항목을 추출해 추적 가능한 체크리스트 생성(checklist 모드).
+- 구현 diff를 체크리스트와 대조해 구현/부분/미구현 분류 및 심각도별 갭 보고(verify 모드).
+
+**안 한다:**
+- 코드 자동 수정(갭 보고만, 보완 진행은 사용자 승인 후).
+- 데이터 값 정합성 실측 → `devoks-verify:verify-data-flow`.
+- 코드 품질·보안 리뷰 → `devoks-code:code-review-diff-branch`, `devoks-code:code-security-review`.
+
+---
+
+## 호출 방법
+
+```
+/devoks-verify:verify-requirements [mode=checklist|verify] [spec=<요구사항 문서 경로>]
+```
+
+| 모드 | 시점 | 목적 |
+|------|------|------|
+| `mode=checklist` | 구현 시작 전 | 요구사항 추출 → 구현 목표 체크리스트 생성 |
+| `mode=verify` (기본) | 구현 완료 후 | 체크리스트 + diff traceability → 커버리지 갭 보고 |
+
+`spec` 로 요구사항 문서 경로를 직접 지정할 수 있다. 미지정 시 자동 탐색한다.
 
 ---
 
@@ -21,11 +43,11 @@ description: 요구사항을 체크리스트로 구조화하고 구현 충실도
 
 ### S1. 모드 판별
 
-`$ARGUMENTS` 에 `--checklist` 가 포함되어 있으면 **체크리스트 생성 모드**, 아니면 **구현 검증 모드**로 분기한다.
+`mode=checklist` 면 **체크리스트 생성 모드**, `mode=verify` 또는 미지정이면 **구현 검증 모드**로 분기한다.
 
 ### S2. 요구사항 문서 탐색 및 로딩
 
-1. **`$ARGUMENTS` 확인** — `--checklist` 를 제외한 나머지 인자를 문서 경로로 해석한다.
+1. **`spec` 인자 확인** — 지정된 경로를 요구사항 문서로 해석한다.
 2. **자동 탐색** — 경로가 없으면 다음 위치를 순서대로 탐색한다:
    - `.claude/workspace/` — PRD, 워크플로우, 비즈니스 로직 SSOT
    - `.claude/plans/` — 구현 플랜 파일 (가장 최신 플랜 우선)
@@ -56,7 +78,7 @@ description: 요구사항을 체크리스트로 구조화하고 구현 충실도
 
 ---
 
-## 체크리스트 생성 모드 전용 Steps (`--checklist`)
+## 체크리스트 생성 모드 전용 Steps (`mode=checklist`)
 
 ### C1. 체크리스트 출력
 
@@ -131,7 +153,7 @@ S4에서 추출한 각 요구사항 항목에 대해:
 
 ---
 
-## 출력 템플릿 — 체크리스트 생성 모드 (`--checklist`)
+## 출력 템플릿 — 체크리스트 생성 모드 (`mode=checklist`)
 
 ```markdown
 ## 📋 구현 체크리스트
@@ -171,7 +193,7 @@ S4에서 추출한 각 요구사항 항목에 대해:
 
 ## 🚀 다음 단계
 - 위 체크리스트를 기준으로 구현을 진행한다.
-- 구현 완료 후 `/devoks-feature:new-feature-verify` (구현 검증 모드)로 커버리지를 확인한다.
+- 구현 완료 후 `/devoks-verify:verify-requirements mode=verify` (구현 검증 모드)로 커버리지를 확인한다.
 ```
 
 ---
@@ -271,11 +293,11 @@ S4에서 추출한 각 요구사항 항목에 대해:
 ## 참고
 
 - **권장 워크플로우**:
-  1. 구현 전 → `/devoks-feature:new-feature-verify --checklist` — 구현 목표 체크리스트 확보
-  2. 구현 후 → `/devoks-feature:new-feature-verify` — 커버리지 갭 검증
+  1. 구현 전 → `/devoks-verify:verify-requirements mode=checklist` — 구현 목표 체크리스트 확보
+  2. 구현 후 → `/devoks-verify:verify-requirements mode=verify` — 커버리지 갭 검증
   3. 코드 품질 → `/devoks-code:code-review-diff-branch` — 별개로 병행 실행
 - **체크리스트 저장 위치**: `.claude/workspace/checklists/<feature-name>.md` — 브랜치명 그대로 파일명 사용
 - **요구사항 문서 기본 위치**: `doc/workspace/` (PRD, 워크플로우), `.claude/plans/` (구현 플랜)
 - **프로젝트 원칙**: `.claude/refs/engineering-principles.md`, `.claude/rules/agent-principles.md`
 - **추적 ID 형식**: `[REQ-카테고리약어-번호]` — 예: `[REQ-F-01]` (기능), `[REQ-B-01]` (비즈니스로직), `[REQ-U-01]` (UI), `[REQ-E-01]` (엣지케이스), `[REQ-D-01]` (데이터계약)
-- **ID 연속성**: `--checklist`에서 생성된 ID가 구현 검증 모드에서 동일하게 사용됨 — 사전/사후 추적 가능
+- **ID 연속성**: `mode=checklist`에서 생성된 ID가 구현 검증 모드에서 동일하게 사용됨 — 사전/사후 추적 가능

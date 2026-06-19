@@ -93,7 +93,7 @@ Figma 계정 연결은 최초 도구 호출 시 브라우저 OAuth 플로우로 
 
 ## 3. Chrome DevTools MCP
 
-`devoks-browser:browser-devtools` 스킬, `devoks-browser:browser-visual-diff`의 라이브 렌더 캡처(**기본 도구**), `devoks-feature:data-verification`(browser 환경)에 필요합니다.
+`devoks-browser:browser-devtools` 스킬, `devoks-browser:browser-visual-diff`의 라이브 렌더 캡처(**기본 도구**), `devoks-verify:verify-data-flow`(browser 환경)에 필요합니다.
 
 ### 3-1. 플러그인 설치 (스킬 파일 로딩)
 
