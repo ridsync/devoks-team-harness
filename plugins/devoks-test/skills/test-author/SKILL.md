@@ -1,5 +1,5 @@
 ---
-description: 대상 코드·모듈의 자동화 테스트(단위·통합)를 작성하거나 기존 테스트를 확장한다. 프로젝트의 실제 테스트 러너·라이브러리·파일 패턴을 먼저 감지해 그 컨벤션에 맞춰 작성한다. "테스트 작성해줘", "테스트 짜줘", "유닛 테스트 추가", "테스트 커버리지 보강", "이 함수 테스트 만들어줘", "write tests" 요청에서 사용한다. 테스트 실행·실패 분석은 devoks-test:test-run-triage, 요구·보안 충족 판정은 devoks-feature:new-feature-verify / devoks-code:code-security-review 를 쓴다.
+description: 대상 코드·모듈의 자동화 테스트(단위·통합)를 작성하거나 기존 테스트를 확장한다. 프로젝트의 실제 테스트 러너·라이브러리·파일 패턴을 먼저 감지해 그 컨벤션에 맞춰 작성한다. "테스트 작성해줘", "테스트 짜줘", "유닛 테스트 추가", "테스트 커버리지 보강", "이 함수 테스트 만들어줘", "write tests" 요청에서 사용한다. 테스트 실행·실패 분석은 devoks-test:test-run-triage, 요구·보안 충족 판정은 devoks-verify:verify-requirements / devoks-code:code-security-review 를 쓴다.
 metadata:
   author: ridsync
   version: 1.0.0
@@ -22,7 +22,7 @@ metadata:
 **안 한다:**
 - 프로덕션 코드 수정(테스트가 드러낸 버그는 보고만 하고 수정은 사용자 승인 후).
 - 전체 스위트 실행·실패 triage → `devoks-test:test-run-triage`.
-- 요구·보안 충족 판정 → `devoks-feature:new-feature-verify`, `devoks-code:code-security-review`.
+- 요구·보안 충족 판정 → `devoks-verify:verify-requirements`, `devoks-code:code-security-review`.
 
 ---
 
@@ -85,4 +85,4 @@ metadata:
 ## 참고 기준 문서
 
 - **프로젝트 규칙**: `.claude/rules/project-convention.md`(Test 섹션), `.claude/rules/agent-principles.md`(Definition of Done).
-- 관련 스킬: `devoks-test:test-run-triage`(실행·triage), `devoks-feature:new-feature-verify`(요구 충족 판정).
+- 관련 스킬: `devoks-test:test-run-triage`(실행·triage), `devoks-verify:verify-requirements`(요구 충족 판정).
