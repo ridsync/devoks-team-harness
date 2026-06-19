@@ -1,7 +1,7 @@
 {
   "name": "devoks-code",
   "version": "1.0.0",
-  "description": "DevOks 코드 품질 — 코드리뷰(범위·브랜치), 리팩토링, 모듈분석 커맨드",
+  "description": "DevOks 코드 품질 — 코드리뷰(범위·브랜치), 리팩토링, 모듈분석, 보안 검증",
   "author": { "name": "ridsync" },
   "dependencies": ["devoks-core"]
 }
