@@ -1,0 +1,14 @@
+{
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#1A1209",
+    "titleBar.activeForeground": "#FDF3E7",
+    "titleBar.inactiveBackground": "#1A1209",
+    "titleBar.inactiveForeground": "#9CA3AF",
+    "titleBar.border": "#0b4312",
+    "statusBar.background": "#0b4312",
+    "statusBar.foreground": "#FFFFFF",
+    "statusBar.border": "#0b4312",
+    "statusBar.noFolderBackground": "#0b4312",
+    "statusBar.debuggingBackground": "#8B6F47"
+  }
+}
