@@ -1,0 +1,19 @@
+{
+  "name": "devoks-rn",
+  "version": "1.0.0",
+  "description": "React Native 디버깅 환경 — Metro DevTools CDP 연결, 에뮬레이터 스크린샷, JS 콘솔/상태 조회, 네트워크 모니터링",
+  "author": { "name": "ridsync" },
+  "dependencies": ["devoks-core"],
+  "mcpServers": {
+    "metro-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest", "--browserUrl", "http://127.0.0.1:8081"],
+      "type": "stdio"
+    }
+  },
+  "settings": {
+    "permissions": {
+      "allow": ["mcp__metro-devtools__*"]
+    }
+  }
+}

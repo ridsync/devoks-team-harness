@@ -44,6 +44,12 @@
       "source": "./plugins/devoks-browser",
       "description": "Chrome DevTools MCP 연결 + Visual Diff 검증",
       "dependencies": ["devoks-core"]
+    },
+    {
+      "name": "devoks-rn",
+      "source": "./plugins/devoks-rn",
+      "description": "React Native 디버깅 — Metro DevTools CDP 연결, 에뮬레이터 스크린샷, JS 콘솔/상태 조회",
+      "dependencies": ["devoks-core"]
     }
   ]
 }
