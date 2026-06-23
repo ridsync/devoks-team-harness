@@ -1,5 +1,5 @@
 {
-  "name": "devoks",
+  "name": "devoks-plugins",
   "description": "DevOks 팀 Claude Code 하네스 — 코드리뷰·기능개발·Git 워크플로우",
   "owner": { "name": "ridsync" },
   "plugins": [
