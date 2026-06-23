@@ -60,7 +60,32 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
    - `/plugin install`은 대화형 Claude Code 명령이므로 shell로 자동 실행하지 말고, 위 명령을 그대로 안내한다.
    - figma는 최초 도구 호출 시 브라우저 OAuth로 인증된다.
 
-5. **chrome-devtools-attach (visual-diff·data-verify 필수 — figma·playwright와 동일하게 플러그인 경로)**
+5. **metro-devtools (React Native 전용 — devoks-rn 플러그인 필요)**
+   - RN 프로젝트에서 `devoks-rn:metro-devtools-attach` 스킬 사용 시 필요하다 (JS 콘솔·Zustand·TanStack Query 조회).
+   - Metro WebSocket device ID가 재시작마다 바뀌어 `claude mcp add`나 플러그인 번들로 정적 등록이 불가능하다.
+     대신 **현재 WebSocket URL을 직접 추출해 `~/.claude.json`의 `mcpServers`에 수동 추가**한다.
+
+   **설치 단계:**
+   - Metro가 실행 중인지 확인한다:
+     ```bash
+     curl -s http://localhost:8081/status   # → packager-status:running
+     ```
+   - 현재 WebSocket URL을 추출한다:
+     ```bash
+     python3 -c "import urllib.request,json; print(json.loads(urllib.request.urlopen('http://localhost:8081/json').read())[0]['webSocketDebuggerUrl'])"
+     ```
+   - 출력된 URL을 아래 형식으로 `~/.claude.json`의 `mcpServers` 블록에 추가한다:
+     ```json
+     "metro-devtools": {
+       "command": "npx",
+       "args": ["chrome-devtools-mcp@latest", "--wsEndpoint", "ws://localhost:8081/inspector/debug?device=<DEVICE_ID>&page=1"],
+       "type": "stdio"
+     }
+     ```
+   - Claude Code를 재시작해야 반영된다. 이후 `mcp__metro-devtools__*` 도구를 사용한다.
+   - ⚠ **Metro 재시작마다 device ID가 바뀐다** — 재시작 후 URL을 재추출해 `~/.claude.json`을 업데이트하고 Claude Code를 재시작해야 한다. 콘솔 로그가 당장 필요 없으면 스크린샷(`adb exec-out screencap -p`)만 사용해도 된다.
+
+6. **chrome-devtools-attach (visual-diff·data-verify 필수 — figma·playwright와 동일하게 플러그인 경로)**
    - 이 서버는 `devoks-browser` 플러그인이 번들한다(`:9269` attach 고유 설정, prefix `mcp__chrome-devtools-attach__*`).
    - **`claude mcp add`로 깔지 않는다.** 같은 서버가 플러그인 번들 + user scope에 이중 등록되면
      동일한 `:9269` 디버그 포트에 두 인스턴스가 동시에 attach를 시도해 충돌한다.
@@ -68,7 +93,7 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
      다음을 안내한다: `/plugin install devoks-browser@devoks`. 이미 devoks-browser가 설치돼 있으면 별도 작업 불필요.
    - Chrome 디버그 실행(`--remote-debugging-port=9269`)은 `docs/mcp-setup-guide.md` 3절을 참조하게 한다.
 
-6. **결과 보고**
+7. **결과 보고**
    - 설치가 끝나면 `claude mcp list`를 다시 실행해 최종 상태를 요약한다.
    - 변경 사항이 도구로 반영되려면 **세션 재시작이 필요할 수 있음**을 안내한다.
 
