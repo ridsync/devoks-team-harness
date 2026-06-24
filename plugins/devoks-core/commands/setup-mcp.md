@@ -62,28 +62,33 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
 
 5. **metro-devtools (React Native 전용 — devoks-rn 플러그인 필요)**
    - RN 프로젝트에서 `devoks-rn:metro-devtools-attach` 스킬 사용 시 필요하다 (JS 콘솔·Zustand·TanStack Query 조회).
-   - Metro WebSocket device ID가 재시작마다 바뀌어 `claude mcp add`나 플러그인 번들로 정적 등록이 불가능하다.
-     대신 **현재 WebSocket URL을 직접 추출해 `~/.claude.json`의 `mcpServers`에 수동 추가**한다.
+   - `devoks-rn` 플러그인에 번들된 `metro-mcp.js`를 `~/.devoks/mcp/`에 복사 후 user scope에 등록한다.
+     Metro URL을 `/json` 엔드포인트로 **자동 조회**하므로 Metro 재시작마다 수동 갱신이 불필요하다.
 
    **설치 단계:**
-   - Metro가 실행 중인지 확인한다:
-     ```bash
-     curl -s http://localhost:8081/status   # → packager-status:running
-     ```
-   - 현재 WebSocket URL을 추출한다:
-     ```bash
-     python3 -c "import urllib.request,json; print(json.loads(urllib.request.urlopen('http://localhost:8081/json').read())[0]['webSocketDebuggerUrl'])"
-     ```
-   - 출력된 URL을 아래 형식으로 `~/.claude.json`의 `mcpServers` 블록에 추가한다:
-     ```json
-     "metro-devtools": {
-       "command": "npx",
-       "args": ["chrome-devtools-mcp@latest", "--wsEndpoint", "ws://localhost:8081/inspector/debug?device=<DEVICE_ID>&page=1"],
-       "type": "stdio"
-     }
-     ```
-   - Claude Code를 재시작해야 반영된다. 이후 `mcp__metro-devtools__*` 도구를 사용한다.
-   - ⚠ **Metro 재시작마다 device ID가 바뀐다** — 재시작 후 URL을 재추출해 `~/.claude.json`을 업데이트하고 Claude Code를 재시작해야 한다. 콘솔 로그가 당장 필요 없으면 스크린샷(`adb exec-out screencap -p`)만 사용해도 된다.
+   1. `devoks-rn` 플러그인이 설치돼 있는지 확인한다:
+      ```bash
+      ls ~/.claude/plugins/cache/devoks/devoks-rn/ 2>/dev/null || echo "플러그인 미설치"
+      ```
+      미설치면 먼저 `/plugin install devoks-rn@devoks-plugins`를 안내한다.
+
+   2. 스크립트를 devoks 관리 경로에 복사한다:
+      ```bash
+      mkdir -p ~/.devoks/mcp
+      SCRIPT=$(find ~/.claude/plugins/cache/devoks/devoks-rn -name "metro-mcp.js" \
+                -path "*/scripts/*" 2>/dev/null | sort -V | tail -1)
+      cp "$SCRIPT" ~/.devoks/mcp/metro-mcp.js
+      ```
+
+   3. user scope에 등록한다:
+      ```bash
+      claude mcp add metro-devtools --scope user \
+        -- node --experimental-websocket ~/.devoks/mcp/metro-mcp.js
+      ```
+
+   4. Claude Code를 재시작하면 `mcp__metro-devtools__*` 도구가 활성화된다.
+
+   ⚠ `devoks-rn` 플러그인 업데이트 후에는 2·3단계를 재실행해 스크립트를 갱신한다.
 
 6. **chrome-devtools-attach (visual-diff·data-verify 필수 — figma·playwright와 동일하게 플러그인 경로)**
    - 이 서버는 `devoks-browser` 플러그인이 번들한다(`:9269` attach 고유 설정, prefix `mcp__chrome-devtools-attach__*`).

@@ -74,7 +74,7 @@ while IFS= read -r -d '' _pkg; do
   fi
 done < <(find "${PROJECT_DIR}" -maxdepth 3 -name "package.json" -not -path "*/node_modules/*" -print0 2>/dev/null)
 if $_rn_detected; then
-  have "metro-devtools" || add_missing_mcp '- metro-devtools (RN JS 콘솔·상태 조회, devoks-rn 스킬 필요): Metro WebSocket URL이 동적이라 플러그인 번들 불가 — ~/.claude.json에 직접 추가 필요. /devoks-setup-mcp 또는 devoks-rn:metro-devtools-attach 스킬 Step 2-0 참조'
+  have "metro-devtools" || add_missing_mcp '- metro-devtools (RN JS 콘솔·상태 조회, devoks-rn 스킬 필요): /devoks-setup-mcp Step 5 실행 — devoks-rn 플러그인의 metro-mcp.js를 ~/.devoks/mcp/에 복사 후 user scope 등록 (Metro URL 자동 조회, 재시작 불필요)'
 fi
 
 if have "serena" && ! serena_project_ready; then
