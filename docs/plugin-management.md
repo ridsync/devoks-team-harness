@@ -213,6 +213,26 @@ done
 
 ---
 
+### 저장소 maintainers용 로컬 skill
+
+이 저장소에서 플러그인 변경 작업을 시작할 때는 배포용 플러그인 기능과 별개로, **로컬 유지보수 스킬**을 먼저 사용하는 것을 권장합니다.
+
+- 위치: `.claude/skills/devoks-plugin-maintenance/SKILL.md`
+- 목적: 플러그인 변경 시 **버전 bump → `validate --strict` → 문서/카탈로그 반영 → MCP prefix / permissions / cross-reference 점검** 순서를 누락 없이 강제
+- 성격: `plugins/devoks-*`에 배포되는 기능이 아니라, **이 저장소 maintainers용 로컬 워크플로우**
+
+이 스킬은 특히 아래 상황에서 먼저 사용하는 것을 권장합니다.
+
+- 플러그인 기능 추가 / 버그 수정
+- skill / command / agent 이름 또는 description 변경
+- `plugin.json`의 `mcpServers` / `settings.permissions.allow` 변경
+- `docs/mcp-setup-guide.md`, `plugins/devoks-core/commands/setup-mcp.md`, `plugins/devoks-core/hooks/check-mcp.sh` 와의 정합성 확인이 필요한 변경
+- `devoks-core`의 `refs/`, `rules/`, `sync-context.sh` 영향 검토가 필요한 변경
+
+상세 체크 항목은 로컬 skill의 reference 문서 `references/workflow-checklist.md`를 기준으로 유지합니다.
+
+---
+
 ## 8. 배포 워크플로우
 
 ```
