@@ -3,37 +3,42 @@
 // Run with: node --experimental-websocket metro-mcp.js
 // Requires Node.js 20+ with --experimental-websocket flag
 
-'use strict';
-const http  = require('http');
-const readline = require('readline');
+"use strict";
+const http = require("http");
+const readline = require("readline");
 
-const METRO_URL = process.env.METRO_URL || 'http://localhost:8081';
+const METRO_URL = process.env.METRO_URL || "http://localhost:8081";
 
 // ─── MCP stdio transport ─────────────────────────────────────────────────────
 const rl = readline.createInterface({ input: process.stdin, terminal: false });
-const send = (obj) => process.stdout.write(JSON.stringify(obj) + '\n');
+const send = (obj) => process.stdout.write(JSON.stringify(obj) + "\n");
 
 // ─── Metro CDP connection ─────────────────────────────────────────────────────
-let ws                = null;
+let ws = null;
 let connectingPromise = null; // serialize concurrent ensureConnected() calls
-let cmdId             = 1;
-const pending         = new Map();
-const consoleMsgs     = [];
+let cmdId = 1;
+const pending = new Map();
+const consoleMsgs = [];
 
 function fetchMetroWsUrl() {
   return new Promise((resolve, reject) => {
-    http.get(`${METRO_URL}/json`, (res) => {
-      let raw = '';
-      res.on('data', d => raw += d);
-      res.on('end', () => {
-        try {
-          const targets = JSON.parse(raw);
-          const target  = Array.isArray(targets) ? targets[0] : null;
-          if (target?.webSocketDebuggerUrl) resolve(target.webSocketDebuggerUrl);
-          else reject(new Error('No Metro target found in /json'));
-        } catch (e) { reject(e); }
-      });
-    }).on('error', reject);
+    http
+      .get(`${METRO_URL}/json`, (res) => {
+        let raw = "";
+        res.on("data", (d) => (raw += d));
+        res.on("end", () => {
+          try {
+            const targets = JSON.parse(raw);
+            const target = Array.isArray(targets) ? targets[0] : null;
+            if (target?.webSocketDebuggerUrl)
+              resolve(target.webSocketDebuggerUrl);
+            else reject(new Error("No Metro target found in /json"));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      })
+      .on("error", reject);
   });
 }
 
@@ -42,13 +47,19 @@ async function doConnect() {
   ws = new WebSocket(wsUrl);
 
   await new Promise((resolve, reject) => {
-    ws.addEventListener('open',  resolve);
-    ws.addEventListener('error', (e) => reject(new Error(String(e.message || e))));
+    ws.addEventListener("open", resolve);
+    ws.addEventListener("error", (e) =>
+      reject(new Error(String(e.message || e))),
+    );
   });
 
-  ws.addEventListener('message', (event) => {
+  ws.addEventListener("message", (event) => {
     let msg;
-    try { msg = JSON.parse(event.data); } catch { return; }
+    try {
+      msg = JSON.parse(event.data);
+    } catch {
+      return;
+    }
 
     // Resolve pending CDP commands
     if (msg.id != null && pending.has(msg.id)) {
@@ -58,45 +69,56 @@ async function doConnect() {
     }
 
     // Capture console output (Hermes: Runtime.consoleAPICalled)
-    if (msg.method === 'Runtime.consoleAPICalled') {
+    if (msg.method === "Runtime.consoleAPICalled") {
       const { type, args } = msg.params;
-      const text = (args || []).map(a => {
-        if (a.value != null)        return String(a.value);
-        if (a.description != null)  return a.description;
-        return JSON.stringify(a);
-      }).join(' ');
+      const text = (args || [])
+        .map((a) => {
+          if (a.value != null) return String(a.value);
+          if (a.description != null) return a.description;
+          return JSON.stringify(a);
+        })
+        .join(" ");
       consoleMsgs.push({ type, text, timestamp: Date.now() });
       if (consoleMsgs.length > 200) consoleMsgs.shift();
     }
 
     // Capture console output (legacy Console domain)
-    if (msg.method === 'Console.messageAdded') {
+    if (msg.method === "Console.messageAdded") {
       const m = msg.params?.message;
       if (m) {
-        consoleMsgs.push({ type: m.level, text: m.text, timestamp: Date.now() });
+        consoleMsgs.push({
+          type: m.level,
+          text: m.text,
+          timestamp: Date.now(),
+        });
         if (consoleMsgs.length > 200) consoleMsgs.shift();
       }
     }
   });
 
-  ws.addEventListener('close', () => { ws = null; connectingPromise = null; });
+  ws.addEventListener("close", () => {
+    ws = null;
+    connectingPromise = null;
+  });
 
   // Enable domains
-  await cdp('Runtime.enable', {});
-  await cdp('Console.enable', {}).catch(() => {}); // optional domain
+  await cdp("Runtime.enable", {});
+  await cdp("Console.enable", {}).catch(() => {}); // optional domain
 }
 
 async function ensureConnected() {
-  if (ws?.readyState === WebSocket.OPEN) return;
+  if (ws?.readyState === 1 /* WebSocket.OPEN */) return;
   // Serialize concurrent calls — don't create multiple WebSockets
   if (connectingPromise) return connectingPromise;
-  connectingPromise = doConnect().finally(() => { connectingPromise = null; });
+  connectingPromise = doConnect().finally(() => {
+    connectingPromise = null;
+  });
   return connectingPromise;
 }
 
 function cdp(method, params = {}) {
   return new Promise((resolve, reject) => {
-    const id      = cmdId++;
+    const id = cmdId++;
     const timeout = setTimeout(() => {
       pending.delete(id);
       reject(new Error(`CDP timeout (10s): ${method}`));
@@ -112,52 +134,64 @@ function cdp(method, params = {}) {
 // ─── Tools ───────────────────────────────────────────────────────────────────
 const TOOLS = [
   {
-    name: 'evaluate_script',
-    description: 'Evaluate a JavaScript function in the live React Native app via Metro CDP. Pass an arrow function string.',
+    name: "evaluate_script",
+    description:
+      "Evaluate a JavaScript function in the live React Native app via Metro CDP. Pass an arrow function string.",
     inputSchema: {
-      type: 'object',
+      type: "object",
       properties: {
         function: {
-          type: 'string',
-          description: 'Arrow function to evaluate, e.g. "() => JSON.stringify(globalThis.__appState__)"'
-        }
+          type: "string",
+          description:
+            'Arrow function to evaluate, e.g. "() => JSON.stringify(globalThis.__appState__)"',
+        },
       },
-      required: ['function']
-    }
+      required: ["function"],
+    },
   },
   {
-    name: 'list_console_messages',
-    description: 'List console messages captured from the React Native app since the MCP server started.',
+    name: "list_console_messages",
+    description:
+      "List console messages captured from the React Native app since the MCP server started.",
     inputSchema: {
-      type: 'object',
+      type: "object",
       properties: {
         types: {
-          type: 'array',
-          items: { type: 'string', enum: ['log', 'warn', 'error', 'info', 'debug', 'warning'] },
-          description: 'Filter by level. Omit for all.'
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["log", "warn", "error", "info", "debug", "warning"],
+          },
+          description: "Filter by level. Omit for all.",
         },
-        pageSize: { type: 'integer', description: 'Max messages to return (newest first).' }
-      }
-    }
+        pageSize: {
+          type: "integer",
+          description: "Max messages to return (newest first).",
+        },
+      },
+    },
   },
   {
-    name: 'list_network_requests',
-    description: 'Return XHR/fetch requests captured in globalThis.__networkRequests__ (requires app-side instrumentation).',
-    inputSchema: { type: 'object', properties: {} }
+    name: "list_network_requests",
+    description:
+      "Return XHR/fetch requests captured in globalThis.__networkRequests__ (requires app-side instrumentation).",
+    inputSchema: { type: "object", properties: {} },
   },
   {
-    name: 'get_metro_status',
-    description: 'Check Metro bundler status and current WebSocket endpoint.',
-    inputSchema: { type: 'object', properties: {} }
-  }
+    name: "get_metro_status",
+    description: "Check Metro bundler status and current WebSocket endpoint.",
+    inputSchema: { type: "object", properties: {} },
+  },
 ];
 
 async function callTool(name, args) {
-  if (name === 'get_metro_status') {
+  if (name === "get_metro_status") {
     try {
       const wsUrl = await fetchMetroWsUrl();
-      const connected = ws?.readyState === WebSocket.OPEN;
-      return text(JSON.stringify({ metro: METRO_URL, wsUrl, connected }, null, 2));
+      const connected = ws?.readyState === 1; /* OPEN */
+      return text(
+        JSON.stringify({ metro: METRO_URL, wsUrl, connected }, null, 2),
+      );
     } catch (e) {
       return text(`Metro not reachable: ${e.message}`);
     }
@@ -165,7 +199,7 @@ async function callTool(name, args) {
 
   await ensureConnected();
 
-  if (name === 'evaluate_script') {
+  if (name === "evaluate_script") {
     const fn = args.function;
     // Hermes does not properly support awaitPromise:true via CDP.
     // Wrap in JSON.stringify so the result is always a string primitive.
@@ -182,44 +216,53 @@ async function callTool(name, args) {
     return JSON.stringify({ __error: __e.message });
   }
 })()`;
-    const res = await cdp('Runtime.evaluate', {
+    const res = await cdp("Runtime.evaluate", {
       expression: expr,
-      returnByValue: true
+      returnByValue: true,
     });
     // CDP response shape: { id, result: { result: { type, value|description } } }
     const remoteObj = res.result?.result;
-    const val = remoteObj?.value ?? remoteObj?.description ?? JSON.stringify(res);
+    const val =
+      remoteObj?.value ?? remoteObj?.description ?? JSON.stringify(res);
     return text(String(val));
   }
 
-  if (name === 'list_console_messages') {
+  if (name === "list_console_messages") {
     const { types, pageSize } = args;
     let msgs = [...consoleMsgs];
-    if (types?.length) msgs = msgs.filter(m => types.includes(m.type));
-    if (pageSize)       msgs = msgs.slice(-pageSize);
-    return text(msgs.length ? JSON.stringify(msgs, null, 2) : '(no messages captured yet)');
+    if (types?.length) msgs = msgs.filter((m) => types.includes(m.type));
+    if (pageSize) msgs = msgs.slice(-pageSize);
+    return text(
+      msgs.length
+        ? JSON.stringify(msgs, null, 2)
+        : "(no messages captured yet)",
+    );
   }
 
-  if (name === 'list_network_requests') {
-    const res = await cdp('Runtime.evaluate', {
-      expression: 'JSON.stringify(globalThis.__networkRequests__ || [])',
-      returnByValue: true
+  if (name === "list_network_requests") {
+    const res = await cdp("Runtime.evaluate", {
+      expression: "JSON.stringify(globalThis.__networkRequests__ || [])",
+      returnByValue: true,
     });
-    return text(res.result?.result?.value ?? '[]');
+    return text(res.result?.result?.value ?? "[]");
   }
 
   throw new Error(`Unknown tool: ${name}`);
 }
 
-const text = (t) => ({ content: [{ type: 'text', text: t }] });
+const text = (t) => ({ content: [{ type: "text", text: t }] });
 
 // ─── MCP request handler ──────────────────────────────────────────────────────
-rl.on('line', async (line) => {
+rl.on("line", async (line) => {
   const trimmed = line.trim();
   if (!trimmed) return;
 
   let msg;
-  try { msg = JSON.parse(trimmed); } catch { return; }
+  try {
+    msg = JSON.parse(trimmed);
+  } catch {
+    return;
+  }
 
   const { id, method, params } = msg;
 
@@ -227,31 +270,35 @@ rl.on('line', async (line) => {
   if (id == null) return;
 
   try {
-    if (method === 'initialize') {
-      send({ jsonrpc: '2.0', id, result: {
-        protocolVersion: '2024-11-05',
-        capabilities: { tools: {} },
-        serverInfo: { name: 'metro-mcp', version: '1.0.0' }
-      }});
+    if (method === "initialize") {
+      send({
+        jsonrpc: "2.0",
+        id,
+        result: {
+          protocolVersion: "2024-11-05",
+          capabilities: { tools: {} },
+          serverInfo: { name: "metro-mcp", version: "1.0.0" },
+        },
+      });
 
       // Connect eagerly so console capture starts immediately
       ensureConnected().catch(() => {});
-
-    } else if (method === 'tools/list') {
-      send({ jsonrpc: '2.0', id, result: { tools: TOOLS } });
-
-    } else if (method === 'tools/call') {
+    } else if (method === "tools/list") {
+      send({ jsonrpc: "2.0", id, result: { tools: TOOLS } });
+    } else if (method === "tools/call") {
       const result = await callTool(params?.name, params?.arguments || {});
-      send({ jsonrpc: '2.0', id, result });
-
-    } else if (method === 'ping') {
-      send({ jsonrpc: '2.0', id, result: {} });
-
+      send({ jsonrpc: "2.0", id, result });
+    } else if (method === "ping") {
+      send({ jsonrpc: "2.0", id, result: {} });
     } else {
-      send({ jsonrpc: '2.0', id, error: { code: -32601, message: `Method not found: ${method}` } });
+      send({
+        jsonrpc: "2.0",
+        id,
+        error: { code: -32601, message: `Method not found: ${method}` },
+      });
     }
   } catch (err) {
-    send({ jsonrpc: '2.0', id, error: { code: -32603, message: err.message } });
+    send({ jsonrpc: "2.0", id, error: { code: -32603, message: err.message } });
   }
 });
 

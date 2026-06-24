@@ -142,6 +142,8 @@ AsyncStorage 확인:
 | JS eval 무응답 | 앱 background 상태 | 앱을 foreground로 전환 |
 | `evaluate_script` 에러 | Hermes strict mode | `require()` 대신 빌드 시 import한 모듈 참조 |
 | `mcp__metro-devtools__*` 도구 없음 | metro-devtools user scope 미등록 | `/devoks-setup-mcp` Step 5 실행 |
+| `get_metro_status` → "WebSocket is not defined" | Node.js 20에서 `--experimental-websocket` 플래그 없이 등록됨 | `~/.devoks/mcp/metro-mcp.js` 재등록: `claude mcp add metro-devtools --scope user -- node --experimental-websocket ~/.devoks/mcp/metro-mcp.js` |
+| `evaluate_script` → "Property 'global' doesn't exist" | Hermes에서 `global` 전역 없음 | `global.xxx` → `globalThis.xxx` 로 교체 |
 | adb 없음 | PATH 미설정 | `~/Library/Android/sdk/platform-tools` PATH 추가 |
 
 ---
