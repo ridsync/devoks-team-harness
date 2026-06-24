@@ -1,0 +1,23 @@
+{
+  "skill_name": "devoks-plugin-maintenance",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "devoks-browser 에서 chrome-devtools-attach 관련 동작을 손보려고 해. 버전 bump, validate, README 쪽 정합성까지 빠짐없이 챙기는 유지보수 절차로 진행해줘.",
+      "expected_output": "대상 플러그인을 devoks-browser로 식별하고, version bump 필요 여부, validate --strict, README/README.ko/MCP 관련 문서 점검, prefix/permission 대조를 체크리스트로 분리해 제시한다.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "devoks-rn 의 metro-devtools prefix 와 setup 안내를 수정하려고 해. 어떤 문서와 설정을 같이 봐야 하는지 유지보수 스킬 기준으로 점검해줘.",
+      "expected_output": "devoks-rn 의 MCP/prefix/policy change 로 분류하고, plugin.json allow prefix, mcp-setup-guide, setup-mcp 문서, validate --strict, 비대상 사유 기록을 포함한 절차를 제시한다.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "devoks-core 의 refs/rules 와 sync-context 관련 설명을 같이 바꾸려 해. 루트 .claude 사본 정합성까지 포함해서 maintainer 절차로 정리해줘.",
+      "expected_output": "devoks-core 의 core refs/rules change 로 분류하고, refs/rules 원본과 루트 .claude 사본, sync-context/check-mcp 관련 문서, plugin-management 문서 반영 여부까지 점검하도록 유도한다.",
+      "files": []
+    }
+  ]
+}
