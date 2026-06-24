@@ -2,9 +2,10 @@
 
 Claude Code harness for the DevOks team — plugins for code review, feature development, Git workflows, and React Native debugging.
 
+> **한국어 문서**: [docs/README.ko.md](docs/README.ko.md)
+> 
 > **MCP & dependency setup**: [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)  
 > **Plugin management** (create, validate, deploy): [`docs/plugin-management.md`](docs/plugin-management.md)
-> **한국어 문서**: [docs/README.ko.md](docs/README.ko.md)
 
 ![DevOks Team Harness plugin map](assets/devoks-harness-engineering-final.png)
 

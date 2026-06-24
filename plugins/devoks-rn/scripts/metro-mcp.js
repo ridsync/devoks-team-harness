@@ -141,7 +141,7 @@ const TOOLS = [
     }
   },
   {
-    name: 'get_network_requests',
+    name: 'list_network_requests',
     description: 'Return XHR/fetch requests captured in globalThis.__networkRequests__ (requires app-side instrumentation).',
     inputSchema: { type: 'object', properties: {} }
   },
@@ -200,7 +200,7 @@ async function callTool(name, args) {
     return text(msgs.length ? JSON.stringify(msgs, null, 2) : '(no messages captured yet)');
   }
 
-  if (name === 'get_network_requests') {
+  if (name === 'list_network_requests') {
     const res = await cdp('Runtime.evaluate', {
       expression: 'JSON.stringify(globalThis.__networkRequests__ || [])',
       returnByValue: true
