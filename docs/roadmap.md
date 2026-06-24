@@ -3,7 +3,16 @@
 DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-06-19
+> 최종 갱신: 2026-06-24
+
+---
+
+## 완료 / 최근 반영
+
+- [x] **`devoks-rn` 신설 (React Native 디버깅)**
+  - `metro-devtools-attach` 스킬: 에뮬레이터 스크린샷, Metro CDP JS 콘솔/상태 조회.
+  - `metro-devtools` MCP는 WebSocket URL 동적 변경으로 `~/.claude.json` 수동 등록 필요.
+  - 마켓플레이스 식별자 `devoks` → `devoks-plugins` 로 변경.
 
 ---
 

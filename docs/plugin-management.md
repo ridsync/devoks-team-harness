@@ -131,11 +131,11 @@ description: "스킬 설명 — 콜론이 포함되면 쌍따옴표 필수."
 
 ## 5. marketplace.json 등록
 
-`.claude-plugin/marketplace.json`에 신규 플러그인 항목을 추가합니다.
+`.claude-plugin/marketplace.json`에 신규 플러그인 항목을 추가합니다. 현재 마켓플레이스 식별자는 **`devoks-plugins`** 입니다 (예전 `devoks`에서 변경됨 — 기존 등록이 있다면 `/plugin marketplace remove devoks` 후 재등록).
 
 ```json
 {
-  "name": "devoks",
+  "name": "devoks-plugins",
   "owner": { "name": "ridsync" },
   "plugins": [
     {
@@ -152,7 +152,7 @@ description: "스킬 설명 — 콜론이 포함되면 쌍따옴표 필수."
 | `name` | ✅ | 플러그인 식별자 (kebab-case) |
 | `source` | ✅ | 플러그인 디렉토리 상대 경로 (`..` 포함 불가) |
 | `description` | 권장 | 사용자에게 표시되는 설명 |
-| `dependencies` | 선택 | `["devoks-core@devoks"]` 형태 |
+| `dependencies` | 선택 | `["devoks-core@devoks-plugins"]` 형태 |
 | `version` | 선택 | 명시 시 해당 값이 변경될 때만 업데이트 배포 |
 
 ---
@@ -175,7 +175,7 @@ claude plugin validate ./plugins/my-plugin --strict
 ### 전체 플러그인 일괄 검증
 
 ```bash
-for plugin in devoks-core devoks-git devoks-feature devoks-code devoks-browser; do
+for plugin in devoks-core devoks-git devoks-feature devoks-verify devoks-code devoks-test devoks-browser devoks-rn; do
   echo "=== $plugin ==="
   claude plugin validate ./plugins/$plugin --strict
 done
@@ -202,13 +202,13 @@ done
 ```bash
 # 로컬 마켓플레이스로 테스트 설치
 /plugin marketplace add ./devoks-team-harness
-/plugin install my-new-plugin@devoks
+/plugin install my-new-plugin@devoks-plugins
 
 # 설치 확인
 /plugin list
 
 # 마켓플레이스 제거 (테스트 후)
-/plugin marketplace remove devoks
+/plugin marketplace remove devoks-plugins
 ```
 
 ---
@@ -235,7 +235,7 @@ claude plugin validate ./plugins/<plugin> --strict
 git push origin main
 
 # 5. 팀원은 다음 명령으로 업데이트
-/plugin marketplace update devoks
+/plugin marketplace update devoks-plugins
 ```
 
 ### 버전 전략
@@ -254,7 +254,7 @@ git push origin main
 ```json
 {
   "extraKnownMarketplaces": {
-    "devoks": {
+    "devoks-plugins": {
       "source": {
         "source": "github",
         "repo": "ridsync/devoks-team-harness"
@@ -262,8 +262,8 @@ git push origin main
     }
   },
   "enabledPlugins": {
-    "devoks-core@devoks": true,
-    "devoks-git@devoks": true
+    "devoks-core@devoks-plugins": true,
+    "devoks-git@devoks-plugins": true
   }
 }
 ```
@@ -281,18 +281,18 @@ git push origin main
 /plugin marketplace list
 
 # 업데이트 (최신 커밋 반영)
-/plugin marketplace update devoks
+/plugin marketplace update devoks-plugins
 /plugin marketplace update           # 전체 업데이트
 
 # 제거
-/plugin marketplace remove devoks
+/plugin marketplace remove devoks-plugins
 ```
 
 ```bash
 # 플러그인 설치·관리
-/plugin install devoks-core@devoks
+/plugin install devoks-core@devoks-plugins
 /plugin list
-/plugin uninstall devoks-core@devoks
+/plugin uninstall devoks-core@devoks-plugins
 ```
 
 ---

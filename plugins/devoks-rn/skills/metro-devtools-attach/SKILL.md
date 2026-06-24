@@ -7,7 +7,7 @@ description: "React Native 앱 디버깅 — 에뮬레이터/시뮬레이터 스
 ### 플러그인 설치
 
 ```sh
-/plugin install devoks-rn@devoks
+/plugin install devoks-rn@devoks-plugins
 /reload-plugins
 ```
 

@@ -1,6 +1,6 @@
 # DevOks Team Harness
 
-Claude Code harness for the DevOks team — plugins for code review, feature development, and Git workflows.
+Claude Code harness for the DevOks team — plugins for code review, feature development, Git workflows, and React Native debugging.
 
 > **MCP & dependency setup**: [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)  
 > **Plugin management** (create, validate, deploy): [`docs/plugin-management.md`](docs/plugin-management.md)
@@ -21,8 +21,11 @@ Claude Code harness for the DevOks team — plugins for code review, feature dev
 | `devoks-code` | Code review, refactoring, module analysis, and security review | Recommended |
 | `devoks-test` | Automated test authoring & test-run triage | Recommended |
 | `devoks-browser` | Chrome DevTools MCP attach + Visual Diff verification | Optional |
+| `devoks-rn` | React Native debugging — Metro DevTools CDP attach, emulator screenshots, JS console/state inspection | Optional (RN projects) |
 
 All plugins except `devoks-core` declare a dependency on `devoks-core` in the marketplace catalog.
+
+Marketplace identifier: **`devoks-plugins`** (install with `@devoks-plugins`). If you previously registered the old `devoks` marketplace, remove it and re-add: `/plugin marketplace remove devoks` → `/plugin marketplace add ridsync/devoks-team-harness`.
 
 ---
 
@@ -36,12 +39,13 @@ brew install gh && gh auth login
 /plugin marketplace add ridsync/devoks-team-harness
 
 # 2. Install plugins
-/plugin install devoks-core@devoks
-/plugin install devoks-git@devoks
-/plugin install devoks-feature@devoks
-/plugin install devoks-verify@devoks
-/plugin install devoks-code@devoks
-/plugin install devoks-test@devoks
+/plugin install devoks-core@devoks-plugins
+/plugin install devoks-git@devoks-plugins
+/plugin install devoks-feature@devoks-plugins
+/plugin install devoks-verify@devoks-plugins
+/plugin install devoks-code@devoks-plugins
+/plugin install devoks-test@devoks-plugins
+# /plugin install devoks-rn@devoks-plugins          # optional — React Native projects
 ```
 
 Full dependency setup → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
@@ -59,19 +63,20 @@ Full dependency setup → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
 ### Step 2: Install plugins
 
 ```bash
-/plugin install devoks-core@devoks           # required — syncs rules & refs on session start
-/plugin install devoks-git@devoks            # Git workflow
-/plugin install devoks-feature@devoks        # feature development
-/plugin install devoks-verify@devoks         # requirement & data-flow verification
-/plugin install devoks-code@devoks           # code quality & security review
-/plugin install devoks-test@devoks           # test authoring & triage
-/plugin install devoks-browser@devoks        # browser tools (optional)
+/plugin install devoks-core@devoks-plugins           # required — syncs rules & refs on session start
+/plugin install devoks-git@devoks-plugins            # Git workflow
+/plugin install devoks-feature@devoks-plugins        # feature development
+/plugin install devoks-verify@devoks-plugins         # requirement & data-flow verification
+/plugin install devoks-code@devoks-plugins           # code quality & security review
+/plugin install devoks-test@devoks-plugins           # test authoring & triage
+/plugin install devoks-browser@devoks-plugins        # browser tools (optional)
+/plugin install devoks-rn@devoks-plugins             # React Native debugging (optional)
 ```
 
 ### Step 3: Update
 
 ```bash
-/plugin marketplace update devoks
+/plugin marketplace update devoks-plugins
 ```
 
 ---
@@ -127,6 +132,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 | `test-run-triage` | `/devoks-test:test-run-triage` | devoks-test |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
+| `metro-devtools-attach` | `/devoks-rn:metro-devtools-attach` | devoks-rn |
 
 ## Available Agents
 
@@ -170,7 +176,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 
 ## Dependency Summary
 
-> DevOks plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-mcp.sh`) detects missing servers each session and prints install guidance. **Exception:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
+> DevOks plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-mcp.sh`) detects missing servers each session and prints install guidance. **Exceptions:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). `devoks-rn` requires `metro-devtools` in `~/.claude.json` with a dynamic `--wsEndpoint` (Metro WebSocket URL changes on restart). See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
 
 | Plugin | Required | Optional |
 |--------|----------|----------|
@@ -181,6 +187,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 | devoks-code | CodeGraph MCP, Serena MCP | context-mode MCP |
 | devoks-test | — | context-mode MCP |
 | devoks-browser | Chrome DevTools MCP + `~/.claude.json` | Playwright MCP, Figma MCP |
+| devoks-rn | `devoks-rn` plugin + Metro running; `metro-devtools` in `~/.claude.json` (dynamic `--wsEndpoint`) | `adb` / `xcrun simctl` (screenshots) |
 
 Full setup guide → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
 
@@ -201,7 +208,8 @@ devoks-team-harness/
 │   ├── devoks-verify/                 # verification (2 skills)
 │   ├── devoks-code/                   # code quality (5 commands + 2 skills + 2 agents)
 │   ├── devoks-test/                   # testing (2 skills)
-│   └── devoks-browser/               # browser tools (2 skills + 1 agent)
+│   ├── devoks-browser/               # browser tools (2 skills + 1 agent)
+│   └── devoks-rn/                    # React Native debugging (1 skill)
 ├── shared/
 │   ├── setup/claude.json.template     # ~/.claude.json MCP config template
 │   └── templates/CLAUDE.md.project.template
@@ -229,4 +237,4 @@ Planned plugin structure & content improvements are tracked in [`docs/roadmap.md
 1. Fork this repository.
 2. Edit `plugins/devoks-core/rules/`, `plugins/devoks-core/refs/`, or plugin files.
 3. Open a PR.
-4. After merge, teammates run `/plugin marketplace update devoks` to refresh.
+4. After merge, teammates run `/plugin marketplace update devoks-plugins` to refresh.
