@@ -4,6 +4,7 @@
     "devoks-code@devoks-plugins": true,
     "devoks-feature@devoks-plugins": true,
     "devoks-browser@devoks-plugins": true,
-    "devoks-core@devoks-plugins": true
+    "devoks-core@devoks-plugins": true,
+    "devoks-rn@devoks-plugins": true
   }
 }
