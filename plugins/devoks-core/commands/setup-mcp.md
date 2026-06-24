@@ -90,7 +90,7 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
    - **`claude mcp add`로 깔지 않는다.** 같은 서버가 플러그인 번들 + user scope에 이중 등록되면
      동일한 `:9269` 디버그 포트에 두 인스턴스가 동시에 attach를 시도해 충돌한다.
    - 감지 결과(`claude mcp list`에 `chrome-devtools-attach` 부재, 또는 SessionStart 훅 경고)로 **누락이면**
-     다음을 안내한다: `/plugin install devoks-browser@devoks`. 이미 devoks-browser가 설치돼 있으면 별도 작업 불필요.
+     다음을 안내한다: `/plugin install devoks-browser@devoks-plugins`. 이미 devoks-browser가 설치돼 있으면 별도 작업 불필요.
    - Chrome 디버그 실행(`--remote-debugging-port=9269`)은 `docs/mcp-setup-guide.md` 3절을 참조하게 한다.
 
 7. **결과 보고**
