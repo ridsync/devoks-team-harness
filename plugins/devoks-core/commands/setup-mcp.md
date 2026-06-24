@@ -68,14 +68,14 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
    **설치 단계:**
    1. `devoks-rn` 플러그인이 설치돼 있는지 확인한다:
       ```bash
-      ls ~/.claude/plugins/cache/devoks/devoks-rn/ 2>/dev/null || echo "플러그인 미설치"
+      ls ~/.claude/plugins/cache/devoks-plugins/devoks-rn/ 2>/dev/null || echo "플러그인 미설치"
       ```
       미설치면 먼저 `/plugin install devoks-rn@devoks-plugins`를 안내한다.
 
    2. 스크립트를 devoks 관리 경로에 복사한다:
       ```bash
       mkdir -p ~/.devoks/mcp
-      SCRIPT=$(find ~/.claude/plugins/cache/devoks/devoks-rn -name "metro-mcp.js" \
+      SCRIPT=$(find ~/.claude/plugins/cache/devoks-plugins/devoks-rn -name "metro-mcp.js" \
                 -path "*/scripts/*" 2>/dev/null | sort -V | tail -1)
       cp "$SCRIPT" ~/.devoks/mcp/metro-mcp.js
       ```

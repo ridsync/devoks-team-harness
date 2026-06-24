@@ -1,6 +1,6 @@
 {
   "name": "devoks-core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "DevOks 기본 원칙 자동 로딩 — SessionStart 훅이 Agent Principles·Project Convention·Memory Policy(rules)와 코드리뷰·엔지니어링·Git·워크플로우(refs) 문서를 프로젝트 .claude/에 동기화한다.",
   "author": { "name": "ridsync" },
   "dependencies": []

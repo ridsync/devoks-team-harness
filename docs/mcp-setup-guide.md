@@ -257,7 +257,7 @@ Metro `/json` 엔드포인트로 WebSocket URL을 **자동 조회**하므로, Me
 ```bash
 # 1. 스크립트를 devoks 관리 경로에 복사
 mkdir -p ~/.devoks/mcp
-SCRIPT=$(find ~/.claude/plugins/cache/devoks/devoks-rn -name "metro-mcp.js" \
+SCRIPT=$(find ~/.claude/plugins/cache/devoks-plugins/devoks-rn -name "metro-mcp.js" \
           -path "*/scripts/*" 2>/dev/null | sort -V | tail -1)
 cp "$SCRIPT" ~/.devoks/mcp/metro-mcp.js
 
