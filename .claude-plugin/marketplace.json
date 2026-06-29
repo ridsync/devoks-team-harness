@@ -16,27 +16,9 @@
       "dependencies": ["devoks-core"]
     },
     {
-      "name": "devoks-feature",
-      "source": "./plugins/devoks-feature",
-      "description": "기능개발·UI 워크플로우 (FRD/PLAN/실행 스킬 포함)",
-      "dependencies": ["devoks-core"]
-    },
-    {
-      "name": "devoks-verify",
-      "source": "./plugins/devoks-verify",
-      "description": "요구사항 체크리스트·구현 충실도 검증 + 데이터 흐름 정합성 검증",
-      "dependencies": ["devoks-core"]
-    },
-    {
-      "name": "devoks-code",
-      "source": "./plugins/devoks-code",
-      "description": "코드리뷰·리팩토링·모듈분석·보안 검증",
-      "dependencies": ["devoks-core"]
-    },
-    {
-      "name": "devoks-test",
-      "source": "./plugins/devoks-test",
-      "description": "테스트 작성·확장 + 테스트 실행·실패 triage",
+      "name": "devoks-sdlc",
+      "source": "./plugins/devoks-sdlc",
+      "description": "SDLC 워크플로우 통합 — 기능개발(FRD/PLAN/실행/UI)·테스트(작성/triage)·코드리뷰/리팩토링/모듈분석/보안검증·요구사항/데이터흐름 검증",
       "dependencies": ["devoks-core"]
     },
     {

@@ -1,7 +1,0 @@
-{
-  "name": "devoks-test",
-  "version": "1.0.0",
-  "description": "DevOks 테스트 — 자동화 테스트 코드 작성·확장, 테스트 스위트 실행·실패 triage",
-  "author": { "name": "ridsync" },
-  "dependencies": ["devoks-core"]
-}

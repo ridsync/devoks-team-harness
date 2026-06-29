@@ -45,14 +45,11 @@ cp -f "$SCRIPT_DIR/plugins/devoks-core/refs/"*.md "$CLAUDE_DIR/refs/"
 echo "  commands/ (git)"
 cp -f "$SCRIPT_DIR/plugins/devoks-git/commands/"*.md "$CLAUDE_DIR/commands/"
 
-echo "  commands/ (feature)"
-cp -f "$SCRIPT_DIR/plugins/devoks-feature/commands/"*.md "$CLAUDE_DIR/commands/"
+echo "  commands/ (sdlc)"
+cp -f "$SCRIPT_DIR/plugins/devoks-sdlc/commands/"*.md "$CLAUDE_DIR/commands/"
 
-echo "  commands/ (code)"
-cp -f "$SCRIPT_DIR/plugins/devoks-code/commands/"*.md "$CLAUDE_DIR/commands/"
-
-echo "  skills/ (feature)"
-for skill_dir in "$SCRIPT_DIR/plugins/devoks-feature/skills/"/*/; do
+echo "  skills/ (sdlc)"
+for skill_dir in "$SCRIPT_DIR/plugins/devoks-sdlc/skills/"/*/; do
   skill_name=$(basename "$skill_dir")
   mkdir -p "$CLAUDE_DIR/skills/$skill_name"
   cp -rf "$skill_dir"* "$CLAUDE_DIR/skills/$skill_name/" 2>/dev/null || true
@@ -197,7 +194,7 @@ PYEOF
 }
 
 # 플러그인 순서대로 처리
-PLUGINS=(devoks-core devoks-git devoks-feature devoks-code devoks-browser)
+PLUGINS=(devoks-core devoks-git devoks-sdlc devoks-browser)
 OPTIONAL_HINTS=""
 
 for plugin in "${PLUGINS[@]}"; do

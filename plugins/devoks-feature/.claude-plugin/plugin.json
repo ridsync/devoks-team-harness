@@ -1,7 +1,0 @@
-{
-  "name": "devoks-feature",
-  "version": "1.0.0",
-  "description": "DevOks 기능개발 워크플로우 — FRD·PLAN·실행 스킬, UI 구현",
-  "author": { "name": "ridsync" },
-  "dependencies": ["devoks-core"]
-}

@@ -33,11 +33,12 @@ DevOks 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 |----------------|------|------|
 | **devoks-core** | — | — |
 | **devoks-git** | `gh` CLI | — |
-| **devoks-feature** (commands) | `gh` CLI | Figma MCP (`devoks-new-ui-draft`) |
-| **devoks-feature** (skills: frd/plan) | — | CodeGraph MCP, Serena MCP |
-| **devoks-feature** (skills: workflow-runner) | Figma MCP, context-mode MCP | CodeGraph MCP, Serena MCP |
-| **devoks-feature** (skills: data-verify) | Chrome DevTools MCP | Playwright MCP |
-| **devoks-code** | CodeGraph MCP, Serena MCP | context-mode MCP |
+| **devoks-sdlc** (feature commands) | `gh` CLI | Figma MCP (`new-ui-draft`) |
+| **devoks-sdlc** (feature skills: frd/plan) | — | CodeGraph MCP, Serena MCP |
+| **devoks-sdlc** (feature-workflow-runner) | Figma MCP, context-mode MCP | CodeGraph MCP, Serena MCP |
+| **devoks-sdlc** (verify-data-flow) | Chrome DevTools MCP | Playwright MCP |
+| **devoks-sdlc** (code review/refactor/security) | CodeGraph MCP, Serena MCP | context-mode MCP |
+| **devoks-sdlc** (test author/triage) | — | context-mode MCP |
 | **devoks-browser** (chrome-devtools) | Chrome DevTools MCP + `~/.claude.json` | — |
 | **devoks-browser** (visual-diff) | Figma MCP, Chrome DevTools MCP (attach) | Playwright MCP (폴백) |
 | **devoks-rn** (`metro-devtools-attach`) | `devoks-rn` 플러그인, Metro 실행 중 | `metro-devtools` (user scope — `/devoks-setup-mcp` Step 5); `adb` / `xcrun simctl` (스크린샷) |
@@ -46,7 +47,7 @@ DevOks 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 
 ## 1. GitHub CLI (`gh`)
 
-devoks-git 커맨드와 devoks-feature의 GitHub 이슈 기반 커맨드에 필요합니다.
+devoks-git 커맨드와 devoks-sdlc의 GitHub 이슈 기반 커맨드에 필요합니다.
 
 ```bash
 # macOS
@@ -64,7 +65,7 @@ gh api user --jq '.login'
 
 ## 2. Figma MCP
 
-`devoks-feature:new-ui-draft`, `devoks-feature:feature-workflow-runner`, `devoks-browser:browser-visual-diff` 에 필요합니다.
+`devoks-sdlc:new-ui-draft`, `devoks-sdlc:feature-workflow-runner`, `devoks-browser:browser-visual-diff` 에 필요합니다.
 
 ### 설치
 
@@ -94,7 +95,7 @@ Figma 계정 연결은 최초 도구 호출 시 브라우저 OAuth 플로우로 
 
 ## 3. Chrome DevTools MCP
 
-`devoks-browser:browser-devtools` 스킬, `devoks-browser:browser-visual-diff`의 라이브 렌더 캡처(**기본 도구**), `devoks-verify:verify-data-flow`(browser 환경)에 필요합니다.
+`devoks-browser:browser-devtools` 스킬, `devoks-browser:browser-visual-diff`의 라이브 렌더 캡처(**기본 도구**), `devoks-sdlc:verify-data-flow`(browser 환경)에 필요합니다.
 
 ### 3-1. 플러그인 설치 (스킬 파일 로딩)
 
@@ -171,7 +172,7 @@ mcp__chrome-devtools-attach__*
 
 ## 5. CodeGraph MCP
 
-`devoks-code` 커맨드와 FRD/PLAN 스킬의 코드 탐색에 필요합니다.
+`devoks-sdlc`의 코드리뷰·모듈분석 커맨드와 FRD/PLAN 스킬의 코드 탐색에 필요합니다.
 
 ### 설치 및 초기화
 
@@ -207,7 +208,7 @@ codegraph index .
 
 ## 6. Serena MCP
 
-심볼 단위 정밀 코드 편집(`devoks-code`, FRD/PLAN 스킬)에 필요합니다.
+심볼 단위 정밀 코드 편집(`devoks-sdlc`의 코드 계열 + FRD/PLAN 스킬)에 필요합니다.
 
 ### 설치
 
@@ -284,7 +285,7 @@ mcp__metro-devtools__*
 
 ## 8. context-mode MCP
 
-`devoks-feature-workflow-runner`의 대용량 출력 처리와 세션 지식베이스에 필요합니다.
+`devoks-sdlc:feature-workflow-runner`(및 test·verify 계열)의 대용량 출력 처리와 세션 지식베이스에 필요합니다.
 
 ### 설치
 
@@ -309,7 +310,7 @@ mcp__metro-devtools__*
 
 ## 9. Context7 MCP (선택)
 
-라이브러리 문서 조회에 사용됩니다 (devoks-feature, devoks-code의 웹 검색 대안).
+라이브러리 문서 조회에 사용됩니다 (devoks-sdlc의 웹 검색 대안).
 
 ```bash
 # ~/.claude.json
@@ -359,14 +360,14 @@ brew install gh && gh auth login
 ### 기능개발 구성
 ```bash
 # 위 최소 구성 +
-/plugin install devoks-feature@devoks-plugins
+/plugin install devoks-sdlc@devoks-plugins
 /plugin install @figma/figma-mcp    # new-ui-draft 사용 시
 ```
 
 ### 코드 품질 구성
 ```bash
 # 최소 구성 +
-/plugin install devoks-code@devoks-plugins
+/plugin install devoks-sdlc@devoks-plugins
 # ~/.claude.json에 codegraph, serena 추가
 ```
 
@@ -382,10 +383,7 @@ brew install gh && gh auth login
 # 전체 설치
 /plugin install devoks-core@devoks-plugins
 /plugin install devoks-git@devoks-plugins
-/plugin install devoks-feature@devoks-plugins
-/plugin install devoks-verify@devoks-plugins
-/plugin install devoks-code@devoks-plugins
-/plugin install devoks-test@devoks-plugins
+/plugin install devoks-sdlc@devoks-plugins
 /plugin install devoks-browser@devoks-plugins
 # /plugin install devoks-rn@devoks-plugins   # RN 프로젝트 시
 
