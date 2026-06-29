@@ -175,7 +175,7 @@ claude plugin validate ./plugins/my-plugin --strict
 ### 전체 플러그인 일괄 검증
 
 ```bash
-for plugin in devoks-core devoks-git devoks-feature devoks-verify devoks-code devoks-test devoks-browser devoks-rn; do
+for plugin in devoks-core devoks-git devoks-sdlc devoks-browser devoks-rn; do
   echo "=== $plugin ==="
   claude plugin validate ./plugins/$plugin --strict
 done
