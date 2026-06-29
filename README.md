@@ -27,49 +27,32 @@ Marketplace identifier: **`devoks-plugins`** (install with `@devoks-plugins`). I
 
 ---
 
-## Quick Start (Minimum Dependencies)
+## Quick Start
 
 ```bash
-# Required: install gh CLI
+# Prerequisite: gh CLI
 brew install gh && gh auth login
+
+# Start a Claude session
+claude
 
 # 1. Register marketplace (once)
 /plugin marketplace add ridsync/devoks-team-harness
 
 # 2. Install plugins
-/plugin install devoks-core@devoks-plugins
-/plugin install devoks-git@devoks-plugins
-/plugin install devoks-sdlc@devoks-plugins
-# /plugin install devoks-rn@devoks-plugins          # optional — React Native projects
+/plugin install devoks-core@devoks-plugins      # required — syncs rules & refs on session start
+/plugin install devoks-git@devoks-plugins       # Git workflow (recommended)
+/plugin install devoks-sdlc@devoks-plugins      # SDLC: feature · test · code review/security · verify (recommended)
+/plugin install devoks-browser@devoks-plugins   # browser tools (optional)
+/plugin install devoks-rn@devoks-plugins        # React Native debugging (optional — RN projects)
+
+# 3. Initialize MCP servers & dependencies (final step)
+/devoks-core:setup-mcp
 ```
 
-Full dependency setup → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
-
----
-
-## Plugin Installation (Claude Code Plugin System)
-
-### Step 1: Register marketplace (once)
-
-```bash
-/plugin marketplace add ridsync/devoks-team-harness
-```
-
-### Step 2: Install plugins
-
-```bash
-/plugin install devoks-core@devoks-plugins           # required — syncs rules & refs on session start
-/plugin install devoks-git@devoks-plugins            # Git workflow
-/plugin install devoks-sdlc@devoks-plugins           # SDLC: feature · test · code review/security · verify
-/plugin install devoks-browser@devoks-plugins        # browser tools (optional)
-/plugin install devoks-rn@devoks-plugins             # React Native debugging (optional)
-```
-
-### Step 3: Update
-
-```bash
-/plugin marketplace update devoks-plugins
-```
+> Full dependency & MCP setup → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
+>
+> Update later: `/plugin marketplace update devoks-plugins`
 
 ---
 
