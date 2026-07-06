@@ -5,6 +5,7 @@ title: <기능 이름> 작업 계획
 status: draft        # draft | in-progress | done
 frd: ./FRD.md
 updated: <YYYY-MM-DD>
+issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으면 생략)
 ---
 
 # Plan — <기능 이름>
