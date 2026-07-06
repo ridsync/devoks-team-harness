@@ -33,7 +33,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 - **추적성 우선** — 모든 `AC/CTR/EDGE`는 최소 한 Task의 `traces`에 등장한다(누락 0). 근거 없는 Task도 두지 않는다.
 - **검증 가능한 요구** — AC는 EARS로 써서 그대로 테스트가 된다. 통과/실패를 판정 못 하는 문장은 요구가 아니다.
 - **설계는 제안 후 확인** — 요구 누락은 묻고(추측 금지), 설계 공백은 합리적 안을 먼저 제안한 뒤 확인한다. 복잡도 임계(파일 3개 초과·신규 모듈/계층·아키텍처 변경·새 패턴) 초과 시 FRD §4에 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. → `references/design-spec.md`
-- **증분 분해·PR 분리** — 머지해도 안 깨지는 크기로 쪼개고, 독립 가치/위험 단위로 PR을 나눈다.
+- **증분 분해·PR 분리** — 머지해도 안 깨지는 크기로 쪼개고, 필요할 때만(기본은 PR 1개) 독립 가치/위험 단위로 PR을 나눈다.
 - **PLAN이 진행 SSOT** — 완료는 검증 통과 후에만 `[x]`. 세션 도구는 미러일 뿐 PLAN을 이긴다.
 - **실행은 태스크까지** — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) 후 구현·테스트·린트·진행 갱신까지. → `references/branch-issue-precheck.md`. **커밋/PR 및 타 커맨드 오케스트레이션은 이 스킬 범위 밖**(사용자/별도 도구).
 - **읽기 전 변경 금지 + 재사용 우선** — 손대기 전 관련 코드를 읽고, 기존 유틸/훅/패턴을 먼저 찾아 재사용한다.
@@ -63,7 +63,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 1. 초안에서 Goal·Context·요구사항 후보를 추출한다.
 2. 각 요구사항을 `REQ-xxx` + EARS `AC-xxx-y` 로 정형화한다(정상 경로 + 예외 경로 최소 1쌍). → `references/ears-acceptance-criteria.md`
 3. 수치·세팅·상태전이를 §5 Contract(`CTR-xxx`)로 빼고, Edge Case를 §8(`EDGE-xxx`)로 정리한다.
-4. §6 Resources(참고 코드·외부 문서·시안·API)와 §7 Constraints(PR 분리 기준·기술 제약)를 채운다.
+4. §6 Resources(참고 코드·외부 문서·시안·API)와 §7 Constraints(위험/의존 제약·기술 제약)를 채운다. PR 분리 여부·개수는 이 단계에서 정하지 않는다(PLAN 단계 — `references/task-pr-splitting.md`).
 5. **§4 설계 스펙** — 복잡도 임계 초과 시 코드 패턴을 먼저 탐색(기존 상태관리·훅·유틸·모델)하고 **설계안을 제안·확인**한 뒤 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. 단순 기능은 §4.1만 간결히. → `references/design-spec.md`
 6. **누락 슬롯은 한 번에 모아 사용자에게 확인**한다(추측 금지 — 요구는 묻고, 설계는 제안 후 확인). 확정되면 `<out>/FRD.md` 작성.
 
@@ -76,12 +76,12 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태). → `references/progress-tracking.md`
 1. Approach·PR 분리 방침을 1~2문장으로 적는다(§1). Resource Check(§2)는 FRD §6에서 가져온다.
 2. 요구사항을 Task로 쪼갠다: 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면) `[P]`, `file:`, `traces:` 부여. → `references/task-pr-splitting.md`
-3. Task를 **PR 그룹**으로 묶는다(독립 가치/위험/리뷰 부담 기준). PR 간 의존은 단방향.
+3. Task를 **PR 그룹**으로 묶는다 — 기본값 PR 1개. FRD의 메모는 참고일 뿐, `task-pr-splitting.md` 기준으로 이 단계에서 직접 재판단한다(애매하면 AskUserQuestion). 분리 시 §1에 근거 1줄. → `references/task-pr-splitting.md`
 4. §4 의존성 그래프(mermaid, **사이클 금지**)와 §5 DoD를 작성한다.
 5. **커버리지 검증**: FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검(누락 0). → `references/traceability.md` 의 comm 스크립트.
 6. 확정되면 `<out>/PLAN.md` 작성. 누락이 있으면 담당 Task를 추가한 뒤에만 다음 단계로.
 
-완료 기준: 모든 Task가 `file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(2개 이상이면 PR 그룹·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재. `PLAN.md` 작성 시 frontmatter `status: draft → approved`. → `references/progress-tracking.md`
+완료 기준: 모든 Task가 `file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(기본 1개, 2개 이상이면 §1에 분리 근거 명시·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재. `PLAN.md` 작성 시 frontmatter `status: draft → approved`. → `references/progress-tracking.md`
 
 ## Phase 3 — 태스크 단계 실행
 
