@@ -18,6 +18,18 @@
       "prompt": "devoks-core 의 refs/rules 와 sync-context 관련 설명을 같이 바꾸려 해. 루트 .claude 사본 정합성까지 포함해서 maintainer 절차로 정리해줘.",
       "expected_output": "devoks-core 의 core refs/rules change 로 분류하고, refs/rules 원본과 루트 .claude 사본, sync-context/check-mcp 관련 문서, plugin-management 문서 반영 여부까지 점검하도록 유도한다.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "devoks-sdlc 의 code-reviewer agent에 새 체크 항목을 추가하고 관련 skill 설명도 손보려고 해. 유지보수 절차대로 버전 bump부터 문서 반영까지 점검해줘.",
+      "expected_output": "devoks-sdlc를 public workflow change로 분류하고, version bump 필요 여부, validate --strict, agent-internal-only 설명 유지 여부, README/README.ko catalog, gh/CodeGraph/Serena 의존성 표기 일치 여부, skill 간 cross-reference 정합성을 체크리스트로 제시한다.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "devoks-git 의 git-pull-request 커맨드에 새 옵션을 추가하려고 해. 버전 bump랑 문서 반영까지 유지보수 절차로 점검해줘.",
+      "expected_output": "devoks-git을 대상 플러그인으로 식별하고, command frontmatter 변경 여부, version bump, validate --strict, README/README.ko catalog 반영 여부, devoks-sdlc 쪽 텍스트 참조 영향 여부를 체크리스트로 제시한다.",
+      "files": []
     }
   ]
 }

@@ -201,3 +201,5 @@ claude plugin validate ./plugins/<plugin> --strict
 - `devoks-browser 에서 chrome-devtools 관련 버그를 수정하려고 해. 버전 bump랑 문서 반영까지 포함해서 절차대로 점검해줘.`
 - `devoks-rn 의 metro-devtools prefix 정책을 손봐야 해. setup 문서, permissions, validate 체크까지 빠짐없이 관리해줘.`
 - `devoks-core 의 refs/rules 와 sync-context 훅 설명을 같이 바꾸려 해. 루트 .claude 사본과 운영 문서 정합성까지 확인해줘.`
+- `devoks-sdlc 의 code-reviewer agent에 새 체크 항목을 추가하고 관련 skill 설명도 손보려고 해. 유지보수 절차대로 버전 bump부터 문서 반영까지 점검해줘.`
+- `devoks-git 의 git-pull-request 커맨드에 새 옵션을 추가하려고 해. 버전 bump랑 문서 반영까지 유지보수 절차로 점검해줘.`
