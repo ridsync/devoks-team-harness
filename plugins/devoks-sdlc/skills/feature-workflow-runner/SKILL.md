@@ -48,7 +48,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 | `references/design-spec.md` | Phase 1 — §4 설계 스펙(컴포넌트/패턴/배치)·`DSN`·능동 제안 절차 |
 | `references/traceability.md` | Phase 2·4 — `traces` 커버리지 검증(누락 0) |
 | `references/task-pr-splitting.md` | Phase 2 — Task 분해·`[P]`·PR 분리·의존성 그래프 |
-| `references/progress-tracking.md` | Phase 3 — PLAN 체크박스/status 갱신, 재개 절차 |
+| `references/progress-tracking.md` | Phase 1·2·3 — FRD/PLAN 승인 전환, PLAN 체크박스/status 갱신, 재개 절차 |
 | `references/branch-issue-precheck.md` | Phase 3 — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) |
 | `references/output-location.md` | 시작 시 — 산출물 워크스페이스 경로 규칙(문서/코드 분리) |
 | `references/example-walkthrough.md` | 막힐 때 — 도메인 중립 FRD→PLAN 완성 예시 |
@@ -67,12 +67,13 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 5. **§4 설계 스펙** — 복잡도 임계 초과 시 코드 패턴을 먼저 탐색(기존 상태관리·훅·유틸·모델)하고 **설계안을 제안·확인**한 뒤 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. 단순 기능은 §4.1만 간결히. → `references/design-spec.md`
 6. **누락 슬롯은 한 번에 모아 사용자에게 확인**한다(추측 금지 — 요구는 묻고, 설계는 제안 후 확인). 확정되면 `<out>/FRD.md` 작성.
 
-완료 기준: 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능.
+완료 기준: 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능. `FRD.md` 작성 시 frontmatter `status: draft → review`. → `references/progress-tracking.md`
 
 ## Phase 2 — PLAN 작성
 
 `<out>/FRD.md` 를 `assets/PLAN.template.md` 형식의 작업 분해로 변환한다.
 
+0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태). → `references/progress-tracking.md`
 1. Approach·PR 분리 방침을 1~2문장으로 적는다(§1). Resource Check(§2)는 FRD §6에서 가져온다.
 2. 요구사항을 Task로 쪼갠다: 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면) `[P]`, `file:`, `traces:` 부여. → `references/task-pr-splitting.md`
 3. Task를 **PR 그룹**으로 묶는다(독립 가치/위험/리뷰 부담 기준). PR 간 의존은 단방향.
@@ -80,18 +81,18 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 5. **커버리지 검증**: FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검(누락 0). → `references/traceability.md` 의 comm 스크립트.
 6. 확정되면 `<out>/PLAN.md` 작성. 누락이 있으면 담당 Task를 추가한 뒤에만 다음 단계로.
 
-완료 기준: 모든 Task가 `file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(2개 이상이면 PR 그룹·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재.
+완료 기준: 모든 Task가 `file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(2개 이상이면 PR 그룹·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재. `PLAN.md` 작성 시 frontmatter `status: draft → approved`. → `references/progress-tracking.md`
 
 ## Phase 3 — 태스크 단계 실행
 
 `<out>/PLAN.md` 를 SSOT로 의존성 순서대로 실행한다. → `references/progress-tracking.md`
 
-1. PLAN을 읽어 미완 Task와 의존성 그래프를 파악, 세션 Task/Todo 목록을 PLAN에 맞춰 구성한다.
+1. PLAN을 읽어 미완 Task와 의존성 그래프를 파악, 세션 Task/Todo 목록을 PLAN에 맞춰 구성한다. PLAN `status`가 아직 `draft`이면 `approved`로 보정. → `references/progress-tracking.md`
 2. **선행이 모두 `[x]`인 Task**를 골라 착수(세션 도구 in_progress). `[P]` Task는 함께 진행 가능.
 3. **브랜치·이슈 사전체크(최초 1회)** — 첫 구현 착수 직전, 현재 브랜치·연결 이슈를 확인하고 브랜치명·이슈 초안을 제안한 뒤 사용자 확인 후 적용한다(모드 `full`). → `references/branch-issue-precheck.md`
 4. 각 Task: 관련 코드 읽기 → 기존 패턴 재사용해 구현 → **관련 테스트/린트 실행**으로 검증.
    - 로직 Task는 테스트를 동반한다(AC ID를 테스트 설명에 박아 양방향 추적).
-5. **검증 통과 후에만** PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `in-progress`로(첫 착수 시).
+5. **검증 통과 후에만** PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `approved` → `in-progress`로(첫 착수 시).
    - 실패·미완이면 `[x]`로 바꾸지 않고 in_progress 유지, 막힌 이유를 명시한다.
 6. PR 경계는 **기록만** 한다(어떤 Task가 어느 PR인지). 커밋·푸시·PR 생성은 하지 않는다.
 

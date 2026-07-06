@@ -36,5 +36,6 @@ metadata:
 - 측정값은 CTR로, 예외는 EDGE로 분리됨.
 - 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨.
 - ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능.
+- `FRD.md` 작성 완료 시 frontmatter `status: draft → review`. → `../feature-workflow-runner/references/progress-tracking.md`
 
 > 막히면 `../feature-workflow-runner/references/example-walkthrough.md` 의 완성 예시를 참고한다.
