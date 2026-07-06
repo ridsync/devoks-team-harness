@@ -6,7 +6,7 @@ description: GitHub 이슈 본문을 SSOT로 기능을 설계·구현한다.
 
 ## Overview
 
-GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 패턴에 맞게 기능을 설계·구현한다. `/devoks-sdlc:new-feature-draft`와 동일하게 **요구 정리 → 설계·승인 → 로컬 브랜치 생성 → 구현 → 마무리** 순서를 따른다. 본 Command에는 **제품·도메인 전용 용어·스택**을 넣지 않는다.
+GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 패턴에 맞게 기능을 설계·구현한다. `/devoks-sdlc:new-feature-draft`와 동일하게 **요구 정리 → 설계·승인 → 브랜치 사전체크 → 구현 → 마무리** 순서를 따른다. 본 Command에는 **제품·도메인 전용 용어·스택**을 넣지 않는다.
 
 ## 입력
 
@@ -129,14 +129,14 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 
 > 사용자 규칙에 "승인 후 코드 생성"이 있으면 이 단계를 생략하지 않는다.
 
-### 4. 로컬 작업 브랜치 생성
+### 4. 브랜치 사전체크
 
-구현(코드 작성)에 들어가기 **직전**에, 이슈 목적과 `/devoks-git:git-commit-msg`의 Conventional Commits **타입**에 맞는 로컬 브랜치를 만든다.
+구현(코드 작성)에 들어가기 **직전**에, 현재 브랜치를 확인하고 브랜치명 초안을 제안한 뒤 사용자 확인 후 적용한다.
 
-- **타입**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore` 중 이슈 성격에 가장 가까운 것을 고른다(상세는 `/devoks-git:git-commit-msg`의 Rules).
-- **이름 패턴**: `타입/이슈번호-간단-슬러그` — 이슈 번호는 GitHub 이슈 `n`을 사용하고, 슬러그는 **kebab-case**·짧게(예: `feat/42-partner-etc-page`).
-- **기준 브랜치**: 원격 기본 브랜치(예: `main`) 최신을 기준으로 분기한다(`git fetch` 후 `git checkout -b …` 등 저장소 관례에 맞게).
-- **범위**: 브랜치 생성·체크아웃만 수행한다. **커밋·푸시**는 사용자가 명시적으로 요청할 때만 한다(아래 **금지·주의**).
+- **이슈는 이미 SSOT로 주어짐** — 이슈 생성·연결 확인 단계는 **스킵**한다.
+- **모드 `branch-only`** — 입력 이슈 번호를 브랜치명에 반영(`타입/이슈번호-슬러그`).
+
+→ [`../skills/feature-workflow-runner/references/branch-issue-precheck.md`](../skills/feature-workflow-runner/references/branch-issue-precheck.md) (SSOT — 브랜치명 규칙·적용 범위 포함)
 
 ### 5. 구현
 
@@ -186,7 +186,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 - [ ] 갭 표 작성; 차단 시 사용자 보완 후 재파싱
 - [ ] UI 범위 시 디자인 참조·연결 이슈 확인
 - [ ] 설계 작성 후 사용자 승인
-- [ ] 구현 전 `/devoks-git:git-commit-msg` 타입에 맞는 로컬 브랜치 생성(`타입/이슈번호-슬러그`)
+- [ ] 구현 전 브랜치 사전체크(제안→확인→적용, 모드 `branch-only`) — `branch-issue-precheck.md`
 - [ ] `.claude/CLAUDE.md` / `.claude/rules/` / `.claude/refs/` 원본 참조
 - [ ] 린트·import 정리
 - [ ] 구현 요약 및 추후 작업 안내

@@ -35,7 +35,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 - **설계는 제안 후 확인** — 요구 누락은 묻고(추측 금지), 설계 공백은 합리적 안을 먼저 제안한 뒤 확인한다. 복잡도 임계(파일 3개 초과·신규 모듈/계층·아키텍처 변경·새 패턴) 초과 시 FRD §4에 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. → `references/design-spec.md`
 - **증분 분해·PR 분리** — 머지해도 안 깨지는 크기로 쪼개고, 독립 가치/위험 단위로 PR을 나눈다.
 - **PLAN이 진행 SSOT** — 완료는 검증 통과 후에만 `[x]`. 세션 도구는 미러일 뿐 PLAN을 이긴다.
-- **실행은 태스크까지** — (구현 착수 전 `main`이면 작업 브랜치 생성·체크아웃) 구현·테스트·린트·진행 갱신까지. **커밋/PR 및 타 커맨드 오케스트레이션은 이 스킬 범위 밖**(사용자/별도 도구).
+- **실행은 태스크까지** — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) 후 구현·테스트·린트·진행 갱신까지. → `references/branch-issue-precheck.md`. **커밋/PR 및 타 커맨드 오케스트레이션은 이 스킬 범위 밖**(사용자/별도 도구).
 - **읽기 전 변경 금지 + 재사용 우선** — 손대기 전 관련 코드를 읽고, 기존 유틸/훅/패턴을 먼저 찾아 재사용한다.
 
 ## 자산 · 레퍼런스
@@ -49,6 +49,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 | `references/traceability.md` | Phase 2·4 — `traces` 커버리지 검증(누락 0) |
 | `references/task-pr-splitting.md` | Phase 2 — Task 분해·`[P]`·PR 분리·의존성 그래프 |
 | `references/progress-tracking.md` | Phase 3 — PLAN 체크박스/status 갱신, 재개 절차 |
+| `references/branch-issue-precheck.md` | Phase 3 — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) |
 | `references/output-location.md` | 시작 시 — 산출물 워크스페이스 경로 규칙(문서/코드 분리) |
 | `references/example-walkthrough.md` | 막힐 때 — 도메인 중립 FRD→PLAN 완성 예시 |
 
@@ -87,7 +88,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 1. PLAN을 읽어 미완 Task와 의존성 그래프를 파악, 세션 Task/Todo 목록을 PLAN에 맞춰 구성한다.
 2. **선행이 모두 `[x]`인 Task**를 골라 착수(세션 도구 in_progress). `[P]` Task는 함께 진행 가능.
-3. **작업 브랜치 준비(최초 1회)** — 첫 구현 착수 직전, `main`이면 의미론적 이름(`타입/슬러그`, Conventional Commits — `devoks-git:git-commit-msg` 규칙)의 작업 브랜치생성·체크아웃한다. `main`이 아니면 진행 여부를 한 줄로 확인. 브랜치 생성·체크아웃까지만(커밋·푸시·PR 제외).
+3. **브랜치·이슈 사전체크(최초 1회)** — 첫 구현 착수 직전, 현재 브랜치·연결 이슈를 확인하고 브랜치명·이슈 초안을 제안한 뒤 사용자 확인 후 적용한다(모드 `full`). → `references/branch-issue-precheck.md`
 4. 각 Task: 관련 코드 읽기 → 기존 패턴 재사용해 구현 → **관련 테스트/린트 실행**으로 검증.
    - 로직 Task는 테스트를 동반한다(AC ID를 테스트 설명에 박아 양방향 추적).
 5. **검증 통과 후에만** PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `in-progress`로(첫 착수 시).
