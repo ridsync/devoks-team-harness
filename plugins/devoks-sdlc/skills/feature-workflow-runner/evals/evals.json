@@ -6,7 +6,7 @@
       "id": 1,
       "name": "saved-filter-views-frd-to-plan",
       "prompt": "다음 기능 초안을 FRD로 정련한 뒤 추적 가능한 PLAN으로 분해해줘.\n\n초안: \"목록 화면에서 자주 쓰는 필터 조합을 '뷰'로 저장하고 다시 적용할 수 있게 하고 싶어요. 저장한 뷰는 팀원과 공유도 되면 좋겠고요. 저장된 뷰의 필터 키가 더 이상 스키마에 없으면 화면이 깨지지 않게 처리해주세요. 사용자당 저장 뷰 개수는 제한이 있으면 좋겠어요.\"",
-      "expected_output": "기본 워크스페이스 .claude/workspace/{feature-name}-{date}/ 아래 FRD.md·PLAN.md 생성. FRD는 REQ/AC(EARS)·CTR·EDGE 포함. PLAN은 TASK-ID·[P]·file:·traces: 를 가진 Task들이 2개 이상 PR 그룹으로 분리되고, 모든 AC/CTR/EDGE가 어떤 traces에 등장(누락 0), 의존성 그래프와 DoD 포함.",
+      "expected_output": "기본 워크스페이스 .claude/workspace/{feature-name}-{date}/ 아래 FRD.md·PLAN.md 생성. FRD는 REQ/AC(EARS)·CTR·EDGE 포함. PLAN은 TASK-ID·[P]·file:·traces: 를 가진 Task들로 구성되며, PR 분리는 REQ 개수가 아니라 기준(기능/위험/리뷰 부담)에 따라 판단된다 — 이 시나리오는 로컬 저장·적용과 외부 공유 연동이 위험 축에서 갈리므로 2개 PR로 분리하고 §1에 근거를 명시하는 것이 합리적이다. 모든 AC/CTR/EDGE가 어떤 traces에 등장(누락 0), 의존성 그래프와 DoD 포함.",
       "files": [],
       "assertions": [
         { "text": "산출물이 기본 워크스페이스 .claude/workspace/{feature-name}-{date}/ 아래에 생성된다(별도 경로 지정 없이)" },
@@ -16,7 +16,7 @@
         { "text": "PLAN의 모든 Task가 file: 와 traces: 필드를 가진다" },
         { "text": "TASK-ID 가 TASK-\\d+ 규칙을 따른다" },
         { "text": "최소 하나의 [P] 병렬 마커가 의존성 그래프와 모순 없이 사용된다" },
-        { "text": "Task가 2개 이상 PR 그룹으로 분리되고 PR 간 의존이 단방향이다" },
+        { "text": "PR을 나눴다면(이 시나리오는 로컬 저장·적용 vs 외부 공유 연동으로 위험 축이 갈려 분리가 합리적) §1에 분리 근거가 명시되고 PR 간 의존이 단방향이다 — REQ 개수만으로 기계적으로 나누지 않는다" },
         { "text": "FRD의 모든 AC/CTR/EDGE ID가 어떤 Task traces에 1회 이상 등장한다(누락 0)" },
         { "text": "PLAN에 mermaid 의존성 그래프와 Definition of Done 섹션이 있다" }
       ]
@@ -25,13 +25,13 @@
       "id": 2,
       "name": "bulk-export-frd-to-plan",
       "prompt": "아래 초안으로 FRD를 정련하고 PLAN을 작성해줘.\n\n초안: \"리포트 목록을 CSV/XLSX로 내보내기. 선택한 항목만 또는 전체 내보내기 둘 다 지원. 항목이 5천 건을 넘으면 비동기로 처리하고 완료되면 다운로드 링크를 알림으로 보냄. 내보내기 중 실패하면 재시도하거나 부분 결과를 받을지 선택. 동시에 진행 가능한 내보내기 작업 수에 상한.\"",
-      "expected_output": "out/FRD.md, out/PLAN.md 생성. 동기/비동기 분기, 실패 재시도/부분결과, 동시 작업 상한이 CTR/EDGE로 분리되고, PLAN에서 동기 경로 PR과 비동기 경로 PR로 합리적으로 분리되며 추적 누락 0.",
+      "expected_output": "out/FRD.md, out/PLAN.md 생성. 동기/비동기 분기, 실패 재시도/부분결과, 동시 작업 상한이 CTR/EDGE로 분리되고, PLAN에서 동기 경로 PR과 비동기 경로 PR로 분리한다면(위험/복잡도 축이 실제로 갈리므로) §1에 근거를 명시하며 추적 누락 0.",
       "files": [],
       "assertions": [
         { "text": "FRD.md 와 PLAN.md 두 산출물이 생성된다" },
         { "text": "동시 작업 상한·임계값(5천 건 등) 수치가 AC 본문이 아니라 CTR 파라미터로 분리된다" },
         { "text": "실패 재시도/부분 결과 같은 예외가 EDGE 또는 IF AC로 명시된다" },
-        { "text": "PLAN이 동기/비동기 등 합리적 축으로 2개 이상 PR로 분리된다" },
+        { "text": "PLAN이 동기/비동기 등 합리적 축으로 PR을 분리했다면 §1에 근거(기능/위험/리뷰 부담 중 하나)가 명시된다 — 근거 없이 REQ 개수로 기계적 분리하지 않는다" },
         { "text": "FRD의 모든 AC/CTR/EDGE ID가 어떤 Task traces에 1회 이상 등장한다(누락 0)" },
         { "text": "각 Task가 단일 관심사이며 file: 경로를 가진다" }
       ]
