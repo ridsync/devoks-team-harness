@@ -21,6 +21,7 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 
 ## 절차
 
+0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태). → `../feature-workflow-runner/references/progress-tracking.md`
 1. **골격 로드** — `../feature-workflow-runner/assets/PLAN.template.md` 형식을 따른다.
 2. **Approach·Resource** — §1 구현 방식·PR 분리 방침, §2 Resource Check(FRD §6에서 가져옴).
 3. **Task 분해** — 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면)`[P]`, `file:`, `traces:` 부여. → `../feature-workflow-runner/references/task-pr-splitting.md`
@@ -35,5 +36,6 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 - `[P]` 가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음).
 - 1개 이상 PR생성. PR2개 이상일 경우 PR 그룹, PR 간 의존 단방향 준수.
 - 커버리지 점검 출력 공백(누락 0), DoD 섹션 존재.
+- `PLAN.md` 작성 완료 시 frontmatter `status: draft → approved`. → `../feature-workflow-runner/references/progress-tracking.md`
 
 > 형식이 헷갈리면 `../feature-workflow-runner/references/example-walkthrough.md` 참고.

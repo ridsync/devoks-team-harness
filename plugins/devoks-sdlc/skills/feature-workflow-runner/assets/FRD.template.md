@@ -2,7 +2,7 @@
 doc_type: frd
 id: FRD-<feature-slug>
 title: <기능 이름>
-status: draft        # draft | review | approved | done
+status: draft        # draft | review | approved
 owner: <이름>
 updated: <YYYY-MM-DD>
 plan: ./PLAN.md
