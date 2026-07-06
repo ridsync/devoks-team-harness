@@ -58,6 +58,17 @@
 - `rules/`, `refs/`, hook 변경 시 루트 `.claude/` 사본과 관계
 - `check-mcp.sh`, `sync-context.sh`와 문서 설명 일치 여부
 
+### devoks-sdlc
+- 구 devoks-code/devoks-feature/devoks-test/devoks-verify 통합체 — skill 10 + command 8 + agent 2, 변경 영향 범위가 5개 플러그인 중 가장 넓음
+- `code-reviewer`/`code-security-reviewer` agent와 `code-review`/`code-security-review` skill은 agent-internal only — 메인 루프 직접 트리거 금지 설명이 README/문서에 유지되는지 확인
+- `gh` CLI, CodeGraph MCP, Serena MCP 의존 — 플러그인 자체 번들 MCP 아님(일반 MCP 등록형), README dependency summary와 실제 의존 일치 여부 확인
+- skill 간 cross-reference(예: `feature-workflow-runner` ↔ `feature-plan-executor` ↔ `branch-issue-precheck.md`)가 많아 하나만 고치면 다른 곳의 참조·완료 기준 문구가 어긋나기 쉬움 — 관련 SKILL.md 전체를 grep으로 교차 확인
+
+### devoks-git
+- skill 없이 command만 존재(`git-commit-msg`, `git-create-issue`, `git-pull-request`) — 변경 시 command frontmatter/문서만 대상
+- `gh` CLI 의존, 별도 MCP 서버·prefix 없음
+- devoks-sdlc의 여러 커맨드/스킬이 `/devoks-git:git-commit-msg`, `/devoks-git:git-create-issue`를 텍스트로 참조함(plugin.json `dependencies`엔 미기재) — devoks-git 쪽 커맨드명·규칙을 바꾸면 devoks-sdlc 참조도 함께 확인
+
 ## 5. 비대상 사유 작성 규칙
 
 업데이트하지 않는 파일은 아래 형식으로 남긴다.
