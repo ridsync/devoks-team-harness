@@ -115,6 +115,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 |-------|--------|--------------|
 | `code-reviewer` | devoks-sdlc | `code-review-general`, `code-review-diff-branch` commands |
 | `code-security-reviewer` | devoks-sdlc | `code-security-review` command |
+| `code-implementer` | devoks-sdlc | `feature-plan-executor` skill, `feature-workflow-runner` skill (Phase 3) |
 | `browser-visual-diff-capture` | devoks-browser | `browser-visual-diff` skill (Phase 1–4) |
 
 ---
@@ -171,7 +172,7 @@ devoks-team-harness/
 │   │   ├── rules/                     # SSOT: agent-principles, project-convention, memory-policy
 │   │   └── refs/                      # SSOT: code-review, engineering-principles, git-convention, workflow
 │   ├── devoks-git/commands/           # Git commands (3)
-│   ├── devoks-sdlc/                    # SDLC: feature·test·code·verify (8 commands + 10 skills + 2 agents)
+│   ├── devoks-sdlc/                    # SDLC: feature·test·code·verify (8 commands + 10 skills + 3 agents)
 │   ├── devoks-browser/               # browser tools (2 skills + 1 agent)
 │   └── devoks-rn/                    # React Native debugging (1 skill)
 ├── shared/

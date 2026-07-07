@@ -2,6 +2,7 @@
 name: browser-visual-diff-capture
 description: browser-visual-diff 스킬의 Phase 1~4(Figma 캡처·라이브 렌더 캡처·시각 diff·디자인 가이드 정합성 검증)를 subagent 컨텍스트에서 수행하고 충실도 리포트만 리턴하는 에이전트. Figma·라이브 렌더 스크린샷(대용량 멀티모달 바이트)을 subagent 컨텍스트에 격리해 메인 루프 컨텍스트 소모를 방지한다. browser-visual-diff 스킬에서만 위임받는다.
 tools: Read, Bash, Edit, ToolSearch
+model: sonnet
 ---
 
 # browser-visual-diff-capture

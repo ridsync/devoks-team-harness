@@ -2,6 +2,7 @@
 name: code-reviewer
 description: 코드리뷰 전담 subagent. /code-review-general(파일/폴더 범위 리뷰), /code-review-diff-branch(브랜치 커밋 범위 리뷰) 커맨드에서 위임받아 실행한다. "코드리뷰", "코드 리뷰", "review this code", "변경사항 리뷰", "브랜치 리뷰", "PR 리뷰" 요청 시 이 에이전트에 위임한다. 파일/diff/lint·타입 검사를 자체 수행하고 포맷된 리포트만 리턴한다. 코드 수정 금지, 사용자 질문 금지.
 tools: Read, Grep, Glob, Bash, Skill
+model: sonnet
 ---
 
 # code-reviewer

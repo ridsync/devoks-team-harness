@@ -104,6 +104,7 @@ claude plugin validate ./plugins/<plugin> --strict
 
 - 신규/수정 skill frontmatter
 - 신규/수정 command frontmatter
+- 신규/수정 agent frontmatter (`model` 필드를 의도적으로 선택했는지 — 근거는 `docs/plugin-management.md` §12 참고)
 - 경로 구조 유효성
 - warning도 실패로 취급할지 여부 (`--strict` 기준)
 
