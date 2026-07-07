@@ -198,26 +198,79 @@ export default class Bean {
 - **한국어** 사용: 도메인 규칙, 계약 이유, throw 사유, 사이드이펙트, 성능 이슈
 - 자명한 코드에 주석 금지
 - 타겟 독자: 5년차 미드레벨 엔지니어
+- 아래 3종은 독립적으로 판단한다. 한 대상이 둘 이상에 해당하면 각 블록을 나란히 작성한다 (순서 무관)
+
+### 프로젝트 기본 주석
+
+컴포넌트·훅·유틸 함수·상수 등 **재사용되는 대상의 사용법(계약)**을 설명할 때 사용한다. 자명한 함수·private 헬퍼에는 사용하지 않는다.
+자명한 코드에는 추가하지 않는다 — 이름과 시그니처만으로 사용법이 드러나면 주석 불필요.
+
+**추가 대상 (아래 중 하나에 해당할 때만):**
+- 모듈 경계를 넘어 재사용되는 공개 API로, 파라미터·반환값의 의미가 이름만으로 드러나지 않을 때
+- 사이드이펙트가 있는 훅/유틸 (구독·타이머·이벤트 리스너 등록 등)
+- 특정 조합·범위만 허용되는 상수/설정 객체
+
+**태그 정의 (구체적 문법은 JSDoc/TSDoc 등 프로젝트 언어 컨벤션을 따르며 강제하지 않음):**
+- Description — 무엇을 하는지 한 줄 요약 (**필수**)
+- `@param` — 파라미터 의미가 이름만으로 드러나지 않을 때 (선택)
+- `@returns` — 반환값의 의미가 이름만으로 드러나지 않을 때 (선택)
+- `@throws` — 발생 가능한 예외가 있을 때 (선택)
+
+```javascript
+/**
+ * 원두 잔량이 재주문 임계값 이하인지 판단한다.
+ * @param {number} remainingGrams - 현재 재고(g)
+ * @param {number} thresholdGrams - 재주문 트리거 임계값(g)
+ * @returns {boolean} 임계값 이하면 true
+ * @throws {Error} remainingGrams가 음수일 때
+ */
+function shouldReorderBeans(remainingGrams, thresholdGrams) {
+    if (remainingGrams < 0) throw new Error("remainingGrams는 음수일 수 없습니다");
+    return remainingGrams <= thresholdGrams;
+}
+```
 
 ### Rationale Comment
 
+자명한 코드에는 주석을 달지 않는다. 이름만으로 의도가 드러나면 주석 대신 네이밍으로 해결한다.
+**"왜"가 코드 문법만으로는 전혀 드러나지 않을 때만** 추가하며, 모든 변수·함수에 기계적으로 붙이지 않는다.
+
+**추가 대상 (아래 중 하나에 해당할 때만):**
+- **Workaround/Hack** — 외부 라이브러리, 특정 브라우저, 레거시 시스템의 버그·특이 동작을 우회할 때
+- **Business Rule** — 오프라인 정책, 비직관적인 제품 스펙 등 코드만으로는 유추 불가능한 도메인 규칙에 의존할 때
+- **Non-obvious Trade-off** — 가독성보다 성능·보안을 택한 경우 (예: 비트 연산, 복잡한 정규식, 캐싱 레이어)
+
+**태그 정의 (최대 1~2줄, 무거운 템플릿 금지):**
+- `[WHY]` — 이 코드가 왜 필요한가 / 왜 이 방식을 택했는가 (**필수**)
+- `[CONTEXT]` — 관련 배경, 제약, 참고 링크·이슈 (선택)
+- `[TRADE-OFF]` — 포기한 대안과 그 이유 (선택)
+
 ```javascript
-// 왜: 레이어 계층 SSOT
-// 깨짐 영향: 오버레이/모달 겹침
-// 수정 경계: 계층 순서 유지(Modal > PopOver > Header)
+// [WHY] 외부 결제 SDK가 iOS Safari에서 blur 이벤트를 중복 발생시키는 버그 우회
+// [CONTEXT] 오프라인 매장은 재고 음수를 허용하는 정책(온라인과 다른 룰)
+// [TRADE-OFF] O(1) 조회를 위해 메모리 캐시 사용, 최대 10MB 제한
 ```
 
 ### Provider Header
 
+Context/Provider 파일(`XxxContext.js`/`XxxProvider.jsx`) 최상단에 붙이는 헤더.
+
+**적용 대상:** Context/Provider 쌍으로 구현되는 파일 (일반 컴포넌트·훅에는 사용하지 않음)
+
+**태그 정의:** Source Header(파일 첫 줄 경로 표기)와 같은 성격의 고정 항목 — "자명한 코드에 주석 금지" 원칙은 인라인 주석 판단에 적용되는 것이며, 이 헤더 자체는 Context/Provider 파일이면 항상 붙인다.
+- `Domain` — 이 컨텍스트가 담당하는 책임 경계 (SSOT 여부 등). 코드만으로는 알 수 없는 아키텍처 정보가 있으면 그것을, 없으면 책임 범위를 한 줄로 요약한다 (**필수**)
+- `Contract` — 이 컨텍스트/훅을 올바르게 쓰기 위한 전제조건·사용 규칙 중 코드만으로는 드러나지 않는 것 (예: Provider 배치 순서, 특정 환경·라우트 제약) (선택)
+
 ```javascript
 // Domain: Toolbar context SSOT boundary
-// Contract: ToolbarProvider must wrap any consumer of useToolbar
-// Fail-Fast: missing provider → throw
+// Contract: AuthProvider보다 하위에 위치해야 함 — 로그인 상태로 노출 항목을 계산하므로 순서가 바뀌면 툴바가 항상 비어 보임
+export const ToolbarContext = createContext(null);
+export function useToolbarOrThrow() {
+    const ctx = useContext(ToolbarContext);
+    if (!ctx) throw new Error("useToolbar must be used within a ToolbarProvider");
+    return ctx;
+}
 ```
-
-### JSDoc
-
-복잡한 public API에만 사용. 간단한 함수에는 불필요.
 
 ---
 
