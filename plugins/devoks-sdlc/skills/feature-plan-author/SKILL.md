@@ -1,8 +1,8 @@
 ---
-description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)로 만든다. 요구사항을 단일·검증가능·증분 Task로 쪼개고, TASK-ID·`[P]` 병렬 마커·`file:`·`traces:`를 부여하며, PR 단위로 그룹핑하고 의존성 그래프와 Definition of Done을 작성한다. 모든 REQ/AC/CTR/EDGE가 traces로 커버되는지(누락 0) 검증한다. "FRD를 작업으로 분해해줘", "PLAN 짜줘", "태스크/PR 나눠줘", "스펙→태스크 분해", "작업 계획 세워줘" 같은 요청에서 사용한다. 분해 후 실행은 devoks-sdlc:feature-plan-executor, 전체 흐름은 devoks-sdlc:feature-workflow-runner.
+description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)로 만든다. 요구사항을 단일·검증가능·증분 Task로 쪼개고, TASK-ID·`[P]` 병렬 마커·`size` 크기 마커(실행 라우팅 신호)·`file:`·`traces:`를 부여하며, PR 단위로 그룹핑하고 의존성 그래프와 Definition of Done을 작성한다. 모든 REQ/AC/CTR/EDGE가 traces로 커버되는지(누락 0) 검증한다. "FRD를 작업으로 분해해줘", "PLAN 짜줘", "태스크/PR 나눠줘", "스펙→태스크 분해", "작업 계획 세워줘" 같은 요청에서 사용한다. 분해 후 실행은 devoks-sdlc:feature-plan-executor, 전체 흐름은 devoks-sdlc:feature-workflow-runner.
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # plan-author — PLAN 작성 (Phase 2)
@@ -24,7 +24,7 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태). → `../feature-workflow-runner/references/progress-tracking.md`
 1. **골격 로드** — `../feature-workflow-runner/assets/PLAN.template.md` 형식을 따른다.
 2. **Approach·Resource** — §1 구현 방식·PR 분리 방침, §2 Resource Check(FRD §6에서 가져옴).
-3. **Task 분해** — 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면)`[P]`, `file:`, `traces:` 부여. → `../feature-workflow-runner/references/task-pr-splitting.md`
+3. **Task 분해** — 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면)`[P]`, `size`(S/M/L — 실행 라우팅 신호, 애매하면 M), `file:`, `traces:` 부여. `L`은 분해 재검토 신호 — 원칙적으로 더 쪼개고, 못 쪼개면 §1에 사유 1줄. → `../feature-workflow-runner/references/task-pr-splitting.md`
 4. **PR 그룹핑** — 기본값 PR 1개. FRD의 메모는 참고일 뿐, `task-pr-splitting.md` 기준으로 이 단계에서 직접 재판단한다(애매하면 AskUserQuestion). 분리 시 §1에 근거 1줄. → `../feature-workflow-runner/references/task-pr-splitting.md`
 5. **그래프·DoD** — §4 mermaid 의존성 그래프(사이클 금지), §5 Definition of Done.
 6. **커버리지 검증(누락 0)** — FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검. → `../feature-workflow-runner/references/traceability.md` 의 comm 스크립트.
@@ -32,8 +32,10 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 
 ## 완료 기준
 
-- 모든 Task가 `file:`·`traces:`를 가짐, ID 규칙(`TASK-\d+`) 준수.
+- 모든 Task가 `size:`·`file:`·`traces:`를 가짐, ID 규칙(`TASK-\d+`) 준수.
 - `[P]` 가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음).
+- `size: L` Task가 남아 있으면 §1에 분해 불가 사유 명시.
+- `size` 분포 자기점검 — `S` 후보(단일 파일·1~2함수 수준)가 있는데도 전부 `M`으로 부여되지 않았는지 확인.
 - 1개 이상 PR 생성(기본 1개). 2개 이상이면 §1에 분리 근거(기능/위험/리뷰 부담 중 하나) 명시 + PR 간 의존 단방향 준수.
 - 커버리지 점검 출력 공백(누락 0), DoD 섹션 존재.
 - `PLAN.md` 작성 완료 시 frontmatter `status: draft → approved`. → `../feature-workflow-runner/references/progress-tracking.md`

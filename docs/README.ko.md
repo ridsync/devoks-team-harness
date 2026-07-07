@@ -115,6 +115,7 @@ cd /path/to/your-project
 |---------|---------|---------|
 | `code-reviewer` | devoks-sdlc | `code-review-general`, `code-review-diff-branch` 커맨드 |
 | `code-security-reviewer` | devoks-sdlc | `code-security-review` 커맨드 |
+| `code-implementer` | devoks-sdlc | `feature-plan-executor` 스킬, `feature-workflow-runner` 스킬 (Phase 3) |
 | `browser-visual-diff-capture` | devoks-browser | `browser-visual-diff` 스킬 (Phase 1~4) |
 
 ---
@@ -171,7 +172,7 @@ devoks-team-harness/
 │   │   ├── rules/                     # SSOT: agent-principles, project-convention, memory-policy
 │   │   └── refs/                      # SSOT: code-review, engineering-principles, git-convention, workflow
 │   ├── devoks-git/commands/           # Git 커맨드 (3개)
-│   ├── devoks-sdlc/                    # SDLC: 기능·테스트·코드·검증 (커맨드 8개 + 스킬 10개 + 에이전트 2개)
+│   ├── devoks-sdlc/                    # SDLC: 기능·테스트·코드·검증 (커맨드 8개 + 스킬 10개 + 에이전트 3개)
 │   ├── devoks-browser/               # 브라우저 도구 (스킬 2개 + 에이전트 1개)
 │   └── devoks-rn/                    # React Native 디버깅 (스킬 1개)
 ├── shared/
