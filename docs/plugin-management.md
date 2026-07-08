@@ -374,7 +374,7 @@ model: sonnet
 | 단순 조회/검색/포맷 정리 (저난도·고빈도) | `haiku` | 판단 난이도 낮고 결과 검증이 쉬움 — 지연·rate limit 절약 |
 | 설계 판단이 포함된 조사·문서 종합 | `sonnet` | 단순 검색 이상의 판단은 Sonnet |
 | 일반 품질/버그 리뷰형 (코드리뷰, 비주얼 diff) | `sonnet` 고정 | 세션 모델과 무관하게 판단 품질을 일관 유지 — `code-reviewer`, `browser-visual-diff-capture` 적용 사례 |
-| 스펙 확정 구현 실행 (태스크 위임형) | `inherit` 명시 | 구현 품질은 세션 추론 깊이와 동일해야 하므로 모델을 낮추지 않음 — `code-implementer` 적용 사례 |
+| 스펙 확정 구현 실행 (태스크 위임형) | `sonnet` 고정 | plan(메인 루프)·execute(위임) 역할 분리 — Anthropic 공식 권장 패턴("plan with Opus, execute with Sonnet", [Claude Code 사용량 가이드](https://support.claude.com/en/articles/14552983-models-usage-and-limits-in-claude-code)) 적용. 스코프 초과 시 blocked→메인 루프 인수가 안전장치 — `code-implementer` 적용 사례 |
 | 실패 비용이 최대인 감사형 (auth·입력검증·동시성·정합성 보안검증) | `opus` + `effort: high`(가능 시) | 품질 최우선 — `code-security-reviewer`. `effort` 미지원 시 `opus` 단독(위 표 참고) |
 | 크로스파일·설계 변경 구현, 장기 체인 추론 | `opus` + `effort: high` 검토 | 첫 시도 정확도가 중요 — 비용/지연 트레이드오프 선검토 |
 
@@ -396,7 +396,7 @@ model: sonnet
 | researcher (설계 판단 포함 조사) | `sonnet` | `code-analyze-module` (메인 루프) — 에이전트화는 향후 후보 |
 | code-reviewer (일반 품질/버그) | `sonnet` | `code-reviewer` (기존) |
 | security-reviewer (auth·입력검증·동시성·정합성) | `opus` + `effort: high` | `code-security-reviewer` |
-| implementer (스코프 확정 구현) | `inherit` | `code-implementer` |
+| implementer (스코프 확정 구현) | `sonnet` | `code-implementer` |
 | implementer-hard (크로스파일·설계 변경) | `opus` + `effort: high` | 별도 에이전트 없음 — blocked 에스컬레이션으로 메인 루프(세션 모델)가 담당 |
 | architect (설계·ADR·장기 계획) | `opus` + `effort: high` | 메인 루프 유지 — 승인 게이트가 본질 (`feature-frd-author` 등) |
 | test-runner (실행·실패 원인 해석) | `sonnet` | `test-run-triage` (메인 루프 + context-mode 격리) — 에이전트화는 향후 후보 |
