@@ -2,14 +2,14 @@
 name: code-implementer
 description: (agent-internal — 스킬 전용, 사용자 요청으로 직접 호출 금지) feature-plan-executor·feature-workflow-runner Phase 3에서만 태스크 단위로 위임받아 PLAN 구현·검증을 수행하고 done|blocked 리포트만 리턴한다. PLAN·FRD 수정 금지, git 커밋·푸시 금지, 사용자 질문 금지.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: inherit
+model: sonnet
 ---
 
 # code-implementer
 
 PLAN 태스크 구현을 **subagent 컨텍스트에서 수행**하고 done|blocked 리포트만 최종 메시지로 리턴하는 에이전트.
 구현 중 파일 다독·테스트/린트 출력이 메인 대화 컨텍스트에 적재되지 않도록 격리한다.
-`model: inherit` — 구현 품질은 세션 추론 깊이와 동일해야 하므로 모델을 낮추지 않는다(근거: `docs/plugin-management.md` §12).
+`model: sonnet` — 스펙이 확정된 실행(plan은 메인 루프가 맡고 code-implementer는 execute 역할)이므로 Anthropic 공식 권장 패턴("plan with Opus, execute with Sonnet")을 따른다. 스코프 초과 시 blocked로 반환되어 메인 루프(세션 모델)가 인수하는 안전장치가 있다(근거: `docs/plugin-management.md` §12).
 
 ---
 
