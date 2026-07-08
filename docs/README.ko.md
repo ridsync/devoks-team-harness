@@ -103,7 +103,7 @@ cd /path/to/your-project
 | `verify-data-flow` | `/devoks-sdlc:verify-data-flow` | devoks-sdlc |
 | `code-review` | `/devoks-sdlc:code-review` *(에이전트 내부 전용)* | devoks-sdlc |
 | `code-security-review` | `/devoks-sdlc:code-security-review` *(에이전트 내부 전용)* | devoks-sdlc |
-| `test-author` | `/devoks-sdlc:test-author` | devoks-sdlc |
+| `test-author` | `/devoks-sdlc:test-author` *(에이전트 내부 전용)* | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
@@ -116,6 +116,7 @@ cd /path/to/your-project
 | `code-reviewer` | devoks-sdlc | `code-review-general`, `code-review-diff-branch` 커맨드 |
 | `code-security-reviewer` | devoks-sdlc | `code-security-review` 커맨드 |
 | `code-implementer` | devoks-sdlc | `feature-plan-executor` 스킬, `feature-workflow-runner` 스킬 (Phase 3) |
+| `test-writer` | devoks-sdlc | `test-author` 커맨드 |
 | `browser-visual-diff-capture` | devoks-browser | `browser-visual-diff` 스킬 (Phase 1~4) |
 
 ---
@@ -140,6 +141,7 @@ cd /path/to/your-project
 | `/devoks-sdlc:code-review-general` | 범위 지정 코드리뷰 |
 | `/devoks-sdlc:code-review-diff-branch` | 브랜치 diff 기반 코드리뷰 |
 | `/devoks-sdlc:code-security-review` | repo·의존성·위협 수준 보안 검증 |
+| `/devoks-sdlc:test-author` | 테스트 작성/확장 |
 | `/devoks-sdlc:code-refactoring` | 구조·계약·품질 리팩토링 |
 | `/devoks-sdlc:code-analyze-module` | 모듈/비즈니스 로직 분석 |
 

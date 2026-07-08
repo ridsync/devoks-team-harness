@@ -103,7 +103,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 | `verify-data-flow` | `/devoks-sdlc:verify-data-flow` | devoks-sdlc |
 | `code-review` | `/devoks-sdlc:code-review` *(agent-internal only)* | devoks-sdlc |
 | `code-security-review` | `/devoks-sdlc:code-security-review` *(agent-internal only)* | devoks-sdlc |
-| `test-author` | `/devoks-sdlc:test-author` | devoks-sdlc |
+| `test-author` | `/devoks-sdlc:test-author` *(agent-internal only)* | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
@@ -116,6 +116,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 | `code-reviewer` | devoks-sdlc | `code-review-general`, `code-review-diff-branch` commands |
 | `code-security-reviewer` | devoks-sdlc | `code-security-review` command |
 | `code-implementer` | devoks-sdlc | `feature-plan-executor` skill, `feature-workflow-runner` skill (Phase 3) |
+| `test-writer` | devoks-sdlc | `test-author` command |
 | `browser-visual-diff-capture` | devoks-browser | `browser-visual-diff` skill (Phase 1–4) |
 
 ---
@@ -140,6 +141,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 | `/devoks-sdlc:code-review-general` | Scoped code review |
 | `/devoks-sdlc:code-review-diff-branch` | Branch diff code review |
 | `/devoks-sdlc:code-security-review` | Repo / dependency / threat-level security review |
+| `/devoks-sdlc:test-author` | Write / extend automated tests |
 | `/devoks-sdlc:code-refactoring` | Structure, contract, and quality refactoring |
 | `/devoks-sdlc:code-analyze-module` | Module / business logic analysis |
 
