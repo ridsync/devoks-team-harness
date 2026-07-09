@@ -171,4 +171,4 @@ metadata:
 ## 참고 기준 문서
 
 - **리뷰 기준 SSOT**: `.claude/refs/code-review.md` (C.L.E.A.R. / Layered / Checklists / §8 Severity)
-- **프로젝트 규칙**: `.claude/refs/engineering-principles.md`, `.claude/rules/project-convention.md`
+- **프로젝트 규칙**: `.claude/refs/engineering-principles.md`, 프로젝트 active convention `.claude/rules/project-convention.md`, 프로젝트 사실 SSOT `.claude/CLAUDE.md`

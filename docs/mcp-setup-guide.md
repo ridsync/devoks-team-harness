@@ -10,7 +10,7 @@ DevOks 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 
 - **원칙**: 공유 MCP는 **user 또는 project scope에 1회만** 설치한다. 플러그인은 그 단일 서버를 참조만 한다.
 - **예외**: `devoks-browser`의 `chrome-devtools-attach`(`:9269` 연결 전용 고유 설정)만 플러그인이 번들한다. `devoks-rn`의 `metro-devtools`는 `/devoks-setup-mcp` Step 5로 user scope에 설치한다 (Metro URL 자동 조회, 재시작 자동 적응).
-- **자동 안내**: `devoks-core`의 SessionStart 훅(`hooks/check-mcp.sh`)이 매 세션 시작 시 권장 MCP의 설치 여부를 점검하고, **누락 항목만** 설치 명령과 함께 안내한다. 모두 설치돼 있으면 아무것도 출력하지 않는다(멱등·non-blocking).
+- **자동 안내**: `devoks-core`의 SessionStart 훅(`hooks/check-setup-state.sh`)이 매 세션 시작 시 권장 MCP의 설치 여부를 점검하고, **누락 항목만** 설치 명령과 함께 안내한다. 모두 설치돼 있으면 아무것도 출력하지 않는다(멱등·non-blocking).
 - **도구 네임스페이스 주의**: 설치 방식에 따라 도구 prefix가 다르다 — 플러그인 설치 → `mcp__plugin_<plugin>_<server>__*`, `claude mcp add` → `mcp__<server>__*`. 스킬이 하드코딩한 prefix(Figma=`mcp__plugin_figma_figma__*`, Playwright=`mcp__plugin_playwright_playwright__*`)와 맞추려면 해당 서버는 **플러그인으로 설치**한다.
 
 ---

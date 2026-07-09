@@ -1,9 +1,11 @@
 # 수정 계획 — sync-context.sh 의 gitignore 자동 추가 제거
 
-> 상태: **하네스측 완료 (gitignore 자동 추가만 제거, 동기화 유지, branch `fix/sync-context-seed-once`) / crema-service Step 5 는 배포·재설치 후 진행**
+> **주의 (2026-07-09):** 이 문서는 "SessionStart 동기화 유지 + gitignore 비관여" 시점의 결정 기록입니다. 현재 운영 모델은 explicit setup/apply 기반으로 바뀌었고, legacy `sync-context.sh` 파일도 제거되었습니다. 최신 구조는 `docs/roadmap.md`, `README.md`, `docs/README.ko.md`를 우선 참고하세요.
+
+> 상태: **역사 문서** — 당시에는 `sync-context.sh` force-sync를 유지하는 결정을 기록했지만, 현재 하네스는 explicit setup/apply 모델로 전환되었습니다.
 > 발견 출처: crema-service 프로젝트 현황 조사 세션 (2026-06-18)
-> 결정: **rules/refs 동기화(force-sync)는 유지한다(플러그인 번들이 SSOT). 다만 훅이 `.gitignore` 에 항목을 추가하던 동작만 제거하여, 동기화되는 파일들이 프로젝트 git 에 추적·커밋되도록 한다.** 훅은 복사만 하므로 동기화 대상이 아닌 폴더 내 프로젝트 고유 파일에는 관여하지 않는다.
-> 영향 파일(SSOT): [`plugins/devoks-core/hooks/sync-context.sh`](../plugins/devoks-core/hooks/sync-context.sh)
+> 결정(당시): **rules/refs 동기화(force-sync)는 유지한다(플러그인 번들이 SSOT). 다만 훅이 `.gitignore` 에 항목을 추가하던 동작만 제거하여, 동기화되는 파일들이 프로젝트 git 에 추적·커밋되도록 한다.** 훅은 복사만 하므로 동기화 대상이 아닌 폴더 내 프로젝트 고유 파일에는 관여하지 않는다.
+> 영향 파일(당시 SSOT, 현재 제거됨): `plugins/devoks-core/hooks/sync-context.sh`
 
 ---
 

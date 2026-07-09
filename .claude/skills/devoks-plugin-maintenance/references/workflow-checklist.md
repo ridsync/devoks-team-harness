@@ -9,9 +9,9 @@
 | runtime behavior only | 대상 플러그인 식별, `plugin.json` version bump 여부, `validate --strict` | 사용자-facing 설명 변경이 있으면 README/README.ko 검토 |
 | public workflow change | version bump, `validate --strict`, 관련 skill/command 문서 | `docs/plugin-management.md`, README/README.ko |
 | docs-only | 실제 코드/동작 불변인지 확인 | plugin version bump 비대상 사유 기록 |
-| MCP/prefix/policy change | `mcpServers`, `permissions.allow`, prefix, setup 문서 | `docs/mcp-setup-guide.md`, `setup-mcp.md`, `check-mcp.sh` |
+| MCP/prefix/policy change | `mcpServers`, `permissions.allow`, prefix, setup 문서 | `docs/mcp-setup-guide.md`, `setup-mcp.md`, `check-setup-state.sh` |
 | naming/catalog change | 이름/description/dependency 변경 반영 | README, README.ko, marketplace, 다른 SKILL 참조 |
-| core refs/rules change | 루트 `.claude/` 사본과 sync 정책 확인 | `sync-context.sh`, 관련 운영 문서 |
+| core refs/rules change | 루트 `.claude/` 사본과 explicit setup/sync 정책 확인 | `docs/fix-plan-sync-context-ssot.md`, 관련 운영 문서 |
 
 ## 2. 문서 대상 판단표
 
@@ -40,7 +40,7 @@
 - 관련 SKILL.md / agent 문서
 - `docs/mcp-setup-guide.md`
 - `plugins/devoks-core/commands/setup-mcp.md`
-- `plugins/devoks-core/hooks/check-mcp.sh`
+- `plugins/devoks-core/hooks/check-setup-state.sh`
 
 ## 4. 특수 케이스
 
@@ -56,7 +56,7 @@
 
 ### devoks-core
 - `rules/`, `refs/`, hook 변경 시 루트 `.claude/` 사본과 관계
-- `check-mcp.sh`, `sync-context.sh`와 문서 설명 일치 여부
+- `check-setup-state.sh`, explicit setup/sync 정책 문서와 설명 일치 여부
 
 ### devoks-sdlc
 - 구 devoks-code/devoks-feature/devoks-test/devoks-verify 통합체 — skill 10 + command 8 + agent 2, 변경 영향 범위가 5개 플러그인 중 가장 넓음
