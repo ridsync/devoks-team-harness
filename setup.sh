@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# setup.sh — DevOks Team Harness 폴백 동기화 스크립트
+# setup.sh — DevOks Team Harness 폴백 부트스트랩 스크립트
 # 플러그인 시스템 없이 .claude/ 로 직접 파일을 복사할 때 사용.
+# project convention preset은 자동 주입하지 않고, 설치 후 명시적으로 구성한다.
 #
 # 사용법:
 #   ./setup.sh              # 전체 설치
-#   ./setup.sh --update     # git pull 후 재동기화
+#   ./setup.sh --update     # git pull 후 재설치
 #   TARGET_DIR=/other/project ./setup.sh   # 다른 프로젝트에 설치
 
 set -euo pipefail
@@ -36,17 +37,28 @@ mkdir -p \
 
 echo "[2/4] 파일 복사 중..."
 
-echo "  rules/"
-cp -f "$SCRIPT_DIR/plugins/devoks-core/rules/"*.md "$CLAUDE_DIR/rules/"
+echo "  rules/ (base)"
+cp -f "$SCRIPT_DIR/plugins/devoks-core/rules/agent-principles.md" "$CLAUDE_DIR/rules/"
+cp -f "$SCRIPT_DIR/plugins/devoks-core/rules/memory-policy.md" "$CLAUDE_DIR/rules/"
 
 echo "  refs/"
 cp -f "$SCRIPT_DIR/plugins/devoks-core/refs/"*.md "$CLAUDE_DIR/refs/"
+
+echo "  commands/ (core)"
+cp -f "$SCRIPT_DIR/plugins/devoks-core/commands/"*.md "$CLAUDE_DIR/commands/"
 
 echo "  commands/ (git)"
 cp -f "$SCRIPT_DIR/plugins/devoks-git/commands/"*.md "$CLAUDE_DIR/commands/"
 
 echo "  commands/ (sdlc)"
 cp -f "$SCRIPT_DIR/plugins/devoks-sdlc/commands/"*.md "$CLAUDE_DIR/commands/"
+
+echo "  skills/ (core)"
+for skill_dir in "$SCRIPT_DIR/plugins/devoks-core/skills/"/*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p "$CLAUDE_DIR/skills/$skill_name"
+  cp -rf "$skill_dir"* "$CLAUDE_DIR/skills/$skill_name/" 2>/dev/null || true
+done
 
 echo "  skills/ (sdlc)"
 for skill_dir in "$SCRIPT_DIR/plugins/devoks-sdlc/skills/"/*/; do
@@ -230,6 +242,9 @@ if [[ ! -f "$CLAUDE_DIR/CLAUDE.md" ]]; then
 else
   echo "  ✓  CLAUDE.md 존재 확인"
 fi
+
+echo "  ⚠  project-convention preset은 자동 주입하지 않았습니다."
+  echo "     설치 후 Claude에서 /setup-project-convention 을 실행해 스택 preset을 선택하세요."
 
 echo ""
 echo "✅ 완료!"

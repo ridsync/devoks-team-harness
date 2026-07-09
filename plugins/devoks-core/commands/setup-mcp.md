@@ -7,7 +7,7 @@ description: DevOks 권장 MCP 서버를 현재 상태에 맞춰 user scope에 1
 ## SSOT
 
 - 설치 정책·방식·prefix 규칙: [`docs/mcp-setup-guide.md`](../../../docs/mcp-setup-guide.md)를 따른다.
-- 감지 로직 참고: `devoks-core` SessionStart 훅 [`hooks/check-mcp.sh`](../hooks/check-mcp.sh).
+- 감지 로직 참고: `devoks-core` SessionStart 훅 [`hooks/check-setup-state.sh`](../hooks/check-setup-state.sh).
 
 ## Overview
 
@@ -101,6 +101,7 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
 7. **결과 보고**
    - 설치가 끝나면 `claude mcp list`를 다시 실행해 최종 상태를 요약한다.
    - 변경 사항이 도구로 반영되려면 **세션 재시작이 필요할 수 있음**을 안내한다.
+   - 프로젝트 규칙/refs 는 SessionStart 자동 동기화가 아니므로, 신규 설치 후에는 **별도로** `/devoks-core:setup-project-convention`을 실행해 stack preset 기반 `project-convention.md`를 구성하도록 안내한다.
 
 ## 주의
 

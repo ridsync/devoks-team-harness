@@ -107,7 +107,7 @@ PR 생성 직후, 아래 순서로 담당자·리뷰 요청을 맞춘다. `gh pr
 ## PR 본문 작성 시 참고
 
 - **템플릿 경로**: [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md)
-- **프로젝트 규칙**: `.claude/refs/` — `engineering-principles.md`, `code-review.md`, `git-convention.md`, `workflow.md` / `.claude/rules/` — `agent-principles.md`, `project-convention.md` — 영향 영역·테스트 항목 정리 시 참고 (필요 시 `.claude/CLAUDE.md` 참고)
+- **프로젝트 규칙**: `.claude/refs/` — `engineering-principles.md`, `code-review.md`, `git-convention.md`, `workflow.md` / `.claude/rules/` — `agent-principles.md`, 프로젝트 active convention `project-convention.md` — 영향 영역·테스트 항목 정리 시 참고 (프로젝트 사실은 필요 시 `.claude/CLAUDE.md` 우선 확인)
 
 ## 요약
 

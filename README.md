@@ -15,7 +15,7 @@ Claude Code harness for the DevOks team — plugins for code review, feature dev
 
 | Plugin | Contents | Required |
 |--------|----------|----------|
-| `devoks-core` | Core principles & reference docs — SessionStart hook syncs `rules/` and `refs/` into the project `.claude/` (git-tracked; no longer gitignored) for native auto-loading | **Required** |
+| `devoks-core` | Core principles, convention presets, explicit setup flows — MCP checks plus project convention setup/management for `.claude/` | **Required** |
 | `devoks-git` | Git commit, issue, and PR workflow commands | Recommended |
 | `devoks-sdlc` | Unified SDLC workflow — feature dev (FRD/PLAN/execution/UI), test authoring & triage, code review/refactoring/module analysis/security review, requirement & data-flow verification | Recommended |
 | `devoks-browser` | Chrome DevTools MCP attach + Visual Diff verification | Optional |
@@ -40,16 +40,23 @@ claude
 /plugin marketplace add ridsync/devoks-team-harness
 
 # 2. Install plugins
-/plugin install devoks-core@devoks-plugins      # required — syncs rules & refs on session start
+/plugin install devoks-core@devoks-plugins      # required — core rules, convention presets, setup/management flows
 /plugin install devoks-git@devoks-plugins       # Git workflow (recommended)
 /plugin install devoks-sdlc@devoks-plugins      # SDLC: feature · test · code review/security · verify (recommended)
 /plugin install devoks-browser@devoks-plugins   # browser tools (optional)
 /plugin install devoks-rn@devoks-plugins        # React Native debugging (optional — RN projects)
 
-# 3. Initialize MCP servers & dependencies (final step)
+# 3. Initialize MCP servers & dependencies
 /devoks-core:setup-mcp
+
+# 4. Apply base rules/refs + choose a stack preset
+/devoks-core:setup-project-convention
 ```
 
+> **After plugin install, always run these two setup commands in order:**
+> 1. `/devoks-core:setup-mcp`
+> 2. `/devoks-core:setup-project-convention`
+>
 > Full dependency & MCP setup → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
 >
 > Update later: `/plugin marketplace update devoks-plugins`
@@ -69,25 +76,28 @@ cd /path/to/your-project
 /path/to/devoks-team-harness/setup.sh --update
 ```
 
-> **Note:** `setup.sh` copies static files but does not run the `devoks-core` SessionStart hook. Re-run `setup.sh --update` after pulling harness changes to refresh rules and refs.
+> **Note:** `setup.sh` bootstraps base rules/refs and commands/skills, but it does **not** auto-apply a stack-specific `project-convention.md`. After setup, run `/setup-project-convention` in the project to choose a preset.
 
 ---
 
-## How `devoks-core` Context Sync Works
+## How `devoks-core` Convention Setup Works
 
-On session start (`startup`, `resume`, `clear`, `compact`), the `devoks-core` hook runs `sync-context.sh` and:
+`devoks-core` no longer overwrites `.claude/rules/` or `.claude/refs/` on every SessionStart.
+Instead, it uses an **explicit setup/apply model**:
 
-1. Copies bundled `plugins/devoks-core/rules/*.md` → `.claude/rules/` (overwrites when the bundle changed)
-2. Copies bundled `plugins/devoks-core/refs/*.md` → `.claude/refs/` (overwrites when the bundle changed)
+1. `/devoks-core:setup-mcp` installs shared MCP servers and dependencies
+2. `/devoks-core:setup-project-convention` copies base rules/refs and asks the user to choose a stack preset
+3. The chosen preset is applied to `.claude/rules/project-convention.md`
+4. Later changes are handled by explicit convention management flows — **not** by automatic overwrite
 
-**Policy:** The plugin bundle is the SSOT for these rules/refs, so the hook keeps each project's copy in sync with the bundle. It only copies the bundled files — project-specific files in those folders (e.g. `pitfalls.md`) are never touched. The hook does **not** modify `.gitignore`; projects track and commit `.claude/rules/` and `.claude/refs/` in git.
+| Type | Source | Applied to project |
+|------|--------|--------------------|
+| **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | copied during explicit setup |
+| **refs** | `plugins/devoks-core/refs/*.md` | copied during explicit setup |
+| **stack preset** | `shared/conventions/<preset>/project-convention.md` | copied to `.claude/rules/project-convention.md` |
+| **project active convention** | `.claude/rules/project-convention.md` | project-owned; no SessionStart overwrite |
 
-| Type | Files | Role |
-|------|-------|------|
-| **rules** | `agent-principles`, `project-convention`, `memory-policy` | Always-on agent behavior |
-| **refs** | `code-review`, `engineering-principles`, `git-convention`, `workflow` | On-demand reference docs |
-
-No slash command is needed — Claude Code loads `.claude/rules/` natively.
+The SessionStart hook now only checks MCP/project initialization state and prints guidance when needed.
 
 ---
 
@@ -107,6 +117,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
+| `project-convention-manage` | `/devoks-core:project-convention-manage` | devoks-core |
 | `metro-devtools-attach` | `/devoks-rn:metro-devtools-attach` | devoks-rn |
 
 ## Available Agents
@@ -122,6 +133,13 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 ---
 
 ## Available Commands
+
+### devoks-core
+
+| Command | Description |
+|---------|-------------|
+| `/devoks-core:setup-mcp` | Install/check recommended MCP servers and dependencies |
+| `/devoks-core:setup-project-convention` | Apply base rules/refs and choose a stack preset for `project-convention.md` |
 
 ### devoks-git
 
@@ -149,7 +167,7 @@ No slash command is needed — Claude Code loads `.claude/rules/` natively.
 
 ## Dependency Summary
 
-> DevOks plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-mcp.sh`) detects missing servers each session and prints install guidance. **Exceptions:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). `devoks-rn` requires `metro-devtools` in `~/.claude.json` with a dynamic `--wsEndpoint` (Metro WebSocket URL changes on restart). See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
+> DevOks plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-setup-state.sh`) detects missing servers each session and prints install guidance. **Exceptions:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). `devoks-rn` requires `metro-devtools` in `~/.claude.json` with a dynamic `--wsEndpoint` (Metro WebSocket URL changes on restart). See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
 
 | Plugin | Required | Optional |
 |--------|----------|----------|
@@ -170,14 +188,17 @@ devoks-team-harness/
 ├── .claude-plugin/marketplace.json    # marketplace catalog
 ├── plugins/
 │   ├── devoks-core/
-│   │   ├── hooks/                     # SessionStart → sync-context.sh
-│   │   ├── rules/                     # SSOT: agent-principles, project-convention, memory-policy
-│   │   └── refs/                      # SSOT: code-review, engineering-principles, git-convention, workflow
+│   │   ├── hooks/                     # SessionStart → MCP/project state check (no auto overwrite)
+│   │   ├── commands/                  # setup-mcp, setup-project-convention
+│   │   ├── skills/                    # project convention management
+│   │   ├── rules/                     # base rules: agent-principles, memory-policy (+ management contract)
+│   │   └── refs/                      # setup 시 주입하는 reference docs
 │   ├── devoks-git/commands/           # Git commands (3)
 │   ├── devoks-sdlc/                    # SDLC: feature·test·code·verify (8 commands + 10 skills + 3 agents)
 │   ├── devoks-browser/               # browser tools (2 skills + 1 agent)
 │   └── devoks-rn/                    # React Native debugging (1 skill)
 ├── shared/
+│   ├── conventions/                   # stack-specific project convention presets
 │   ├── setup/claude.json.template     # ~/.claude.json MCP config template
 │   └── templates/CLAUDE.md.project.template
 ├── docs/
@@ -189,7 +210,7 @@ devoks-team-harness/
 └── README.md
 ```
 
-> `plugins/devoks-core/rules/` and `plugins/devoks-core/refs/` are the SSOT for team principles and reference docs. Edit those files and commit — the SessionStart hook (or `setup.sh`) syncs them into each project's `.claude/`. Projects keep these copies git-tracked (the hook does not gitignore them).
+> `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` and `plugins/devoks-core/refs/*` are seeded into projects by explicit setup. Stack-specific `project-convention.md` comes from `shared/conventions/*` presets, is applied explicitly, and remains project-owned afterward.
 
 ---
 

@@ -227,8 +227,8 @@ done
 - 플러그인 기능 추가 / 버그 수정
 - skill / command / agent 이름 또는 description 변경
 - `plugin.json`의 `mcpServers` / `settings.permissions.allow` 변경
-- `docs/mcp-setup-guide.md`, `plugins/devoks-core/commands/setup-mcp.md`, `plugins/devoks-core/hooks/check-mcp.sh` 와의 정합성 확인이 필요한 변경
-- `devoks-core`의 `refs/`, `rules/`, `sync-context.sh` 영향 검토가 필요한 변경
+- `docs/mcp-setup-guide.md`, `plugins/devoks-core/commands/setup-mcp.md`, `plugins/devoks-core/hooks/check-setup-state.sh` 와의 정합성 확인이 필요한 변경
+- `devoks-core`의 `refs/`, `rules/`, legacy sync 제거 또는 explicit setup 정책 영향 검토가 필요한 변경
 
 상세 체크 항목은 로컬 skill의 reference 문서 `references/workflow-checklist.md`를 기준으로 유지합니다.
 

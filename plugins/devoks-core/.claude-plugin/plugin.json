@@ -1,7 +1,7 @@
 {
   "name": "devoks-core",
-  "version": "1.0.3",
-  "description": "DevOks 기본 원칙 자동 로딩 — SessionStart 훅이 Agent Principles·Project Convention·Memory Policy(rules)와 코드리뷰·엔지니어링·Git·워크플로우(refs) 문서를 프로젝트 .claude/에 동기화한다.",
+  "version": "1.1.1",
+  "description": "DevOks 기본 원칙·preset 기반 project convention 구성 플러그인 — MCP 점검, 명시적 setup, convention 관리 흐름을 제공한다.",
   "author": { "name": "ridsync" },
   "dependencies": []
 }

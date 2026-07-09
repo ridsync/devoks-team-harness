@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-mcp.sh — DevOks 권장 MCP 서버 설치 및 프로젝트 초기화 상태 점검
+# check-setup-state.sh — DevOks 권장 MCP 서버 설치 및 프로젝트 초기화 상태 점검
 #
 # SessionStart 훅으로 실행. devoks 플러그인은 범용·공유 MCP(context7·figma·
 # serena·codegraph·playwright)를 번들하지 않는다(플러그인별 중복 인스턴스·
@@ -18,6 +18,7 @@ set -uo pipefail
 USER_CFG="${HOME}/.claude.json"
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-${PWD:-.}}"
 PROJ_MCP="${PROJECT_DIR}/.mcp.json"
+CLAUDE_DIR="${PROJECT_DIR}/.claude"
 
 # user 설정(mcpServers·enabledPlugins)과 project .mcp.json 에서 토큰 존재 여부 확인.
 # 휴리스틱: 토큰이 보이면 "설정됨"으로 간주(거짓음성=경고 누락, 거짓양성=경고 안 뜸 — 둘 다 저비용).
@@ -48,11 +49,31 @@ codegraph_project_ready() {
   return 0
 }
 
+base_rules_ready() {
+  is_project_dir || return 0
+  [[ -f "$CLAUDE_DIR/rules/agent-principles.md" && -f "$CLAUDE_DIR/rules/memory-policy.md" ]]
+}
+
+refs_ready() {
+  is_project_dir || return 0
+  [[ -f "$CLAUDE_DIR/refs/code-review.md" \
+    && -f "$CLAUDE_DIR/refs/engineering-principles.md" \
+    && -f "$CLAUDE_DIR/refs/git-convention.md" \
+    && -f "$CLAUDE_DIR/refs/workflow.md" ]]
+}
+
+project_convention_ready() {
+  is_project_dir || return 0
+  [[ -f "$CLAUDE_DIR/rules/project-convention.md" && -f "$CLAUDE_DIR/project-convention.json" ]]
+}
+
 # JSON 단일 문자열에 들어가므로 큰따옴표·실제 개행 금지. 항목 구분은 리터럴 \n.
 missing_mcp=""
 missing_project=""
+setup_steps=""
 add_missing_mcp() { missing_mcp="${missing_mcp}${missing_mcp:+\n}$1"; }
 add_missing_project() { missing_project="${missing_project}${missing_project:+\n}$1"; }
+add_setup_step() { setup_steps="${setup_steps}${setup_steps:+\n}$1"; }
 
 have "context7"   || add_missing_mcp '- context7 (문서조회, 선택): 미설정 시 WebSearch 폴백. 설치: claude mcp add context7 --scope user -- npx -y @upstash/context7-mcp@latest'
 have "serena"     || add_missing_mcp '- serena (코드 심볼탐색·리팩토링, 권장): 설치: claude mcp add serena --scope user -- uvx serena@latest --project <프로젝트_절대경로>'
@@ -85,10 +106,19 @@ if have "codegraph" && ! codegraph_project_ready; then
   add_missing_project '- codegraph index: 현재 프로젝트에 유효한 .codegraph 인덱스가 없습니다. 초기화: codegraph init <프로젝트_절대경로>'
 fi
 
-# 누락 없으면 조용히 종료
-[[ -z "$missing_mcp" && -z "$missing_project" ]] && exit 0
+if ! base_rules_ready || ! refs_ready || ! project_convention_ready; then
+  add_setup_step '1. /devoks-core:setup-mcp — 권장 MCP 서버·의존성 설치/초기화'
+  add_setup_step '2. /devoks-core:setup-project-convention — base rules/refs 적용 + stack preset 선택'
+fi
 
-ctx='[DevOks] 권장 MCP 서버 및 프로젝트 초기화 상태를 확인했습니다. 관련 스킬·커맨드 사용 요청이 들어오면 아래 항목을 사용자에게 안내하세요(이미 처리돼 있다면 무시). 한 번에 설치하려면 /devoks-setup-mcp 커맨드를 안내하세요. 평소 대화에서는 먼저 언급하지 마세요.'
+# 누락 없으면 조용히 종료
+[[ -z "$missing_mcp" && -z "$missing_project" && -z "$setup_steps" ]] && exit 0
+
+ctx='[DevOks] 플러그인 설치 후 필요한 setup 상태를 확인했습니다. 관련 스킬·커맨드 사용 전 아래 안내를 우선 참고하세요.'
+
+if [[ -n "$setup_steps" ]]; then
+  ctx="${ctx}\n[설치 직후 권장 setup]\n${setup_steps}"
+fi
 
 if [[ -n "$missing_mcp" ]]; then
   ctx="${ctx}\n[MCP 서버 미감지]\n${missing_mcp}"

@@ -6,7 +6,7 @@
     {
       "name": "devoks-core",
       "source": "./plugins/devoks-core",
-      "description": "기본 원칙 자동 로딩 — SessionStart 훅이 rules(원칙)·refs(참조) 문서를 프로젝트 .claude/에 동기화",
+      "description": "기본 원칙·preset 기반 project convention 구성 — SessionStart 훅은 setup 상태를 점검하고 명시적 setup/apply 흐름을 제공",
       "dependencies": []
     },
     {
