@@ -50,7 +50,7 @@ metadata:
 - `package.json`의 `scripts`(test 계열)·`devDependencies`에서 테스트 러너·라이브러리 식별.
 - 테스트 설정 파일(`vitest.config.*`, `jest.config.*`, `pytest.ini` 등) 확인.
 - 기존 테스트 파일의 **위치(colocated vs `__tests__` vs `test/`)와 네이밍 패턴**(`*.test.js`, `*.spec.ts` 등)을 샘플로 파악.
-- 프로젝트 컨벤션 문서(`.claude/rules/project-convention.md` 등)가 있으면 Test 섹션 규칙을 따른다.
+- 프로젝트 active convention(`.claude/rules/project-convention.md`)이 있으면 Test 섹션 규칙을 따른다. 스택 사실은 필요 시 `.claude/CLAUDE.md`로 교차 확인한다.
 
 > 감지값이 SSOT다. 본 스킬에 러너/라이브러리/경로를 하드코딩하지 않는다.
 
@@ -108,5 +108,5 @@ metadata:
 
 ## 참고 기준 문서
 
-- **프로젝트 규칙**: `.claude/rules/project-convention.md`(Test 섹션), `.claude/rules/agent-principles.md`(Definition of Done).
+- **프로젝트 규칙**: 프로젝트 active convention `.claude/rules/project-convention.md`(Test 섹션), `.claude/rules/agent-principles.md`(Definition of Done), 필요 시 `.claude/CLAUDE.md`.
 - 관련 스킬: `devoks-sdlc:test-run-triage`(실행·triage), `devoks-sdlc:verify-requirements`(요구 충족 판정).

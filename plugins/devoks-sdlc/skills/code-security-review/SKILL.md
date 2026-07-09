@@ -52,7 +52,7 @@ metadata:
 
 ### 2. 프로젝트 고유 정책 감지 (있으면 우선)
 
-- `.claude/rules/project-convention.md`의 Security 섹션, `.claude/refs/code-review.md`의 보안 항목, 프로젝트가 선언한 민감 파일/시크릿 정책이 **존재하면 우선 적용**한다.
+- 프로젝트 active convention `.claude/rules/project-convention.md`의 Security 섹션, `.claude/refs/code-review.md`의 보안 항목, `.claude/CLAUDE.md`가 선언한 민감 파일/시크릿 정책이 **존재하면 우선 적용**한다.
 - 없으면 범용 기준만 적용한다.
 - 스킬 본문에 특정 식별자·파일명을 박지 않는다 — 감지값이 SSOT다.
 
@@ -121,5 +121,5 @@ metadata:
 ## 참고 기준 문서
 
 - **심각도 분류 SSOT**: `.claude/refs/code-review.md §8`.
-- **프로젝트 규칙**: `.claude/rules/project-convention.md`(Security), `.claude/rules/agent-principles.md`.
+- **프로젝트 규칙**: 프로젝트 active convention `.claude/rules/project-convention.md`(Security), `.claude/rules/agent-principles.md`, 필요 시 `.claude/CLAUDE.md`.
 - 관련: `devoks-sdlc:code-review`(변경분 인라인 보안 스크리닝 — 본 스킬과 역할 분리).

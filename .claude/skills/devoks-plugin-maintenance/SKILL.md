@@ -31,8 +31,8 @@ metadata:
 - 구조·버전·검증 규칙: `docs/plugin-management.md`
 - 카탈로그와 사용자-facing 구성: `README.md`, `docs/README.ko.md`
 - MCP 설치/prefix 정책: `docs/mcp-setup-guide.md`, `plugins/devoks-core/commands/setup-mcp.md`
-- 세션 시작 MCP 경고 규칙: `plugins/devoks-core/hooks/check-mcp.sh`
-- core 문서 동기화 정책: `plugins/devoks-core/hooks/sync-context.sh`, `docs/fix-plan-sync-context-ssot.md`
+- 세션 시작 setup 상태 점검 규칙: `plugins/devoks-core/hooks/check-setup-state.sh`
+- legacy sync 종료 맥락: `docs/fix-plan-sync-context-ssot.md`
 - 카탈로그 drift 맥락: `docs/roadmap.md`
 - 상세 체크표: `references/workflow-checklist.md`
 
@@ -138,7 +138,7 @@ claude plugin validate ./plugins/<plugin> --strict
 - 관련 SKILL.md / agent 문서의 tool 명칭
 - `docs/mcp-setup-guide.md`
 - `plugins/devoks-core/commands/setup-mcp.md`
-- `plugins/devoks-core/hooks/check-mcp.sh`
+- `plugins/devoks-core/hooks/check-setup-state.sh`
 
 ### 특수 케이스
 
@@ -157,14 +157,14 @@ claude plugin validate ./plugins/<plugin> --strict
 
 - `plugins/devoks-core/refs/*`
 - `plugins/devoks-core/rules/*`
-- `plugins/devoks-core/hooks/check-mcp.sh`
-- `plugins/devoks-core/hooks/sync-context.sh`
+- `plugins/devoks-core/hooks/check-setup-state.sh`
+- legacy `sync-context.sh` 제거 또는 explicit setup 정책 변경
 
 확인 항목:
 
 - 루트 `.claude/refs/*`, `.claude/rules/*` 사본과의 관계
 - 운영 문서 설명과 실제 동작이 맞는지
-- sync 정책이 바뀌면 관련 문서도 함께 갱신했는지
+- explicit setup/sync 정책이 바뀌면 관련 문서도 함께 갱신했는지
 
 ## Step 8 — 결과 보고 형식
 

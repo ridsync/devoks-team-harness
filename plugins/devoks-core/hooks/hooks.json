@@ -1,5 +1,5 @@
 {
-  "description": "DevOks 기본 원칙·참조 문서를 프로젝트 .claude/rules·.claude/refs 로 동기화 (네이티브 자동 로딩 활성화)",
+  "description": "DevOks 프로젝트 초기화 상태와 권장 MCP 구성을 SessionStart에 점검한다.",
   "hooks": {
     "SessionStart": [
       {
@@ -7,12 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/sync-context.sh",
-            "args": []
-          },
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/check-mcp.sh",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/check-setup-state.sh",
             "args": [],
             "timeout": 5
           }
