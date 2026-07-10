@@ -2,5 +2,3 @@
 *.local
 node_modules/
 .history/
-.claude/rules/
-.claude/refs/

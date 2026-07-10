@@ -65,7 +65,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 
 - 현재 preset provenance 유무
 - `CLAUDE.md`의 stack 사실과 active convention의 일치 여부
-- active convention이 starter placeholder를 그대로 많이 포함하는지
+- active convention이 preset의 예시 스택/코드를 그대로 쓰는지, 프로젝트 실제 값으로 교체됐는지
 - 로컬 커스터마이징이 어느 정도 누적됐는지
 
 ### 4. diff 제시
@@ -76,13 +76,13 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - 유지되는 로컬 커스터마이징
 - 제거/덮어쓰기 되는 내용
 - `CLAUDE.md`와 충돌하는 항목
-- placeholder가 새로 생기거나 여전히 남는 항목
+- preset 예시값(스택 선택, SSOT 경로 등)이 새로 생기거나 여전히 프로젝트 실제 값으로 교체되지 않고 남는 항목
 
 #### selective apply 옵션
 
 재적용/전환 시 아래 같은 단위로 선택 반영을 제안할 수 있다.
 
-- Stack Declaration
+- Stack
 - Core Rules
 - Design Pattern
 - Comments & Docs / Comment Rules
@@ -107,7 +107,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - 적용한 preset / source
 - 적용 모드 (`full apply` / `selective apply` / `switch` / `cleanup`)
 - 유지한 로컬 커스터마이징
-- 추가로 사용자가 채워야 할 placeholder
+- 추가로 프로젝트 실제 값으로 바꿔야 할 preset 예시 항목 (Stack, Project Decisions 등)
 - 필요 시 다음 액션 (`CLAUDE.md` 보강, 테스트 스택 명시, UI guideline SSOT 연결 등)
 
 ---

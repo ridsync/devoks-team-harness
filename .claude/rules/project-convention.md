@@ -1,312 +1,81 @@
 # Project Convention
 
-이 문서에서는 코딩 스타일, 네이밍 규칙, 파일 구조 등 프로젝트의 일관된 conventions를 정리합니다.
+`devoks-team-harness` 자신의 개발 컨벤션입니다. 이 저장소는 Claude Code 플러그인 마켓플레이스이며,
+런타임 애플리케이션 코드(JS/React 등)를 갖지 않습니다 — 산출물은 **Markdown(SKILL/command/agent 정의) +
+Bash(hooks) + JSON(plugin manifest)** 입니다. `shared/conventions/*`에 있는 스택별 preset(React Web 등)은
+**이 저장소가 관리하는 산출물**이지, 이 저장소 자신의 개발 스택이 아닙니다.
 
 ---
 
-## Coding Style
+## SSOT — 경로별 소유 범위 (가장 중요)
 
-**Language:** JavaScript + JSDoc (TypeScript 미사용)
+이 저장소에는 겉보기엔 비슷한 두 종류의 `.claude/`류 경로가 공존한다. **절대 혼동하지 않는다.**
 
-### Naming
+| 경로 | 소유 범위 | 용도 |
+|------|----------|------|
+| `/.claude/` (저장소 루트) | **이 harness 저장소 자신**에게만 유효 | harness 자신을 개발할 때 Claude Code가 참조하는 rules/refs/skills. 대상 프로젝트에 배포되지 않는다 |
+| `plugins/<plugin>/` | **플러그인을 설치한 대상 프로젝트**를 위한 산출물 | 설치 시 캐시 위치로 통째 복사되어 대상 프로젝트의 세션에 로드된다. harness 저장소 자신의 설정이 아니다 |
+| `shared/conventions/<preset>/project-convention.md` | 대상 프로젝트에 주입될 **starter preset 원본** | `devoks-core:setup-project-convention`이 대상 프로젝트의 `.claude/rules/project-convention.md`로 복사한다 |
 
-| 대상 | 규칙 | 예시 |
-|------|------|------|
-| 컴포넌트 파일 | PascalCase.jsx | `AppHeader.jsx`, `SafeModal.jsx` |
-| 유틸/훅 파일 | camelCase.js | `debug.util.js`, `useBootSplash.js` |
-| 상수 파일 | PascalCase.js | `SchemaNames.js`, `BeanStatus.js` |
-| 컴포넌트 | PascalCase | `export default AppHeader` |
-| 커스텀 훅 | use + PascalCase | `useBootSplash`, `useInViewport` |
-| Context 훅 | useXxxOrThrow | `useToolbarOrThrow()` |
-| Private 헬퍼 | # + prefix | `#requireBooleanOrThrow` |
-| 상수 | UPPER_SNAKE_CASE | `ZINDEX.HEADER`, `BEAN_STATUS.CREATE` |
-| 변수/함수 | camelCase | `showTimeText`, `loadConfig` |
+**과거 사고 사례(교훈):** 레거시 `sync-context.sh`(SessionStart 훅)가 플러그인 번들 rules를 "현재 프로젝트"와
+무관하게 강제 복사했고, harness 저장소 자신에서 세션을 열었을 때도 그대로 실행되어 **당시 stack preset 원본
+(커피/원두 도메인 예시)이 이 파일(`/.claude/rules/project-convention.md`) 자리에 잘못 박제**됐다. 그 훅은
+`1ac291e`에서 폐기되고 명시적 setup 모델로 전환됐다. **plugins/ 하위의 내용을 이 저장소 자신의 `.claude/`로
+복사·동기화하는 자동 메커니즘은 더 이상 없다** — 있어서도 안 된다. `plugins/`를 수정하는 작업과 `/.claude/`를
+수정하는 작업은 항상 별개의 결정이다.
 
-- 이름은 **도메인 + 맥락 + 의도**를 담아 3단어 이상 권장. 제네릭 이름 회피.
+---
 
-### Code Size
+## Stack
 
-- **Functions:** ≤50 lines (target), **100 lines max** (hard limit).
-- **Files:** ≤500 lines (target), **1000 lines max** (hard limit).
+- **저작 포맷:** Markdown (`SKILL.md`, `commands/*.md`, `agents/*.md`, `docs/*.md`) + Bash (`hooks/*.sh`) + JSON (`plugin.json`, `marketplace.json`)
+- **런타임 코드 없음** — lint/type/test 파이프라인 대상 소스가 아니다. "테스트"는 `claude plugin validate --strict` + 훅 스모크 테스트로 대체한다.
+- **버전 관리:** semver 기반 `plugin.json.version` (patch/minor/major 기준은 `docs/plugin-management.md` §6 참고)
 
-### Import Order
+---
 
-```javascript
-// 1. React / 외부 라이브러리
-import { useEffect, useMemo, useState } from "react";
-import { Button, Typography } from "antd";
-import { useTranslation } from "react-i18next";
+## 디렉토리·네이밍 구조
 
-// 2. 유틸 / 상수
-import { createDebugger } from "../../common/debug.util";
-import { ZINDEX } from "../../constants/ZIndexHelper";
+`docs/plugin-management.md` §1이 SSOT. 요약:
 
-// 3. 컨텍스트 / 모델
-import { useAuth } from "../../context/network/AuthProvider";
-import MenuItem from "../../model/MenuItem";
-
-// 4. 컴포넌트 / 스타일
-import MenuBrew from "./components/MenuBrew";
-import styles from "./brewing.style";
+```
+plugins/<plugin-name>/
+├── .claude-plugin/plugin.json   # 필수, kebab-case name, semver version
+├── commands/<command>.md        # frontmatter: description
+├── skills/<skill>/SKILL.md      # frontmatter: name, description
+├── hooks/hooks.json (+ *.sh)
+└── agents/<agent>.md            # frontmatter: name, description, tools?, model?, effort?
 ```
 
-### Constants
-
-- 매직 넘버/문자열 금지 → named constant 추출
-- 파일 상단 (import 직후, 함수 전)
-- `Object.freeze()` 적용
-- 도메인별 그룹화
-
-```javascript
-export const BEAN_AMOUNT_RULE = Object.freeze({
-    key: "beanAmount",
-    min: 0.0,
-    max: 20.0,
-    precision: 1,
-    defaultValue: 18.0,
-});
-```
+- 플러그인 이름/스킬/커맨드/에이전트 이름: kebab-case, 소문자.
+- 플러그인 루트 **외부** 파일 참조 금지 (`../shared-utils` 형태) — 설치 시 디렉토리 전체만 복사되므로 동작하지 않는다. 공유가 필요하면 symlink.
+- 플러그인 루트의 `CLAUDE.md`는 설치 후 로드되지 않는다 — 컨텍스트 주입은 반드시 `skills/<name>/SKILL.md`로.
 
 ---
 
-## React
+## Frontmatter 규칙
 
-- **Functional 컴포넌트만** 사용 (class 컴포넌트 금지)
-- **default export** (컴포넌트)
-- Props는 함수 시그니처에서 **destructuring**
-- Hooks: `useXxx` prefix, 커스텀 훅은 `hooks/` 디렉토리
-
-```javascript
-const AppHeader = ({ toggleDrawer }) => {
-    const { token } = theme.useToken();
-    // ...
-};
-export default AppHeader;
-```
+- `description`(또는 다른 YAML 값)에 `: `(콜론+공백)이 포함되면 YAML 파싱 실패 → **쌍따옴표로 감싼다.**
+- SKILL.md: `name`, `description` 필수.
+- command `.md`: `description` 필수, frontmatter 없으면 `--strict` 검증 실패.
+- agent `.md`: `name`, `description` 필수. `model`/`effort`는 생략 시 세션 상속(`inherit`) — 신규 agent는 반드시 의도적으로 결정하고, `inherit`로 두기로 했어도 명시한다. 모델 선택 기준은 `docs/plugin-management.md` §12.
 
 ---
 
-## Component Pattern
+## 문서·주석 언어
 
-### Context / Provider
-
-```javascript
-// Context 파일 (XxxContext.js)
-export const ToolbarContext = createContext(null);
-export function useToolbarOrThrow() {
-    const ctx = useContext(ToolbarContext);
-    if (!ctx) throw new Error("useToolbar must be used within a ToolbarProvider");
-    return ctx;
-}
-
-// Provider 파일 (XxxProvider.jsx)
-export const ToolbarProvider = ({ children }) => {
-    const value = useMemo(() => ({ ... }), [deps]);
-    return <ToolbarContext.Provider value={value}>{children}</ToolbarContext.Provider>;
-};
-export const useToolbar = () => useToolbarOrThrow();
-```
-
-- Context와 Provider 파일 분리
-- `createContext(null)` + `useXxxOrThrow()` 패턴 (Contract: missing provider → throw)
-- `useMemo`로 context value 감싸기 (불필요한 re-render 방지)
-- Composition over inheritance
+- 문서(SKILL.md, command, docs/*)는 **한국어** 작성, 식별자·CLI 출력·코드 인용은 원문 유지.
+- Bash 훅의 주석은 한국어로 의도(왜 이 분기가 필요한지)를 남긴다 — `check-setup-state.sh` 헤더 주석이 기준 예시.
+- 자명한 내용에는 주석을 달지 않는다. 훅의 "왜"가 코드만으로 드러나지 않을 때만 추가한다.
 
 ---
 
-## UI and Styling
+## 변경 시 준수 절차
 
-- **Ant Design token** (`theme.useToken()`) 으로 동적 테마 색상 사용
-- **인라인 스타일 객체** — 동적 값에 사용
-- **CSS 파일** — 애니메이션/키프레임 전용
-- z-index는 `ZINDEX` 상수 사용 (SSOT: `constants/ZIndexHelper.js`)
-
-```javascript
-const { token } = theme.useToken();
-const styles = {
-    header: {
-        position: "sticky",
-        height: "5.33rem",
-        zIndex: ZINDEX.HEADER,
-        borderBottom: `1px solid ${token.colorBorder}`,
-    },
-};
-```
-
----
-
-## State Management
-
-- **Context API + Provider chain** — App.jsx가 Provider 순서 SSOT
-- **Provider 순서 = 의존관계 순서** → 변경 금지 (변경 시 하위 훅 undefined)
-- 도메인별 Provider 분리 (Auth, Mqtt, Monitoring, Document, Udp 등)
-- Provider에서 `useMemo`로 value 감싸기
-
----
-
-## Design Pattern
-
-### Model Class
-
-```javascript
-export default class Bean {
-    #name; // private field
-    constructor({ name, version, brandName } = {}) {
-        this.name = Bean.#validateText(name, "name");
-        this.validate();
-    }
-    static #validateText(value, field) { /* ... */ }
-    static from(obj) { return new Bean(obj); }
-    toJSON() { this.validate(); return { ... }; }
-}
-```
-
-- ES6 class + `#private` fields
-- `from()` static factory method
-- `toJSON()` for serialization
-- `validate()` on construction
-
-### Validation (Contract)
-
-- `*OrThrow` 헬퍼 함수: 계약 경계에서 입력 검증, 실패 시 throw
-- context message 포함: `throw new Error(\`\${module}: \${field} is required\`)`
-
-### Source Header
-
-- 파일 첫 줄에 `// path/filename.js` 형태의 소스 헤더 권장
-
----
-
-## Error Handling
-
-| 상황 | 처리 |
-|------|------|
-| Contract boundary | `*OrThrow` → `throw Error` with context message |
-| HTTP (ApiController) | `fetchWithAuth` 에러 → 호출자에서 catch/handle |
-| I/O (DB, 파일) | try-catch + `console.error` + rethrow or explicit handle |
-| Provider 초기화 | catch + `console.error` + rethrow |
-
-**금지:**
-- silent catch (빈 catch 블록)
-- implicit fallback (에러 삼키고 기본값 반환)
-- `typeof` 가드로 조용히 넘기기 → `*OrThrow` 사용
-
----
-
-## Comment Rules
-
-- **한국어** 사용: 도메인 규칙, 계약 이유, throw 사유, 사이드이펙트, 성능 이슈
-- 자명한 코드에 주석 금지
-- 타겟 독자: 5년차 미드레벨 엔지니어
-- 아래 3종은 독립적으로 판단한다. 한 대상이 둘 이상에 해당하면 각 블록을 나란히 작성한다 (순서 무관)
-
-### 프로젝트 기본 주석
-
-컴포넌트·훅·유틸 함수·상수 등 **재사용되는 대상의 사용법(계약)**을 설명할 때 사용한다. 자명한 함수·private 헬퍼에는 사용하지 않는다.
-자명한 코드에는 추가하지 않는다 — 이름과 시그니처만으로 사용법이 드러나면 주석 불필요.
-
-**추가 대상 (아래 중 하나에 해당할 때만):**
-- 모듈 경계를 넘어 재사용되는 공개 API로, 파라미터·반환값의 의미가 이름만으로 드러나지 않을 때
-- 사이드이펙트가 있는 훅/유틸 (구독·타이머·이벤트 리스너 등록 등)
-- 특정 조합·범위만 허용되는 상수/설정 객체
-
-**태그 정의 (구체적 문법은 JSDoc/TSDoc 등 프로젝트 언어 컨벤션을 따르며 강제하지 않음):**
-- Description — 무엇을 하는지 한 줄 요약 (**필수**)
-- `@param` — 파라미터 의미가 이름만으로 드러나지 않을 때 (선택)
-- `@returns` — 반환값의 의미가 이름만으로 드러나지 않을 때 (선택)
-- `@throws` — 발생 가능한 예외가 있을 때 (선택)
-
-```javascript
-/**
- * 원두 잔량이 재주문 임계값 이하인지 판단한다.
- * @param {number} remainingGrams - 현재 재고(g)
- * @param {number} thresholdGrams - 재주문 트리거 임계값(g)
- * @returns {boolean} 임계값 이하면 true
- * @throws {Error} remainingGrams가 음수일 때
- */
-function shouldReorderBeans(remainingGrams, thresholdGrams) {
-    if (remainingGrams < 0) throw new Error("remainingGrams는 음수일 수 없습니다");
-    return remainingGrams <= thresholdGrams;
-}
-```
-
-### Rationale Comment
-
-자명한 코드에는 주석을 달지 않는다. 이름만으로 의도가 드러나면 주석 대신 네이밍으로 해결한다.
-**"왜"가 코드 문법만으로는 전혀 드러나지 않을 때만** 추가하며, 모든 변수·함수에 기계적으로 붙이지 않는다.
-
-**추가 대상 (아래 중 하나에 해당할 때만):**
-- **Workaround/Hack** — 외부 라이브러리, 특정 브라우저, 레거시 시스템의 버그·특이 동작을 우회할 때
-- **Business Rule** — 오프라인 정책, 비직관적인 제품 스펙 등 코드만으로는 유추 불가능한 도메인 규칙에 의존할 때
-- **Non-obvious Trade-off** — 가독성보다 성능·보안을 택한 경우 (예: 비트 연산, 복잡한 정규식, 캐싱 레이어)
-
-**태그 정의 (최대 1~2줄, 무거운 템플릿 금지):**
-- `[WHY]` — 이 코드가 왜 필요한가 / 왜 이 방식을 택했는가 (**필수**)
-- `[CONTEXT]` — 관련 배경, 제약, 참고 링크·이슈 (선택)
-- `[TRADE-OFF]` — 포기한 대안과 그 이유 (선택)
-
-```javascript
-// [WHY] 외부 결제 SDK가 iOS Safari에서 blur 이벤트를 중복 발생시키는 버그 우회
-// [CONTEXT] 오프라인 매장은 재고 음수를 허용하는 정책(온라인과 다른 룰)
-// [TRADE-OFF] O(1) 조회를 위해 메모리 캐시 사용, 최대 10MB 제한
-```
-
-### Provider Header
-
-Context/Provider 파일(`XxxContext.js`/`XxxProvider.jsx`) 최상단에 붙이는 헤더.
-
-**적용 대상:** Context/Provider 쌍으로 구현되는 파일 (일반 컴포넌트·훅에는 사용하지 않음)
-
-**태그 정의:** Source Header(파일 첫 줄 경로 표기)와 같은 성격의 고정 항목 — "자명한 코드에 주석 금지" 원칙은 인라인 주석 판단에 적용되는 것이며, 이 헤더 자체는 Context/Provider 파일이면 항상 붙인다.
-- `Domain` — 이 컨텍스트가 담당하는 책임 경계 (SSOT 여부 등). 코드만으로는 알 수 없는 아키텍처 정보가 있으면 그것을, 없으면 책임 범위를 한 줄로 요약한다 (**필수**)
-- `Contract` — 이 컨텍스트/훅을 올바르게 쓰기 위한 전제조건·사용 규칙 중 코드만으로는 드러나지 않는 것 (예: Provider 배치 순서, 특정 환경·라우트 제약) (선택)
-
-```javascript
-// Domain: Toolbar context SSOT boundary
-// Contract: AuthProvider보다 하위에 위치해야 함 — 로그인 상태로 노출 항목을 계산하므로 순서가 바뀌면 툴바가 항상 비어 보임
-export const ToolbarContext = createContext(null);
-export function useToolbarOrThrow() {
-    const ctx = useContext(ToolbarContext);
-    if (!ctx) throw new Error("useToolbar must be used within a ToolbarProvider");
-    return ctx;
-}
-```
-
----
-
-## Logging
-
-| 레벨 | 용도 |
-|------|------|
-| `console.error(msg, err)` | caught error — 모듈명 + 맥락 포함 |
-| `console.warn(msg)` | fallback/degraded path |
-| `createDebugger(namespace)` | 도메인별 디버그 (개발 전용) |
-
----
-
-## Performance
-
-- `useMemo`: context value, 비용 높은 계산
-- `useCallback`: 이벤트 핸들러 (불필요한 re-render 방지)
-- Viewport-based lazy rendering (`useInViewport` 훅)
-- Dynamic import: 대형 페이지/컴포넌트 지연 로딩
-
----
-
-## Security
-
-- API key, token, credential 하드코딩 금지
-- Sensitive files 목록 참조 (CLAUDE.md → Sensitive Files)
-- 권한은 RBAC (`hasRoleAccess`) 통해 검증
-
----
-
-## Test Code
-
-- **Framework:** Vitest + @testing-library/react + happy-dom
-- **위치:** 소스 파일과 같은 디렉토리 (colocated, `*.test.js`)
-- **구조:** `describe(단위)` → `it(동작)` → `expect(결과)`
-- Provider 의존 컴포넌트 테스트 시: 최소 mock, 실 Provider 우선
+플러그인(`plugins/devoks-*`) 변경 작업은 반드시 `.claude/skills/devoks-plugin-maintenance/SKILL.md`를 먼저 사용한다.
+이 스킬이 강제하는 순서: 변경 범위 선언 → 플러그인별 체크리스트 → 버전 bump 판단 → `claude plugin validate --strict` →
+문서/카탈로그(`README.md`, `docs/README.ko.md`, `docs/mcp-setup-guide.md`, `marketplace.json`) 정합성 → MCP prefix/permission 점검 →
+`devoks-core`의 `refs/rules` 변경 시 core sync 점검.
 
 ---
 
@@ -314,8 +83,9 @@ export function useToolbarOrThrow() {
 
 | 실수 | 결과 | 방지 |
 |------|------|------|
-| Provider 순서 변경 | 하위 훅 undefined | App.jsx 순서 = 의존관계 SSOT |
-| features.js에 side-effect | 자동화 평가 오류 | 순수 함수만, React/side-effect는 Module Provider에서 |
-| SSOT 외부 정규화 | 타입명 불일치 | PouchDB 문서 타입은 schemaNames.js에서만 정의 |
-| /dev 라우트 사용 | 프로덕션 오류 | /dev, /dev2~4는 테스트 전용 |
-| Contract 위반 시 typeof 가드 | 에러 은폐 | `*OrThrow` 헬퍼 사용 |
+| `plugins/` 번들 내용을 harness 저장소 자신의 `/.claude/`로 복사·동기화 | 위 "과거 사고 사례"처럼 대상-프로젝트용 산출물이 harness 자신의 설정으로 오염 | `/.claude/`는 harness 자신 전용, `plugins/`는 설치 대상 전용 — 자동 동기화 메커니즘을 다시 두지 않는다 |
+| `mcpServers`에 `required`/`optional`/`interactive` 중첩 키 사용 | `Invalid input` 검증 실패 | 서버 이름을 최상위 키로 직접 사용하는 플랫 맵 |
+| `description`에 콜론+공백을 따옴표 없이 사용 | YAML frontmatter 파싱 실패 | 쌍따옴표로 감싸기 |
+| `marketplace.json`의 `source`에 `..` 포함 | `Path contains ".."` 실패 | 플러그인 루트 기준 상대 경로만 사용 |
+| 플러그인 변경 후 버전 bump/문서 반영 누락 | 마켓플레이스 배포 시 카탈로그 drift | `devoks-plugin-maintenance` 스킬 절차 준수 |
+| `plugins/devoks-core/rules/*`를 "대상 프로젝트에 자동 복사되는 base rule"로 오해 | 실제로는 `agent-principles.md`/`memory-policy.md`만 base rule로 복사됨(`setup-project-convention.md` SSOT 참고) — 그 외 파일을 추가해도 조용히 무시됨 | 복사 대상 여부는 `setup-project-convention.md`의 SSOT 목록과 `check-setup-state.sh`의 `base_rules_ready()`로만 판단 |
