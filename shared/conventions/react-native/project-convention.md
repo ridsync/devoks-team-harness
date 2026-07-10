@@ -7,11 +7,16 @@
 
 ## Stack
 
-- **Runtime:** Expo (managed workflow)
+- **Runtime:** Expo SDK 55 (managed workflow), React Native 0.83, React 19.2
+- **Architecture:** New Architecture 고정 — SDK 55부터 Legacy Architecture 옵트아웃 자체가 제거됨 (`newArchEnabled` 플래그 없음)
+- **Bundler:** Metro (Expo 번들, 별도 버전 선택 불필요)
 - **Language:** TypeScript
-- **Navigation:** React Navigation (native stack + bottom tabs)
-- **State:** Zustand
-- **Styling:** `StyleSheet.create` + 공용 디자인 토큰
+- **Navigation:** Expo Router v6 (내부적으로 React Navigation 기반, file-based routing)
+- **State:** Zustand v5 (persist가 필요하면 MMKV 기반 storage adapter 사용, `AsyncStorage` 직접 사용 지양)
+- **Server State / Data Fetching:** TanStack Query v5
+- **Styling:** NativeWind v4 (Tailwind CSS v3.4 문법 기반) + 공용 디자인 토큰
+- **Animation:** Reanimated v4 + `react-native-worklets` (New Architecture 필수 — SDK 55 기준 항상 충족)
+- **Lint/Format:** Biome (format + 기본 lint) + Oxlint(+`oxlint-config-universe`) — 단, Biome은 아직 React Native 전용 lint 규칙 플러그인이 없으므로, 필요하면 ESLint로 대체할지 사용자 확인 필요
 - **Test:** Jest + React Native Testing Library
 
 ---
@@ -26,6 +31,7 @@
 | 컴포넌트 파일 | PascalCase.tsx | `ItemCard.tsx`, `SafeModal.tsx` |
 | 훅 파일 | camelCase.ts, `useXxx` | `useAppStateOrThrow.ts` |
 | store 파일 | camelCase + `.store.ts` | `cart.store.ts` |
+| query 파일 | camelCase + `.query.ts` | `product.query.ts` |
 | 유틸 파일 | camelCase.ts | `debug.util.ts` |
 | 플랫폼 전용 파일 | RN 표준 suffix | `Header.ios.tsx`, `Header.android.tsx` |
 | 상수 | UPPER_SNAKE_CASE | `ZINDEX.HEADER`, `ITEM_STATUS.CREATE` |
@@ -42,19 +48,19 @@
 // 1. React / React Native / 외부 라이브러리
 import { useEffect, useMemo, useState } from "react";
 import { View, Text } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 
 // 2. 유틸 / 상수
 import { createDebugger } from "../../common/debug.util";
 import { ZINDEX } from "../../constants/ZIndexHelper";
 
-// 3. 스토어 / 모델
+// 3. 스토어 / 쿼리 / 모델
 import { useCartStore } from "../../store/cart.store";
+import { useProductQuery } from "../../query/product.query";
 import Item from "../../model/Item";
 
 // 4. 컴포넌트 / 스타일
 import ItemCard from "./components/ItemCard";
-import { styles } from "./ProductListScreen.styles";
 ```
 
 ### Constants
@@ -79,10 +85,16 @@ export const ITEM_QUANTITY_RULE = Object.freeze({
 - `Platform.OS` 분기와 `.ios.*`/`.android.*` 파일 분리는 꼭 필요한 경우에만 사용하고, 분기 이유를 Rationale Comment로 남긴다.
 - 네이티브 모듈/권한/딥링크/foreground-background 전환처럼 플랫폼 경계가 있는 로직은 화면 코드와 분리한다.
 - Bridge 호출 실패는 silent ignore 하지 않고 사용자 영향 범위를 명시적으로 처리한다.
+- 서버 상태(TanStack Query)와 로컬 UI 상태(Zustand)를 섞지 않는다 — 서버 응답을 store에 복제 저장하지 않는다.
 
 ---
 
 ## Component Pattern
+
+### Navigation (Expo Router)
+
+- 라우트는 `app/` 디렉토리 구조 자체가 SSOT — 별도 라우트 정의 파일을 두지 않는다.
+- 화면 간 이동은 `useRouter()`/`<Link>`를 사용하고, 문자열 경로를 컴포넌트 곳곳에 하드코딩하지 않고 라우트 상수 모듈로 모은다.
 
 ### Store (Zustand)
 
@@ -97,16 +109,18 @@ export const useCartStore = create<CartState>((set, get) => ({
 
 - store는 도메인별로 분리한다 (`cart.store.ts`, `auth.store.ts`).
 - selector 단위로 구독해 불필요한 re-render를 막는다.
+- persist가 필요한 store는 `zustand/middleware`의 `persist` + MMKV 기반 `StateStorage` adapter를 사용한다 (`AsyncStorage`는 비동기·저성능이라 지양).
 - 앱 전역 환경값(테마, locale 등)처럼 provider 경계가 필요한 것만 Context로 두고, 나머지는 store로 관리한다.
 
 ---
 
 ## UI & UX
 
+- NativeWind `className`으로 spacing/color/typography를 표현하고, 디자인 토큰은 Tailwind 설정(v3.4 문법)에 둔다 — 하드코딩 금지.
+- Reanimated `useAnimatedStyle`이 반환하는 애니메이션 스타일은 NativeWind `className`과 직접 병합할 수 없다 — 정적/조건부 스타일은 NativeWind, 애니메이션 값은 `style` prop으로 분리한다 (Pitfalls 참고).
 - 터치 영역, safe area (`SafeAreaView`/`useSafeAreaInsets`), keyboard avoidance, loading/error/empty state 처리를 기본 고려사항으로 둔다.
-- spacing/color/typography는 디자인 토큰 상수를 사용한다 (하드코딩 금지).
 - 기기 크기·platform별 미세 차이는 토큰/유틸/컴포넌트 추상화로 흡수한다.
-- animation은 사용자 경험상 필요한 경우에만 넣고, 성능 비용이 큰 레이아웃 thrash를 피한다.
+- animation은 사용자 경험상 필요한 경우에만 Reanimated로 넣고, 성능 비용이 큰 레이아웃 thrash를 피한다.
 
 ---
 
@@ -141,7 +155,24 @@ export default class Item {
 
 ## State, Data Flow, Device Integration
 
-- 서버 상태(TanStack Query 등)와 로컬 UI 상태(Zustand)를 분리한다.
+### Data Fetching (TanStack Query)
+
+- 서버 상태는 TanStack Query의 `useQuery`/`useMutation`으로만 다루고, `query/` 아래 도메인별 모듈로 분리한다.
+- 웹과 달리 RN에는 `window` focus/online 이벤트가 없다 — `focusManager`는 `AppState`, `onlineManager`는 `@react-native-community/netinfo`(또는 `expo-network`)로 수동 연결해야 자동 refetch가 동작한다.
+
+```typescript
+// query/queryClientSetup.ts
+focusManager.setEventListener((handleFocus) => {
+    const subscription = AppState.addEventListener("change", (state) => handleFocus(state === "active"));
+    return () => subscription.remove();
+});
+onlineManager.setEventListener((setOnline) =>
+    NetInfo.addEventListener((state) => setOnline(!!state.isConnected)),
+);
+```
+
+### State / Device Integration
+
 - 앱 lifecycle(`AppState`), network reachability, permission status, deep link state는 명시적으로 관리한다.
 - 네이티브 API 사용 시 iOS/Android 계약 차이를 문서화한다.
 - background task, push notification, storage sync는 실패 범위를 core flow와 분리한다.
@@ -154,6 +185,7 @@ export default class Item {
 - 큰 이미지는 lazy loading / caching 전략을 검토한다.
 - 불필요한 re-render를 피하도록 store selector, `useCallback`, `useMemo` 분리를 검토한다.
 - JS thread를 막는 무거운 연산은 분리하거나 배치 처리한다.
+- Reanimated 애니메이션은 worklet(UI thread) 안에서 실행되도록 작성하고, JS thread로 값을 넘길 때만 `runOnJS`를 사용한다.
 
 ---
 
@@ -163,6 +195,7 @@ export default class Item {
 - **위치:** 소스 파일과 같은 디렉토리 (colocated, `*.test.tsx`)
 - **구조:** `describe(단위)` → `it(동작)` → `expect(결과)`
 - hook, store, permission flow, navigation guard, offline/online 전환 같은 모바일 특화 시나리오를 포함한다.
+- TanStack Query 사용 컴포넌트는 테스트마다 새 `QueryClient`를 주입해 캐시 격리
 - 네이티브 모듈 mock은 최소화하되, 플랫폼 경계 contract는 테스트로 드러낸다.
 - 실제 기기/시뮬레이터 검증이 필요한 항목은 PR 설명에 명시한다.
 
@@ -172,7 +205,7 @@ export default class Item {
 
 - token, secure storage(`expo-secure-store`/Keychain), deep link, webview boundary를 우선 점검한다.
 - 권한 요청은 필요한 시점에만 수행하고, 거부 시 fallback UI를 명시한다.
-- 민감 데이터는 `AsyncStorage` 같은 비보안 저장소에 임의 저장하지 않는다.
+- 민감 데이터는 `AsyncStorage`/평문 MMKV 같은 비보안 저장소에 임의 저장하지 않는다.
 - crash를 삼키지 말고, 사용자 영향/재시도 정책을 분리한다.
 
 ---
@@ -223,6 +256,9 @@ export const useCartStore = create<CartState>(...);
 | 플랫폼 분기를 화면 곳곳에 흩뿌림 | 유지보수 악화 | bridge/service 경계로 격리 |
 | permission/deeplink payload를 느슨하게 처리 | 재현 어려운 런타임 오류 | `*OrThrow` 검증 |
 | `AsyncStorage`에 민감 데이터 저장 | 보안 취약점 | secure storage SSOT 준수 |
+| Zustand store에 서버 응답을 그대로 복제 저장 | TanStack Query 캐시와 이중 관리, drift | 서버 상태는 TanStack Query만 SSOT |
+| Reanimated `useAnimatedStyle` 결과를 NativeWind `className`과 병합 시도 | 스타일 미적용/워크릿 오류 | 애니메이션 값은 `style` prop, 정적 스타일은 `className`으로 분리 |
+| TanStack Query에서 RN의 focus/online 이벤트 미연결 | 앱 포그라운드 복귀 시 자동 refetch 안 됨 | `focusManager`/`onlineManager`를 `AppState`/`NetInfo`로 수동 연결 |
 | `FlatList` 최적화 미흡 | 스크롤 성능 저하 | `keyExtractor`/memoization/render 분리 |
 | store/provider 순서 문서화 누락 | 특정 상태가 항상 비정상 | Provider Header + active convention 명시 |
 
@@ -232,8 +268,9 @@ export const useCartStore = create<CartState>(...);
 
 아래는 preset 주입 후 반드시 프로젝트 실정에 맞게 채운다.
 
-- **Navigation SSOT:** [예: `src/navigation/`]
+- **Navigation SSOT:** [예: `app/` (Expo Router file-based routing)]
 - **State SSOT:** [예: `src/store/`]
+- **Data Fetching SSOT:** [예: `src/query/`]
 - **Native Modules:** [예: `android/app/...`, `ios/...`]
-- **Design Guideline SSOT:** [예: `docs/DESIGN.md`]
+- **Design Guideline SSOT:** [예: `docs/DESIGN.md`, NativeWind 토큰 설정]
 - **Sensitive Files:** [예: `.env*`, `GoogleService-Info.plist`, `google-services.json`]

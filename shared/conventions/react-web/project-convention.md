@@ -8,13 +8,24 @@
 ## Stack
 
 - **Language:** JavaScript + JSDoc (TypeScript 미사용)
-- **Framework:** React (Vite)
-- **UI Library:** Ant Design
-- **State:** Context API + Provider chain
-- **Routing:** React Router
-- **Data Fetching:** fetch + 커스텀 API 모듈 (`src/api/`)
+- **Build Tool (CSR):** Vite + React 19
+- **Framework (SSR):** Next.js 16 (App Router) — CSR/SSR 중 하나를 프로젝트 결정으로 선택 (아래 "SSR Variant" 참고)
+- **Routing (CSR):** React Router v7 (Data Router)
+- **Styling:** Tailwind CSS v4 + shadcn/ui
+- **Animation:** motion (구 `framer-motion`, import는 `motion/react`)
+- **State:** Zustand v5 (도메인/앱 상태) + Context API (Auth/Theme 등 provider 경계가 필요한 cross-cutting 값만)
+- **Server State / Data Fetching:** TanStack Query v5 + axios
+- **Forms:** react-hook-form + zod(`zodResolver`)
 - **i18n:** react-i18next
+- **Lint/Format:** Biome (format + 기본 lint) + Oxlint (고속 보조 lint) — 단, React/Next.js 전용 규칙(`jsx-a11y` 등)은 Biome/Oxlint가 아직 커버하지 않으므로, 필요하면 ESLint로 대체할지 사용자 확인 필요
 - **Test:** Vitest + @testing-library/react + happy-dom
+
+### SSR Variant (Next.js)
+
+- Next.js 16 App Router가 라우팅 SSOT — React Router는 사용하지 않는다.
+- 데이터 패칭은 Server Component/Route Handler가 1차, 클라이언트 상호작용이 필요한 화면만 TanStack Query를 보조로 쓴다.
+- Tailwind/shadcn/motion/zustand/react-hook-form+zod/Biome+Oxlint/테스트 스택은 CSR과 동일하게 적용한다.
+- 프로젝트가 CSR/SSR 중 하나로 결정되면, 반대쪽 코드 예시는 프로젝트 convention에서 제거한다 — 두 갈래를 동시에 bracket처럼 남기지 않는다.
 
 ---
 
@@ -26,15 +37,18 @@
 |------|------|------|
 | 컴포넌트 파일 | PascalCase.jsx | `AppHeader.jsx`, `SafeModal.jsx` |
 | 유틸/훅 파일 | camelCase.js | `debug.util.js`, `useBootSplash.js` |
+| store 파일 | camelCase + `.store.js` | `cart.store.js`, `auth.store.js` |
 | 상수 파일 | PascalCase.js | `SchemaNames.js`, `ItemStatus.js` |
 | 컴포넌트 | PascalCase | `export default AppHeader` |
 | 커스텀 훅 | use + PascalCase | `useBootSplash`, `useInViewport` |
 | Context 훅 | useXxxOrThrow | `useToolbarOrThrow()` |
+| shadcn/ui 컴포넌트 | CLI 생성 그대로 `components/ui/` 하위 유지 | `components/ui/button.jsx` |
 | Private 헬퍼 | # + prefix | `#requireBooleanOrThrow` |
 | 상수 | UPPER_SNAKE_CASE | `ZINDEX.HEADER`, `ITEM_STATUS.CREATE` |
 | 변수/함수 | camelCase | `showTimeText`, `loadConfig` |
 
 - 이름은 **도메인 + 맥락 + 의도**를 담아 3단어 이상 권장. 제네릭 이름 회피.
+- `components/ui/` 하위 shadcn/ui 생성 파일은 CLI가 관리하는 영역으로 간주하고 직접 리팩터링하지 않는다 — 커스터마이징은 `components/` 상위 래퍼에서 한다.
 
 ### Code Size
 
@@ -46,20 +60,21 @@
 ```javascript
 // 1. React / 외부 라이브러리
 import { useEffect, useMemo, useState } from "react";
-import { Button, Typography } from "antd";
-import { useTranslation } from "react-i18next";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 // 2. 유틸 / 상수
 import { createDebugger } from "../../common/debug.util";
 import { ZINDEX } from "../../constants/ZIndexHelper";
 
-// 3. 컨텍스트 / 모델
-import { useAuth } from "../../context/network/AuthProvider";
-import MenuItem from "../../model/MenuItem";
+// 3. 스토어 / 쿼리 / 모델
+import { useCartStore } from "../../store/cart.store";
+import { useProductQuery } from "../../queries/useProductQuery";
+import Product from "../../model/Product";
 
 // 4. 컴포넌트 / 스타일
+import { Button } from "../../components/ui/button";
 import UserCard from "./components/UserCard";
-import styles from "./userCard.style";
 ```
 
 ### Constants
@@ -87,12 +102,13 @@ export const ITEM_QUANTITY_RULE = Object.freeze({
 - Props는 함수 시그니처에서 **destructuring**
 - Hooks: `useXxx` prefix, 커스텀 훅은 `hooks/` 디렉토리
 - **i18n:** 하드코딩 텍스트 금지 → `useTranslation()` 사용, 번역 키는 화면/도메인 단위 네임스페이스로 분리(예: `common.save`, `productList.title`)
+- **서버 상태와 클라이언트 상태를 분리**: 서버 데이터는 TanStack Query, 화면/도메인 로컬 상태는 Zustand, cross-cutting 값(Auth/Theme)만 Context
 
 ---
 
 ## Component Pattern
 
-### Context / Provider
+### Context / Provider (cross-cutting 값 전용)
 
 ```javascript
 // Context 파일 (XxxContext.js)
@@ -111,30 +127,64 @@ export const ToolbarProvider = ({ children }) => {
 export const useToolbar = () => useToolbarOrThrow();
 ```
 
-- Context와 Provider 파일 분리
+- Context는 Auth/Theme처럼 provider 경계가 실제로 필요한 cross-cutting 값에만 사용한다. 화면/도메인 상태를 Context로 끌어올리지 않는다.
 - `createContext(null)` + `useXxxOrThrow()` 패턴 (Contract: missing provider → throw)
 - `useMemo`로 context value 감싸기 (불필요한 re-render 방지)
-- Composition over inheritance
+
+### Store (Zustand)
+
+```javascript
+// cart.store.js
+export const useCartStore = create((set) => ({
+    items: [],
+    addItem: (item) => set((state) => ({ items: [...state.items, item] })),
+    removeItem: (id) => set((state) => ({ items: state.items.filter((i) => i.id !== id) })),
+}));
+```
+
+- store는 도메인별로 분리한다 (`cart.store.js`, `ui.store.js`).
+- selector 단위로 구독해 불필요한 re-render를 막는다: `useCartStore((state) => state.items)`.
+- 서버에서 가져온 데이터를 store에 복제해 보관하지 않는다 — 서버 상태는 TanStack Query 캐시가 SSOT.
 
 ---
 
 ## UI and Styling
 
-- **Ant Design token** (`theme.useToken()`) 으로 동적 테마 색상 사용
-- **인라인 스타일 객체** — 동적 값에 사용
-- **CSS 파일** — 애니메이션/키프레임 전용
-- z-index는 `ZINDEX` 상수 사용 (SSOT: `constants/ZIndexHelper.js`)
+- Tailwind CSS v4 유틸리티 클래스가 기본 스타일링 수단이다. v4는 CSS-first 설정(`@theme` 디렉티브)이므로 `tailwind.config.js`에 디자인 토큰을 재정의하지 않는다 — 토큰 SSOT는 CSS의 `@theme` 블록.
+- shadcn/ui 컴포넌트를 CLI로 생성해 `components/ui/`에 두고, `cva`(class-variance-authority)로 variant를 관리한다. Ant Design류 런타임 테마 토큰 API는 사용하지 않는다.
+- 동적 클래스 조합은 `cn()`(clsx + tailwind-merge) 헬퍼로 처리하고, 인라인 스타일 객체는 Tailwind로 표현 불가능한 값(motion 애니메이션 중간값 등)에만 예외적으로 사용한다.
+- z-index는 Tailwind 임의값 대신 `ZINDEX` 상수를 CSS 변수/`@theme` 토큰으로 노출해 사용한다 (SSOT: `constants/ZIndexHelper.js`).
 
 ```javascript
-const { token } = theme.useToken();
-const styles = {
-    header: {
-        position: "sticky",
-        height: "5.33rem",
-        zIndex: ZINDEX.HEADER,
-        borderBottom: `1px solid ${token.colorBorder}`,
-    },
-};
+import { cn } from "../../lib/cn";
+import { Button } from "../../components/ui/button";
+
+function ProductActionBar({ isPending, className }) {
+    return (
+        <div className={cn("flex items-center gap-2", className)}>
+            <Button variant="default" disabled={isPending}>
+                주문하기
+            </Button>
+        </div>
+    );
+}
+```
+
+### Animation (motion)
+
+- 화면 전환/등장 애니메이션은 `motion/react`의 `motion.div` 등으로 선언형으로 작성한다. 커스텀 CSS keyframe은 motion으로 표현 불가능한 경우에만 예외적으로 둔다.
+- 레이아웃 애니메이션에는 `layout` prop을, 목록 추가/삭제에는 `AnimatePresence`를 사용한다.
+
+```javascript
+import { motion, AnimatePresence } from "motion/react";
+
+<AnimatePresence>
+    {isVisible && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            {children}
+        </motion.div>
+    )}
+</AnimatePresence>
 ```
 
 ---
@@ -172,38 +222,60 @@ export default class Product {
 
 ### State Management
 
-- **Context API + Provider chain** — `App.jsx`가 Provider 순서 SSOT
+- **Zustand** — 도메인/앱 로컬 상태의 기본 저장소. 도메인별 store 분리, selector 구독.
+- **Context API** — Auth/Theme/Notification처럼 provider 순서가 의미를 갖는 cross-cutting 값만. `App.jsx`가 Provider 순서 SSOT.
 - **Provider 순서 = 의존관계 순서** → 변경 금지 (변경 시 하위 훅 undefined)
-- 도메인별 Provider 분리 (Auth, Theme, Notification, Analytics 등)
-- Provider에서 `useMemo`로 value 감싸기
 
-### Data Fetching / API Layer
+### Data Fetching (TanStack Query + axios)
 
-- API 호출은 `src/api/` 아래 도메인별 모듈로만 수행 — 컴포넌트에서 직접 `fetch` 금지
-- 요청 상태는 `idle/loading/success/error` 4단계로 표현하고, 화면은 각 단계를 명시적으로 렌더링
+- API 호출은 `src/api/` 아래 axios 인스턴스(`apiClient`) + 도메인별 모듈로만 수행 — 컴포넌트에서 직접 `fetch`/`axios` 호출 금지.
+- 서버 상태는 TanStack Query의 `useQuery`/`useMutation`으로만 다루고, 그 결과를 Zustand store에 복제하지 않는다.
+- 인증 토큰 갱신, 공통 에러 변환은 axios interceptor에서 처리한다.
 
 ```javascript
+// src/api/apiClient.js
+export const apiClient = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL });
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => Promise.reject(new Error(`API error: ${error.response?.status}`)),
+);
+
 // src/api/productApi.js
 export async function fetchProduct(id) {
-    const response = await fetchWithAuth(`/products/${id}`);
-    if (!response.ok) throw new Error(`fetchProduct: ${response.status}`);
-    return response.json();
+    const { data } = await apiClient.get(`/products/${id}`);
+    return data;
+}
+
+// src/queries/useProductQuery.js
+export function useProductQuery(id) {
+    return useQuery({ queryKey: ["product", id], queryFn: () => fetchProduct(id) });
 }
 
 // 사용부
-const [state, setState] = useState({ status: "idle", data: null, error: null });
-useEffect(() => {
-    setState({ status: "loading", data: null, error: null });
-    fetchProduct(id)
-        .then((data) => setState({ status: "success", data, error: null }))
-        .catch((error) => setState({ status: "error", data: null, error }));
-}, [id]);
+const { data, status, error } = useProductQuery(id);
+```
+
+### Forms (react-hook-form + zod)
+
+- 폼 상태는 `useForm` + `zodResolver`로 관리하고, 검증 스키마는 zod로 정의해 `*OrThrow` 계약과 동일하게 실패 시 명시적 에러 메시지를 노출한다.
+- 폼 스키마는 컴포넌트 파일이 아닌 별도 모듈(`schemas/`)에 SSOT로 둔다.
+
+```javascript
+// schemas/productFormSchema.js
+export const productFormSchema = z.object({
+    name: z.string().min(1, "name is required"),
+    price: z.number().min(0),
+});
+
+// 사용부
+const form = useForm({ resolver: zodResolver(productFormSchema), defaultValues: { name: "", price: 0 } });
 ```
 
 ### Routing
 
-- 라우트 정의는 단일 파일(`src/routes.jsx` 등)에서 SSOT로 관리 — 화면 컴포넌트에 라우트 문자열 하드코딩 금지
-- 대형 페이지는 `lazy` + `Suspense`로 지연 로딩 (아래 Performance의 dynamic import 원칙과 동일)
+- CSR: React Router v7 Data Router 라우트 정의는 단일 파일(`src/routes.jsx`)에서 SSOT로 관리 — 화면 컴포넌트에 라우트 문자열 하드코딩 금지.
+- SSR: Next.js App Router의 파일 기반 라우팅이 SSOT — `src/routes.jsx` 없이 `app/` 디렉토리 구조 자체가 라우트 정의다.
+- 대형 페이지는 `lazy` + `Suspense`(CSR) 또는 Next.js의 자동 코드 스플리팅(SSR)으로 지연 로딩한다.
 - 테스트/디버그 전용 라우트는 프로덕션 빌드에서 제외 (Pitfalls 참고)
 
 ```javascript
@@ -216,8 +288,10 @@ const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 
 - `useMemo`: context value, 비용 높은 계산
 - `useCallback`: 이벤트 핸들러 (불필요한 re-render 방지)
+- Zustand selector 구독으로 불필요한 리렌더 차단
 - Viewport-based lazy rendering (`useInViewport` 훅)
 - Dynamic import: 대형 페이지/컴포넌트 지연 로딩
+- motion 애니메이션은 `layout`/`AnimatePresence` 남용 시 리렌더 비용이 커질 수 있어 목록 규모에 따라 사용 범위를 제한한다
 
 ---
 
@@ -227,6 +301,8 @@ const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 - **위치:** 소스 파일과 같은 디렉토리 (colocated, `*.test.js`)
 - **구조:** `describe(단위)` → `it(동작)` → `expect(결과)`
 - Provider 의존 컴포넌트 테스트 시: 최소 mock, 실 Provider 우선
+- shadcn/ui(Radix 기반) 컴포넌트 테스트 시 `ResizeObserver`/`matchMedia` 등 happy-dom 미구현 API를 test setup에서 mock 처리 (Pitfalls 참고)
+- TanStack Query 사용 컴포넌트는 테스트마다 새 `QueryClient`를 주입해 캐시 격리
 
 ---
 
@@ -237,7 +313,7 @@ const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 | 상황 | 처리 |
 |------|------|
 | Contract boundary | `*OrThrow` → `throw Error` with context message |
-| HTTP (ApiController) | `fetchWithAuth` 에러 → 호출자에서 catch/handle |
+| HTTP (axios) | interceptor에서 공통 변환 → 호출자(TanStack Query)에서 catch/handle |
 | I/O (DB, 파일) | try-catch + `console.error` + rethrow or explicit handle |
 | Provider 초기화 | catch + `console.error` + rethrow |
 
@@ -300,8 +376,8 @@ function shouldReorderStock(remainingQty, thresholdQty) {
 
 ### Provider Header
 
-- 적용 대상: Context/Provider 파일(`XxxContext.js`/`XxxProvider.jsx`) 최상단, 항상 붙인다
-- `Domain` — 이 컨텍스트가 담당하는 책임 경계 (필수)
+- 적용 대상: Context/Provider 파일(`XxxContext.js`/`XxxProvider.jsx`), Zustand store 파일(`*.store.js`) 최상단, 항상 붙인다
+- `Domain` — 이 컨텍스트/store가 담당하는 책임 경계 (필수)
 - `Contract` — Provider 배치 순서 등 코드로 드러나지 않는 전제조건 (선택)
 
 ```javascript
@@ -323,8 +399,10 @@ export function useToolbarOrThrow() {
 |------|------|------|
 | Provider 순서 변경 | 하위 훅 undefined | `App.jsx` 순서 = 의존관계 SSOT |
 | 파생 가능한 값을 state로 중복 보관 | 동기화 drift, stale UI | 계산으로 유지하거나 `useMemo` 사용 |
-| API 응답 타입을 여러 파일에서 재정의 | 타입명 불일치 | 타입은 `SchemaNames.js` 등 단일 SSOT에서만 정의 |
-| 테스트 전용 라우트를 프로덕션 빌드에 노출 | 예기치 못한 진입점 노출 | 라우트 가드 또는 빌드 분기로 제외 (Data & Platform Integration › Routing 참고) |
+| 서버 응답을 Zustand store에 그대로 복제 | TanStack Query 캐시와 store가 따로 놀아 stale drift | 서버 상태는 TanStack Query만 SSOT로 사용 |
+| shadcn/ui(Radix) 컴포넌트를 happy-dom에서 그대로 테스트 | `ResizeObserver is not defined` 등으로 실패 | test setup에서 `ResizeObserver`/`matchMedia` mock 등록 |
+| Tailwind v4 토큰을 `tailwind.config.js`와 `@theme` 양쪽에 중복 정의 | 토큰 drift | v4는 `@theme` CSS 블록이 SSOT, config 파일에 재정의 금지 |
+| 테스트 전용 라우트를 프로덕션 빌드에 노출 | 예기치 못한 진입점 노출 | 라우트 가드 또는 빌드 분기로 제외 |
 | Contract 위반 시 `typeof` 가드로 조용히 처리 | 에러 은폐 | `*OrThrow` 헬퍼 사용 |
 
 ---
@@ -333,9 +411,10 @@ export function useToolbarOrThrow() {
 
 아래는 preset 주입 후 반드시 프로젝트 실정에 맞게 채운다.
 
+- **Rendering Mode:** [CSR(Vite) / SSR(Next.js) 중 택1 — 결정 후 반대쪽 예시 코드 제거]
 - **Directory Policy:** [feature-first / layer-first / route-first]
-- **State SSOT:** [예: Provider chain은 `src/App.jsx` 순서를 따름]
-- **API Layer SSOT:** [예: `src/api/`]
-- **Routing SSOT:** [예: `src/routes.jsx`]
-- **UI Guideline SSOT:** [예: `docs/DESIGN.md`]
+- **State SSOT:** [예: Zustand store는 `src/store/`, Context Provider 순서는 `src/App.jsx` 순서를 따름]
+- **API Layer SSOT:** [예: `src/api/`, axios 인스턴스는 `src/api/apiClient.js`]
+- **Design System SSOT:** [예: `components/ui/`(shadcn/ui) + `@theme` 토큰]
+- **Routing SSOT:** [예: `src/routes.jsx`(CSR) 또는 `app/`(SSR)]
 - **Sensitive Files:** [예: `.env*`, `*.pem`]
