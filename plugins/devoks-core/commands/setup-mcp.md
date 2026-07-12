@@ -39,11 +39,18 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
      claude mcp add context7 --scope user -- npx -y @upstash/context7-mcp@latest
      ```
    - **codegraph** (코드그래프, 선택):
-     ```bash
-     claude mcp add codegraph --scope user -- npx -y codegraph-mcp@latest
-     ```
-     설치 후 현재 프로젝트에 `.codegraph/`가 없으면 인덱싱을 제안한다:
-     `codegraph init "$CLAUDE_PROJECT_DIR"` (CLI 설치돼 있을 때).
+     - 먼저 CodeGraph CLI를 설치한다:
+       ```bash
+       npm install -g colbymchenry/codegraph
+       ```
+     - CLI 설치 후 MCP로 등록한다:
+       ```bash
+       claude mcp add codegraph --scope user -- codegraph serve --mcp
+       ```
+     - 프로젝트 인덱싱(선택):
+       ```bash
+       codegraph install "$CLAUDE_PROJECT_DIR"
+       ```
    - **serena** (심볼 탐색·리팩토링, 권장):
      - 먼저 `uvx` 존재를 확인한다(`command -v uvx`). 없으면 설치를 안내한다:
        `curl -LsSf https://astral.sh/uv/install.sh | sh`.
@@ -55,7 +62,7 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
 
 4. **플러그인 설치 (figma·playwright — prefix 일치를 위해 플러그인 경로 유지)**
    - 이들은 `claude mcp add`로 깔지 **않는다**(prefix가 달라져 스킬이 깨짐). 다음 슬래시 명령을 안내한다:
-     - figma (UI 구현·visual-diff 필수): `/plugin install @figma/figma-mcp`
+     - figma (UI 구현·visual-diff 필수): `/plugin install figma@claude-plugins-official`
      - playwright (visual-diff 폴백, 선택): `/plugin install @playwright/playwright-mcp`
    - `/plugin install`은 대화형 Claude Code 명령이므로 shell로 자동 실행하지 말고, 위 명령을 그대로 안내한다.
    - figma는 최초 도구 호출 시 브라우저 OAuth로 인증된다.
