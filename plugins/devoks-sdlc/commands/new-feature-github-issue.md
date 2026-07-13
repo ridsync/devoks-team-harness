@@ -147,7 +147,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 
 ### 6. 마무리
 
-- `npm run lint`(Bash)로 린트 확인.
+- 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`)(Bash)로 린트 확인.
 - 미사용 import 제거.
 - 구현 요약 및 남은 작업 안내.
 

@@ -24,7 +24,7 @@ metadata:
 
 **예시:**
 ```
-/devoks-sdlc:verify-data-flow target="추출 보정 B2·override·brewAmountWeight" spec=doc/brew_adjustment_workflow.md flow="보정 2세트 완주" env=browser
+/devoks-sdlc:verify-data-flow target="주문 합계·할인율·override" spec=doc/order_discount_workflow.md flow="쿠폰 적용 후 결제 완료" env=browser
 ```
 
 인자가 없어도 동작한다. Phase 0 에서 1회 확인한다.

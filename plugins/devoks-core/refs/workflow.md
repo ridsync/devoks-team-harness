@@ -10,19 +10,19 @@
 
 - 새 기능: 관련 테스트 작성 권장. 미작성 시 이유를 완료 메시지에 명시.
 - 기존 테스트 깨짐: 수정 필수
-- 환경: happy-dom (경량 DOM), setupFiles: `src/setupTests.js`
+- 환경: 프로젝트가 채택한 테스트 러너·설정 (`project-convention.md` 참고)
 
 ---
 
 ## Code Review
 
-> 상세 규칙: `.claude/code-review.md` (SSOT)
+> 상세 규칙: `.claude/refs/code-review.md` (SSOT)
 
 ---
 
 ## Git Convention
 
-> 상세 규칙: `.claude/git-convention.md` (SSOT)
+> 상세 규칙: `.claude/refs/git-convention.md` (SSOT)
 
 ### Pre-commit
 
@@ -35,20 +35,7 @@
 
 ## Deploy (CI/CD)
 
-### APK 빌드
+배포 파이프라인(빌드 명령, 배포 대상, 환경 변수 등)은 프로젝트·스택마다 다르므로 이 문서에서 고정하지 않는다.
+프로젝트의 `.claude/CLAUDE.md` 또는 `.claude/rules/project-convention.md`에 실제 배포 명령·환경을 명시한다.
 
-```bash
-MODE=debug ./app.deploy.sh     # 디버그 빌드
-MODE=release ./app.deploy.sh   # 릴리스 빌드
-npm run release                # Gradle assembleRelease
-```
-
-- **MODE 명시 필수** — fallback/auto-inference 금지
-- Docker 기반 빌드 환경 (node:20 + OpenJDK-21 + Android SDK 34)
-- Android 12+ (AOSP) 타겟
-
-### Web 배포
-
-```bash
-./deploy.sh                    # S3 sync + CloudFront
-```
+- **모드/타겟을 명시적으로 지정** — fallback/auto-inference 금지 (예: 디버그/릴리스 모드를 인자로 강제)

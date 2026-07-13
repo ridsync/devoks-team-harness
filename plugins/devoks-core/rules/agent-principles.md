@@ -11,7 +11,7 @@ Behavioral principles the AI agent must follow during development work.
 - **YAGNI (You Aren't Gonna Need It)** — Do not implement features, configurations, error handling, or infrastructure that are not required by the current task. Future requirements are added when they actually arise.
 - **Fail Fast (Core Flows)** — In correctness-critical paths, surface errors immediately and stop execution. Prevent large costs at later stages.
 - **Explicit Handling (No Implicit Fallback)** — All failures and edge cases must be handled explicitly; silent or implicit fallback is prohibited.
-- **Graceful Degradation for Non-Critical Paths** — Failures in non-critical features (analytics, notifications, telemetry) must not block core flows (auth, brew, sensor-ingest). Isolate failure scope; core flows always apply Fail Fast.
+- **Graceful Degradation for Non-Critical Paths** — Failures in non-critical features (analytics, notifications, telemetry) must not block core flows (auth, checkout, payment). Isolate failure scope; core flows always apply Fail Fast.
 
 ## [Pre-Work] Checklist Before Starting
 

@@ -42,14 +42,14 @@ Staged 변경을 검토한 뒤, SSOT에 맞는 커밋 메시지를 작성하고,
 ## 예시 (형식 참고 — 상세 타입 설명은 SSOT)
 
 ```
-chore(naming): React 컴포넌트 네이밍 컨벤션 적용
+chore(naming): 파일 네이밍 컨벤션 적용
 
-페이지 컴포넌트 파일명을 소문자에서 PascalCase로 변경하여
-React 컴포넌트 네이밍 컨벤션을 준수하도록 통일.
+파일명을 소문자에서 프로젝트 컨벤션(PascalCase)으로 변경하여
+네이밍 컨벤션을 준수하도록 통일.
 
-- 레이아웃(라우트,아웃렛 포함) 컴포넌트: *Layout.jsx
-- 페이지 컴포넌트: *Page.jsx
-- 라우트 컴포넌트: *Route.jsx
+- 유틸 파일: *Util
+- 상수 파일: *Constants
+- 서비스 파일: *Service
 
 관련 import 경로 및 참조 업데이트 포함하여 수정.
 

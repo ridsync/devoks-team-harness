@@ -27,8 +27,8 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 
 수동 리뷰 전에 최소 품질 게이트를 통과해야 한다.
 
-- [ ] `eslint` / `prettier` 기준 위반 없음
-- [ ] 타입 검사 오류 없음 (`tsc` 또는 프로젝트 타입 체크 명령)
+- [ ] 프로젝트의 lint/format 도구 기준 위반 없음
+- [ ] 프로젝트의 타입 검사 도구가 있다면 오류 없음
 
 ---
 
@@ -104,10 +104,9 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 - [ ] 코드 복잡도(중첩 조건, 함수 길이, 분기 수)가 과도하지 않은가?
 - [ ] 중복 로직이 분리되어 재사용 가능한 구조인가? 읽는 사람이 흐름을 빠르게 파악할 수 있는가?
 
-### Performance (React)
+### Performance
 
-- [ ] 불필요한 re-render가 있는가?
-- [ ] Memoization이 필요한가? (useMemo, useCallback, React.memo)
+- [ ] (컴포넌트 기반 UI 프레임워크 사용 시) 불필요한 re-render가 있는가? Memoization이 필요한가?
 - [ ] Code splitting이나 lazy loading 기회가 있는가?
 - [ ] API 호출이 최적화되어 있는가?
 
@@ -115,7 +114,7 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 
 | 영역 | 체크 항목 |
 |------|----------|
-| React | Hooks, dependency arrays 올바르게 사용하고 있는가? |
+| UI 프레임워크 | (해당 시) Hooks/lifecycle, dependency 배열 등을 프레임워크 규칙대로 사용하고 있는가? |
 | State Management | 목적에 맞는 상태 관리 방법이 사용되었는가? |
 | Error Handling | 에러가 적절히 catch·처리되는가? |
 | Accessibility | 적절한 ARIA labels, 키보드 네비게이션이 지원되는가? |
@@ -157,9 +156,9 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 
 ### Build / Lint Verification
 
-- [ ] `eslint` 오류 없음.
-- [ ] `vitest` 테스트 통과.
-- [ ] `build` 클린 빌드 성공.
+- [ ] 프로젝트의 lint 도구 오류 없음.
+- [ ] 프로젝트의 테스트 스위트 통과.
+- [ ] 클린 빌드 성공.
 
 ---
 

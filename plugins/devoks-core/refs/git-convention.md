@@ -26,14 +26,14 @@ description: 브랜치·커밋 메시지 Conventional Commits 관행, 타입별 
 
 - **언제**: 사용자·운영자에게 **새 동작·새 기능**이 보이거나, API/계약상 **기능 추가**.
 - **UI**: 새 화면, 새 버튼 동작, 새 설정 항목, 라우트 추가.
-- **예**: `feat(brew): 레시피 복제 버튼 추가`
+- **예**: `feat(auth): 소셜 로그인 버튼 추가`
 - **헷갈림**: 기능인가 스타일인가 → **동작이나 데이터 흐름이 바뀌면** `feat`. 스타일만이면 `style`.
 
 ### `fix`
 
 - **언제**: **버그 수정** — 의도와 다른 동작, 크래시, 잘못된 계산/상태.
 - **UI**: 잘못된 표시·레이아웃이 **로직/조건 버그**일 때.
-- **예**: `fix(mqtt): 재연결 후 구독 토픽 누락 수정`
+- **예**: `fix(payment): 재시도 후 결제 상태 누락 수정`
 - **헷갈림**: 리팩터이면서 버그도 고침 → 사용자 관점이 **고장 수리**면 `fix`, 동작 동일·구조만 정리면 `refactor`.
 
 ### `docs`
@@ -51,7 +51,7 @@ description: 브랜치·커밋 메시지 Conventional Commits 관행, 타입별 
 ### `refactor`
 
 - **언제**: **외부 관측 동작 동일** — 구조·이름·모듈 분리·중복 제거.
-- **예**: `refactor(brew): 스텝 빌더 팩토리 분리`
+- **예**: `refactor(auth): 토큰 갱신 로직 분리`
 - **헷갈림**: 목적이 성능만이면 `perf`가 더 정확.
 
 ### `perf`
@@ -62,7 +62,7 @@ description: 브랜치·커밋 메시지 Conventional Commits 관행, 타입별 
 ### `test`
 
 - **언제**: 테스트 코드 추가/수정, 스냅샷·모킹·커버리지.
-- **예**: `test(brew): 레시피 유효성 검증 케이스 추가`
+- **예**: `test(payment): 결제 금액 유효성 검증 케이스 추가`
 
 ### `build`
 
@@ -88,12 +88,12 @@ description: 브랜치·커밋 메시지 Conventional Commits 관행, 타입별 
 
 - **원칙**: 이름만으로 **의도(기능/수정/긴급/릴리스)**를 추론할 수 있게 한다. 아래 패턴을 **우선**하되, CI/훅으로 **강제하지 않는다** (문서·리뷰 가이드 수준).
 - **권장 접두사**: `feature/` 또는 `feat/` (신규 기능), `fix/` (버그), `hotfix/` (운영 긴급, 팀이 구분할 때만), `chore/` (선택), `release/` (예: `release/1.2.0`).
-- **형식**: 소문자, 단어는 하이픈(`kebab-case`). 이슈 티켓이 있으면 접두에 붙여도 된다 (예: `fix/PROJ-42-mqtt-reconnect`).
+- **형식**: 소문자, 단어는 하이픈(`kebab-case`). 이슈 티켓이 있으면 접두에 붙여도 된다 (예: `fix/PROJ-42-auth-token-refresh`).
 - **참고**: [Conventional Branch](https://conventional-branch.github.io/) (커뮤니티 관행, 필수 아님).
 
 ## 자동화 (선택)
 
-- 커밋 메시지 검증은 [lefthook.yml](../../lefthook.yml)에 **미설정**. 팀 합의 시 `commit-msg` + commitlint 등을 추가할 수 있다.
+- 커밋 메시지 검증은 기본 **미설정**. 프로젝트에 Lefthook/Husky 등 커밋 훅 설정이 있다면 `commit-msg` + commitlint 등을 팀 합의로 추가할 수 있다.
 
 ## 참고 링크
 
