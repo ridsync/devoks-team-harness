@@ -15,7 +15,8 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 
 - base rules: `plugins/devoks-core/rules/agent-principles.md`, `plugins/devoks-core/rules/memory-policy.md`
 - stack preset: `shared/conventions/<preset>/project-convention.md`
-- 참조 문서: `plugins/devoks-core/refs/*.md`
+- 참조 문서(공통, 모든 스택): `plugins/devoks-core/refs/*.md` 중 frontmatter에 `scope`가 없는 파일 — 항상 복사
+- 참조 문서(스택 한정): `plugins/devoks-core/refs/*.md` 중 frontmatter `scope: <preset>`이 선택한 preset과 일치하는 파일만 복사 (예: `web-security.md`는 `scope: react-web`)
 - 프로젝트 active convention: `.claude/rules/project-convention.md`
 - provenance metadata: `.claude/project-convention.json`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
@@ -61,7 +62,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 
 1. `.claude/rules/agent-principles.md` 복사/갱신
 2. `.claude/rules/memory-policy.md` 복사/갱신
-3. `.claude/refs/*.md` 복사/갱신
+3. `.claude/refs/*.md` 복사/갱신 — 공통 refs는 항상, 스택 한정 refs(frontmatter `scope`)는 선택한 preset과 일치할 때만
 4. 선택한 preset을 `.claude/rules/project-convention.md`로 생성 또는 교체
 5. `.claude/project-convention.json` 생성/갱신
 
@@ -113,7 +114,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 승인되면 아래를 수행한다.
 
 - `.claude/rules/` 및 `.claude/refs/`가 없으면 생성
-- base rules/refs 를 명시적으로 복사
+- base rules/refs 를 명시적으로 복사 — refs는 frontmatter `scope` 없는 공통 파일 전체 + 선택한 preset과 `scope`가 일치하는 파일만 선별 복사
 - 선택한 preset 원본을 `.claude/rules/project-convention.md`로 복사
 - 필요 시 `Custom` 보정 내용을 같은 파일에 반영
 - `.claude/project-convention.json`에 provenance 저장

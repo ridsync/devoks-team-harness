@@ -93,7 +93,7 @@ cd /path/to/your-project
 | 유형 | 소스 | 프로젝트 적용 방식 |
 |------|------|--------------------|
 | **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | explicit setup 시 복사 |
-| **refs** | `plugins/devoks-core/refs/*.md` | explicit setup 시 복사 |
+| **refs** | `plugins/devoks-core/refs/*.md` | explicit setup 시 복사 — 공통 refs는 항상, 스택 한정 refs(frontmatter `scope: <preset>`)는 선택한 preset과 일치할 때만 |
 | **stack preset** | `shared/conventions/<preset>/project-convention.md` | `.claude/rules/project-convention.md`로 주입 |
 | **project active convention** | `.claude/rules/project-convention.md` | 프로젝트 소유, SessionStart overwrite 없음 |
 

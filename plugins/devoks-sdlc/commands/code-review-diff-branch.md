@@ -56,4 +56,4 @@ description: 현재 브랜치의 커밋 내역 기준 변경 코드를 리뷰한
 
 ## 참고
 
-- **프로젝트 규칙**: `.claude/refs/` — `engineering-principles.md`, `code-review.md`, `git-convention.md`, `workflow.md` / `.claude/rules/` — `agent-principles.md`, 프로젝트 active convention `project-convention.md` (필요 시 `.claude/CLAUDE.md`로 stack 사실 확인)
+- **프로젝트 규칙**: `.claude/refs/` — `engineering-principles.md`, `code-review.md`, `git-convention.md`, `workflow.md` + 스택 한정 ref(예: `web-security.md`, 존재 시) / `.claude/rules/` — `agent-principles.md`, 프로젝트 active convention `project-convention.md` (필요 시 `.claude/CLAUDE.md`로 stack 사실 확인)
