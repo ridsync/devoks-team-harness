@@ -59,6 +59,7 @@ refs_ready() {
   [[ -f "$CLAUDE_DIR/refs/code-review.md" \
     && -f "$CLAUDE_DIR/refs/engineering-principles.md" \
     && -f "$CLAUDE_DIR/refs/git-convention.md" \
+    && -f "$CLAUDE_DIR/refs/security-engineering.md" \
     && -f "$CLAUDE_DIR/refs/workflow.md" ]]
 }
 

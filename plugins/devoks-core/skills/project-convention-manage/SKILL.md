@@ -18,6 +18,7 @@ description: 현재 프로젝트의 active convention을 점검하고, preset pr
 - preset provenance metadata: `.claude/project-convention.json`
 - preset 원본: `shared/conventions/<preset>/project-convention.md`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
+- 범용 보안 기준: `.claude/refs/security-engineering.md`
 
 ---
 
@@ -42,6 +43,7 @@ description: 현재 프로젝트의 active convention을 점검하고, preset pr
 - `.claude/project-convention.json`
 - `.claude/rules/project-convention.md`
 - `.claude/CLAUDE.md` (있으면)
+- `.claude/refs/security-engineering.md` (Security 섹션 또는 Security Decisions를 다룰 때)
 
 metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지 않는다.**
 
@@ -85,6 +87,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - Stack
 - Core Rules
 - Design Pattern
+- Security & Reliability / Security Decisions
 - Comments & Docs / Comment Rules
 - Pitfalls
 - Project Decisions
@@ -98,6 +101,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - `.claude/rules/project-convention.md`를 직접 덮어쓸 수 있는 작업은 반드시 사용자 확인 후에만 수행
 - provenance metadata를 함께 갱신
 - preset 전환 후에는 `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files도 drift 여부를 점검
+- Security 섹션을 반영하면 `Security Profile`, auth/session, authorization, CSRF/CORS, browser policy owner 등 미결정 slot을 사용자에게 알림
 - `Custom` 흐름은 가장 가까운 preset + 사용자 보정값으로 처리
 
 ### 6. 마무리 리포트
@@ -108,7 +112,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - 적용 모드 (`full apply` / `selective apply` / `switch` / `cleanup`)
 - 유지한 로컬 커스터마이징
 - 추가로 프로젝트 실제 값으로 바꿔야 할 preset 예시 항목 (Stack, Project Decisions 등)
-- 필요 시 다음 액션 (`CLAUDE.md` 보강, 테스트 스택 명시, UI guideline SSOT 연결 등)
+- 필요 시 다음 액션 (`CLAUDE.md` 보강, 보안 profile·Security Decisions 확정, 테스트 스택 명시, UI guideline SSOT 연결 등)
 
 ---
 

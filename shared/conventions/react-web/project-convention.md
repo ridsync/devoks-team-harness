@@ -230,7 +230,8 @@ export default class Product {
 
 - API 호출은 `src/api/` 아래 axios 인스턴스(`apiClient`) + 도메인별 모듈로만 수행 — 컴포넌트에서 직접 `fetch`/`axios` 호출 금지.
 - 서버 상태는 TanStack Query의 `useQuery`/`useMutation`으로만 다루고, 그 결과를 Zustand store에 복제하지 않는다.
-- 인증 토큰 갱신, 공통 에러 변환은 axios interceptor에서 처리한다.
+- 공통 에러 변환과 프로젝트가 채택한 인증 전송 정책은 `apiClient` 한 곳에서 처리한다.
+- 토큰 갱신을 interceptor에 둘지는 `Security Decisions`의 세션 방식으로 결정한다. 브라우저 저장소에 session/refresh token을 넣는 구현을 기본값으로 만들지 않는다.
 
 ```javascript
 // src/api/apiClient.js
@@ -329,9 +330,43 @@ const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 
 ### Security
 
-- API key, token, credential 하드코딩 금지
-- Sensitive files 목록 참조 (CLAUDE.md → Sensitive Files)
-- 권한은 RBAC (`hasRoleAccess`) 통해 검증
+범용 기준은 `.claude/refs/security-engineering.md`를 따르고, 이 섹션에는 React Web 구현 규칙만 둔다.
+[Security in React Applications](https://certificates.dev/blog/security-in-react-applications)는 React 위험 지점을 빠르게 이해하는 보조 자료로 사용하되, 검증·합격 기준은 ASVS와 OWASP 지침을 따른다.
+
+#### Trust Boundary
+
+- 클라이언트 검증, 라우트 가드, 버튼 숨김은 UX 통제다. 보호 연산의 인증·객체별 인가는 서버가 다시 검증한다.
+- Server Component, Server Function/Action, Route Handler는 서버 코드이므로 외부 입력 검증·인가·secret 접근·오류 노출을 API endpoint와 동일하게 리뷰한다.
+- 서버 응답, URL 파라미터, 브라우저 저장소, `postMessage`, 외부 SDK 데이터는 모두 untrusted input으로 취급한다.
+
+#### XSS / DOM / URL
+
+- JSX의 `{value}` 기본 렌더링을 우선한다. `dangerouslySetInnerHTML`, `innerHTML`, `document.write`, 문자열 기반 script 실행은 기본 금지다.
+- raw HTML이 불가피하면 단일 adapter에서 검증된 sanitizer와 명시적 allowlist를 사용하고, sanitizer 우회 회귀 테스트를 둔다.
+- 사용자·서버가 제공한 `href`, `src`, redirect URL은 허용 scheme/host 기준으로 검증해 `javascript:` 등 실행 가능 scheme과 open redirect를 차단한다.
+- `postMessage`는 `"*"` target origin을 사용하지 않고, 수신 시 `event.origin`과 message schema를 검증한다.
+
+#### Authentication / Session / CSRF
+
+- 기본 권장안은 서버/BFF가 관리하는 `HttpOnly; Secure; SameSite` cookie session이다. 실제 방식은 `Security Decisions`에 기록한다.
+- session ID, access/refresh token, credential을 `localStorage`, `sessionStorage`, IndexedDB, Zustand persist에 저장하지 않는다.
+- cookie 인증의 상태 변경 요청은 SameSite 정책만 가정하지 말고 프로젝트의 CSRF token 또는 검증된 동등 통제를 적용한다.
+- 권한 정보는 화면 표시 최적화에 사용할 수 있지만 서버 인가의 SSOT로 사용하지 않는다.
+
+#### Browser Policy / Data
+
+- CSP는 서버/CDN에서 `Content-Security-Policy-Report-Only`로 관찰한 뒤 nonce/hash 기반 enforcement로 전환한다. `unsafe-inline`/`unsafe-eval` 상시 허용은 금지한다.
+- clickjacking은 CSP `frame-ancestors`로 제한하고, 외부 script/style은 필요성·출처·SRI/self-host 가능성을 검토한다.
+- Service Worker는 최소 scope로 등록하고 인증·개인정보 응답을 cache하지 않는다. 민감 응답은 `Cache-Control: no-store` 등 서버 정책까지 확인한다.
+- 클라이언트 번들에 포함되는 환경값은 공개 정보로 취급한다. API key, token, credential 하드코딩 금지, Sensitive Files는 `CLAUDE.md`를 참조한다.
+- 사용자·세션·결제·개인정보를 console, analytics, error reporting에 그대로 기록하지 않는다.
+
+#### Security Verification
+
+- auth/permission: 미인증, 타 사용자 객체, 만료 세션, 권한 변경 후 접근을 테스트한다.
+- input/output: raw HTML, URL, redirect, `postMessage`, 서버 action의 악성·경계 입력을 테스트한다.
+- browser policy: 배포 응답의 cookie/CORS/CSP/cache/security header를 실제 브라우저 또는 HTTP 응답에서 확인한다.
+- dependency/secret scan이 실행되지 않았으면 통과로 쓰지 않고 `not-run` 사유를 기록한다.
 
 ---
 
@@ -418,3 +453,11 @@ export function useToolbarOrThrow() {
 - **Design System SSOT:** [예: `components/ui/`(shadcn/ui) + `@theme` 토큰]
 - **Routing SSOT:** [예: `src/routes.jsx`(CSR) 또는 `app/`(SSR)]
 - **Sensitive Files:** [예: `.env*`, `*.pem`]
+- **Security Profile:** [`baseline` / `elevated` / `high-assurance`; 근거와 고위험 자산]
+- **Auth/Session:** [예: same-origin BFF + HttpOnly cookie; session 생성·회전·만료·로그아웃]
+- **Authorization SSOT:** [서버 guard/policy 위치; 객체별 권한 검증 방식]
+- **CSRF/CORS:** [상태 변경 보호 방식; 허용 origin/credentials 정책]
+- **HTML/URL Policy:** [sanitizer adapter, raw HTML 예외, URL allowlist 위치]
+- **Browser Policy Owner:** [CSP/cookie/cache/security headers를 설정하는 서버·CDN 파일]
+- **Third-party Scripts:** [허용 목록, 소유자, 제거 경로, SRI/self-host 결정]
+- **Sensitive Data & Logging:** [데이터 등급, client cache 금지 항목, redaction 위치]

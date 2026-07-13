@@ -1,5 +1,5 @@
 ---
-description: 기술스택 preset을 선택해 프로젝트 규칙·참조 문서와 active project convention을 명시적으로 구성한다.
+description: 기술스택 preset을 선택해 프로젝트 규칙·보안 참조 문서와 active project convention을 명시적으로 구성한다.
 ---
 
 # Project Convention Setup
@@ -16,6 +16,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 - base rules: `plugins/devoks-core/rules/agent-principles.md`, `plugins/devoks-core/rules/memory-policy.md`
 - stack preset: `shared/conventions/<preset>/project-convention.md`
 - 참조 문서: `plugins/devoks-core/refs/*.md`
+- 보안 엔지니어링 기준: `plugins/devoks-core/refs/security-engineering.md`
 - 프로젝트 active convention: `.claude/rules/project-convention.md`
 - provenance metadata: `.claude/project-convention.json`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
@@ -136,6 +137,7 @@ metadata 예시:
 - `.claude/rules/project-convention.md`는 이제 **프로젝트 active convention**이며 자동 overwrite 되지 않음
 - preset 전환 / diff / selective apply는 `devoks-core:project-convention-manage` 흐름으로 수행
 - `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files가 비어 있으면 함께 정리 권장
+- `.claude/refs/security-engineering.md`의 적용 프로필(`baseline`/`elevated`/`high-assurance`)과 프로젝트 Security Decisions를 확정하도록 안내
 - preset은 starter이므로 placeholder와 pitfall 섹션을 프로젝트 실정에 맞게 채워야 함
 
 ---

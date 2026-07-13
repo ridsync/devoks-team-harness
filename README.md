@@ -1,6 +1,6 @@
 # DevOks Team Harness
 
-Claude Code harness for the DevOks team — plugins for code review, feature development, Git workflows, and React Native debugging.
+Claude Code harness for the DevOks team — plugins for security engineering, evidence-based code review, feature development, Git workflows, and React Native debugging.
 
 > **한국어 문서**: [docs/README.ko.md](docs/README.ko.md)
 > 
@@ -15,9 +15,9 @@ Claude Code harness for the DevOks team — plugins for code review, feature dev
 
 | Plugin | Contents | Required |
 |--------|----------|----------|
-| `devoks-core` | Core principles, convention presets, explicit setup flows — MCP checks plus project convention setup/management for `.claude/` | **Required** |
+| `devoks-core` | Core principles, security-engineering baseline, convention presets, explicit setup flows — MCP checks plus project convention setup/management for `.claude/` | **Required** |
 | `devoks-git` | Git commit, issue, and PR workflow commands | Recommended |
-| `devoks-sdlc` | Unified SDLC workflow — feature dev (FRD/PLAN/execution/UI), test authoring & triage, code review/refactoring/module analysis/security review, requirement & data-flow verification | Recommended |
+| `devoks-sdlc` | Unified SDLC workflow — feature dev, test authoring/triage, evidence-based code review, baseline/targeted security review, refactoring, requirement & data-flow verification | Recommended |
 | `devoks-browser` | Chrome DevTools MCP attach + Visual Diff verification | Optional |
 | `devoks-rn` | React Native debugging — Metro DevTools CDP attach, emulator screenshots, JS console/state inspection | Optional (RN projects) |
 
@@ -40,7 +40,7 @@ claude
 /plugin marketplace add ridsync/devoks-team-harness
 
 # 2. Install plugins
-/plugin install devoks-core@devoks-plugins      # required — core rules, convention presets, setup/management flows
+/plugin install devoks-core@devoks-plugins      # required — core rules, security baseline, convention presets, setup flows
 /plugin install devoks-git@devoks-plugins       # Git workflow (recommended)
 /plugin install devoks-sdlc@devoks-plugins      # SDLC: feature · test · code review/security · verify (recommended)
 /plugin install devoks-browser@devoks-plugins   # browser tools (optional)
@@ -93,11 +93,11 @@ Instead, it uses an **explicit setup/apply model**:
 | Type | Source | Applied to project |
 |------|--------|--------------------|
 | **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | copied during explicit setup |
-| **refs** | `plugins/devoks-core/refs/*.md` | copied during explicit setup |
+| **refs** | `plugins/devoks-core/refs/*.md` including `security-engineering.md` | copied during explicit setup |
 | **stack preset** | `shared/conventions/<preset>/project-convention.md` | copied to `.claude/rules/project-convention.md` |
 | **project active convention** | `.claude/rules/project-convention.md` | project-owned; no SessionStart overwrite |
 
-The SessionStart hook now only checks MCP/project initialization state and prints guidance when needed.
+The SessionStart hook now only checks MCP/project initialization state — including the security baseline ref — and prints guidance when needed.
 
 ---
 
@@ -156,9 +156,9 @@ The SessionStart hook now only checks MCP/project initialization state and print
 | `/devoks-sdlc:new-feature-draft` | Spec-driven feature implementation |
 | `/devoks-sdlc:new-feature-github-issue` | GitHub issue-driven feature implementation |
 | `/devoks-sdlc:new-ui-draft` | Figma → code UI implementation |
-| `/devoks-sdlc:code-review-general` | Scoped code review |
-| `/devoks-sdlc:code-review-diff-branch` | Branch diff code review |
-| `/devoks-sdlc:code-security-review` | Repo / dependency / threat-level security review |
+| `/devoks-sdlc:code-review-general` | Scoped evidence-based code review with security-delta triage |
+| `/devoks-sdlc:code-review-diff-branch` | Branch diff review with high-risk security escalation |
+| `/devoks-sdlc:code-security-review` | Baseline / targeted server, browser, dependency, and threat review |
 | `/devoks-sdlc:test-author` | Write / extend automated tests |
 | `/devoks-sdlc:code-refactoring` | Structure, contract, and quality refactoring |
 | `/devoks-sdlc:code-analyze-module` | Module / business logic analysis |
@@ -192,9 +192,9 @@ devoks-team-harness/
 │   │   ├── commands/                  # setup-mcp, setup-project-convention
 │   │   ├── skills/                    # project convention management
 │   │   ├── rules/                     # base rules: agent-principles, memory-policy (+ management contract)
-│   │   └── refs/                      # setup 시 주입하는 reference docs
+│   │   └── refs/                      # setup-seeded refs, including security-engineering
 │   ├── devoks-git/commands/           # Git commands (3)
-│   ├── devoks-sdlc/                    # SDLC: feature·test·code·verify (8 commands + 10 skills + 3 agents)
+│   ├── devoks-sdlc/                    # SDLC: feature·test·code·verify (8 commands + 10 skills + 4 agents)
 │   ├── devoks-browser/               # browser tools (2 skills + 1 agent)
 │   └── devoks-rn/                    # React Native debugging (1 skill)
 ├── shared/
@@ -210,7 +210,7 @@ devoks-team-harness/
 └── README.md
 ```
 
-> `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` and `plugins/devoks-core/refs/*` are seeded into projects by explicit setup. Stack-specific `project-convention.md` comes from `shared/conventions/*` presets, is applied explicitly, and remains project-owned afterward.
+> `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` and `plugins/devoks-core/refs/*` (including the ASVS/OWASP-aligned `security-engineering.md`) are seeded into projects by explicit setup. Stack-specific `project-convention.md` comes from `shared/conventions/*` presets, is applied explicitly, and remains project-owned afterward.
 
 ---
 

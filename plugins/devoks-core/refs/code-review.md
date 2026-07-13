@@ -10,6 +10,8 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 참고: [Vibe Coding – Code Review Guidelines](https://docs.vibe-coding-framework.com/best-practices/code-review-guidelines), [CodeRabbit – Review instructions](https://docs.coderabbit.ai/guides/review-instructions),
 [OWASP Secure Code Review Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html), [OWASP Secure Coding Practices Quick Reference](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/02-checklist/)
 
+보안 요구사항·증거 계약·게이트의 SSOT는 `.claude/refs/security-engineering.md`다. 이 문서는 일반 리뷰에서 적용할 요약과 공통 심각도만 정의한다.
+
 ---
 
 ## 1. Review Philosophy
@@ -65,13 +67,16 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 
 ### Level 3 – Security / Edge Cases
 
-- 외부/사용자 입력 검증 누락이 없는가? (타입, 범위, 포맷)
-- SQL 인젝션 위험(문자열 결합 쿼리) 없이 파라미터화되어 있는가?
-- XSS 위험(미검증 입력 렌더링, 미이스케이프 출력)이 없는가?
-- 하드코딩 자격증명(비밀번호, 토큰, 키)이 없는가?
-- 인증/인가 검사가 보호 연산 **이전**에 수행되는가?
-- 경로 탐색, 명령어 인젝션, ReDoS 위험은 해당 코드에서 최소한으로 확인했는가?
-- 경계값/빈 목록/타임아웃/예외 경로에서 민감 정보 노출이 없는가?
+- 변경이 인증·인가·세션·raw HTML·URL/redirect·server action/API/DB·파일·CORS/CSP·dependency/CI 고위험 트리거에 해당하는가?
+- 외부 입력의 source → validation/transform → trust boundary → sink 흐름을 확인했는가?
+- 클라이언트 검증이나 UI 가드를 서버 보안 통제로 오인하지 않았는가?
+- SQL/NoSQL/OS/템플릿 인젝션 없이 파라미터화 또는 안전한 API를 사용하는가?
+- React/DOM XSS escape hatch, 실행 가능한 URL scheme, open redirect 위험이 없는가?
+- 하드코딩 자격증명, 클라이언트 번들 secret, 민감 로그·캐시 노출이 없는가?
+- cookie session의 CSRF, CORS credentials, CSP와 브라우저 저장소 정책이 프로젝트 결정과 일치하는가?
+- 경로 탐색, SSRF, 파일 업로드, ReDoS, race/중복 실행 위험을 관련 코드에서 확인했는가?
+- 경계값·빈 목록·타임아웃·예외 경로가 권한을 넓히거나 민감 정보를 노출하지 않는가?
+- diff만으로 통제를 검증할 수 없다면 targeted security review 승격을 제안했는가?
 
 ### Level 4 – Performance / Efficiency
 
@@ -129,8 +134,11 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 
 - [ ] 비밀번호·토큰이 평문으로 로그·응답에 포함되지 않는다.
 - [ ] 인증 실패 시 안전한 에러 메시지만 노출.
-- [ ] 권한 검사가 보호된 연산 **이전**에 수행된다.
-- [ ] 토큰 만료·갱신·저장 방식이 보안 권장사항을 따른다.
+- [ ] 인증과 객체별 권한 검사가 보호된 **서버 연산 직전**에 수행된다.
+- [ ] UI 가드·role state는 표시 보조일 뿐 인가 SSOT가 아니다.
+- [ ] 세션 생성·회전·만료·로그아웃·권한 변경 폐기 흐름이 정의돼 있다.
+- [ ] 브라우저 저장소에 session/access/refresh token을 보관하지 않는다.
+- [ ] cookie 인증의 CSRF 방어와 cookie 속성이 실제 서버 설정에 적용된다.
 
 ### Data Access
 
@@ -150,7 +158,9 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 ### UI Component
 
 - [ ] 시맨틱 HTML·ARIA 접근성 요구사항.
-- [ ] 사용자 입력 검증·이스케이프 (XSS 방지).
+- [ ] JSX 기본 이스케이프를 우회하는 raw HTML/DOM sink가 없거나 중앙 sanitizer를 사용한다.
+- [ ] 동적 URL은 허용 scheme/host 정책을 통과한다.
+- [ ] 사용자 입력 검증은 UX 보조이며 서버 검증이 별도로 존재한다.
 - [ ] 로딩·에러·빈 상태 정의 및 표시.
 - [ ] 디자인 시스템·스타일 가이드 준수.
 - [ ] 키보드·포커스 상호작용 동작 확인.
@@ -160,6 +170,7 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 - [ ] `eslint` 오류 없음.
 - [ ] `vitest` 테스트 통과.
 - [ ] `build` 클린 빌드 성공.
+- [ ] 보안 관련 명령이 미실행이면 `not-run` 사유를 명시하고 통과로 처리하지 않음.
 
 ---
 
@@ -177,14 +188,34 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 
 ## 8. Severity Classification
 
-| 심각도 | 대상 | 예시 |
-|--------|------|------|
-| **Critical** | 보안 취약·데이터 손실·시스템 오류 | SQL 인젝션, 민감 정보 노출 |
-| **High** | 보안·정확성·심각한 버그 | rate limiting 누락, 잘못된 비즈니스 로직 |
-| **Medium** | 유지보수·일관성·성능 | 중복 코드, 과도한 re-render |
-| **Low** | 스타일·문서·코스메틱 | 네이밍, 포맷팅, 주석 |
+심각도는 취약점 이름이나 패턴만으로 정하지 않고 **Likelihood × Impact**로 판단한다.
 
-형식: "현재 문제 → 권장 방향 → 해당 위치(`file_path:line_number`)"
+### Likelihood
+
+| 수준 | 판단 기준 |
+|------|-----------|
+| High | 외부 또는 낮은 권한 공격자가 현실적인 조건에서 반복 가능하고 통제를 우회할 수 있음 |
+| Medium | 인증·사용자 상호작용·특정 구성 등 전제조건이 필요하지만 도달 가능한 경로가 확인됨 |
+| Low | 강한 전제조건, 제한된 공격 표면, 유효한 보완 통제로 실제 악용 가능성이 낮음 |
+
+### Impact
+
+| 수준 | 판단 기준 |
+|------|-----------|
+| High | 광범위한 권한 탈취, 중요 비밀·개인정보 노출, 무결성 훼손, 핵심 서비스 중단 |
+| Medium | 제한된 사용자·객체·기능 범위의 기밀성·무결성·가용성 영향 |
+| Low | 보안 경계 밖의 제한적 영향, 직접 악용보다 방어 심도·운영 품질 저하 |
+
+| 심각도 | 조합과 조치 |
+|--------|-------------|
+| **Critical** | High Likelihood × High Impact 중 즉시·대규모 악용 가능. 머지·릴리스 차단 |
+| **High** | 한 축이 High이고 다른 축이 Medium 이상. 필수 수정 또는 만료일 있는 보안 예외 필요 |
+| **Medium** | 제한된 악용 가능성·영향이지만 유효한 결함. 소유자와 기한을 두고 수정 |
+| **Low** | 직접 위험이 작거나 방어 심도 개선. 선택·후속 개선 |
+
+보안 finding은 별도로 `Confidence: High/Medium/Low`를 기록한다. 증거가 부족한 패턴 일치는 심각도를 높이지 말고 `확인 필요`와 미확인 가정을 명시한다.
+
+모든 finding 형식: "현재 문제 → 증거·영향 → 재현/검증 → 권장 방향 → 후속 테스트 → 위치(`file_path:line_number`)".
 
 ---
 

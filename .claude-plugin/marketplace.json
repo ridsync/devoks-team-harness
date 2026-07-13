@@ -1,12 +1,12 @@
 {
   "name": "devoks-plugins",
-  "description": "DevOks 팀 Claude Code 하네스 — 코드리뷰·기능개발·Git 워크플로우",
+  "description": "DevOks 팀 Claude Code 하네스 — 보안 엔지니어링·증거 기반 코드리뷰·기능개발·Git 워크플로우",
   "owner": { "name": "ridsync" },
   "plugins": [
     {
       "name": "devoks-core",
       "source": "./plugins/devoks-core",
-      "description": "기본 원칙·preset 기반 project convention 구성 — SessionStart 훅은 setup 상태를 점검하고 명시적 setup/apply 흐름을 제공",
+      "description": "기본 원칙·보안 엔지니어링 기준·preset 기반 project convention 구성 — SessionStart 훅은 setup 상태를 점검하고 명시적 setup/apply 흐름을 제공",
       "dependencies": []
     },
     {
@@ -18,7 +18,7 @@
     {
       "name": "devoks-sdlc",
       "source": "./plugins/devoks-sdlc",
-      "description": "SDLC 워크플로우 통합 — 기능개발(FRD/PLAN/실행/UI)·테스트(작성/triage)·코드리뷰/리팩토링/모듈분석/보안검증·요구사항/데이터흐름 검증",
+      "description": "SDLC 워크플로우 통합 — 기능개발·테스트·증거 기반 코드리뷰·baseline/targeted 보안검증·리팩토링·요구사항/데이터흐름 검증",
       "dependencies": ["devoks-core"]
     },
     {

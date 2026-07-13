@@ -28,7 +28,7 @@
 
 - `.claude/CLAUDE.md` → 프로젝트 사실 SSOT (tech stack, commands, architecture, sensitive files, UI guide 경로)
 - `.claude/rules/project-convention.md` → 프로젝트 코딩 규약 SSOT (언어/프레임워크/테스트/UI/보안/주석 규칙) — 이 디렉토리의 preset이 주입되는 대상
-- `.claude/refs/*` → 필요 시 읽는 참조 문서
+- `.claude/refs/*` → 필요 시 읽는 범용 참조 문서 (`security-engineering.md`는 보안 요구사항·증거·게이트 SSOT)
 
 ## 금지 사항
 
