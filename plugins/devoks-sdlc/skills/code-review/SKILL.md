@@ -2,7 +2,7 @@
 description: code-reviewer 에이전트가 호출하는 코드리뷰 실행 엔진. mode(general|diff-branch)와 scope를 입력받아 코드 수집 → 자동화 선행검증 → C.L.E.A.R./Layered/Checklist/심각도 분류 리뷰 → 포맷된 리포트 생성까지 수행한다. 메인 루프에서 직접 실행하지 않고 code-reviewer 에이전트를 통해서만 사용한다.
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # code-review — 리뷰 실행 엔진
@@ -107,6 +107,7 @@ metadata:
 - XSS 위험: ✅ / ⚠️ / ❌
 - 하드코딩 자격증명: ✅ / ⚠️ / ❌
 - 인증·인가 우회 가능성: ✅ / ⚠️ / ❌
+- 민감정보 노출(토큰 저장·로깅): ✅ / ⚠️ / ❌
 - 자동화 도구(Lint/TS) 통과: ✅ / ❌
 
 ---

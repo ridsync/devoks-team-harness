@@ -2,7 +2,7 @@
 description: code-security-reviewer 에이전트가 호출하는 보안 검증 실행 엔진. scope를 입력받아 의존성 취약점·시크릿 하드코딩·인증인가 경계 우회·인젝션/XSS/SSRF·민감 데이터 노출·안전하지 않은 설정을 repo 전수로 점검하고 심각도별 리포트를 생성한다. 메인 루프에서 직접 실행하지 않고 code-security-reviewer 에이전트를 통해서만 사용한다(진입은 /devoks-sdlc:code-security-review 커맨드). 변경분 단위 경량 보안 체크는 devoks-sdlc:code-review에 포함된 별개 기능이다.
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # code-security-review — 전용 보안 검증 (엔진)
@@ -52,7 +52,7 @@ metadata:
 
 ### 2. 프로젝트 고유 정책 감지 (있으면 우선)
 
-- 프로젝트 active convention `.claude/rules/project-convention.md`의 Security 섹션, `.claude/refs/code-review.md`의 보안 항목, `.claude/CLAUDE.md`가 선언한 민감 파일/시크릿 정책이 **존재하면 우선 적용**한다.
+- 프로젝트 active convention `.claude/rules/project-convention.md`의 Security 섹션, `.claude/refs/code-review.md`의 보안 항목, `.claude/refs/`의 스택 보안 ref(예: `web-security.md` — 탐지 시그널 표 포함), `.claude/CLAUDE.md`가 선언한 민감 파일/시크릿 정책이 **존재하면 우선 적용**한다.
 - 없으면 범용 기준만 적용한다.
 - 스킬 본문에 특정 식별자·파일명을 박지 않는다 — 감지값이 SSOT다.
 
@@ -121,5 +121,6 @@ metadata:
 ## 참고 기준 문서
 
 - **심각도 분류 SSOT**: `.claude/refs/code-review.md §8`.
+- **스택 보안 기준(존재 시)**: `.claude/refs/web-security.md` 등 setup이 주입한 스택 보안 ref.
 - **프로젝트 규칙**: 프로젝트 active convention `.claude/rules/project-convention.md`(Security), `.claude/rules/agent-principles.md`, 필요 시 `.claude/CLAUDE.md`.
 - 관련: `devoks-sdlc:code-review`(변경분 인라인 보안 스크리닝 — 본 스킬과 역할 분리).
