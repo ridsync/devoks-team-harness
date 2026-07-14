@@ -94,7 +94,7 @@ Instead, it uses an **explicit setup/apply model**:
 |------|--------|--------------------|
 | **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | copied during explicit setup |
 | **refs** | `plugins/devoks-core/refs/*.md` | copied during explicit setup |
-| **stack preset** | `shared/conventions/<preset>/project-convention.md` | copied to `.claude/rules/project-convention.md` |
+| **stack preset** | `plugins/devoks-core/conventions/<preset>/project-convention.md` | copied to `.claude/rules/project-convention.md` |
 | **project active convention** | `.claude/rules/project-convention.md` | project-owned; no SessionStart overwrite |
 
 The SessionStart hook now only checks MCP/project initialization state and prints guidance when needed.
@@ -192,13 +192,13 @@ devoks-team-harness/
 │   │   ├── commands/                  # setup-mcp, setup-project-convention
 │   │   ├── skills/                    # project convention management
 │   │   ├── rules/                     # base rules: agent-principles, memory-policy (+ management contract)
-│   │   └── refs/                      # setup 시 주입하는 reference docs
+│   │   ├── refs/                      # setup 시 주입하는 reference docs
+│   │   └── conventions/               # stack-specific project convention presets (bundled, referenced via ${CLAUDE_PLUGIN_ROOT})
 │   ├── devoks-git/commands/           # Git commands (3)
 │   ├── devoks-sdlc/                    # SDLC: feature·test·code·verify (8 commands + 10 skills + 3 agents)
 │   ├── devoks-browser/               # browser tools (2 skills + 1 agent)
 │   └── devoks-rn/                    # React Native debugging (1 skill)
 ├── shared/
-│   ├── conventions/                   # stack-specific project convention presets
 │   ├── setup/claude.json.template     # ~/.claude.json MCP config template
 │   └── templates/CLAUDE.md.project.template
 ├── docs/
@@ -210,7 +210,7 @@ devoks-team-harness/
 └── README.md
 ```
 
-> `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` and `plugins/devoks-core/refs/*` are seeded into projects by explicit setup. Stack-specific `project-convention.md` comes from `shared/conventions/*` presets, is applied explicitly, and remains project-owned afterward.
+> `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` and `plugins/devoks-core/refs/*` are seeded into projects by explicit setup. Stack-specific `project-convention.md` comes from `plugins/devoks-core/conventions/*` presets, is applied explicitly, and remains project-owned afterward.
 
 ---
 

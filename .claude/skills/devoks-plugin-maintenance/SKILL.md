@@ -162,7 +162,7 @@ claude plugin validate ./plugins/<plugin> --strict
 
 확인 항목:
 
-- 루트 `.claude/refs/*`, `.claude/rules/*` 사본과의 관계
+- 루트 `.claude/rules/`에 `plugins/devoks-core/rules|refs/*` 번들 사본이 다시 나타나지 않았는지(2026-07-14 잔재 제거 완료 — 루트에는 이 저장소 전용 `project-convention.md`만 있어야 한다)
 - 운영 문서 설명과 실제 동작이 맞는지
 - explicit setup/sync 정책이 바뀌면 관련 문서도 함께 갱신했는지
 

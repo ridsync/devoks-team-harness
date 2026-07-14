@@ -6,8 +6,9 @@ description: DevOks 권장 MCP 서버를 현재 상태에 맞춰 user scope에 1
 
 ## SSOT
 
-- 설치 정책·방식·prefix 규칙: [`docs/mcp-setup-guide.md`](../../../docs/mcp-setup-guide.md)를 따른다.
-- 감지 로직 참고: `devoks-core` SessionStart 훅 [`hooks/check-setup-state.sh`](../hooks/check-setup-state.sh).
+- 이 커맨드 자체가 설치 정책·방식·prefix 규칙의 실행 가능한 SSOT다 (아래 Steps 전부 self-contained).
+- 감지 로직 참고: `devoks-core` SessionStart 훅 `${CLAUDE_PLUGIN_ROOT}/hooks/check-setup-state.sh`.
+- `docs/mcp-setup-guide.md`는 harness 저장소 자체(devoks-team-harness) 안에만 있는 배경 설명·의존성 매트릭스 문서다 — 대상 프로젝트에는 설치되지 않으므로 이 커맨드 실행에 필요한 내용을 그 문서에 미루지 않는다.
 
 ## Overview
 
@@ -103,7 +104,17 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
      동일한 `:9269` 디버그 포트에 두 인스턴스가 동시에 attach를 시도해 충돌한다.
    - 감지 결과(`claude mcp list`에 `chrome-devtools-attach` 부재, 또는 SessionStart 훅 경고)로 **누락이면**
      다음을 안내한다: `/plugin install devoks-browser@devoks-plugins`. 이미 devoks-browser가 설치돼 있으면 별도 작업 불필요.
-   - Chrome 디버그 실행(`--remote-debugging-port=9269`)은 `docs/mcp-setup-guide.md` 3절을 참조하게 한다.
+   - Chrome을 디버그 모드로 직접 실행해야 하면 아래 명령을 안내한다(사용자가 로컬에서 실행):
+     ```bash
+     # macOS
+     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+       --remote-debugging-port=9269 \
+       --user-data-dir="$HOME/.claude/chrome-dev-mcp/" \
+       http://localhost:5500
+
+     # 연결 확인
+     curl -s http://127.0.0.1:9269/json | python3 -m json.tool
+     ```
 
 7. **결과 보고**
    - 설치가 끝나면 `claude mcp list`를 다시 실행해 최종 상태를 요약한다.

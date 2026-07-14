@@ -124,6 +124,9 @@ Figma 계정 연결은 최초 도구 호출 시 브라우저 OAuth 플로우로 
 
 ### 3-3. Chrome 디버그 모드로 실행
 
+> 아래 명령은 `plugins/devoks-core/commands/setup-mcp.md` Step 6에도 그대로 inline돼 있다(대상 프로젝트에
+> 설치된 커맨드는 이 문서에 접근할 수 없어 자기완결적이어야 함). 한쪽을 고치면 반드시 다른 쪽도 갱신한다.
+
 ```bash
 # macOS
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \

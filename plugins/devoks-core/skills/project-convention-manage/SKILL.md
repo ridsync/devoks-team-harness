@@ -1,5 +1,4 @@
 ---
-name: project-convention-manage
 description: 현재 프로젝트의 active convention을 점검하고, preset provenance 확인·diff·selective apply·재적용·스택 전환을 안전하게 수행한다.
 ---
 
@@ -16,7 +15,7 @@ description: 현재 프로젝트의 active convention을 점검하고, preset pr
 
 - 프로젝트 active convention: `.claude/rules/project-convention.md`
 - preset provenance metadata: `.claude/project-convention.json`
-- preset 원본: `shared/conventions/<preset>/project-convention.md`
+- preset 원본: `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
 
 ---
@@ -42,6 +41,21 @@ description: 현재 프로젝트의 active convention을 점검하고, preset pr
 - `.claude/project-convention.json`
 - `.claude/rules/project-convention.md`
 - `.claude/CLAUDE.md` (있으면)
+
+#### hash 사전 체크 (`presetHash`가 있을 때)
+
+`.claude/project-convention.json`에 `presetHash`가 있으면, 전체 diff·유사도 추론을 돌기 전에 먼저
+값싸고 정확한 same/different 사전 필터를 돈다.
+
+1. `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md`의 현재 `sha256`을 계산한다
+   (예: `shasum -a 256`).
+2. 저장된 `presetHash`와 **동일** → "업스트림 preset 변경 없음"으로 즉시 보고한다. 사용자가 명시적으로
+   전체 diff를 요청하지 않는 한 아래 3~4단계(drift 판단·diff 제시)는 생략한다.
+3. **다르면** → "업스트림 preset이 변경됨"을 알리고 3~4단계로 그대로 진행한다. 적용 후에는 `presetHash`를
+   최신 값으로 갱신한다(5단계).
+
+`presetHash`가 **없으면**(이 필드 도입 이전에 생성된 레거시 provenance) 에러 없이 아래 기존 추정
+체인으로 폴백한다 — 강제 재설정 없음.
 
 metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지 않는다.**
 
@@ -96,7 +110,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 적용 시 아래 원칙을 지킨다.
 
 - `.claude/rules/project-convention.md`를 직접 덮어쓸 수 있는 작업은 반드시 사용자 확인 후에만 수행
-- provenance metadata를 함께 갱신
+- provenance metadata를 함께 갱신 — `presetHash`도 현재 preset 원본의 최신 해시로 갱신
 - preset 전환 후에는 `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files도 drift 여부를 점검
 - `Custom` 흐름은 가장 가까운 preset + 사용자 보정값으로 처리
 
@@ -106,6 +120,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 
 - 적용한 preset / source
 - 적용 모드 (`full apply` / `selective apply` / `switch` / `cleanup`)
+- preset이 최신 상태였는지, 업스트림 변경으로 갱신됐는지 (`presetHash` 일치 여부)
 - 유지한 로컬 커스터마이징
 - 추가로 프로젝트 실제 값으로 바꿔야 할 preset 예시 항목 (Stack, Project Decisions 등)
 - 필요 시 다음 액션 (`CLAUDE.md` 보강, 테스트 스택 명시, UI guideline SSOT 연결 등)

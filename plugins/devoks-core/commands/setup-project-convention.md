@@ -13,9 +13,9 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 
 ## SSOT
 
-- base rules: `plugins/devoks-core/rules/agent-principles.md`, `plugins/devoks-core/rules/memory-policy.md`
-- stack preset: `shared/conventions/<preset>/project-convention.md`
-- 참조 문서: `plugins/devoks-core/refs/*.md`
+- base rules: `${CLAUDE_PLUGIN_ROOT}/rules/agent-principles.md`, `${CLAUDE_PLUGIN_ROOT}/rules/memory-policy.md`
+- stack preset: `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md`
+- 참조 문서: `${CLAUDE_PLUGIN_ROOT}/refs/*.md`
 - 프로젝트 active convention: `.claude/rules/project-convention.md`
 - provenance metadata: `.claude/project-convention.json`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
@@ -116,18 +116,23 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 - base rules/refs 를 명시적으로 복사
 - 선택한 preset 원본을 `.claude/rules/project-convention.md`로 복사
 - 필요 시 `Custom` 보정 내용을 같은 파일에 반영
-- `.claude/project-convention.json`에 provenance 저장
+- preset 원본 파일의 `sha256` 해시를 계산(예: `shasum -a 256 "${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md"`)
+- `.claude/project-convention.json`에 provenance 저장 — 이 해시를 `presetHash`로 함께 기록
 
 metadata 예시:
 
 ```json
 {
   "preset": "react-web",
-  "source": "shared/conventions/react-web/project-convention.md",
+  "source": "${CLAUDE_PLUGIN_ROOT}/conventions/react-web/project-convention.md",
+  "presetHash": "<sha256>",
   "managedBy": "devoks-core:setup-project-convention",
   "mode": "fresh-apply"
 }
 ```
+
+`presetHash`는 이후 `devoks-core:project-convention-manage`가 "업스트림 preset이 그 사이 바뀌었는지"를
+값싸고 정확하게 판단하는 사전 필터로 쓴다 — preset 원본 내용이 변경될 때만 값이 달라진다.
 
 ### 7. 후속 안내
 

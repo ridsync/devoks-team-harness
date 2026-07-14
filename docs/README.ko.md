@@ -94,7 +94,7 @@ cd /path/to/your-project
 |------|------|--------------------|
 | **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | explicit setup 시 복사 |
 | **refs** | `plugins/devoks-core/refs/*.md` | explicit setup 시 복사 |
-| **stack preset** | `shared/conventions/<preset>/project-convention.md` | `.claude/rules/project-convention.md`로 주입 |
+| **stack preset** | `plugins/devoks-core/conventions/<preset>/project-convention.md` | `.claude/rules/project-convention.md`로 주입 |
 | **project active convention** | `.claude/rules/project-convention.md` | 프로젝트 소유, SessionStart overwrite 없음 |
 
 SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
@@ -192,13 +192,13 @@ devoks-team-harness/
 │   │   ├── commands/                  # setup-mcp, setup-project-convention
 │   │   ├── skills/                    # project convention 관리
 │   │   ├── rules/                     # base rules: agent-principles, memory-policy (+ 운영 계약)
-│   │   └── refs/                      # setup 시 주입하는 reference docs
+│   │   ├── refs/                      # setup 시 주입하는 reference docs
+│   │   └── conventions/               # 기술스택별 project convention preset (번들, ${CLAUDE_PLUGIN_ROOT}로 참조)
 │   ├── devoks-git/commands/           # Git 커맨드 (3개)
 │   ├── devoks-sdlc/                    # SDLC: 기능·테스트·코드·검증 (커맨드 8개 + 스킬 10개 + 에이전트 3개)
 │   ├── devoks-browser/               # 브라우저 도구 (스킬 2개 + 에이전트 1개)
 │   └── devoks-rn/                    # React Native 디버깅 (스킬 1개)
 ├── shared/
-│   ├── conventions/                   # 기술스택별 project convention preset
 │   ├── setup/claude.json.template     # ~/.claude.json MCP 설정 템플릿
 │   └── templates/CLAUDE.md.project.template
 ├── docs/
@@ -210,7 +210,7 @@ devoks-team-harness/
 └── README.md                          # English README
 ```
 
-> `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` 와 `plugins/devoks-core/refs/*` 는 explicit setup으로 프로젝트에 seed 됩니다. stack-specific `project-convention.md`는 `shared/conventions/*` preset에서 선택 주입되며, 이후에는 프로젝트가 소유합니다.
+> `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` 와 `plugins/devoks-core/refs/*` 는 explicit setup으로 프로젝트에 seed 됩니다. stack-specific `project-convention.md`는 `plugins/devoks-core/conventions/*` preset에서 선택 주입되며, 이후에는 프로젝트가 소유합니다.
 
 ---
 
