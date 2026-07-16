@@ -1,8 +1,8 @@
 ---
-description: test-writer 에이전트가 호출하는 테스트 작성 실행 엔진. target을 입력받아 프로젝트의 실제 테스트 러너·라이브러리·파일 패턴을 감지하고 그 컨벤션에 맞춰 단위·통합 테스트를 작성·확장한 뒤 자기검증까지 수행한다. 메인 루프에서 직접 실행하지 않고 test-writer 에이전트를 통해서만 사용한다(진입은 /devoks-sdlc:test-author 커맨드). 테스트 실행·실패 분석은 devoks-sdlc:test-run-triage, 요구·보안 충족 판정은 devoks-sdlc:verify-requirements / devoks-sdlc:code-security-review 를 쓴다.
+description: (agent-internal — test-writer 에이전트 전용, 사용자 요청으로 직접 호출 금지) test-writer 에이전트가 호출하는 테스트 작성 실행 엔진. target을 입력받아 프로젝트의 실제 테스트 러너·라이브러리·파일 패턴을 감지하고 그 컨벤션에 맞춰 단위·통합 테스트를 작성·확장한 뒤 자기검증까지 수행한다. 진입은 /devoks-sdlc:test-author 커맨드. 테스트 실행·실패 분석은 devoks-sdlc:test-run-triage, 요구·보안 충족 판정은 devoks-sdlc:verify-requirements / devoks-sdlc:code-security-review 를 쓴다.
 metadata:
   author: ridsync
-  version: 2.0.0
+  version: 2.0.1
 ---
 
 # test-author — 테스트 작성/확장 (엔진)

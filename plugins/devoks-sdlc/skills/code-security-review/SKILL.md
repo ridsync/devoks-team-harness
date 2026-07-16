@@ -1,8 +1,8 @@
 ---
-description: code-security-reviewer 에이전트가 호출하는 보안 검증 실행 엔진. scope를 입력받아 의존성 취약점·시크릿 하드코딩·인증인가 경계 우회·인젝션/XSS/SSRF·민감 데이터 노출·안전하지 않은 설정을 repo 전수로 점검하고 심각도별 리포트를 생성한다. 메인 루프에서 직접 실행하지 않고 code-security-reviewer 에이전트를 통해서만 사용한다(진입은 /devoks-sdlc:code-security-review 커맨드). 변경분 단위 경량 보안 체크는 devoks-sdlc:code-review에 포함된 별개 기능이다.
+description: (agent-internal — code-security-reviewer 에이전트 전용, 사용자 요청으로 직접 호출 금지) code-security-reviewer 에이전트가 호출하는 보안 검증 실행 엔진. scope를 입력받아 의존성 취약점·시크릿 하드코딩·인증인가 경계 우회·인젝션/XSS/SSRF·민감 데이터 노출·안전하지 않은 설정을 repo 전수로 점검하고 심각도별 리포트를 생성한다. 진입은 /devoks-sdlc:code-security-review 커맨드. 변경분 단위 경량 보안 체크는 devoks-sdlc:code-review에 포함된 별개 기능이다.
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # code-security-review — 전용 보안 검증 (엔진)
