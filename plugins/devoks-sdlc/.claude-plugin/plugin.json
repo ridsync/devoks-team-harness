@@ -1,6 +1,6 @@
 {
   "name": "devoks-sdlc",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "DevOks SDLC 워크플로우 — 기능개발(FRD·PLAN·실행·UI), 테스트 작성·triage, 코드리뷰·리팩토링·모듈분석·보안검증, 요구사항·데이터흐름 검증을 한 사이클로 통합",
   "author": { "name": "ridsync" },
   "dependencies": ["devoks-core"]

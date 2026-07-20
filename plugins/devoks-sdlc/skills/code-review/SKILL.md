@@ -2,7 +2,7 @@
 description: (agent-internal — code-reviewer 에이전트 전용, 사용자 요청으로 직접 호출 금지) code-reviewer 에이전트가 호출하는 코드리뷰 실행 엔진. mode(general|diff-branch)와 scope를 입력받아 코드 수집 → 자동화 선행검증 → C.L.E.A.R./Layered/Checklist/심각도 분류 리뷰 → 포맷된 리포트 생성까지 수행한다.
 metadata:
   author: ridsync
-  version: 1.1.0
+  version: 1.2.0
 ---
 
 # code-review — 리뷰 실행 엔진
@@ -73,6 +73,8 @@ metadata:
 심각도 분류 및 이슈 형식은 `.claude/refs/code-review.md §8`을 따른다.
 
 `📋 리뷰 대상` 헤더는 **mode별로 분기**한다 (아래 출력 템플릿 참조).
+
+**보안 이슈 에스컬레이션:** `🔒 보안 점검 요약`에서 Critical/High급 보안 이슈가 하나라도 발견되면, `🚀 다음 액션 제안`의 `즉시:` 항목에 `/devoks-sdlc:code-security-review` 실행을 권장 문구로 명시한다. 이 스킬은 diff/scope 한정 경량 스크리닝이라 repo 전수·의존성 취약점·위협 모델링은 다루지 않으므로, 발견된 문제의 실제 파급 범위는 전용 심층 검증으로 확인해야 한다.
 
 ---
 
@@ -185,7 +187,7 @@ metadata:
 ---
 
 ## 🚀 다음 액션 제안
-- 즉시:
+- 즉시: <!-- Critical/High 보안 이슈 발견 시: "심층 보안 검증 권장 — `/devoks-sdlc:code-security-review` 실행 (repo 전수·의존성·위협 모델링 필요)" 포함 -->
 - 다음 배치:
 - 보류:
 ```
@@ -196,3 +198,4 @@ metadata:
 
 - **리뷰 기준 SSOT**: `.claude/refs/code-review.md` (C.L.E.A.R. / Layered / Checklists / §8 Severity)
 - **프로젝트 규칙**: `.claude/refs/engineering-principles.md`, 프로젝트 active convention `.claude/rules/project-convention.md`, 프로젝트 사실 SSOT `.claude/CLAUDE.md`
+- **관련**: `devoks-sdlc:code-security-review` — 본 스킬은 diff/scope 한정 경량 보안 스크리닝만 수행한다. Critical/High급 보안 이슈 발견 시, 또는 repo 전수·의존성 취약점·위협 모델링이 필요하면 `/devoks-sdlc:code-security-review`(전용 심층 검증, 역할 분리)로 확장한다.
