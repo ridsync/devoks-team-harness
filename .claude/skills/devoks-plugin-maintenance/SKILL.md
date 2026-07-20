@@ -3,7 +3,7 @@ name: devoks-plugin-maintenance
 description: devoks-team-harness 저장소에서 플러그인 기능 변경, 버그 수정, 스킬/커맨드/에이전트 추가·수정, MCP prefix·permission 정책 변경, 카탈로그/문서 정합성 점검이 필요한 작업을 할 때 사용하는 maintainers용 로컬 워크플로우. 사용자가 devoks-browser/devoks-rn/devoks-core 같은 플러그인 변경을 요청하거나, plugin version bump / validate --strict / README·README.ko·marketplace·MCP guide 동기화가 필요해 보이면 반드시 이 스킬을 먼저 사용한다.
 metadata:
   author: ridsync
-  version: 0.1.0
+  version: 0.2.0
 ---
 
 # devoks-plugin-maintenance
@@ -63,6 +63,10 @@ metadata:
 
 범위가 애매하면 바로 수정하지 말고 먼저 사용자에게 확인한다.
 
+**추가 신호**: 아래 중 하나라도 해당하면 Step 4의 "스킬 품질 체크리스트"를 함께 적용 대상으로 표시한다.
+- 신규 skill 생성
+- 기존 skill의 `description` 또는 핵심 동작(트리거 조건·워크플로 단계)이 바뀌는 변경
+
 ## Step 2 — 플러그인별 체크리스트 작성
 
 각 변경 플러그인마다 아래 블록을 만든다.
@@ -107,6 +111,19 @@ claude plugin validate ./plugins/<plugin> --strict
 - 신규/수정 agent frontmatter (`model` 필드를 의도적으로 선택했는지 — 근거는 `docs/plugin-management.md` §12 참고)
 - 경로 구조 유효성
 - warning도 실패로 취급할지 여부 (`--strict` 기준)
+
+### 스킬 품질 체크리스트 (신규/변경 스킬 한정)
+
+Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한다. 상세 판정 기준·체크 명령은 `references/workflow-checklist.md` §7을 따른다. 6축:
+
+1. **description ↔ 실제 동작 일치(효용성 포함)** — `evals/evals.json` 프롬프트를 서브에이전트로 실제 실행해 `expected_output`과 대조한다. **신규 skill은 이 동적 실행을 생략할 수 없다.** 기존 skill 변경은 권장(트리거 조건이 크게 바뀌면 필수로 격상).
+2. **`references/` 존재** — SKILL.md가 언급하는 `references/*.md`가 실제로 존재하는지 대조한다.
+3. **`evals/evals.json` 보유** — 신규 skill은 최소 1~2개 케이스 작성이 blocking이다(축 1 실행에 그대로 사용).
+4. **의존 MCP/도구 명시** — Step 6의 MCP/prefix 대조 지점을 그대로 재사용한다(중복 로직 신설 금지).
+5. **설치 후 경로 참조 안전성** — 플러그인 루트 밖 상대경로(`../`) 참조가 없는지, 크로스 참조가 필요하면 `${CLAUDE_PLUGIN_ROOT}`를 쓰는지 확인한다.
+6. **토큰효율성** — SKILL.md 라인 수·인라인 대용량 예시 유무·`references/` 분리 여부를 정적으로 먼저 살피고, 축 1의 동적 실행 시 소모 토큰/턴 수를 함께 관찰한다. 신규 skill은 축 1과 함께 관찰이 필수.
+
+축 2·3·4·5는 정적 체크로 항상 필수다. 축 1·6의 동적 실행은 신규 skill에서 필수, 기존 skill의 description/동작 변경에서는 권장이다.
 
 ## Step 5 — 문서/카탈로그 정합성 검토
 
@@ -183,6 +200,7 @@ claude plugin validate ./plugins/<plugin> --strict
 - [ ] docs/catalog updates
 - [ ] MCP/prefix/permission checks
 - [ ] core sync checks
+- [ ] 스킬 품질 체크(해당 시 — 6축, 신규 skill은 동적 실행 포함)
 
 ### Docs updated
 - <file>
@@ -204,3 +222,4 @@ claude plugin validate ./plugins/<plugin> --strict
 - `devoks-core 의 refs/rules 와 sync-context 훅 설명을 같이 바꾸려 해. 루트 .claude 사본과 운영 문서 정합성까지 확인해줘.`
 - `devoks-sdlc 의 code-reviewer agent에 새 체크 항목을 추가하고 관련 skill 설명도 손보려고 해. 유지보수 절차대로 버전 bump부터 문서 반영까지 점검해줘.`
 - `devoks-git 의 git-pull-request 커맨드에 새 옵션을 추가하려고 해. 버전 bump랑 문서 반영까지 유지보수 절차로 점검해줘.`
+- `devoks-sdlc 에 새 skill을 하나 추가하려고 해. 목적만 있고 이름은 아직 안 정했어. 유지보수 절차대로 점검해줘.`

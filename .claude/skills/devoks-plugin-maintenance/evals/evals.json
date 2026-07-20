@@ -30,6 +30,12 @@
       "prompt": "devoks-git 의 git-pull-request 커맨드에 새 옵션을 추가하려고 해. 버전 bump랑 문서 반영까지 유지보수 절차로 점검해줘.",
       "expected_output": "devoks-git을 대상 플러그인으로 식별하고, command frontmatter 변경 여부, version bump, validate --strict, README/README.ko catalog 반영 여부, devoks-sdlc 쪽 텍스트 참조 영향 여부를 체크리스트로 제시한다.",
       "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "devoks-sdlc 에 새 skill을 하나 추가하려고 해. 이름은 아직 안 정했고 목적만 있어. 유지보수 절차대로 점검해줘.",
+      "expected_output": "신규 skill 생성에 해당함을 인식해 스킬 품질 체크리스트(6축: description-동작 일치·references 존재·evals 보유·MCP 명시·경로 참조 안전성·토큰효율성)를 적용 대상으로 표시하고, 축 1·6의 동적 검증(evals 프롬프트를 서브에이전트로 실행)이 신규 skill에서 생략 불가한 필수 항목임을 안내한다.",
+      "files": []
     }
   ]
 }

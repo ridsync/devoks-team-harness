@@ -87,3 +87,33 @@
 - [ ] 문서 대상/비대상 판단이 파일별로 남아 있는가
 - [ ] MCP/prefix/permission 대조 지점이 확인되었는가
 - [ ] core sync 영향이 있으면 `.claude/` 사본과 문서까지 함께 봤는가
+- [ ] 신규/변경 skill이면 §7 스킬 품질 체크리스트(6축)를 적용했는가
+
+## 7. 스킬 품질 체크리스트 (신규/변경 스킬 한정)
+
+적용 조건: 신규 skill 생성 또는 기존 skill의 `description`/핵심 동작(트리거 조건·워크플로 단계) 변경.
+
+| # | 축 | 검증 방식 | 적용 강도 |
+|---|---|---|---|
+| 1 | description ↔ 실제 동작 일치(효용성 포함) | 동적 — `evals/evals.json` 프롬프트를 서브에이전트로 실행해 `expected_output`과 대조 | 신규 skill: 필수 / 기존 skill 변경: 권장(트리거 조건 대폭 변경 시 필수) |
+| 2 | `references/` 존재 | 정적 — SKILL.md 내 `references/*.md` 언급을 grep, 실제 파일과 대조 | 필수 |
+| 3 | `evals/evals.json` 보유 | 정적 — 파일 존재 확인 | 신규 skill: blocking(없으면 최소 1~2개 작성) / 기존 skill 변경: 권장 |
+| 4 | 의존 MCP/도구 명시 | 정적 — 위 "3. MCP / prefix / permission 점검 포인트" 대조 지점 재사용 | 필수 |
+| 5 | 설치 후 경로 참조 안전성 | 정적 — 플러그인 루트 밖 상대경로(`../`) grep, `${CLAUDE_PLUGIN_ROOT}` 사용 확인 | 필수 |
+| 6 | 토큰효율성 | 정적(SKILL.md 라인수·인라인 대용량 예시·`references/` 분리 여부) + 동적(축 1 실행 시 토큰/턴수 관찰) | 신규 skill: 필수 / 기존 skill 변경: 권장 |
+
+### 동적 검증(축 1·6) 실행 방법
+
+1. 대상 skill의 `evals/evals.json`에서 프롬프트를 가져온다(없으면 최소 1~2개 신규 작성).
+2. 서브에이전트(`Agent` 도구, 신선한 컨텍스트)에 프롬프트를 그대로 전달해 skill을 실제로 트리거시킨다.
+3. 결과를 `expected_output`과 대조해 description-동작 일치·효용성을 판정한다.
+4. 실행 과정에서 관찰된 토큰/턴 소모가 skill의 목적·워크플로 복잡도 대비 과도한지 판단한다(예: 단순 조회성 skill이 references를 불필요하게 여러 개 순차 로드하는지).
+5. 신규 skill은 이 실행을 생략할 수 없다.
+
+### 정적 체크(축 2~6) 실행 방법
+
+- 축 2: `grep -o 'references/[a-zA-Z0-9_.-]*\.md' SKILL.md` 결과와 `references/` 디렉토리 실제 파일 목록 대조
+- 축 3: `evals/evals.json` 파일 존재 확인
+- 축 4: 위 §3 "MCP / prefix / permission 점검 포인트" 절차 재사용
+- 축 5: `grep -n '\.\./' skills/<name>/SKILL.md` 등으로 플러그인 루트 밖 상대경로 참조 여부 확인
+- 축 6: SKILL.md 라인 수(`wc -l`), 본문 내 대용량 코드블록/예시 유무, `references/` 분리 여부 확인

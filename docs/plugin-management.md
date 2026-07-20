@@ -220,6 +220,7 @@ done
 
 - 위치: `.claude/skills/devoks-plugin-maintenance/SKILL.md`
 - 목적: 플러그인 변경 시 **버전 bump → `validate --strict` → 문서/카탈로그 반영 → MCP prefix / permissions / cross-reference 점검** 순서를 누락 없이 강제
+- 신규 skill 생성 또는 skill `description`/핵심 동작 변경 시에는 **스킬 품질 체크리스트(6축: description-동작 일치·`references/` 존재·`evals` 보유·MCP 명시·경로 참조 안전성·토큰효율성)**를 추가로 적용 — 축 1·6은 신규 skill에서 서브에이전트 실행 기반 동적 검증이 필수
 - 성격: `plugins/devoks-*`에 배포되는 기능이 아니라, **이 저장소 maintainers용 로컬 워크플로우**
 
 이 스킬은 특히 아래 상황에서 먼저 사용하는 것을 권장합니다.
