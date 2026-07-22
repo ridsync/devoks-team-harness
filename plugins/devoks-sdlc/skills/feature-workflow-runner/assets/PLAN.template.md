@@ -54,5 +54,5 @@ flowchart TD
 ## 5. Definition of Done
 - [ ] 모든 Task 완료
 - [ ] 모든 `REQ`/`AC`/`CTR`/`EDGE` 가 Task `traces`로 커버됨 (누락 0)
-- [ ] 핵심 비즈니스 로직 테스트 통과
+- [ ] 핵심 비즈니스 로직 테스트 통과(정상/경계/실패, 안티패턴 없음 — 기준: `skills/test-author/references/test-quality-bar.md`)
 - [ ] Edge case 처리 확인

@@ -2,7 +2,7 @@
 description: (agent-internal — test-writer 에이전트 전용, 사용자 요청으로 직접 호출 금지) test-writer 에이전트가 호출하는 테스트 작성 실행 엔진. target을 입력받아 프로젝트의 실제 테스트 러너·라이브러리·파일 패턴을 감지하고 그 컨벤션에 맞춰 단위·통합 테스트를 작성·확장한 뒤 자기검증까지 수행한다. 진입은 /devoks-sdlc:test-author 커맨드. 테스트 실행·실패 분석은 devoks-sdlc:test-run-triage, 요구·보안 충족 판정은 devoks-sdlc:verify-requirements / devoks-sdlc:code-security-review 를 쓴다.
 metadata:
   author: ridsync
-  version: 2.0.1
+  version: 2.1.0
 ---
 
 # test-author — 테스트 작성/확장 (엔진)
@@ -12,6 +12,7 @@ metadata:
 
 대상 코드의 자동화 테스트를 **프로젝트의 실제 테스트 컨벤션에 맞춰** 작성·확장한다.
 이 스킬은 특정 테스트 프레임워크를 가정하지 않는다 — 프로젝트에서 쓰는 도구를 먼저 감지한다.
+품질 기준(FIRST·행위검증·결정성·테스트 더블·안티패턴 등)은 `references/test-quality-bar.md`를 따른다.
 
 ---
 
@@ -37,7 +38,7 @@ metadata:
 |---------|------|------|
 | `target` | ✅ | 테스트 대상 파일/모듈/심볼 경로 |
 | `plan` / `frd` | 선택 | PLAN.md/FRD.md 절대경로 — EARS AC와 케이스를 `traces`로 연결할 때 |
-| `context` | 선택 | 우선 커버해야 할 케이스, 알려진 제약 등 추가 힌트 |
+| `context` | 선택 | 우선 커버해야 할 케이스, 알려진 제약, 버그 수정 여부 등 추가 힌트 |
 
 ---
 
@@ -63,6 +64,8 @@ metadata:
 
 - 정상 / 경계 / 실패(계약 위반) 케이스를 표로 정리하고 **요구↔케이스**를 매핑한다.
 - FRD/PLAN의 EARS Acceptance Criteria가 있으면 케이스에 `traces`로 연결한다.
+- 케이스 설계·레벨 결정은 `references/test-quality-bar.md` §5(레벨 결정)·§6(케이스 설계)을 따른다.
+- `context`에 버그 수정 신호가 있으면 `references/test-quality-bar.md` §7 예외를 적용한다 — 수정 전 그 버그를 재현하는 실패 테스트부터 작성해 실제로 실패함을 확인한 뒤 고친다.
 
 ### 4. 테스트 작성
 
@@ -84,6 +87,7 @@ metadata:
 - 프로젝트 테스트 컨벤션(위치·네이밍·구조)을 준수한다.
 - 요구↔케이스 매핑이 명시되어 있다.
 - 미해결 TODO·미커버 경로는 명시적으로 플래그한다(은폐 금지).
+- 안티패턴 없음(`references/test-quality-bar.md` §9) — assertion 없는 테스트·over-mocking·커버리지용 허수 테스트가 없다.
 
 ---
 
@@ -109,4 +113,5 @@ metadata:
 ## 참고 기준 문서
 
 - **프로젝트 규칙**: 프로젝트 active convention `.claude/rules/project-convention.md`(Test 섹션), `.claude/rules/agent-principles.md`(Definition of Done), 필요 시 `.claude/CLAUDE.md`.
+- **품질 기준**: `references/test-quality-bar.md`(FIRST·결정성·테스트 레벨·케이스 설계·버그수정 예외·테스트 더블·안티패턴·커버리지 철학).
 - 관련 스킬: `devoks-sdlc:test-run-triage`(실행·triage), `devoks-sdlc:verify-requirements`(요구 충족 판정).
