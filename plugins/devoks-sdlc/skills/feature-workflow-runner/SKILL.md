@@ -2,7 +2,7 @@
 description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-sdlc:feature-frd-author / devoks-sdlc:feature-plan-author / devoks-sdlc:feature-plan-executor 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.3.0
+  version: 1.4.0
 ---
 
 # feature-workflow-runner
@@ -47,7 +47,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 | `references/ears-acceptance-criteria.md` | Phase 1 — AC를 EARS로 쓸 때 |
 | `references/design-spec.md` | Phase 1 — §4 설계 스펙(컴포넌트/패턴/배치)·`DSN`·능동 제안 절차 |
 | `references/traceability.md` | Phase 2·4 — `traces` 커버리지 검증(누락 0) |
-| `references/task-pr-splitting.md` | Phase 2 — Task 분해·`[P]`·`size` 부여 기준·PR 분리·의존성 그래프 |
+| `references/task-pr-splitting.md` | Phase 2 — Task 분해·`[P]`·`size`/`test` 부여 기준·PR 분리·의존성 그래프 |
 | `references/progress-tracking.md` | Phase 1·2·3 — FRD/PLAN 승인 전환, PLAN 체크박스/status 갱신, 재개 절차 |
 | `references/branch-issue-precheck.md` | Phase 3 — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) |
 | `references/task-delegation.md` | Phase 3 — `code-implementer` 위임 프로토콜(`size` 라우팅·공통 예외 ③·손익분기·입력 계약·done/blocked 리포트·인계 노트 윈도잉·에스컬레이션) |
@@ -77,7 +77,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태). → `references/progress-tracking.md`
 1. Approach·PR 분리 방침을 1~2문장으로 적는다(§1). Resource Check(§2)는 FRD §6에서 가져온다.
-2. 요구사항을 Task로 쪼갠다: 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면) `[P]`, `size`(S/M/L — 실행 라우팅 신호, 애매하면 M, `L`은 분해 재검토), `file:`, `traces:` 부여. → `references/task-pr-splitting.md`
+2. 요구사항을 Task로 쪼갠다: 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면) `[P]`, `size`(S/M/L — 실행 라우팅 신호, 애매하면 M, `L`은 분해 재검토), `test`(required/skip — 테스트 필요 여부, 애매하면 required), `file:`, `traces:` 부여. → `references/task-pr-splitting.md`
 3. Task를 **PR 그룹**으로 묶는다 — 기본값 PR 1개. FRD의 메모는 참고일 뿐, `task-pr-splitting.md` 기준으로 이 단계에서 직접 재판단한다(애매하면 AskUserQuestion). 분리 시 §1에 근거 1줄. → `references/task-pr-splitting.md`
 4. §4 의존성 그래프(mermaid, **사이클 금지**)와 §5 DoD를 작성한다.
 5. **커버리지 검증**: FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검(누락 0). → `references/traceability.md` 의 comm 스크립트.
@@ -92,8 +92,8 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 1. PLAN을 읽어 미완 Task와 의존성 그래프를 파악, 세션 Task/Todo 목록을 PLAN에 맞춰 구성한다. PLAN `status`가 아직 `draft`이면 `approved`로 보정. → `references/progress-tracking.md`
 2. **선행이 모두 `[x]`인 Task**를 골라 착수(세션 도구 in_progress). `[P]` Task는 함께 진행 가능.
 3. **브랜치·이슈 사전체크(최초 1회)** — 첫 구현 착수 직전, 현재 브랜치·연결 이슈를 확인하고 브랜치명·이슈 초안을 제안한 뒤 사용자 확인 후 적용한다(모드 `full`). → `references/branch-issue-precheck.md`
-4. 각 Task: **`size` 마커로 라우팅 후 구현·검증** — `S`는 메인 루프 직접, `M`(및 마커 없음)은 `code-implementer` 위임(기본 경로), `L`은 분해 재검토(못 쪼개면 직접), 공통 예외(③ 스펙 미완결·① tools 밖 도구·② 사용자 직접 요청)는 직접. 위임 전 공통 예외 ③을 점검한다. 위임 시 Task 블록 원문·`plan`·`frd` 경로·`context`(인계 노트 윈도잉 적용)를 주입하면, 에이전트가 코드 읽기→기존 패턴 재사용 구현→테스트/린트 검증(로직 Task는 AC ID를 테스트 설명에 박아 양방향 추적)까지 수행하고 done|blocked 리포트를 리턴한다. 한 번에 한 태스크만. → `references/task-delegation.md`
-5. **리포트 판정 후 진행 갱신(메인 루프 수행)** — `done`은 검증 근거(실행 명령·**종료코드**·출력 **tail 1줄 원문**·로직 Task 시 테스트 파일·케이스명) 확인 후에만 PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `approved` → `in-progress`로(첫 착수 시), **인계 노트는 윈도잉 규칙에 맞게 수집해 다음 위임의 `context`에 주입**한다. `blocked`이면 `[x]`로 바꾸지 않고 에스컬레이션(스펙 문제→사용자 확인 후 재위임, 기계적 문제→직접 해소 후 재위임, 스코프 초과→인수·재분해), 막힌 이유를 명시한다.
+4. 각 Task: **`size` 마커로 라우팅 후 구현·검증** — `S`는 메인 루프 직접, `M`(및 마커 없음)은 `code-implementer` 위임(기본 경로), `L`은 분해 재검토(못 쪼개면 직접), 공통 예외(③ 스펙 미완결·① tools 밖 도구·② 사용자 직접 요청)는 직접. 위임 전 공통 예외 ③을 점검한다. 위임 시 Task 블록 원문·`plan`·`frd` 경로·`context`(인계 노트 윈도잉 적용)를 주입하면, 에이전트가 코드 읽기→기존 패턴 재사용 구현→테스트/린트 검증(`test: required` Task는 AC ID를 테스트 설명에 박아 양방향 추적, `test: skip`은 테스트 작성 생략)까지 수행하고 done|blocked 리포트를 리턴한다. 한 번에 한 태스크만. → `references/task-delegation.md`
+5. **리포트 판정 후 진행 갱신(메인 루프 수행)** — `done`은 검증 근거(실행 명령·**종료코드**·출력 **tail 1줄 원문**·`test: required` Task 시 테스트 파일·케이스명) 확인 후에만 PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `approved` → `in-progress`로(첫 착수 시), **인계 노트는 윈도잉 규칙에 맞게 수집해 다음 위임의 `context`에 주입**한다. `blocked`이면 `[x]`로 바꾸지 않고 에스컬레이션(스펙 문제→사용자 확인 후 재위임, 기계적 문제→직접 해소 후 재위임, 스코프 초과→인수·재분해), 막힌 이유를 명시한다.
 6. PR 경계는 **기록만** 한다(어떤 Task가 어느 PR인지). 커밋·푸시·PR 생성은 하지 않는다.
 
 ## Phase 4 — 마무리 / 검증

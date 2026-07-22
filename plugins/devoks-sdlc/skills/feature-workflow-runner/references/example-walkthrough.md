@@ -65,16 +65,16 @@ REQ-003: 저장 뷰 관리(이름 변경·삭제)
 ### 3. Tasks
 
 #### PR1 — 필터 뷰 저장·적용·관리
-- [ ] `TASK-001` 뷰 타입/상수 정의(`viewName`, 상한) — size: S — file: `src/.../views.types.js` — traces: CTR-001, CTR-002
-- [ ] `TASK-002` [P] 필터 직렬화/역직렬화 + 미존재 키 필터링 유틸 + 테스트 — size: M — file: `src/.../filterSerde.js` — traces: AC-001-3, CTR-001, DSN-002
-- [ ] `TASK-003` 뷰 저장소 훅(저장/조회/이름변경/삭제/상한 검증) + 테스트 — size: M — file: `src/.../useSavedViews.js` — traces: AC-001-1, AC-003-1, AC-003-2, CTR-002, EDGE-001, DSN-001
-- [ ] `TASK-004` 뷰 저장/선택/이름변경/삭제 UI + 적용 연동 — size: M — file: `src/.../SavedViews.jsx` — traces: AC-001-1, AC-001-2, AC-003-1, AC-003-2
-- [ ] `TASK-005` 미존재 키 경고 토스트(조건부) — size: S — file: `src/.../SavedViews.jsx` — traces: AC-001-3
+- [ ] `TASK-001` 뷰 타입/상수 정의(`viewName`, 상한) — size: S — test: skip — file: `src/.../views.types.js` — traces: CTR-001, CTR-002
+- [ ] `TASK-002` [P] 필터 직렬화/역직렬화 + 미존재 키 필터링 유틸 — size: M — test: required — file: `src/.../filterSerde.js` — traces: AC-001-3, CTR-001, DSN-002
+- [ ] `TASK-003` 뷰 저장소 훅(저장/조회/이름변경/삭제/상한 검증) — size: M — test: required — file: `src/.../useSavedViews.js` — traces: AC-001-1, AC-003-1, AC-003-2, CTR-002, EDGE-001, DSN-001
+- [ ] `TASK-004` 뷰 저장/선택/이름변경/삭제 UI + 적용 연동 — size: M — test: required — file: `src/.../SavedViews.jsx` — traces: AC-001-1, AC-001-2, AC-003-1, AC-003-2
+- [ ] `TASK-005` 미존재 키 경고 토스트(조건부) — size: S — test: required — file: `src/.../SavedViews.jsx` — traces: AC-001-3
 
 #### PR2 — 뷰 공유
-- [ ] `TASK-010` 공유 링크 발급 클라이언트 + 테스트 — size: M — file: `src/.../shareView.js` — traces: AC-002-1
-- [ ] `TASK-011` 공유 토글 UI + 실패 시 비공개 유지 — size: M — file: `src/.../SavedViews.jsx` — traces: AC-002-1, AC-002-2
-- [ ] `TASK-012` 공유 API 타임아웃 재시도(1회)·폴백 — size: S — file: `src/.../shareView.js` — traces: EDGE-002
+- [ ] `TASK-010` 공유 링크 발급 클라이언트 — size: M — test: required — file: `src/.../shareView.js` — traces: AC-002-1
+- [ ] `TASK-011` 공유 토글 UI + 실패 시 비공개 유지 — size: M — test: required — file: `src/.../SavedViews.jsx` — traces: AC-002-1, AC-002-2
+- [ ] `TASK-012` 공유 API 타임아웃 재시도(1회)·폴백 — size: S — test: required — file: `src/.../shareView.js` — traces: EDGE-002
 
 ### 4. Dependencies
 ```mermaid
