@@ -2,7 +2,7 @@
 description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-sdlc:feature-frd-author / devoks-sdlc:feature-plan-author / devoks-sdlc:feature-plan-executor 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.2.0
+  version: 1.3.0
 ---
 
 # feature-workflow-runner
@@ -52,6 +52,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 | `references/branch-issue-precheck.md` | Phase 3 — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) |
 | `references/task-delegation.md` | Phase 3 — `code-implementer` 위임 프로토콜(`size` 라우팅·공통 예외 ③·손익분기·입력 계약·done/blocked 리포트·인계 노트 윈도잉·에스컬레이션) |
 | `references/output-location.md` | 시작 시 — 산출물 워크스페이스 경로 규칙(문서/코드 분리) |
+| `references/post-implementation-checklist.md` | Phase 4 — 구현 완료 후 다음 단계(검증/리뷰/보안/테스트/커밋/PR) 표준 체크리스트 |
 | `references/example-walkthrough.md` | 막힐 때 — 도메인 중립 FRD→PLAN 완성 예시 |
 
 ---
@@ -103,6 +104,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
    - Edge case 처리 확인.
 2. 모든 Task `[x]` + DoD 충족 시 frontmatter `status: done`.
 3. 미완 Task·임시 코드·추후 작업(예: 커밋/PR, 추가 테스트)을 명시적으로 보고한다(은폐 금지).
+4. **다음 단계 체크리스트 출력** — `references/post-implementation-checklist.md`의 표준 메뉴(요구사항 검증/데이터 흐름 검증/UI 확인/코드 리뷰/테스트 회귀/커밋/PR)를 해당 항목만 골라 `🚀 다음 단계 제안`으로 출력한다. **제안만 하고 실행하지 않는다** — 실행은 사용자 확인 후 개별 스킬/커맨드 호출로 진행한다.
 
 ## 재진입 / 분기
 

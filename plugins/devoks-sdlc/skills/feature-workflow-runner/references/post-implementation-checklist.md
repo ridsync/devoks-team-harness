@@ -1,0 +1,49 @@
+# 구현 완료 후 다음 단계 체크리스트
+
+> 구현(Phase 3/태스크 실행)이 끝나면 검증·리뷰·보안·커밋·PR로 이어지는 흐름이 있지만, 이 흐름은
+> **에이전트가 그때그때 기억에 의존해 제안하거나 누락**하기 쉽다. 이 문서는 그 표준 메뉴를
+> 고정해, `feature-workflow-runner` Phase 4와 `feature-plan-executor`의 "마무리" 절이 **항상
+> 같은 체크리스트를 출력**하게 한다.
+
+## 원칙 — 제안이지 오케스트레이션이 아니다
+
+- 아래 항목은 **모두 제안**이다. 이 스킬(`feature-workflow-runner`/`feature-plan-executor`)은 어떤 항목도
+  대신 실행하지 않는다 — 실행은 사용자가 각 스킬/커맨드를 직접 호출해야 한다.
+- 자동 실행·자동 게이트가 필요한 시나리오(비-HITL 파이프라인)는 `docs/roadmap.md`의
+  `devoks-sdlc-orchestration` 로드맵 항목의 책임 범위다. 이 문서와 역할이 겹치지 않는다.
+- 커밋/푸시/PR 생성 금지 원칙(두 스킬의 "범위" 절 참고)은 이 체크리스트 도입으로 바뀌지 않는다.
+
+## 표준 메뉴
+
+구현 완료 시점(Phase 4 / 마무리)에 아래 순서로 검토하고, 해당하는 항목만 리포트에 남긴다.
+조건부 항목은 조건에 맞지 않으면 리포트에서 생략해도 된다.
+
+| 순서 | 항목 | 스킬/커맨드 | 조건 | 비고 |
+|------|------|------------|------|------|
+| 1 | 요구사항 구현 충실도 재확인(F/B/E/D) | `devoks-sdlc:verify-requirements mode=verify spec=<out>/FRD.md` | 항상 | 별도 체크리스트 파일(`mode=checklist`) 생성은 생략한다 — `FRD.md` §3(REQ/AC)·§5(Contract)·§8(Edge Case)이 이미 각각 F/B/E/D 카테고리에 ID로 대응되는 구조화된 문서라 중복 생성 불필요. Phase 4의 traceability 재점검("할당 커버리지" — AC/CTR/EDGE가 어떤 Task에 배정됐는가)과 달리, 이 검증은 "배정된 게 실제 코드로 올바르게 구현됐는가"(diff 수준 충실도, ✅/⚠️/❌+심각도)를 재확인하는 것이 목적. **U(UI/UX 세부 사양)는 범위 밖** — FRD §4 Design Spec은 컴포넌트/아키텍처 구조 중심이라 i18n 키·색상 인디케이터·버튼 활성 조건 같은 UI 세부는 ID로 강제 추적되지 않는다. 이 갭은 `docs/roadmap.md`의 "UI 작업 분리 검토" 항목으로 별도 추적 중(항목 3과 함께 그 결정을 기다린다) |
+| 2 | 데이터 흐름 정합성 검증 | `devoks-sdlc:verify-data-flow` | 조건부 — 입력→계산→저장→재로드 흐름(폼 제출, 영속화, 상태 동기화 등)이 있는 변경일 때만 | 단순 UI/설정 변경 등 데이터 흐름이 없으면 생략 |
+| 3 | UI 시각 품질 확인 | `devoks-browser:browser-visual-diff` 또는 육안 확인 | 조건부 — UI 컴포넌트/스타일링 변경이 포함된 태스크가 있을 때만 | UI 다듬기를 별도 단계로 고정할지는 `docs/roadmap.md`의 "UI 작업 분리 검토" 항목에서 별도 결정 중 — 그 결정 전까지는 조건부 제안으로만 둔다 |
+| 4 | 코드 리뷰 | `devoks-sdlc:code-review-diff-branch` | 항상 | Critical/High 보안 이슈 발견 시 이 스킬이 자체적으로 `code-security-review` 실행을 권장 문구로 제시한다(기존 에스컬레이션 로직 재사용 — 여기서 중복 안내하지 않는다) |
+| 5 | 테스트 스위트 회귀 확인 | `devoks-sdlc:test-run-triage` | 조건부 — 태스크 단위 테스트는 이미 실행했지만 전체 스위트 회귀를 별도로 확인하고 싶을 때 | 태스크 실행 중 이미 관련 테스트를 통과시켰다면 전체 스위트는 선택 |
+| 6 | 커밋 | `devoks-git:git-commit-msg` | 항상(사용자 확인 후) | Conventional Commits 규칙 적용 |
+| 7 | PR 생성 | `devoks-git:git-pull-request` | 항상(사용자 확인 후, 커밋 이후) | PR 그룹 경계는 PLAN §3에 이미 기록됨 |
+
+## 출력 형식
+
+Phase 4 / 마무리 리포트 끝에 아래 형태로 덧붙인다(코드 리뷰의 `🚀 다음 액션 제안` 패턴과 동일한 톤).
+
+```markdown
+## 🚀 다음 단계 제안
+
+- [ ] 요구사항 구현 충실도 재확인(F/B/E/D) — `devoks-sdlc:verify-requirements mode=verify spec=<out>/FRD.md`
+- [ ] 데이터 흐름 검증 — `devoks-sdlc:verify-data-flow` (해당 시)
+- [ ] UI 시각 품질 확인 — `devoks-browser:browser-visual-diff` (해당 시)
+- [ ] 코드 리뷰 — `devoks-sdlc:code-review-diff-branch`
+- [ ] 테스트 스위트 회귀 확인 — `devoks-sdlc:test-run-triage` (선택)
+- [ ] 커밋 — `devoks-git:git-commit-msg`
+- [ ] PR 생성 — `devoks-git:git-pull-request`
+
+실행 여부·순서는 사용자 확인 후 진행합니다.
+```
+
+해당 없는 조건부 항목은 목록에서 빼고 출력한다(체크리스트를 기계적으로 전부 나열하지 않는다).
