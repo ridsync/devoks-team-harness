@@ -1,6 +1,6 @@
 {
   "name": "devoks-browser",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "DevOks 브라우저 도구 — Chrome DevTools MCP 연결, Visual Diff 검증 스킬",
   "author": { "name": "ridsync" },
   "dependencies": ["devoks-core"],

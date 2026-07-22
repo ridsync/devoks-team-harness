@@ -126,9 +126,9 @@ The SessionStart hook now only checks MCP/project initialization state and print
 |-------|--------|--------------|
 | `code-reviewer` | devoks-sdlc | `code-review-general`, `code-review-diff-branch` commands |
 | `code-security-reviewer` | devoks-sdlc | `code-security-review` command |
-| `code-implementer` | devoks-sdlc | `feature-plan-executor` skill, `feature-workflow-runner` skill (Phase 3) |
+| `code-implementer` *(agent-internal only)* | devoks-sdlc | `feature-plan-executor` skill, `feature-workflow-runner` skill (Phase 3) |
 | `test-writer` | devoks-sdlc | `test-author` command |
-| `browser-visual-diff-capture` | devoks-browser | `browser-visual-diff` skill (Phase 1–4) |
+| `browser-visual-diff-capture` *(agent-internal only)* | devoks-browser | `browser-visual-diff` skill (Phase 1–4) |
 
 ---
 

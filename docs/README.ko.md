@@ -126,9 +126,9 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 |---------|---------|---------|
 | `code-reviewer` | devoks-sdlc | `code-review-general`, `code-review-diff-branch` 커맨드 |
 | `code-security-reviewer` | devoks-sdlc | `code-security-review` 커맨드 |
-| `code-implementer` | devoks-sdlc | `feature-plan-executor` 스킬, `feature-workflow-runner` 스킬 (Phase 3) |
+| `code-implementer` *(agent-internal only)* | devoks-sdlc | `feature-plan-executor` 스킬, `feature-workflow-runner` 스킬 (Phase 3) |
 | `test-writer` | devoks-sdlc | `test-author` 커맨드 |
-| `browser-visual-diff-capture` | devoks-browser | `browser-visual-diff` 스킬 (Phase 1~4) |
+| `browser-visual-diff-capture` *(agent-internal only)* | devoks-browser | `browser-visual-diff` 스킬 (Phase 1~4) |
 
 ---
 
