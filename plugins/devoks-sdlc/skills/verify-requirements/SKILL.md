@@ -1,8 +1,8 @@
 ---
-description: 요구사항을 체크리스트로 구조화하고 구현 충실도를 검증한다. 구현 전 요구사항을 [REQ-카테고리-번호] ID로 추출해 체크리스트를 만들고(checklist 모드), 구현 후 diff와 대조해 커버리지 갭을 심각도별로 보고한다(verify 모드). "요구사항 검증", "구현 충실도 확인", "요구사항 체크리스트", "스펙 커버리지", "구현이 요구를 만족하는지", "requirement verification", "spec compliance" 요청에서 사용한다. 데이터 흐름 정합성은 devoks-sdlc:verify-data-flow, 코드 품질 리뷰는 devoks-sdlc:code-review-diff-branch 를 쓴다.
+description: 요구사항을 체크리스트로 구조화하고 구현 충실도를 검증한다. 구현 전 요구사항을 [REQ-카테고리-번호] ID로 추출해 체크리스트를 만들고(checklist 모드), 구현 후 diff와 대조해 커버리지 갭을 심각도별로 보고한다(verify 모드). "요구사항 검증", "구현 충실도 확인", "요구사항 체크리스트", "스펙 커버리지", "구현이 요구를 만족하는지", "requirement verification", "spec compliance" 요청에서 사용한다. 데이터 흐름 정합성은 devoks-sdlc:verify-data-flow, 코드 품질 리뷰는 devoks-sdlc:code-review-diff-branch, 실제 앱 조작을 통한 실동작 확인은 devoks-sdlc:verify-acceptance-test 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # verify-requirements — 요구사항 체크리스트·구현 충실도 검증
@@ -21,6 +21,7 @@ metadata:
 - 코드 자동 수정(갭 보고만, 보완 진행은 사용자 승인 후).
 - 데이터 값 정합성 실측 → `devoks-sdlc:verify-data-flow`.
 - 코드 품질·보안 리뷰 → `devoks-sdlc:code-review-diff-branch`, `devoks-sdlc:code-security-review`.
+- 실제 앱을 조작한 실동작 확인(UI 조작+상태 영속) → `devoks-sdlc:verify-acceptance-test`.
 
 ---
 

@@ -111,6 +111,7 @@ The SessionStart hook now only checks MCP/project initialization state and print
 | `feature-workflow-runner` | `/devoks-sdlc:feature-workflow-runner` | devoks-sdlc |
 | `verify-requirements` | `/devoks-sdlc:verify-requirements` | devoks-sdlc |
 | `verify-data-flow` | `/devoks-sdlc:verify-data-flow` | devoks-sdlc |
+| `verify-acceptance-test` | `/devoks-sdlc:verify-acceptance-test` | devoks-sdlc |
 | `code-review` | `/devoks-sdlc:code-review` *(agent-internal only)* | devoks-sdlc |
 | `code-security-review` | `/devoks-sdlc:code-security-review` *(agent-internal only)* | devoks-sdlc |
 | `test-author` | `/devoks-sdlc:test-author` *(agent-internal only)* | devoks-sdlc |
@@ -128,6 +129,7 @@ The SessionStart hook now only checks MCP/project initialization state and print
 | `code-security-reviewer` | devoks-sdlc | `code-security-review` command |
 | `code-implementer` *(agent-internal only)* | devoks-sdlc | `feature-plan-executor` skill, `feature-workflow-runner` skill (Phase 3) |
 | `test-writer` | devoks-sdlc | `test-author` command |
+| `acceptance-test-runner` *(agent-internal only)* | devoks-sdlc | `verify-acceptance-test` skill (Phase 1–4) |
 | `browser-visual-diff-capture` *(agent-internal only)* | devoks-browser | `browser-visual-diff` skill (Phase 1–4) |
 
 ---

@@ -111,6 +111,7 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 | `feature-workflow-runner` | `/devoks-sdlc:feature-workflow-runner` | devoks-sdlc |
 | `verify-requirements` | `/devoks-sdlc:verify-requirements` | devoks-sdlc |
 | `verify-data-flow` | `/devoks-sdlc:verify-data-flow` | devoks-sdlc |
+| `verify-acceptance-test` | `/devoks-sdlc:verify-acceptance-test` | devoks-sdlc |
 | `code-review` | `/devoks-sdlc:code-review` *(에이전트 내부 전용)* | devoks-sdlc |
 | `code-security-review` | `/devoks-sdlc:code-security-review` *(에이전트 내부 전용)* | devoks-sdlc |
 | `test-author` | `/devoks-sdlc:test-author` *(에이전트 내부 전용)* | devoks-sdlc |
@@ -128,6 +129,7 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 | `code-security-reviewer` | devoks-sdlc | `code-security-review` 커맨드 |
 | `code-implementer` *(agent-internal only)* | devoks-sdlc | `feature-plan-executor` 스킬, `feature-workflow-runner` 스킬 (Phase 3) |
 | `test-writer` | devoks-sdlc | `test-author` 커맨드 |
+| `acceptance-test-runner` *(agent-internal only)* | devoks-sdlc | `verify-acceptance-test` 스킬 (Phase 1~4) |
 | `browser-visual-diff-capture` *(agent-internal only)* | devoks-browser | `browser-visual-diff` 스킬 (Phase 1~4) |
 
 ---

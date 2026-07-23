@@ -16,16 +16,16 @@
       "dependencies": ["devoks-core"]
     },
     {
-      "name": "devoks-sdlc",
-      "source": "./plugins/devoks-sdlc",
-      "description": "SDLC 워크플로우 통합 — 기능개발(FRD/PLAN/실행/UI)·테스트(작성/triage)·코드리뷰/리팩토링/모듈분석/보안검증·요구사항/데이터흐름 검증",
-      "dependencies": ["devoks-core"]
-    },
-    {
       "name": "devoks-browser",
       "source": "./plugins/devoks-browser",
       "description": "Chrome DevTools MCP 연결 + Visual Diff 검증",
       "dependencies": ["devoks-core"]
+    },
+    {
+      "name": "devoks-sdlc",
+      "source": "./plugins/devoks-sdlc",
+      "description": "SDLC 워크플로우 통합 — 기능개발(FRD/PLAN/실행/UI)·테스트(작성/triage)·코드리뷰/리팩토링/모듈분석/보안검증·요구사항/데이터흐름/실동작 인수 검증",
+      "dependencies": ["devoks-core", "devoks-browser"]
     },
     {
       "name": "devoks-rn",
