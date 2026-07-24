@@ -125,6 +125,8 @@ Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한
 
 축 2·3·4·5는 정적 체크로 항상 필수다. 축 1·6의 동적 실행은 신규 skill에서 필수, 기존 skill의 description/동작 변경에서는 권장이다.
 
+> **AskUserQuestion 사용 규칙:** 스킬 본문에 사용자 확인 분기를 넣거나 고칠 때는 `references/workflow-checklist.md` §8의 적용/금지 기준을 따른다(HITL 직접 호출에서만, 비-HITL·서브에이전트 경로에선 기본값 진행 — 가드 문구는 스킬 본문에 baked-in).
+
 ## Step 5 — 문서/카탈로그 정합성 검토
 
 상세 매트릭스는 `references/workflow-checklist.md`를 따른다.

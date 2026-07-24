@@ -2,7 +2,7 @@
 description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-sdlc:feature-frd-author / devoks-sdlc:feature-plan-author / devoks-sdlc:feature-plan-executor 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.4.1
+  version: 1.5.0
 ---
 
 # feature-workflow-runner
@@ -35,7 +35,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 - **설계는 제안 후 확인** — 요구 누락은 묻고(추측 금지), 설계 공백은 합리적 안을 먼저 제안한 뒤 확인한다. 복잡도 임계(파일 3개 초과·신규 모듈/계층·아키텍처 변경·새 패턴) 초과 시 FRD §4에 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. → `references/design-spec.md`
 - **증분 분해·PR 분리** — 머지해도 안 깨지는 크기로 쪼개고, 필요할 때만(기본은 PR 1개) 독립 가치/위험 단위로 PR을 나눈다.
 - **PLAN이 진행 SSOT** — 완료는 검증 통과 후에만 `[x]`. 세션 도구는 미러일 뿐 PLAN을 이긴다.
-- **실행은 태스크까지** — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) 후, 태스크 구현·검증은 `size` 라우팅(S 직접/M 위임/L 분해 재검토)에 따라 `code-implementer` 위임(기본 경로)·직접 실행으로 처리하고, 리포트 판정·인계 노트 윈도잉·진행 갱신은 메인 루프가 수행. → `references/branch-issue-precheck.md`, `references/task-delegation.md`. **커밋/PR 및 타 커맨드 오케스트레이션은 이 스킬 범위 밖**(사용자/별도 도구).
+- **실행은 태스크까지** — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) 후, 태스크 구현·검증은 `size` 라우팅(S 직접/M 위임/L 분해 재검토)에 따라 `code-implementer` 위임(기본 경로)·직접 실행으로 처리하고, 리포트 판정·인계 노트 윈도잉·진행 갱신은 메인 루프가 수행. → `references/branch-issue-precheck.md`, `references/task-delegation.md`. 태스크 실행 중엔 자동 커밋/PR·타 커맨드 오케스트레이션을 하지 않는다. **단 Phase 4 마무리에서 사용자가 AskUserQuestion으로 명시 선택한 항목**(검증·리뷰·테스트·커밋·PR)은 메뉴 순서대로 위임 실행한다(HITL 선택 실행 — `references/post-implementation-checklist.md`).
 - **읽기 전 변경 금지 + 재사용 우선** — 손대기 전 관련 코드를 읽고, 기존 유틸/훅/패턴을 먼저 찾아 재사용한다.
 
 ## 자산 · 레퍼런스
@@ -78,7 +78,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태). → `references/progress-tracking.md`
 1. Approach·PR 분리 방침을 1~2문장으로 적는다(§1). Resource Check(§2)는 FRD §6에서 가져온다.
 2. 요구사항을 Task로 쪼갠다: 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면) `[P]`, `size`(S/M/L — 실행 라우팅 신호, 애매하면 M, `L`은 분해 재검토), `test`(required/skip — 테스트 필요 여부, 애매하면 required), `file:`, `traces:` 부여. → `references/task-pr-splitting.md`
-3. Task를 **PR 그룹**으로 묶는다 — 기본값 PR 1개. FRD의 메모는 참고일 뿐, `task-pr-splitting.md` 기준으로 이 단계에서 직접 재판단한다(애매하면 AskUserQuestion). 분리 시 §1에 근거 1줄. → `references/task-pr-splitting.md`
+3. Task를 **PR 그룹**으로 묶는다 — 기본값 PR 1개. FRD의 메모는 참고일 뿐, `task-pr-splitting.md` 기준으로 이 단계에서 직접 재판단한다. 기본값이 명확하면 묻지 말고 진행하고, **애매할 때만 AskUserQuestion 단일선택**(`[PR 1개 (권장)]` / `[독립 가치·위험 단위로 분리]`; HITL 전용 — 비-HITL 경로에선 기본값 PR 1개). 분리 시 §1에 근거 1줄. → `references/task-pr-splitting.md`
 4. §4 의존성 그래프(mermaid, **사이클 금지**)와 §5 DoD를 작성한다.
 5. **커버리지 검증**: FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검(누락 0). → `references/traceability.md` 의 comm 스크립트.
 6. 확정되면 `<out>/PLAN.md` 작성. 누락이 있으면 담당 Task를 추가한 뒤에만 다음 단계로.
@@ -91,7 +91,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 1. PLAN을 읽어 미완 Task와 의존성 그래프를 파악, 세션 Task/Todo 목록을 PLAN에 맞춰 구성한다. PLAN `status`가 아직 `draft`이면 `approved`로 보정. → `references/progress-tracking.md`
 2. **선행이 모두 `[x]`인 Task**를 골라 착수(세션 도구 in_progress). `[P]` Task는 함께 진행 가능.
-3. **브랜치·이슈 사전체크(최초 1회)** — 첫 구현 착수 직전, 현재 브랜치·연결 이슈를 확인하고 브랜치명·이슈 초안을 제안한 뒤 사용자 확인 후 적용한다(모드 `full`). → `references/branch-issue-precheck.md`
+3. **브랜치·이슈 사전체크(최초 1회)** — 첫 구현 착수 직전, 현재 브랜치·연결 이슈를 확인하고 브랜치명·이슈 초안을 제안한 뒤 사용자 확인 후 적용한다(모드 `full`; 선택지는 AskUserQuestion 단일선택 — `branch-issue-precheck.md` §4). → `references/branch-issue-precheck.md`
 4. 각 Task: **`size` 마커로 라우팅 후 구현·검증** — `S`는 메인 루프 직접, `M`(및 마커 없음)은 `code-implementer` 위임(기본 경로), `L`은 분해 재검토(못 쪼개면 직접), 공통 예외(③ 스펙 미완결·① tools 밖 도구·② 사용자 직접 요청)는 직접. 위임 전 공통 예외 ③을 점검한다. 위임 시 Task 블록 원문·`plan`·`frd` 경로·`context`(인계 노트 윈도잉 적용)를 주입하면, 에이전트가 코드 읽기→기존 패턴 재사용 구현→테스트/린트 검증(`test: required` Task는 AC ID를 테스트 설명에 박아 양방향 추적, `test: skip`은 테스트 작성 생략)까지 수행하고 done|blocked 리포트를 리턴한다. 한 번에 한 태스크만. → `references/task-delegation.md`
 5. **리포트 판정 후 진행 갱신(메인 루프 수행)** — `done`은 검증 근거(실행 명령·**종료코드**·출력 **tail 1줄 원문**·`test: required` Task 시 테스트 파일·케이스명) 확인 후에만 PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `approved` → `in-progress`로(첫 착수 시), **인계 노트는 윈도잉 규칙에 맞게 수집해 다음 위임의 `context`에 주입**한다. `blocked`이면 `[x]`로 바꾸지 않고 에스컬레이션(스펙 문제→사용자 확인 후 재위임, 기계적 문제→직접 해소 후 재위임, 스코프 초과→인수·재분해), 막힌 이유를 명시한다.
 6. PR 경계는 **기록만** 한다(어떤 Task가 어느 PR인지). 커밋·푸시·PR 생성은 하지 않는다.
@@ -104,7 +104,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
    - Edge case 처리 확인.
 2. 모든 Task `[x]` + DoD 충족 시 frontmatter `status: done`.
 3. 미완 Task·임시 코드·추후 작업(예: 커밋/PR, 추가 테스트)을 명시적으로 보고한다(은폐 금지).
-4. **다음 단계 체크리스트 출력** — `references/post-implementation-checklist.md`의 표준 메뉴(요구사항 검증/코드 리뷰/데이터 흐름 검증/UI 확인/브라우저 실동작 검증/테스트 회귀/커밋/PR)를 해당 항목만 골라 `🚀 다음 단계 제안`으로 출력한다. **제안만 하고 실행하지 않는다** — 실행은 사용자 확인 후 개별 스킬/커맨드 호출로 진행한다.
+4. **다음 단계 (AskUserQuestion 다중선택 → 선택 항목 위임 실행)** — `references/post-implementation-checklist.md`의 표준 메뉴에서 해당 항목만 골라 검증/마무리 2개 질문의 `multiSelect`로 제시하고, **고른 항목을 메뉴 순서대로 위임 실행**한다(HITL 선택 실행). 읽기전용 검증/리뷰/테스트는 즉시 실행, 커밋·PR은 각 git 커맨드 자체 확인 플로를 최종 게이트로 위임한다. **앞선 검증에서 Critical/High가 나오면 커밋·PR 전에 멈추고 확인**한다. → `references/post-implementation-checklist.md`
 
 ## 재진입 / 분기
 
@@ -115,4 +115,4 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 ## 프로젝트 규칙 정합
 
 산출·구현 시 해당 저장소의 규칙 파일(`.claude/rules/`, `.claude/refs/`, `CLAUDE.md` 등)이 있으면 직접 읽어 따른다.
-특히 **커밋/푸시는 사용자가 명시 요청할 때만** — 이 스킬은 그 단계에 관여하지 않는다.
+특히 **커밋/푸시/PR은 사용자가 명시 요청(태스크 착수 요청 또는 Phase 4 마무리 선택)할 때만** 위임 실행하고, 그 외 자동 커밋·푸시는 하지 않는다.

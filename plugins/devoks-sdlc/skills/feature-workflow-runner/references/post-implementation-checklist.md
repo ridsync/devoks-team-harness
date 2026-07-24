@@ -5,13 +5,17 @@
 > 고정해, `feature-workflow-runner` Phase 4와 `feature-plan-executor`의 "마무리" 절이 **항상
 > 같은 체크리스트를 출력**하게 한다.
 
-## 원칙 — 제안이지 오케스트레이션이 아니다
+## 원칙 — HITL 선택 실행 vs 비-HITL 자동 오케스트레이션
 
-- 아래 항목은 **모두 제안**이다. 이 스킬(`feature-workflow-runner`/`feature-plan-executor`)은 어떤 항목도
-  대신 실행하지 않는다 — 실행은 사용자가 각 스킬/커맨드를 직접 호출해야 한다.
-- 자동 실행·자동 게이트가 필요한 시나리오(비-HITL 파이프라인)는 `docs/roadmap.md`의
-  `devoks-sdlc-orchestration` 로드맵 항목의 책임 범위다. 이 문서와 역할이 겹치지 않는다.
-- 커밋/푸시/PR 생성 금지 원칙(두 스킬의 "범위" 절 참고)은 이 체크리스트 도입으로 바뀌지 않는다.
+- 표준 메뉴는 마무리 시점에 **AskUserQuestion `multiSelect`로 제시**하고, **사용자가 고른 항목만** 이 스킬
+  (`feature-workflow-runner`/`feature-plan-executor`)이 **메뉴 순서대로 위임 실행**한다(HITL 선택 실행). 선택은 곧 명시 요청이다.
+- 이는 **비-HITL 자동 실행·자동 게이트**(사용자 개입 없이 파이프라인이 스스로 실행·판정)와 다르다 — 그 시나리오는
+  `devoks-sdlc-orchestration`의 책임 범위이고 역할이 겹치지 않는다. 여기서는 매 단계가 사용자 선택으로만 시작되고,
+  위임 대상 스킬/커맨드는 각자 자체 확인 플로를 유지한다.
+- **안전 인터록:** 앞선 검증/리뷰(요구사항·코드 리뷰·데이터 흐름·실동작)에서 **Critical/High** 이슈가 나오면
+  커밋·PR 위임 **전에 멈추고** 사용자에게 계속할지 확인한다(깨진 코드 자동 커밋 방지).
+- **커밋·PR도 선택 시 위임한다** — 단 `devoks-git:git-commit-msg`/`git-pull-request`가 각자 메시지·본문 확인 플로와
+  deny-list(force-push·`main` 직접 push·`--no-verify` 금지)를 **최종 게이트**로 유지한다. 선택하지 않은 항목은 실행하지 않는다.
 
 ## 표준 메뉴
 
@@ -29,23 +33,35 @@
 | 7 | 커밋 | `devoks-git:git-commit-msg` | 항상(사용자 확인 후) | Conventional Commits 규칙 적용 |
 | 8 | PR 생성 | `devoks-git:git-pull-request` | 항상(사용자 확인 후, 커밋 이후) | PR 그룹 경계는 PLAN §3에 이미 기록됨 |
 
-## 출력 형식
+## 출력 형식 — AskUserQuestion 다중선택 (HITL 전용)
 
-Phase 4 / 마무리 리포트 끝에 아래 형태로 덧붙인다(코드 리뷰의 `🚀 다음 액션 제안` 패턴과 동일한 톤).
+Phase 4 / 마무리 시점에, 해당하는 항목만 **AskUserQuestion `multiSelect`** 로 제시한다. 각 옵션 라벨은
+**`안내(/스킬명)`** 형식으로 실제 위임 대상 스킬/커맨드를 함께 노출한다. AskUserQuestion은 **질문당 옵션 4개**
+제한이 있으므로 **검증 단계 / 마무리 단계**로 나눈다(적용 검증 항목이 4개를 넘으면 검증을 두 질문으로 분할 — 한 호출에 함께 전달).
 
-```markdown
-## 🚀 다음 단계 제안
+- **Q "검증 단계" (multiSelect, 표 1~5 중 해당 항목):**
+  - 요구사항 충실도 재확인(/devoks-sdlc:verify-requirements)
+  - 코드 리뷰(/devoks-sdlc:code-review-diff-branch)
+  - 데이터 흐름 검증(/devoks-sdlc:verify-data-flow) — 해당 시
+  - UI 시각 품질 확인(/devoks-browser:browser-visual-diff) — 해당 시
+  - 실동작 검증(/devoks-sdlc:verify-acceptance-test) — 해당 시
+- **Q "마무리 단계" (multiSelect, 표 6~8):**
+  - 테스트 스위트 회귀 확인(/devoks-sdlc:test-run-triage) — 선택
+  - 커밋(/devoks-git:git-commit-msg)
+  - PR 생성(/devoks-git:git-pull-request)
 
-- [ ] 요구사항 구현 충실도 재확인(F/B/E/D) — `devoks-sdlc:verify-requirements mode=verify spec=<out>/FRD.md`
-- [ ] 코드 리뷰 — `devoks-sdlc:code-review-diff-branch`
-- [ ] 데이터 흐름 검증 — `devoks-sdlc:verify-data-flow` (해당 시)
-- [ ] UI 시각 품질 확인 — `devoks-browser:browser-visual-diff` (해당 시)
-- [ ] 브라우저 실동작 검증 — `devoks-sdlc:verify-acceptance-test` (해당 시, 최종 확인)
-- [ ] 테스트 스위트 회귀 확인 — `devoks-sdlc:test-run-triage` (선택)
-- [ ] 커밋 — `devoks-git:git-commit-msg`
-- [ ] PR 생성 — `devoks-git:git-pull-request`
+해당 없는 조건부 항목은 옵션에서 제외한다(기계적으로 전부 나열하지 않는다).
 
-실행 여부·순서는 사용자 확인 후 진행합니다.
-```
+### 선택 결과 처리 — 고른 항목을 메뉴 순서대로 위임 실행 (HITL 선택 실행)
 
-해당 없는 조건부 항목은 목록에서 빼고 출력한다(체크리스트를 기계적으로 전부 나열하지 않는다).
+사용자가 고른 항목을 **표준 메뉴 순서**(위 표 1→8)대로 해당 스킬/커맨드에 **위임 실행**한다. 선택은 곧 명시 요청이다.
+
+- **읽기전용 검증/리뷰/테스트(1~6):** 부작용이 없으므로 선택 즉시 순차 실행하고 각 리포트를 요약한다.
+- **안전 인터록:** 1~6 중 어느 것이든 **Critical/High** 이슈를 보고하면 **7(커밋)·8(PR)로 넘어가기 전에 멈추고**
+  사용자에게 계속 진행할지 확인한다.
+- **커밋(7)·PR(8):** 선택 시 `devoks-git:git-commit-msg`/`git-pull-request`에 위임한다. 각 커맨드가 메시지·PR 본문
+  확인 플로와 deny-list(force-push·`main` 직접 push·`--no-verify` 금지)를 **최종 게이트**로 유지한다.
+- 선택하지 않은 항목은 실행하지 않는다. 실행 후에는 각 단계 결과를 한 줄씩 요약 보고한다.
+
+> HITL(사용자 직접 호출) 경로 전용이다. 비-HITL 오케스트레이션 경로에서는 이 문답을 띄우지 않는다
+> (사용자 개입 없는 자동 실행·자동 게이트는 `devoks-sdlc-orchestration`의 책임 — 위 "원칙" 절 참고).

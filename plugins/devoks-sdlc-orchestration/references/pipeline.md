@@ -42,6 +42,8 @@ gates: { requirements: -, code-review: -, data-flow: -, ui: -, acceptance: -, te
 
 > B등급 verify **스킬**(`verify-requirements`·`verify-data-flow`·`verify-acceptance-test`)의 **본문은 호출하지 않는다**
 > (Phase 0 사용자 합의 때문). 실동작은 위 runner 에이전트로, 요구사항/데이터흐름은 §Verify의 대체 경로로 처리한다.
+>
+> ⚠️ **불변식(질문 억제 근거):** 오케스트레이터는 HITL 스킬(`feature-*`)의 **본문을 호출하지 않으므로**, 그 스킬들이 쓰는 AskUserQuestion 문답은 비-HITL RUN 경로에 절대 진입하지 않는다. 이 불변식이 깨져(오케스트레이터가 HITL 스킬 본문을 직접 구동하도록 바뀌면) 비로소 스킬 측 **질문 억제 플래그**가 필요해진다 — 현재는 불필요(YAGNI).
 
 ---
 
