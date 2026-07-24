@@ -1,6 +1,6 @@
 {
   "name": "devoks-git",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "DevOks Git 워크플로우 — Conventional Commits 커밋·이슈·PR 커맨드",
   "author": { "name": "ridsync" },
   "dependencies": ["devoks-core"]
