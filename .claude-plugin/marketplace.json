@@ -32,6 +32,12 @@
       "source": "./plugins/devoks-rn",
       "description": "React Native 디버깅 — Metro DevTools CDP 연결, 에뮬레이터 스크린샷, JS 콘솔/상태 조회",
       "dependencies": ["devoks-core"]
+    },
+    {
+      "name": "devoks-sdlc-orchestration",
+      "source": "./plugins/devoks-sdlc-orchestration",
+      "description": "비-HITL SDLC 오케스트레이션 (0.2.0, 검증 중) — Linear 이슈→plan→worktree 병렬 구현→검증 게이트→draft PR 무중단 파이프라인. 크로스-플러그인 에이전트 재사용은 post-publish 스모크로 검증 대기",
+      "dependencies": ["devoks-core", "devoks-git", "devoks-sdlc"]
     }
   ]
 }

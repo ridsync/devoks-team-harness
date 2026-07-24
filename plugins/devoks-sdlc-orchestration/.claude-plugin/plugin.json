@@ -1,0 +1,7 @@
+{
+  "name": "devoks-sdlc-orchestration",
+  "version": "0.2.0",
+  "description": "DevOks 비-HITL SDLC 오케스트레이션 — Linear 이슈(수동 입력)를 받아 intake→plan(EARS·traces)→worktree 병렬 구현→검증 체인(자동 게이트)→draft PR까지 중간 승인 없이 실행. 기존 devoks-sdlc 에이전트를 재사용(수정 없음)하고 정책(deny-list·격리·한도)을 준수. 크로스-플러그인 호출은 post-publish 스모크로 검증 대기.",
+  "author": { "name": "ridsync" },
+  "dependencies": ["devoks-core", "devoks-git", "devoks-sdlc"]
+}
