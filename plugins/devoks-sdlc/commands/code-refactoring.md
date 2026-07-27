@@ -50,7 +50,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 
 `.claude/CLAUDE.md`의 프로젝트 구조, 프로젝트 active convention인 `.claude/rules/project-convention.md`의 `## Comments & Docs` 또는 대응 섹션, `.claude/refs/engineering-principles.md` 전체를 기준으로 점검한다. 핵심 항목:
 
-- 소스 헤더 (`// path/filename` 파일 첫 줄), 코드 크기 (500자 목표 / 1000자 초과 분할)
+- 코드 크기 (500자 목표 / 1000자 초과 분할)
 - 네이밍 (도메인 + 컨텍스트 + 의도 3단어 이상, 제네릭 이름 지양)
 - 계층 구조 (Business 상단 → IO/Adapter 중단 → Config/Const/Utils/Types 하단)
 - 사이드이펙트 명시·그룹화·격리
@@ -62,7 +62,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 `.claude/rules/` 및 `.claude/refs/` 디렉터리의 규칙 파일을 기준으로 점검한다. 핵심 항목:
 
 - `.claude/refs/engineering-principles.md`: Fail-Fast, SSOT, 평가/실행 분리, 계약 검증 (`require*OrThrow`)
-- `.claude/rules/project-convention.md`: 이 프로젝트가 실제로 채택한 화면·네트워크·DB·플랫폼·제어·모니터링 패턴, Context 훅 계약, 소스 헤더, import 순서, effect/memoization, console 사용, 입력 검증, 인증/인가, 데이터 보호
+- `.claude/rules/project-convention.md`: 이 프로젝트가 실제로 채택한 화면·네트워크·DB·플랫폼·제어·모니터링 패턴, Context 훅 계약, import 순서, effect/memoization, console 사용, 입력 검증, 인증/인가, 데이터 보호
 
 > **Fail-Fast 예외**: 고빈도 스트림 ingest 등 단일 이벤트 오류로 전체 파이프라인이 중단되면 안 되는 경로가 프로젝트에 있다면, `project-convention.md`/`CLAUDE.md`에 명시된 예외 기준을 따른다.
 
@@ -81,7 +81,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 |------|-----------|
 | **Critical** | SSOT 위반 (중복 상태 정의), Contract 미검증 (입력 검증 누락), Fail-Fast 누락 (silent ignore·과도한 fallback) |
 | **High** | 파일 크기 1000자 초과, 계층 구조 혼재 (Business ↔ IO 혼용), 사이드이펙트 미분리, Feature/Provider 미분리 |
-| **Medium** | 네이밍 개선 (제네릭 → 도메인 3단어), 주석 누락·과다·형식 불일치 (프로젝트 기본 주석/Rationale/Provider Header), 소스 헤더 누락 |
+| **Medium** | 네이밍 개선 (제네릭 → 도메인 3단어), 주석 누락·과다·형식 불일치 (프로젝트 기본 주석/Rationale/Provider Header) |
 | **Low** | import 정렬, console 사용 정리 (→ `createDebugger`), 미사용 코드·import 제거 |
 
 > 사용자 승인 없이 코드를 변경하지 않는다.
@@ -104,7 +104,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 - 사이드이펙트 → 명시적·그룹화·격리 처리
 - Feature/Provider 미분리 → 평가 로직은 Feature로, 실행·UI·I/O는 Provider로 분리
 
-#### Medium: 네이밍·주석·소스 헤더
+#### Medium: 네이밍·주석
 
 - 제네릭 네이밍 → 도메인 + 컨텍스트 + 의도 3단어 이상으로 개선
 - 프로젝트 기본 주석 추가·정리: 다음 중 하나면 Description(필수)/`@param`·`@returns`·`@throws`(선택)로 추가, 자명한 함수·private 헬퍼에는 추가하지 않음
@@ -120,8 +120,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
   // [CONTEXT] 관련 배경, 제약, 참고 링크·이슈 (선택)
   // [TRADE-OFF] 포기한 대안과 그 이유 (선택)
   ```
-- Provider Header 추가·정리: Context/Provider 파일 최상단에 `// Domain: <책임 경계>`(필수, 자명해도 한 줄 작성 — 소스 헤더처럼 고정 항목)와, 배치 순서·환경 제약처럼 코드로 드러나지 않는 전제조건이 있으면 `// Contract: <내용>`(선택) 추가
-- 소스 헤더 누락 → 파일 첫 줄에 `// <프로젝트 상대 경로>/파일명.js` 추가
+- Provider Header 추가·정리: Context/Provider 파일 최상단에 `// Domain: <책임 경계>`(필수, 자명해도 한 줄 작성)와, 배치 순서·환경 제약처럼 코드로 드러나지 않는 전제조건이 있으면 `// Contract: <내용>`(선택) 추가
 
 #### Low: import·console·미사용 코드
 
@@ -135,7 +134,6 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
   - 대상에 기존 테스트가 있으면 `devoks-sdlc:test-run-triage`(또는 대상 파일만 좁혀 직접 실행)로 리팩토링 전후 회귀 여부를 확인한다.
   - 대상에 테스트가 없거나 커버리지가 낮으면, 이번 리팩토링을 되돌아볼 안전망이 없다는 뜻이므로 `devoks-sdlc:test-author`로 테스트 보강을 사용자에게 제안한다(적용 여부는 사용자 결정).
 - 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`)(Bash)로 수정한 파일 린트 확인, 오류 수정
-- 소스 헤더 존재 확인
 - 미사용 import 최종 정리
 - 리팩토링 요약 및 잔여 작업(추후 분리 필요 항목 등) 안내
 
@@ -147,7 +145,6 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 - **Contract**: 모듈 진입부에 `require*OrThrow` 필수. 누락 시 contract 위반
 - **Fail-Fast**: 계약 위반·필수값 누락 → 즉시 throw. 프로젝트가 정의한 예외 경로(고빈도 ingest 등)는 `project-convention.md` 기준을 따름
 - **코드 크기**: 500자 목표, 1000자 초과 시 반드시 분할
-- **소스 헤더**: 파일 첫 줄 `// path/filename` 필수. 누락 시 contract 위반
 - **네이밍**: 도메인 + 컨텍스트 + 의도 3단어 이상. 제네릭 이름 금지
 - **계층**: Business(상단) → IO/Adapter(중단) → Config/Const/Utils/Types(하단)
 - **프로젝트 기본 주석**: 재사용 API(컴포넌트/훅/유틸/상수) 사용법 설명, 문법 무관 원칙만(자명한 함수·private 헬퍼엔 사용 안 함)
@@ -184,12 +181,12 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 
 - [ ] 리팩토링 대상·목표·제약 조건 확정 (모호하면 재질문)
 - [ ] 대상 파일 및 직접 의존 모듈 탐색 완료
-- [ ] `.claude/CLAUDE.md` 및 `.claude/refs/engineering-principles.md` 기준 위반 항목 도출 (소스 헤더, 코드 크기, 네이밍, 계층, 사이드이펙트)
+- [ ] `.claude/CLAUDE.md` 및 `.claude/refs/engineering-principles.md` 기준 위반 항목 도출 (코드 크기, 네이밍, 계층, 사이드이펙트)
 - [ ] `.claude/rules/` 및 `.claude/refs/` 규칙 파일 기준 위반 항목 도출
 - [ ] 수정/생성/삭제 파일 목록 및 개선 방향 작성 후 사용자 승인
 - [ ] Critical: SSOT/Contract/Fail-Fast 위반 수정
 - [ ] High: 1000자 초과 분할, 계층 재배치, 사이드이펙트 분리
-- [ ] Medium: 네이밍 개선, 소스 헤더 추가, 주석 3종(프로젝트 기본 주석/Rationale/Provider Header) 보완(불필요한 주석 제거 포함)
+- [ ] Medium: 네이밍 개선, 주석 3종(프로젝트 기본 주석/Rationale/Provider Header) 보완(불필요한 주석 제거 포함)
 - [ ] Low: import 정렬, console 정리, 미사용 코드 제거
 - [ ] 동작 불변 검증 — 기존 테스트 있으면 `test-run-triage`로 회귀 확인, 없으면 `test-author` 보강 제안
 - [ ] 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`) 확인, 린트 오류 수정
