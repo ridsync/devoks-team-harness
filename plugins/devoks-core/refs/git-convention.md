@@ -82,7 +82,7 @@ description: 브랜치·커밋 메시지 Conventional Commits 관행, 타입별 
 ### `revert`
 
 - **언제**: 이전 커밋 되돌리기. 필요 시 푸터에 `Refs: <sha>` (공식 FAQ 예시).
-- **예**: `revert: 브루 스텝 타임아웃 실험 롤백`
+- **예**: `revert: 다크모드 전환 실험 롤백`
 
 ## 브랜치명 (권장 · 비강제)
 
