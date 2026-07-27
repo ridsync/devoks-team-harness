@@ -317,7 +317,12 @@ const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 | I/O (DB, 파일) | try-catch + `console.error` + rethrow or explicit handle |
 | Provider 초기화 | catch + `console.error` + rethrow |
 
-**금지:** silent catch(빈 catch 블록) / implicit fallback(에러 삼키고 기본값 반환) / `typeof` 가드로 조용히 넘기기 → `*OrThrow` 사용
+**금지:**
+- silent catch (빈 catch 블록)
+- implicit fallback (에러 삼키고 기본값 반환)
+- `typeof` 가드로 조용히 넘기기
+
+→ `*OrThrow` 사용
 
 ### Logging
 
@@ -347,6 +352,8 @@ const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 - 특정 조합·범위만 허용되는 상수/설정 객체
 - Description은 필수, `@param`/`@returns`/`@throws`는 의미가 자명하지 않을 때만 추가
 
+**태그 정의 (구체적 문법은 JSDoc/TSDoc 등 프로젝트 언어 컨벤션을 따르며 강제하지 않음):**
+
 ```javascript
 /**
  * 재고 수량이 재주문 임계값 이하인지 판단한다.
@@ -363,6 +370,9 @@ function shouldReorderStock(remainingQty, thresholdQty) {
 
 ### Rationale Comment
 
+자명한 코드에는 주석을 달지 않는다. 이름만으로 의도가 드러나면 주석 대신 네이밍으로 해결한다.
+**"왜"가 코드 문법만으로는 전혀 드러나지 않을 때만** 추가하며, 모든 변수·함수에 기계적으로 붙이지 않는다.
+
 - **Workaround/Hack** — 외부 라이브러리·특정 브라우저·레거시 시스템의 버그·특이 동작 우회
 - **Business Rule** — 코드만으로 유추 불가능한 도메인 규칙(오프라인 정책, 비직관적 제품 스펙 등)
 - **Non-obvious Trade-off** — 가독성보다 성능·보안을 택한 경우 (비트 연산, 복잡한 정규식, 캐싱 레이어 등)
@@ -377,7 +387,8 @@ function shouldReorderStock(remainingQty, thresholdQty) {
 ### Provider Header
 
 - 적용 대상: Context/Provider 파일(`XxxContext.js`/`XxxProvider.jsx`), Zustand store 파일(`*.store.js`) 최상단, 항상 붙인다
-- `Domain` — 이 컨텍스트/store가 담당하는 책임 경계 (필수)
+- `Domain` — 이 컨텍스트/store가 담당하는 책임 경계 (SSOT 여부 등). 코드만으로는 알 수 없는
+  아키텍처 정보가 있으면 그것을 적고, 없으면 책임 범위를 한 줄로 요약한다 (필수)
 - `Contract` — Provider 배치 순서 등 코드로 드러나지 않는 전제조건 (선택)
 
 ```javascript
