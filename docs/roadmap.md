@@ -3,7 +3,7 @@
 DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-07-23
+> 최종 갱신: 2026-07-29
 
 ---
 
@@ -13,8 +13,8 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 | 우선순위   | 항목                                                                                                                                                                                     |
 | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **높음** | UI 작업 분리 검토 · `**devoks-sdlc-orchestration` 신설(비-HITL SDLC)**                                                                                                                          |
-| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · 심각도 분류 SSOT 통합 · MCP 버전 고정 검토 · MCP 가이드 이중 관리 정리 · MCP project-scope 표준화 검토 |
-| **낮음** | 구현자 세션 지속(continuation) · 진입점 일관화 · `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 · plugin 버전 메타 정합                                                 |
+| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · 심각도 분류 SSOT 통합 · MCP 버전 고정 검토 · MCP 가이드 이중 관리 정리 · MCP project-scope 표준화 검토 · `git-commit-msg` 스킬+haiku 위임 전환 검토 |
+| **낮음** | 구현자 세션 지속(continuation) · 진입점 일관화 · `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 · plugin 버전 메타 정합 · `git-create-issue`/`git-pull-request` 스킬 전환 검토                                                 |
 
 
 ---
@@ -43,6 +43,20 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 팀이 스킬 우선으로 이동 중(`new-feature-verify` 커맨드→스킬 전환). 그러나 `new-feature-draft`/`new-feature-github-issue`/`new-ui-draft`/`code-*` 등은 여전히 커맨드.
   - 트리거 기반(자연어) 호출로 통일할지, command는 진입 전용으로 남길지 정책을 한 번 확정.
   - 우선순위: 낮음(정책 결정 먼저).
+
+- [ ] **`git-commit-msg` 커맨드 → 스킬 전환 + haiku 서브에이전트 위임**
+  - 배경(2026-07-29): 커밋 메시지 작성은 SSOT(`.claude/refs/git-convention.md`) 기반 포맷팅 위주 작업이라 모델 지능보다 컨텍스트 처리 방식이 비용을 좌우함 — 메인 에이전트 모델을 토글하면 누적 대화의 prompt cache가 전부 깨지므로(스위치 왕복 2회 = cache miss 2회), 별도 서브에이전트(non-fork, `model: haiku`)에 diff+SSOT 요약만 작은 컨텍스트로 넘기는 쪽이 더 저렴할 것으로 판단.
+  - 주의점:
+    1. fork 타입은 `model` override가 무시되므로(부모 모델 강제 상속) 반드시 non-fork/`general-purpose` 계열로 구성.
+    2. 커밋은 git-write 액션 — "사용자 명시 요청 시에만" 원칙과 SSOT의 "사용자 확인 후 커밋" 요건이 스킬 전환 후에도 그대로 지켜져야 한다. 스킬은 자연어 description 매칭으로 auto-trigger될 수 있어 커맨드보다 오발동 리스크가 크므로, description·본문에 explicit-invoke 전제(또는 최소 확인 게이트)를 baked-in할 것.
+    3. 신규/변경 스킬 품질 체크리스트(축1 — `evals/evals.json` 동적 실행)로 haiku가 Conventional Commits 포맷·타입 매핑·footer 규칙(Agent 서명 등)을 안정적으로 지키는지 먼저 검증 — 실패율이 높으면 sonnet 유지로 되돌린다.
+  - 관련: 아래 이슈/PR 스킬 전환 항목(짝 항목이나 리스크 수준이 달라 별도 판단), 위 "진입점 일관화 검토" 항목(상위 정책과 연결).
+  - 우선순위: 중(비용 실측·eval 검증 선행 과제).
+
+- [ ] **`git-create-issue`/`git-pull-request` 커맨드 → 스킬 전환**
+  - 배경(2026-07-29): 위 `git-commit-msg` 스킬 전환 논의와 함께 나온 짝 항목.
+  - 커밋과 달리 haiku 서브에이전트 위임은 별도 판단 필요 — 이슈 생성은 label/assignee/issue-type MCP 검증 순서, `### Additional Context` 단일 블록 blockquote 연속 규칙 등 지침이 촘촘해 작은 모델의 실패(재시도) 비용이 커밋보다 클 수 있다. "커맨드→스킬 전환"(진입점 변경)과 "haiku 위임 여부"(모델 변경)를 분리해서 검토할 것.
+  - 우선순위: 낮음(`git-commit-msg` 스킬 전환·eval 검증 결과를 먼저 보고 착수).
 
 ---
 
