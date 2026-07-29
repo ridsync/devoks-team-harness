@@ -6,7 +6,7 @@ description: Conventional Commits 규칙에 따라 git commit 메시지를 작�
 
 ## SSOT
 
-- 커밋 메시지·타입·스코프·브랜치 권장: [`.claude/refs/git-convention.md`](../refs/git-convention.md)를 따른다.
+- 커밋 메시지·타입·스코프·브랜치 권장: `.claude/refs/git-convention.md`를 따른다.
 - 타입 선택이 애매하면 위 파일의 **타입별 권장 매핑**을 먼저 적용한다.
 
 ## Overview

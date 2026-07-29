@@ -58,7 +58,7 @@ GitHub에 이슈를 등록한다. **이슈 본문을 채우기 전에** 아래 *
 
 ## 이슈 본문 규격 (SSOT)
 
-- **구조화된 작업 이슈**: `.github/ISSUE_TEMPLATE/feature_task.md` 섹션 순서를 따른다.
+- **구조화된 작업 이슈**: 아래 **섹션 매핑**(`.github/ISSUE_TEMPLATE/feature_task.md`형 구조) 순서를 따른다 — 대상 저장소에 실제 그 파일이 없어도 이 섹션 자체가 SSOT이므로 그대로 적용한다.
 
 ### 섹션 매핑 (분석 결과 → 본문)
 
