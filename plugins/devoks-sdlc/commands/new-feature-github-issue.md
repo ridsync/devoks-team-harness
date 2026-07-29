@@ -32,7 +32,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 
 ### 1차 앵커 (SSOT)
 
-[`.github/ISSUE_TEMPLATE/feature_task.md`](../../.github/ISSUE_TEMPLATE/feature_task.md)의 최상위 섹션 제목을 그대로 키로 사용한다.
+`.github/ISSUE_TEMPLATE/feature_task.md`의 최상위 섹션 제목을 그대로 키로 사용한다.
 
 - `### Description`
 - `### Objectives`
@@ -49,10 +49,19 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 
 ### 대체 템플릿
 
-[`.github/ISSUE_TEMPLATE/feature_request.md`](../../.github/ISSUE_TEMPLATE/feature_request.md)처럼 `### Definition of Done` 대신 `### Sub Tasks` 만 있는 경우:
+`.github/ISSUE_TEMPLATE/feature_request.md`처럼 `### Definition of Done` 대신 `### Sub Tasks` 만 있는 경우:
 
 - `Sub Tasks`를 구현·검증 체크리스트의 근거로 삼는다.
 - `Definition of Done` 이 비어 있으면 완료 조건 갭 분석에 **Sub Tasks**를 반영한다.
+
+### 템플릿 부재·불일치 시 (폴백)
+
+위 고정 헤더 5종은 `/devoks-git:git-create-issue`가 생성하는 이슈 본문 구조이자 **이 커맨드 자체의 SSOT**다 — 대상 저장소에 실제 `.github/ISSUE_TEMPLATE/feature_task.md` 파일이 있는지는 전제하지 않는다(파일이 없어도, 팀이 다른 템플릿을 쓰거나 이슈를 수기로 작성했어도 동작해야 한다).
+
+1. 이슈 본문에서 `^### ` 헤더를 먼저 찾는다. 5개 키(`Description`/`Objectives`/`Definition of Done`/`Additional Context`/`Decisions (With Agents)`) 중 **하나도 매칭되지 않으면** 이 템플릿을 쓰지 않은 이슈로 간주한다.
+2. 매칭 실패 시 본문 전체를 비정형 텍스트로 보고 휴리스틱으로 대응시킨다: 첫 문단(또는 이슈 제목 다음 요약) → `Description`, "목표"·"Goal"·"왜" 관련 문단 → `Objectives`, 체크박스(`- [ ]`) 목록이나 "완료 조건"·"Acceptance Criteria" 관련 문단 → `Definition of Done`/`Sub Tasks`.
+3. 휴리스틱으로도 **완료 조건에 대응하는 내용을 전혀 찾을 수 없으면**, 추측으로 채우지 않고 아래 "이슈가 부실할 때 (갭 분석)"의 갭 유형에 `구조 불일치(템플릿 미사용)`로 올려 사용자에게 확인한다.
+4. 대상 저장소에 실제 `.github/ISSUE_TEMPLATE/feature_task.md`가 있고 헤더 구성이 다르면 **그 실제 파일을 우선**한다 — 이 문서의 5개 헤더는 파일이 없거나 확인할 수 없을 때의 참고 기본값이다.
 
 ### 연결 이슈
 
@@ -89,6 +98,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 - `Definition of Done` 또는 `Sub Tasks`에 측정 가능한 완료 조건·검증이 없다.
 - `Decisions (With Agents)` 가 비어 있고 스코프·기술 선택이 모호하다.
 - 위 **UI / 디자인** 차단 조건에 해당한다.
+- 이슈 본문이 고정 헤더 구조를 전혀 따르지 않고, 폴백 휴리스틱으로도 완료 조건에 대응하는 내용을 찾을 수 없다(`구조 불일치`).
 
 ### 에이전트 출력 형식 (고정)
 
@@ -164,13 +174,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 
 ## 참조 룰 (Rules)
 
-구현 시 **규칙 본문을 이 파일에 복사하지 않고**, 아래를 **원본 그대로 읽어** 적용한다.
-
-| 참조 | 역할 |
-|------|------|
-| [`.claude/CLAUDE.md`](../CLAUDE.md) | 저장소 프로젝트 구조 및 원칙 |
-| [`.claude/rules/agent-principles.md`](../rules/agent-principles.md) | 에이전트 행동 원칙 |
-| [`.claude/commands/README.md`](README.md)의 **참조 규칙 파일** 표 | `.claude/rules/` 및 `.claude/refs/` 인덱스 |
+기능 구현 시 `.claude/rules/` 및 `.claude/refs/` 디렉터리의 규칙 파일들을 참조한다. **이 섹션에 내용을 복사하지 않고 원본 파일을 직접 읽어 적용한다.**
 
 ---
 
@@ -192,6 +196,7 @@ GitHub에 등록된 **태스크 이슈 본문**을 SSOT로 삼아, 프로젝트 
 ## Checklist
 
 - [ ] 이슈 본문 로드·고정 헤더 파싱·인용 정규화
+- [ ] 고정 헤더 미매칭 시 폴백 휴리스틱 적용 → 완료조건 갭(`구조 불일치`) 여부 확인
 - [ ] 갭 표 작성; 차단 시 사용자 보완 후 재파싱
 - [ ] UI 범위 시 디자인 참조·연결 이슈 확인
 - [ ] 설계 작성 후 사용자 승인
