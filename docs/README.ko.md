@@ -196,10 +196,10 @@ devoks-team-harness/
 │   │   ├── rules/                     # base rules: agent-principles, memory-policy (+ 운영 계약)
 │   │   ├── refs/                      # setup 시 주입하는 reference docs
 │   │   └── conventions/               # 기술스택별 project convention preset (번들, ${CLAUDE_PLUGIN_ROOT}로 참조)
-│   ├── devoks-git/commands/           # Git 커맨드 (3개)
-│   ├── devoks-sdlc/                    # SDLC: 기능·테스트·코드·검증 (커맨드 8개 + 스킬 10개 + 에이전트 3개)
-│   ├── devoks-browser/               # 브라우저 도구 (스킬 2개 + 에이전트 1개)
-│   └── devoks-rn/                    # React Native 디버깅 (스킬 1개)
+│   ├── devoks-git/commands/           # Git 커맨드 — commit · issue · PR
+│   ├── devoks-sdlc/                    # SDLC — 기능 · 테스트 · 코드리뷰/보안 · 검증
+│   ├── devoks-browser/               # 브라우저 도구 — DevTools attach · visual diff
+│   └── devoks-rn/                    # React Native 디버깅 — Metro CDP attach
 ├── shared/
 │   ├── setup/claude.json.template     # ~/.claude.json MCP 설정 템플릿
 │   └── templates/CLAUDE.md.project.template
@@ -212,6 +212,8 @@ devoks-team-harness/
 └── README.md                          # English README
 ```
 
+> 이 트리는 **무엇이 어디에 있는지**를 보여주며 개수는 다루지 않습니다. 플러그인별 정확한 목록은 위 **사용 가능한 스킬 / 에이전트 / 커맨드** 표가 SSOT입니다 — 여기에 개수를 적지 않습니다(드리프트).
+
 > `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` 와 `plugins/devoks-core/refs/*` 는 explicit setup으로 프로젝트에 seed 됩니다. stack-specific `project-convention.md`는 `plugins/devoks-core/conventions/*` preset에서 선택 주입되며, 이후에는 프로젝트가 소유합니다.
 
 ---
@@ -219,12 +221,3 @@ devoks-team-harness/
 ## 로드맵
 
 플러그인 구조·내용 개선 후보는 [`roadmap.md`](roadmap.md)에 TODO 형식으로 추적합니다. 주요 항목: `browser-visual-diff` → `devoks-sdlc:verify-visual-diff` 이전, Deploy/Release 단계용 `devoks-release` 신설, 카탈로그 표 자동 생성(README drift 방지), 심각도 분류 SSOT 통합.
-
----
-
-## 기여 방법
-
-1. 이 저장소를 fork 합니다.
-2. `plugins/devoks-core/rules/`, `plugins/devoks-core/refs/`, 또는 플러그인 파일을 수정합니다.
-3. PR을 올립니다.
-4. 머지 후 팀원은 `/plugin marketplace update devoks-plugins` 로 갱신합니다.

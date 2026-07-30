@@ -196,10 +196,10 @@ devoks-team-harness/
 │   │   ├── rules/                     # base rules: agent-principles, memory-policy (+ management contract)
 │   │   ├── refs/                      # setup 시 주입하는 reference docs
 │   │   └── conventions/               # stack-specific project convention presets (bundled, referenced via ${CLAUDE_PLUGIN_ROOT})
-│   ├── devoks-git/commands/           # Git commands (3)
-│   ├── devoks-sdlc/                    # SDLC: feature·test·code·verify (8 commands + 10 skills + 3 agents)
-│   ├── devoks-browser/               # browser tools (2 skills + 1 agent)
-│   └── devoks-rn/                    # React Native debugging (1 skill)
+│   ├── devoks-git/commands/           # Git commands — commit · issue · PR
+│   ├── devoks-sdlc/                    # SDLC — feature · test · code review/security · verify
+│   ├── devoks-browser/               # browser tools — DevTools attach · visual diff
+│   └── devoks-rn/                    # React Native debugging — Metro CDP attach
 ├── shared/
 │   ├── setup/claude.json.template     # ~/.claude.json MCP config template
 │   └── templates/CLAUDE.md.project.template
@@ -212,6 +212,8 @@ devoks-team-harness/
 └── README.md
 ```
 
+> This tree shows **what lives where**, not how many. The authoritative per-plugin inventory is the **Available Skills / Agents / Commands** tables above — do not add counts here, they drift.
+
 > `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` and `plugins/devoks-core/refs/*` are seeded into projects by explicit setup. Stack-specific `project-convention.md` comes from `plugins/devoks-core/conventions/*` presets, is applied explicitly, and remains project-owned afterward.
 
 ---
@@ -219,12 +221,3 @@ devoks-team-harness/
 ## Roadmap
 
 Planned plugin structure & content improvements are tracked in [`docs/roadmap.md`](docs/roadmap.md) (TODO format). Highlights: migrate `browser-visual-diff` → `devoks-sdlc:verify-visual-diff`, add a `devoks-release` plugin for the Deploy/Release phase, auto-generate the catalog tables to prevent README drift, and consolidate the severity rubric to a single SSOT.
-
----
-
-## Contributing
-
-1. Fork this repository.
-2. Edit `plugins/devoks-core/rules/`, `plugins/devoks-core/refs/`, or plugin files.
-3. Open a PR.
-4. After merge, teammates run `/plugin marketplace update devoks-plugins` to refresh.
