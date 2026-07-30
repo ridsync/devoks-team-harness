@@ -69,12 +69,12 @@ REQ-003: 저장 뷰 관리(이름 변경·삭제)
 - [ ] `TASK-002` [P] 필터 직렬화/역직렬화 + 미존재 키 필터링 유틸 — size: M — test: required — file: `src/.../filterSerde.js` — traces: AC-001-3, CTR-001, DSN-002
 - [ ] `TASK-003` 뷰 저장소 훅(저장/조회/이름변경/삭제/상한 검증) — size: M — test: required — file: `src/.../useSavedViews.js` — traces: AC-001-1, AC-003-1, AC-003-2, CTR-002, EDGE-001, DSN-001
 - [ ] `TASK-004` 뷰 저장/선택/이름변경/삭제 UI + 적용 연동 — size: M — test: required — file: `src/.../SavedViews.jsx` — traces: AC-001-1, AC-001-2, AC-003-1, AC-003-2
-- [ ] `TASK-005` 미존재 키 경고 토스트(조건부) — size: S — test: required — file: `src/.../SavedViews.jsx` — traces: AC-001-3
+- [ ] `TASK-005` 미존재 키 경고 토스트(조건부) — size: M — test: required — file: `src/.../SavedViews.jsx` — traces: AC-001-3
 
 #### PR2 — 뷰 공유
 - [ ] `TASK-010` 공유 링크 발급 클라이언트 — size: M — test: required — file: `src/.../shareView.js` — traces: AC-002-1
 - [ ] `TASK-011` 공유 토글 UI + 실패 시 비공개 유지 — size: M — test: required — file: `src/.../SavedViews.jsx` — traces: AC-002-1, AC-002-2
-- [ ] `TASK-012` 공유 API 타임아웃 재시도(1회)·폴백 — size: S — test: required — file: `src/.../shareView.js` — traces: EDGE-002
+- [ ] `TASK-012` 공유 API 타임아웃 재시도(1회)·폴백 — size: M — test: required — file: `src/.../shareView.js` — traces: EDGE-002
 
 ### 4. Dependencies
 ```mermaid
@@ -97,6 +97,6 @@ flowchart TD
 - **커버리지 누락 0**: FRD의 AC-001-1~3, AC-002-1~2, AC-003-1~2, CTR-001/002, EDGE-001/002 가 모두 어떤 Task의 `traces`에 등장한다.
 - **설계 추적(DSN)**: DSN-001/002 가 PLAN traces에 참조로 등장한다 — 단, 누락 0 강제 대상은 AC/CTR/EDGE 뿐이고 DSN은 참조용이다.
 - **`[P]`**: TASK-002는 TASK-001(타입)만 의존하고 TASK-003과 서로 무관 → 병렬 착수 가능.
-- **`size` 라우팅**: 타입/상수·조건부 토스트·재시도 폴백 같은 소규모 단일 파일 Task는 `S`(메인 루프 직접), 유틸/훅/UI + 테스트 동반 Task는 `M`(`code-implementer` 위임). `L`이 없는 것이 정상 — 분해 3원칙을 지키면 L은 남지 않는다.
+- **`size` 라우팅**: `S`는 TASK-001(순수 타입/상수 정의, `test: skip`) 하나뿐 — 메인 루프 직접. 나머지는 전부 `M`(`code-implementer` 위임)이다. 조건부 토스트(TASK-005)·재시도 폴백(TASK-012)은 파일 1개짜리 소규모지만 분기·에러 처리가 들어가 `test: required`이므로 `S`가 될 수 없다(**`test: required` ⇒ 최소 `M`**). `L`이 없는 것이 정상 — 분해 3원칙을 지키면 L은 남지 않는다.
 - **PR 분리 근거**: PR2(공유)는 PR1의 저장소 훅(TASK-003)에 단방향 의존. 역방향 의존 없음.
 - **증분성**: 타입 → 유틸/훅(+테스트) → UI → 결과/에러 순으로 쌓여 각 단계가 독립 검증 가능.

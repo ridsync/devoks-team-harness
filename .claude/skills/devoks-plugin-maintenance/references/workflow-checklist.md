@@ -59,8 +59,12 @@
 - `check-setup-state.sh`, explicit setup/sync 정책 문서와 설명 일치 여부
 
 ### devoks-sdlc
-- 구 devoks-code/devoks-feature/devoks-test/devoks-verify 통합체 — skill 10 + command 8 + agent 2, 변경 영향 범위가 5개 플러그인 중 가장 넓음
-- `code-reviewer`/`code-security-reviewer` agent와 `code-review`/`code-security-review` skill은 agent-internal only — 메인 루프 직접 트리거 금지 설명이 README/문서에 유지되는지 확인
+- 구 devoks-code/devoks-feature/devoks-test/devoks-verify 통합체 — skill·command·agent 수가 5개 플러그인 중 가장 많아 변경 영향 범위가 가장 넓다(정확한 개수는 하드코딩하지 않는다 — 드리프트하므로 `ls skills/*/ commands/*.md agents/*.md`로 확인)
+- **agent-internal 경계는 skill과 agent가 서로 다르다** — 혼동 주의:
+  - agent-internal **skill**: `code-review`, `code-security-review` (각각 `code-reviewer`/`code-security-reviewer` 에이전트 전용 실행 엔진)
+  - agent-internal **agent**: `code-implementer`, `acceptance-test-runner` (호출 스킬의 특정 Phase에서만 위임)
+  - **직접 트리거 가능한 agent**: `code-reviewer`, `code-security-reviewer`, `test-writer` (커맨드·사용자 요청의 진입점)
+  - 변경 시 각 파일 `description` 앞머리의 `(agent-internal — …)` 표기와 README/문서 설명이 위 구분과 일치하는지 확인(`grep -l "agent-internal" agents/*.md skills/*/SKILL.md`)
 - `gh` CLI, CodeGraph MCP, Serena MCP 의존 — 플러그인 자체 번들 MCP 아님(일반 MCP 등록형), README dependency summary와 실제 의존 일치 여부 확인
 - skill 간 cross-reference(예: `feature-workflow-runner` ↔ `feature-plan-executor` ↔ `branch-issue-precheck.md`)가 많아 하나만 고치면 다른 곳의 참조·완료 기준 문구가 어긋나기 쉬움 — 관련 SKILL.md 전체를 grep으로 교차 확인
 

@@ -17,6 +17,7 @@ issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으�
 ## 1. Approach
 - **요약:** <구현 방식 1~2문장>
 - **PR 분리:** <기본은 PR 1개. 분리한다면 근거(기능/위험/리뷰 부담 중 하나)와 PR 구성을 명시 — 기준: `references/task-pr-splitting.md`>
+- **`size: L` 잔존 사유:** <`L` Task가 남았을 때만 작성. **스펙 닫힘 축**(관심사가 얽혔지만 각각의 스펙은 확정됨)인지 **판단 축**(설계 변경·인터페이스 파급으로 판단이 필요)인지 밝힌다 — 실행 라우팅이 이 기록으로 위임/직접을 가른다(`references/task-delegation.md`). `L`이 없으면 이 줄을 삭제한다>
 
 ## 2. Resource Check (착수 전)
 > FRD §6에서 가져옴. 미완료 시 시작 금지.
@@ -28,19 +29,19 @@ issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으�
 > 형식: `- [ ] TASK-ID [P?] 설명 — size: <S|M|L> — test: <required|skip> — file: <경로> — traces: <REQ/AC/CTR/EDGE>`
 > `traces`에 `DSN-xxx`(설계 결정)도 인용 가능 — 참조용이며 커버리지 누락 0 강제 대상은 아니다(`references/traceability.md`).
 > `[P]` = 선행 Task에 의존하지 않아 병렬 착수 가능. 상태 추적: `references/progress-tracking.md`
-> `size` = 실행 라우팅 신호(S 직접 / M 위임 / L 분해 재검토) — 부여 기준: `references/task-pr-splitting.md`, 라우팅: `references/task-delegation.md`
+> `size` = 실행 라우팅 신호(S 직접 / M 위임 / L 분해 재검토) — 부여 기준: `references/task-pr-splitting.md`, 라우팅: `references/task-delegation.md`. `S`는 판단이 개입하지 않는 초소형(`test: skip`)만 — 경계선이면 `M`.
 > `test` = 테스트 필요 여부(required 기본값 / skip) — 부여 기준: `references/task-pr-splitting.md`. `code-implementer`는 사용자 확인 없이 이 마커를 그대로 따른다.
 
 ### PR1 — <핵심 작업>
 - [ ] `TASK-001` 공유 타입/상수 정의 — size: S — test: skip — file: `<경로>` — traces: CTR-001
 - [ ] `TASK-002` [P] 계산 로직 훅/유틸 — size: M — test: required — file: `<경로>` — traces: CTR-001, REQ-001
 - [ ] `TASK-003` 화면/라우트 + 상태 처리 — size: M — test: required — file: `<경로>` — traces: REQ-001, AC-001-1
-- [ ] `TASK-004` 결과/조건부 렌더링 — size: S — test: required — file: `<경로>` — traces: AC-001-2
+- [ ] `TASK-004` 결과/조건부 렌더링 — size: M — test: required — file: `<경로>` — traces: AC-001-2
 
 <!-- PR을 나눌 근거(기능/위험/리뷰 부담)가 §1에 명시됐을 때만 PR2 이상을 추가한다 — 기준: `references/task-pr-splitting.md`.
 ### PR2 — <두 번째 큰 작업>
 - [ ] `TASK-010` <...> — size: M — test: required — file: `<경로>` — traces: REQ-002
-- [ ] `TASK-011` 에러/재시도 처리 — size: S — test: required — file: `<경로>` — traces: EDGE-002
+- [ ] `TASK-011` 에러/재시도 처리 — size: M — test: required — file: `<경로>` — traces: EDGE-002
 -->
 
 ## 4. Dependencies

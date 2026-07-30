@@ -2,7 +2,7 @@
 description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-sdlc:feature-frd-author / devoks-sdlc:feature-plan-author / devoks-sdlc:feature-plan-executor 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.5.0
+  version: 1.6.0
 ---
 
 # feature-workflow-runner
@@ -32,7 +32,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 - **추적성 우선** — 모든 `AC/CTR/EDGE`는 최소 한 Task의 `traces`에 등장한다(누락 0). 근거 없는 Task도 두지 않는다.
 - **검증 가능한 요구** — AC는 EARS로 써서 그대로 테스트가 된다. 통과/실패를 판정 못 하는 문장은 요구가 아니다.
-- **설계는 제안 후 확인** — 요구 누락은 묻고(추측 금지), 설계 공백은 합리적 안을 먼저 제안한 뒤 확인한다. 복잡도 임계(파일 3개 초과·신규 모듈/계층·아키텍처 변경·새 패턴) 초과 시 FRD §4에 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. → `references/design-spec.md`
+- **설계는 제안 후 확인** — 요구 누락은 묻고(추측 금지), 설계 공백은 합리적 안을 먼저 제안한 뒤 확인한다. 복잡도 임계(파일 3개 초과(기계적 일괄 변경 제외)·신규 모듈/계층·아키텍처 변경·새 패턴·상태 소유 위치 변경) 초과 시 FRD §4에 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. → `references/design-spec.md`
 - **증분 분해·PR 분리** — 머지해도 안 깨지는 크기로 쪼개고, 필요할 때만(기본은 PR 1개) 독립 가치/위험 단위로 PR을 나눈다.
 - **PLAN이 진행 SSOT** — 완료는 검증 통과 후에만 `[x]`. 세션 도구는 미러일 뿐 PLAN을 이긴다.
 - **실행은 태스크까지** — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) 후, 태스크 구현·검증은 `size` 라우팅(S 직접/M 위임/L 분해 재검토)에 따라 `code-implementer` 위임(기본 경로)·직접 실행으로 처리하고, 리포트 판정·인계 노트 윈도잉·진행 갱신은 메인 루프가 수행. → `references/branch-issue-precheck.md`, `references/task-delegation.md`. 태스크 실행 중엔 자동 커밋/PR·타 커맨드 오케스트레이션을 하지 않는다. **단 Phase 4 마무리에서 사용자가 AskUserQuestion으로 명시 선택한 항목**(검증·리뷰·테스트·커밋·PR)은 메뉴 순서대로 위임 실행한다(HITL 선택 실행 — `references/post-implementation-checklist.md`).
@@ -92,7 +92,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 1. PLAN을 읽어 미완 Task와 의존성 그래프를 파악, 세션 Task/Todo 목록을 PLAN에 맞춰 구성한다. PLAN `status`가 아직 `draft`이면 `approved`로 보정. → `references/progress-tracking.md`
 2. **선행이 모두 `[x]`인 Task**를 골라 착수(세션 도구 in_progress). `[P]` Task는 함께 진행 가능.
 3. **브랜치·이슈 사전체크(최초 1회)** — 첫 구현 착수 직전, 현재 브랜치·연결 이슈를 확인하고 브랜치명·이슈 초안을 제안한 뒤 사용자 확인 후 적용한다(모드 `full`; 선택지는 AskUserQuestion 단일선택 — `branch-issue-precheck.md` §4). → `references/branch-issue-precheck.md`
-4. 각 Task: **`size` 마커로 라우팅 후 구현·검증** — `S`는 메인 루프 직접, `M`(및 마커 없음)은 `code-implementer` 위임(기본 경로), `L`은 분해 재검토(못 쪼개면 직접), 공통 예외(③ 스펙 미완결·① tools 밖 도구·② 사용자 직접 요청)는 직접. 위임 전 공통 예외 ③을 점검한다. 위임 시 Task 블록 원문·`plan`·`frd` 경로·`context`(인계 노트 윈도잉 적용)를 주입하면, 에이전트가 코드 읽기→기존 패턴 재사용 구현→테스트/린트 검증(`test: required` Task는 AC ID를 테스트 설명에 박아 양방향 추적, `test: skip`은 테스트 작성 생략)까지 수행하고 done|blocked 리포트를 리턴한다. 한 번에 한 태스크만. → `references/task-delegation.md`
+4. 각 Task: **`size` 마커로 라우팅 후 구현·검증** — `S`는 메인 루프 직접, `M`(및 마커 없음)은 `code-implementer` 위임(기본 경로), `L`은 분해 재검토(못 쪼개면 §1에 기록된 사유로 갈림 — 판단 축은 직접, 스펙 닫힘 축은 위임), 공통 예외(③ 스펙 미완결·① tools 밖 도구·② 사용자 직접 요청)는 직접. 위임 전 공통 예외 ③을 점검한다. 위임 시 Task 블록 원문·`plan`·`frd` 경로·`context`(인계 노트 윈도잉 적용)를 주입하면, 에이전트가 코드 읽기→기존 패턴 재사용 구현→테스트/린트 검증(`test: required` Task는 AC ID를 테스트 설명에 박아 양방향 추적, `test: skip`은 테스트 작성 생략)까지 수행하고 done|blocked 리포트를 리턴한다. 한 번에 한 태스크만. → `references/task-delegation.md`
 5. **리포트 판정 후 진행 갱신(메인 루프 수행)** — `done`은 검증 근거(실행 명령·**종료코드**·출력 **tail 1줄 원문**·`test: required` Task 시 테스트 파일·케이스명) 확인 후에만 PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `approved` → `in-progress`로(첫 착수 시), **인계 노트는 윈도잉 규칙에 맞게 수집해 다음 위임의 `context`에 주입**한다. `blocked`이면 `[x]`로 바꾸지 않고 에스컬레이션(스펙 문제→사용자 확인 후 재위임, 기계적 문제→직접 해소 후 재위임, 스코프 초과→인수·재분해), 막힌 이유를 명시한다.
 6. PR 경계는 **기록만** 한다(어떤 Task가 어느 PR인지). 커밋·푸시·PR 생성은 하지 않는다.
 
