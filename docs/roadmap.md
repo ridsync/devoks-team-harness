@@ -172,6 +172,7 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 - [ ] **카탈로그 자동 생성 (drift 방지)**
   - 현재 `README.md`와 `docs/README.ko.md`의 플러그인·스킬·커맨드 표를 **수기로 이중 관리** → 실제 drift 발생(devoks-test가 한동안 README에 누락됨).
   - `marketplace.json` + 각 plugin.json/SKILL.md frontmatter에서 카탈로그 표를 생성하는 스크립트를 두고, README는 생성 결과를 포함하도록 전환.
+  - **표면 추가(2026-08-07)**: `devoks-sdlc:workflow-map` 신설로 수기 카탈로그 표면이 **3곳**이 됐다(README.md · docs/README.ko.md · `workflow-map/SKILL.md`). 다만 앞의 둘과 성격이 다르다 — workflow-map이 담는 것은 **단계 순서·진입점**이라 frontmatter에서 생성할 수 없는 정보이고(순서는 어느 메타데이터에도 없다), 생성 대상은 "스킬 이름 목록"뿐이다. 자동 생성 도입 시 workflow-map은 **이름 유효성 검증 대상**(표에 적힌 진입점이 실존하는지 CI 체크)으로만 편입하고 표 본문 생성 대상에서는 제외하는 쪽이 맞다.
   - 우선순위: 중(반복 비용·정확성 직결).
 
 - [ ] **evals 하니스 확대**
@@ -217,6 +218,14 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **`workflow-map` 스킬 신설 — SDLC 흐름·진입점 조회 맵 + README 파이프라인 차트** (2026-08-07, `devoks-sdlc` `1.13.0 → 1.14.0`)
+  - 배경: HITL 작업 중 "지금 어디쯤이고 다음에 뭘 부르나"를 즉시 답하는 진입점이 없었다. 흐름 정보가 세 곳에 흩어져 있었고 어느 것도 그 질문에 답하지 못했다 — README 카탈로그는 **평면 나열**이라 순서가 없고 harness 저장소 문서라 설치 대상 프로젝트에서 접근 불가, `post-implementation-checklist.md`는 **검증→커밋→PR 꼬리 부분만** 담으며 `feature-workflow-runner` 실행 중에만 로드, 각 SKILL.md의 "관련 스킬" 문구는 인접 1~2개만 가리킨다.
+  - 문서가 아니라 **스킬**로 만든 이유: 설치된 대상 프로젝트에서 동작하려면 플러그인 루트 안에 있어야 하고(루트 밖 참조 금지), 커맨드와 달리 스킬은 에이전트가 "다음 단계 제안" 근거로 스스로 참조할 수 있다. 로드맵 "진입점 일관화" 항목의 스킬 우선 방향과도 일치.
+  - 설계 결정: (1) **정적 표만** — 진행 상태 판정은 `PLAN.md` 체크박스가 이미 SSOT라 중복 로직을 만들지 않는다. (2) **얕게 담고 링크** — 단계 순서·진입점만 SSOT로 갖고 조건·절차는 `post-implementation-checklist.md`에 위임(그 문서가 이긴다고 본문에 명시). 심각도 분류·FRD §4 임계 신호에서 겪은 인라인 복제 drift를 반복하지 않기 위함. (3) **실제 흐름 전체 범위** — devoks-core(0단계)·devoks-git(5단계)·devoks-browser(4-4)를 포함하되 prefix로 출처 표기, 미설치 시 생략 안내.
+  - 파생 발견: `new-feature-draft`/`new-feature-github-issue` 커맨드가 `feature-workflow-runner`를 **호출하지 않고**(`branch-issue-precheck.md` 참조만 공유) 기능 구현 진입 경로가 사실상 둘로 병존한다. workflow-map 표 B에 "산출물 없는 간이 구현"으로 성격을 명시해 당장의 혼란은 덮었으나, 통합/정리 여부는 위 "진입점 일관화 검토" 항목에서 결정해야 한다.
+  - 반영: README.md·docs/README.ko.md에 mermaid 파이프라인 차트 섹션 신설(스킬 카탈로그 **앞**에 배치 — 평면 나열을 읽기 전에 순서를 먼저 보게), 양 README 스킬 표에 `workflow-map` 추가, 위 "카탈로그 자동 생성" 항목에 표면 추가 기록.
+  - 미완: 6축 스킬 품질 체크의 **동적 축(1·6)** — 이 저장소는 `enabledPlugins: {}`라 어떤 플러그인도 활성화하지 않아 신규 스킬을 세션에서 트리거할 수 없다. publish + 재설치 후 `evals/evals.json` 2케이스로 스모크 필요.
 
 - [x] **harness 유지보수 체크표(`workflow-checklist.md`) §4 devoks-sdlc 절 사실 정정** (2026-07-30, 플러그인 번들 외부 — 버전 bump 비대상)
   - 위 `size` 개정의 커밋 전 자체 재감사 중 발견. 이 문서는 devoks-sdlc 변경 시 "영향 범위가 가장 넓다"고 경고하는 근거인데 두 곳이 틀려 있었다.

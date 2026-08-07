@@ -1,0 +1,33 @@
+{
+  "skill_name": "devoks-sdlc:workflow-map",
+  "notes": "SDLC 워크플로우 흐름과 진입점을 정적 표로 조회하는 스킬. 두 가지 경계가 핵심 — (1) 조회일 뿐 어떤 단계도 실행하지 않는다, (2) 순서 있는 파이프라인과 순서 없는 단발 작업을 구분한다. 진행 상태 판정(PLAN.md 체크박스 읽기)은 범위 밖이다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "full-map-pipeline-and-oneshot-split",
+      "prompt": "devoks-sdlc 워크플로우 전체 흐름 좀 보여줘. 어떤 순서로 어떤 스킬을 쓰는지 한눈에 알고 싶어.",
+      "expected_output": "파이프라인(0 준비 → 1 요구정의 → 2 작업분해 → 3 구현 → 4 검증체인 → 5 커밋/PR)과 순서 없는 단발 작업을 별도 표로 구분해 출력한다. 각 단계에 실제 호출 가능한 스킬/커맨드 이름을 적는다. feature-workflow-runner가 1~3 통합 진입점임을 표기한다. 표만 출력하고 어떤 스킬도 실행하지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "파이프라인 표에 요구정의(feature-frd-author)→작업분해(feature-plan-author)→구현(feature-plan-executor) 순서가 나타난다" },
+        { "text": "feature-workflow-runner를 1~3 통합 진입점으로 표기한다" },
+        { "text": "순서 없는 단발 작업(code-analyze-module·code-refactoring·code-review-general·code-security-review·test-author 등)을 파이프라인과 분리해 제시한다" },
+        { "text": "표를 출력하는 데 그치고, FRD 작성이나 코드 분석 등 실제 단계를 실행하지 않는다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "post-implementation-verify-chain-order",
+      "prompt": "기능 구현까지 끝났어. 이제 뭘 해야 하지? 순서만 알려줘.",
+      "expected_output": "검증 체인 순서를 요구사항 충실도(verify-requirements) → 코드 리뷰(code-review-diff-branch) → 데이터 흐름(verify-data-flow, 조건부) → UI 시각 품질(browser-visual-diff, 조건부) → 실동작(verify-acceptance-test, 커밋 직전 최종 게이트) → 테스트 회귀(test-run-triage, 조건부) 순으로 제시하고, 마지막에 커밋(git-commit-msg)·PR(git-pull-request)을 둔다. 조건부 항목은 조건을 함께 표기한다. 실제 검증은 실행하지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "코드 리뷰를 데이터 흐름·UI·실동작 검증보다 앞 순서에 둔다" },
+        { "text": "verify-acceptance-test를 커밋 직전 최종 게이트로 표기한다" },
+        { "text": "커밋·PR(devoks-git)을 검증 체인 이후 마지막 단계로 둔다" },
+        { "text": "조건부 항목(데이터 흐름·UI 시각 품질·실동작·테스트 회귀)에 적용 조건을 함께 적는다" },
+        { "text": "순서를 안내할 뿐 verify-requirements 등 실제 검증 스킬을 실행하지 않는다" }
+      ]
+    }
+  ]
+}

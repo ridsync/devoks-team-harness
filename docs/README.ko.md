@@ -101,10 +101,51 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 
 ---
 
+## SDLC 워크플로우 흐름
+
+준비부터 PR까지의 HITL 흐름입니다. 세션 중에는 `/devoks-sdlc:workflow-map` 으로 같은 내용을 표로 출력할 수 있습니다.
+
+```mermaid
+flowchart TD
+    S["0 · 준비 (최초 1회)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
+
+    subgraph BUILD["1–3 · feature-workflow-runner (통합 진입점)"]
+        direction LR
+        F["1 · 요구 정의<br/>feature-frd-author<br/>→ FRD.md"]
+        P["2 · 작업 분해<br/>feature-plan-author<br/>→ PLAN.md"]
+        I["3 · 구현<br/>feature-plan-executor<br/>→ code-implementer 위임"]
+        F --> P --> I
+    end
+
+    subgraph VERIFY["4 · 검증 체인 (정적·저비용 먼저 → 실동작 마지막)"]
+        direction LR
+        V1["요구사항 충실도<br/>verify-requirements"]
+        V2["코드 리뷰<br/>code-review-diff-branch"]
+        V3["데이터 흐름 · 조건부<br/>verify-data-flow"]
+        V4["UI 시각 품질 · 조건부<br/>browser-visual-diff"]
+        V5["실동작 검증 · 최종 게이트<br/>verify-acceptance-test"]
+        V6["테스트 회귀 · 조건부<br/>test-run-triage"]
+        V1 --> V2 --> V3 --> V4 --> V5 --> V6
+    end
+
+    C["5 · 마무리<br/>devoks-git:git-commit-msg<br/>→ devoks-git:git-pull-request"]
+
+    S --> BUILD
+    BUILD --> VERIFY
+    VERIFY --> C
+```
+
+**4단계는 순서에 의미가 있습니다.** 정적·저비용 검증을 앞에 두어 구조적 문제를 먼저 걸러내고, `verify-acceptance-test` 는 앞선 단계가 유발한 수정이 모두 반영된 코드를 대상으로 **커밋 직전 최종 게이트**로 실행합니다. 각 항목의 조건과 Critical/High 안전 인터록(커밋·PR 전 정지)은 `plugins/devoks-sdlc/skills/feature-workflow-runner/references/post-implementation-checklist.md` 가 SSOT입니다.
+
+**단발 작업(순서 없음):** `code-analyze-module` · `code-refactoring` · `code-review-general` · `code-security-review` · `test-author` · `new-ui-draft`, 그리고 `FRD.md`/`PLAN.md` 산출물 없이 가볍게 구현할 때 쓰는 `new-feature-draft` / `new-feature-github-issue`.
+
+---
+
 ## 사용 가능한 스킬
 
 | 스킬 | 호출 | 플러그인 |
 |------|------|---------|
+| `workflow-map` | `/devoks-sdlc:workflow-map` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
 | `feature-plan-author` | `/devoks-sdlc:feature-plan-author` | devoks-sdlc |
 | `feature-plan-executor` | `/devoks-sdlc:feature-plan-executor` | devoks-sdlc |

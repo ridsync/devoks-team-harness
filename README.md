@@ -101,10 +101,51 @@ The SessionStart hook now only checks MCP/project initialization state and print
 
 ---
 
+## SDLC Workflow Pipeline
+
+The HITL flow, from setup to PR. Run `/devoks-sdlc:workflow-map` in any session to print this as a table.
+
+```mermaid
+flowchart TD
+    S["0 · Setup (once)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
+
+    subgraph BUILD["1–3 · feature-workflow-runner (combined entry point)"]
+        direction LR
+        F["1 · Define requirements<br/>feature-frd-author<br/>→ FRD.md"]
+        P["2 · Break down tasks<br/>feature-plan-author<br/>→ PLAN.md"]
+        I["3 · Implement<br/>feature-plan-executor<br/>→ delegates to code-implementer"]
+        F --> P --> I
+    end
+
+    subgraph VERIFY["4 · Verification chain (cheap static checks first, live run last)"]
+        direction LR
+        V1["Requirement fidelity<br/>verify-requirements"]
+        V2["Code review<br/>code-review-diff-branch"]
+        V3["Data flow · conditional<br/>verify-data-flow"]
+        V4["UI visual quality · conditional<br/>browser-visual-diff"]
+        V5["Live behavior · final gate<br/>verify-acceptance-test"]
+        V6["Test regression · conditional<br/>test-run-triage"]
+        V1 --> V2 --> V3 --> V4 --> V5 --> V6
+    end
+
+    C["5 · Wrap up<br/>devoks-git:git-commit-msg<br/>→ devoks-git:git-pull-request"]
+
+    S --> BUILD
+    BUILD --> VERIFY
+    VERIFY --> C
+```
+
+**Order matters in step 4.** Cheap static checks run first so structural problems surface before expensive live verification; `verify-acceptance-test` runs last, as the final gate right before commit, so it sees the code that every earlier step already amended. Conditions and the Critical/High interlock (stop before commit/PR) live in `plugins/devoks-sdlc/skills/feature-workflow-runner/references/post-implementation-checklist.md`.
+
+**One-off tasks (no fixed order):** `code-analyze-module` · `code-refactoring` · `code-review-general` · `code-security-review` · `test-author` · `new-ui-draft`, plus `new-feature-draft` / `new-feature-github-issue` for lightweight feature work that skips the `FRD.md` / `PLAN.md` artifacts.
+
+---
+
 ## Available Skills
 
 | Skill | Invoke | Plugin |
 |-------|--------|--------|
+| `workflow-map` | `/devoks-sdlc:workflow-map` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
 | `feature-plan-author` | `/devoks-sdlc:feature-plan-author` | devoks-sdlc |
 | `feature-plan-executor` | `/devoks-sdlc:feature-plan-executor` | devoks-sdlc |
