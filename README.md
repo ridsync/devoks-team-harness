@@ -157,6 +157,7 @@ flowchart TD
 | `code-security-review` | `/devoks-sdlc:code-security-review` *(agent-internal only)* | devoks-sdlc |
 | `test-author` | `/devoks-sdlc:test-author` *(agent-internal only)* | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
+| `new-ui-draft` | `/devoks-sdlc:new-ui-draft` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
 | `project-convention-manage` | `/devoks-core:project-convention-manage` | devoks-core |
@@ -198,7 +199,6 @@ flowchart TD
 |---------|-------------|
 | `/devoks-sdlc:new-feature-draft` | Spec-driven feature implementation |
 | `/devoks-sdlc:new-feature-github-issue` | GitHub issue-driven feature implementation |
-| `/devoks-sdlc:new-ui-draft` | Figma → code UI implementation |
 | `/devoks-sdlc:code-review-general` | Scoped code review |
 | `/devoks-sdlc:code-review-diff-branch` | Branch diff code review |
 | `/devoks-sdlc:code-security-review` | Repo / dependency / threat-level security review |

@@ -66,15 +66,35 @@ mcp__plugin_figma_figma__get_metadata(
 
 ### 3. `get_design_context` — 코드 힌트 (선택)
 
+> ⚠️ **선행 게이트** — 이 도구를 쓰기로 했다면 호출 **전에** 공식 Figma 스킬을 먼저 로드한다.
+> ```
+> Skill(skill="figma:figma-design-to-code")
+> ```
+> 해당 스킬이 스스로 "`get_design_context` 호출 전 필수"로 규정한 선행 단계다. asset(아이콘·이미지) 재현 규칙과 아래 힌트 우선순위를 공급한다.
+> **로드 실패 시**(figma 플러그인 미설치) `get_design_context`를 호출하지 않고 1·2번(screenshot·metadata)만으로 진행하며, 리포트에 `figma-design-to-code 미로드 — 코드 힌트 생략`을 기록한다. 사용자에게 질문하지 않는다.
+
 ```
 mcp__plugin_figma_figma__get_design_context(
   nodeId = "<FigmaNodeId>",
-  fileKey = "<FigmaFileKey>"
+  fileKey = "<FigmaFileKey>",
+  skillNames = "figma-design-to-code"
 )
 ```
 
 - Code Connect 매핑이 있으면 실제 컴포넌트 코드 스니펫을 반환.
 - 없으면 React + Tailwind 기반의 참조 코드를 반환 — **그대로 사용하지 말고** 프로젝트 스택에 맞게 적용.
+
+**힌트 우선순위 (앞이 뒤를 덮어쓴다):**
+
+| 순위 | 힌트 | 처리 |
+|------|------|------|
+| 1 | Code Connect 스니펫 | 매핑된 코드베이스 컴포넌트를 그대로 사용 |
+| 2 | 컴포넌트 문서 링크 | 링크를 따라가 사용법·가이드라인 확인 |
+| 3 | 디자인 어노테이션 | 디자이너 메모·제약을 따름 |
+| 4 | 디자인 토큰(CSS 변수) | 프로젝트 토큰 체계로 매핑 (§디자인 가이드 매핑 참조) |
+| 5 | raw hex·절대좌표 | 구조가 느슨한 신호 — 스크린샷으로 의도를 보정 |
+
+> 이 우선순위는 `design-guide-mapping.md`의 토큰 매핑 판정보다 **위**에 있다. Code Connect 매핑이 있으면 hex→토큰 판정 트리를 돌리기 전에 그 컴포넌트를 먼저 채택한다.
 
 ---
 

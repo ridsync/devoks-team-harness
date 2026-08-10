@@ -157,6 +157,7 @@ flowchart TD
 | `code-security-review` | `/devoks-sdlc:code-security-review` *(에이전트 내부 전용)* | devoks-sdlc |
 | `test-author` | `/devoks-sdlc:test-author` *(에이전트 내부 전용)* | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
+| `new-ui-draft` | `/devoks-sdlc:new-ui-draft` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
 | `project-convention-manage` | `/devoks-core:project-convention-manage` | devoks-core |
@@ -198,7 +199,6 @@ flowchart TD
 |--------|------|
 | `/devoks-sdlc:new-feature-draft` | 스펙 기반 기능 구현 |
 | `/devoks-sdlc:new-feature-github-issue` | GitHub 이슈 기반 기능 구현 |
-| `/devoks-sdlc:new-ui-draft` | Figma → 코드 UI 구현 |
 | `/devoks-sdlc:code-review-general` | 범위 지정 코드리뷰 |
 | `/devoks-sdlc:code-review-diff-branch` | 브랜치 diff 기반 코드리뷰 |
 | `/devoks-sdlc:code-security-review` | repo·의존성·위협 수준 보안 검증 |

@@ -1,7 +1,7 @@
 ---
 name: browser-visual-diff-capture
 description: (agent-internal — 스킬 전용, 사용자 요청으로 직접 호출 금지) browser-visual-diff 스킬의 Phase 1~4(Figma 캡처·라이브 렌더 캡처·시각 diff·디자인 가이드 정합성 검증)를 subagent 컨텍스트에서 수행하고 충실도 리포트만 리턴하는 에이전트. Figma·라이브 렌더 스크린샷(대용량 멀티모달 바이트)을 subagent 컨텍스트에 격리해 메인 루프 컨텍스트 소모를 방지한다. browser-visual-diff 스킬의 Phase 0에서 확정된 슬롯 값을 전제로 하므로 그 스킬에서만 위임받는다.
-tools: Read, Bash, Edit, ToolSearch, mcp__plugin_figma_figma__*, mcp__chrome-devtools-attach__*, mcp__plugin_playwright_playwright__*
+tools: Read, Bash, Edit, Skill, ToolSearch, mcp__plugin_figma_figma__*, mcp__chrome-devtools-attach__*, mcp__plugin_playwright_playwright__*
 model: sonnet
 ---
 
@@ -46,6 +46,11 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
    ```
    ToolSearch("select:mcp__plugin_playwright_playwright__browser_navigate,mcp__plugin_playwright_playwright__browser_wait_for,mcp__plugin_playwright_playwright__browser_take_screenshot")
    ```
+4. **`get_design_context`를 쓰기로 한 경우에만** 공식 Figma 스킬을 먼저 로드한다 (Phase 1-3 참조):
+   ```
+   Skill(skill="figma:figma-design-to-code")
+   ```
+   `get_screenshot`·`get_metadata`만 쓰는 기본 경로에서는 로드하지 않는다 — 이 스킬은 design→code **구현** 방향 계약이므로 캡처·비교만 할 때는 대상이 아니다.
 
 ---
 
@@ -56,7 +61,10 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 1. `mcp__plugin_figma_figma__get_screenshot(nodeId=<FigmaNodeId>, fileKey=<FigmaFileKey>)`
    → `figma_<screen>.png` 저장
 2. `mcp__plugin_figma_figma__get_metadata(nodeId, fileKey)` → 좌표/사이즈/색상/폰트 수집
-3. (옵션) `mcp__plugin_figma_figma__get_design_context(nodeId, fileKey)` → 코드 힌트
+3. **(옵션) `get_design_context` — 코드 힌트가 필요할 때만.**
+   - ⚠️ 호출 전 반드시 `Skill(skill="figma:figma-design-to-code")`를 먼저 로드한다. 공식 스킬이 요구하는 필수 선행 단계이며, asset(아이콘·이미지) 재현 규칙과 응답 힌트 우선순위(Code Connect 스니펫 > 컴포넌트 문서 링크 > 디자인 어노테이션 > 디자인 토큰 > raw hex·절대좌표)를 공급한다 — **Phase 4 토큰 매핑의 판정 근거**가 되고, Phase 5 미세조정에서 아이콘을 임의로 그려 넣는 사고를 막는다.
+   - 호출: `mcp__plugin_figma_figma__get_design_context(nodeId, fileKey, skillNames="figma-design-to-code")`
+   - **로드 실패(figma 플러그인 미설치) 시**: `get_design_context`를 호출하지 않고 `get_screenshot`+`get_metadata`만으로 진행한 뒤, 리포트에 `figma-design-to-code 미로드 — 코드 힌트 생략` 1줄을 기록한다. **사용자에게 질문하지 않는다.**
 4. 권한 오류 발생 시 리포트에 오류 내용을 기록하고 Phase 2로 진행한다. **사용자에게 질문하지 않는다.**
 
 ---
@@ -118,6 +126,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 - 캡처 도구: Chrome DevTools MCP / Playwright MCP (폴백)
 - 기준 viewport: [<BaselineViewport>]
 - 임시 패치: 없음 / [파일명] (회수 완료 / ⚠️ 잔존)
+- Figma 코드 힌트: 미사용(screenshot+metadata만) / 사용(figma-design-to-code 로드) / ⚠️ 생략(미로드 — 사유)
 
 ### 🔍 시각 차이 발견 목록
 

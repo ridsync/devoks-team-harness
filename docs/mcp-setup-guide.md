@@ -33,7 +33,8 @@ DevOks 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 |----------------|------|------|
 | **devoks-core** | — | — |
 | **devoks-git** | `gh` CLI | — |
-| **devoks-sdlc** (feature commands) | `gh` CLI | Figma MCP (`new-ui-draft`) |
+| **devoks-sdlc** (feature commands) | `gh` CLI | — |
+| **devoks-sdlc** (`new-ui-draft` skill) | Figma MCP + `figma:figma-design-to-code` 스킬 | — |
 | **devoks-sdlc** (feature skills: frd/plan) | — | CodeGraph MCP, Serena MCP |
 | **devoks-sdlc** (feature-workflow-runner) | Figma MCP, context-mode MCP | CodeGraph MCP, Serena MCP |
 | **devoks-sdlc** (verify-data-flow) | Chrome DevTools MCP | Playwright MCP |
@@ -71,21 +72,20 @@ gh api user --jq '.login'
 
 Claude Code 내에서:
 ```
-/plugin install @figma/figma-mcp
+/plugin install figma@claude-plugins-official
 ```
 
-또는 수동 (`~/.claude.json`):
-```json
-{
-  "mcpServers": {
-    "figma": {
-      "command": "npx",
-      "args": ["@figma/figma-mcp@latest"],
-      "type": "stdio"
-    }
-  }
-}
-```
+> ⚠️ **`claude mcp add`나 `~/.claude.json` 수동 등록으로 설치하지 마세요.** 설치 방식이 도구 prefix를 결정합니다 —
+> 플러그인 설치는 `mcp__plugin_figma_figma__*`, 일반 등록은 `mcp__figma__*`가 됩니다. devoks 스킬은 전자를 하드코딩하고
+> 있어 일반 등록으로 깔면 **Figma를 쓰는 스킬이 전부 깨집니다.** (SSOT: `plugins/devoks-core/commands/setup-mcp.md`)
+
+### 함께 제공되는 스킬
+
+이 플러그인은 MCP 서버뿐 아니라 공식 Figma 스킬도 함께 번들합니다. devoks 쪽에서는 그중
+**`figma:figma-design-to-code`** 를 사용합니다 — `get_design_context` 호출 전 선행 로드가 필수이며,
+asset(아이콘·이미지) 재현 규칙과 응답 힌트 우선순위(Code Connect > 컴포넌트 문서 > 디자인 어노테이션 > 토큰 > raw hex)를 공급합니다.
+`new-ui-draft`·`code-implementer`·`browser-visual-diff-capture`가 이 게이트를 강제하고, 로드에 실패하면
+추측 구현 대신 중단하거나 `blocked`를 반환합니다.
 
 ### 인증
 
@@ -364,7 +364,7 @@ brew install gh && gh auth login
 ```bash
 # 위 최소 구성 +
 /plugin install devoks-sdlc@devoks-plugins
-/plugin install @figma/figma-mcp    # new-ui-draft 사용 시
+/plugin install figma@claude-plugins-official    # new-ui-draft 사용 시
 ```
 
 ### 코드 품질 구성
@@ -391,7 +391,7 @@ brew install gh && gh auth login
 # /plugin install devoks-rn@devoks-plugins   # RN 프로젝트 시
 
 # MCP 설치
-/plugin install @figma/figma-mcp
+/plugin install figma@claude-plugins-official
 /plugin install @playwright/playwright-mcp
 # ~/.claude.json에 chrome-devtools-attach, codegraph, serena 추가
 # RN 프로젝트: /devoks-setup-mcp Step 5 실행 — metro-devtools user scope 등록 (7절 참조)

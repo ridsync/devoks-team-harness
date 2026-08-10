@@ -1,5 +1,9 @@
 ---
-description: Figma 디자인 링크를 받아 프로젝트 패턴에 맞게 UI를 구현한다.
+name: new-ui-draft
+description: Figma 디자인 링크를 받아 프로젝트 패턴에 맞게 UI를 구현한다. 디자인 컨텍스트 조회 전 공식 figma-design-to-code 스킬을 로드해 asset(아이콘·이미지) 재현 규칙과 힌트 우선순위를 적용하고, DESIGN.md·디자인 토큰·i18n·라우트 등 프로젝트 계약에 맞춰 코드를 생성한다. "이 피그마로 화면 만들어줘", "Figma 디자인 구현해줘", "디자인 링크로 UI 생성", "figma 노드를 컴포넌트로", "design to code" 요청에서 사용한다. 구현 후 Figma와 실제 렌더의 시각 충실도 비교는 devoks-browser:browser-visual-diff 를 쓴다.
+metadata:
+  author: ridsync
+  version: 1.0.0
 ---
 
 # UI Draft Implement (Figma → 코드 구현)
@@ -8,7 +12,7 @@ description: Figma 디자인 링크를 받아 프로젝트 패턴에 맞게 UI�
 
 Figma 디자인 링크와 추가 정보를 받아, Figma MCP로 디자인을 조회한 뒤 프로젝트 패턴에 맞게 UI를 구현한다.
 
-> **전제 MCP (사용자 설치):** 이 커맨드는 공식 Figma 플러그인이 제공하는 `mcp__plugin_figma_figma__*` 도구(`get_design_context`·`get_screenshot`·`get_metadata`)에 의존한다. devoks 플러그인은 Figma MCP를 번들하지 않으므로(중복·충돌 방지) user/project scope에 1회 설치돼 있어야 한다. 미설치 시 devoks-core SessionStart 훅이 설치를 안내한다.
+> **전제 MCP (사용자 설치):** 이 스킬은 공식 Figma 플러그인이 제공하는 `mcp__plugin_figma_figma__*` 도구(`get_design_context`·`get_screenshot`·`get_metadata`)와 **동일 플러그인이 번들한 `figma:figma-design-to-code` 스킬**에 의존한다. devoks 플러그인은 Figma MCP를 번들하지 않으므로(중복·충돌 방지) user/project scope에 1회 설치돼 있어야 한다. 미설치 시 devoks-core SessionStart 훅이 설치를 안내한다.
 
 **엔지니어링 디자인 시스템 SSOT:** 저장소 루트(또는 문서에 안내된 경로)의 `DESIGN.md`가 있으면, 그 저장소의 테마·간격·타이포·레이어(z-index)·터치/접근성·다크/라이트 등 **코드로 지켜야 할 UI 계약**을 정의한 것으로 본다. Figma는 레이아웃·비주얼 레퍼런스로, `DESIGN.md`는 구현 시 계약으로 우선한다. 문서가 없으면 동일 역할의 디자인/컨벤션 문서·기존 화면을 SSOT로 삼는다.
 
@@ -33,69 +37,93 @@ Figma 디자인 링크와 추가 정보를 받아, Figma MCP로 디자인을 조
 
 ## Steps
 
-### 1. Figma URL에서 node-id 추출
+### 1. Figma URL에서 fileKey·node-id 추출
 
 - `node-id=598-562` → nodeId `598:562` (하이픈을 콜론으로)
 - `node-id=1-2` → nodeId `1:2`
 - 브랜치 URL: `.../branch/:branchKey/...` 이면 `branchKey`를 `fileKey`로 사용
+- **`node-id`가 없는 파일 단위 URL이면 추측하지 말고 사용자에게 노드 URL을 요청한다.**
 
-### 2. Figma MCP로 디자인 조회
+### 2. Figma 스킬 로드 (게이트 — 건너뛰지 않는다)
 
-1. **get_design_context**  
-   - `nodeId`: 위에서 추출한 값  
-   - `clientLanguages`: `javascript,jsx` (또는 `typescript,tsx`)  
-   - `clientFrameworks`: `react`  
-   - `artifactType`, `taskType`: 맥락에 맞게 (선택)
+> ⚠️ **`get_design_context` 호출 전에 반드시 공식 Figma 스킬을 먼저 로드한다.**
+>
+> ```
+> Skill(skill="figma:figma-design-to-code")
+> ```
 
-2. **get_screenshot**  
-   - 같은 `nodeId`로 스크린샷 조회해 레이아웃/비주얼 확인
+이 스킬이 devoks 워크플로우에 없는 아래 규칙을 공급한다. 로드를 건너뛰면 되돌리기 비싼 결함(아이콘 손코딩·에셋 누락·만료 URL 커밋)이 그대로 구현에 박힌다.
 
-3. **섹션/프레임인 경우**  
+- **asset(아이콘·이미지) 재현 규칙** — `<svg>`/`<path>` 손으로 작성 금지, 원본 에셋에서 렌더, 에셋 URL 만료 특성과 다운로드-커밋 처리, 명시적 사이징
+- **응답 힌트 우선순위** — Code Connect 스니펫 > 컴포넌트 문서 링크 > 디자인 어노테이션 > 디자인 토큰(CSS 변수) > raw hex·절대좌표
+- **에러 복구 절차** — 타임아웃 시 더 작은 노드로 재시도 등
+
+**로드 실패 시(figma 플러그인 미설치):** 사용자에게 1줄로 안내하고 **중단한다.**
+`"Figma 플러그인이 필요합니다 — /plugin install figma@claude-plugins-official 실행 후 다시 요청해 주세요."`
+**스크린샷이나 설명만 보고 추측으로 구현하지 않는다.**
+
+### 3. Figma MCP로 디자인 조회
+
+1. **`get_design_context` (주 도구)**
+   - `nodeId`: 1단계에서 추출한 값, `fileKey`: 1단계에서 추출한 값
+   - `clientLanguages`: `javascript,jsx` (또는 `typescript,tsx`)
+   - `clientFrameworks`: `react`
+   - `skillNames`: `figma-design-to-code` 포함 (2단계에서 로드한 스킬이 요구하는 로깅 파라미터)
+
+2. **`get_screenshot` (보조)**
+   - 같은 노드로 스크린샷을 받아 레이아웃·비주얼을 **확인**한다.
+   - ⚠️ `get_screenshot`·`get_metadata`는 **`get_design_context`의 대체재가 아니다.** 방향을 잡거나 결과를 검증할 때만 쓴다.
+
+3. **섹션/프레임인 경우**
    - 응답에 "sparse metadata" 또는 하위 레이어 ID가 있으면, 해당 **하위 nodeId**로 `get_design_context`를 추가 호출해 상세 스펙 확보
 
-### 3. 참고 파일 및 패턴 파악
+4. **반환 코드는 레퍼런스다** — React + Tailwind로 오더라도 그대로 붙여넣지 않는다. 4단계에서 파악한 프로젝트의 언어·프레임워크·컴포넌트 라이브러리·스타일링 체계로 **변환**해 쓴다.
 
-- **`DESIGN.md` (또는 동등한 디자인/컨벤션 문서)를 먼저 읽는다.**  
-  - 뷰포트·테마(다크/라이트)·터치/히트 영역·디자인 토큰 API·z-index 계층·인라인/CSS 모듈 규칙·상태·오버레이 등 **문서에 적힌 구현 제약**을 파악한다. (구체 파일명은 저장소마다 다르므로 문서·코드에서 SSOT 경로를 확인한다.)  
+### 4. 참고 파일 및 패턴 파악
+
+- **`DESIGN.md` (또는 동등한 디자인/컨벤션 문서)를 먼저 읽는다.**
+  - 뷰포트·테마(다크/라이트)·터치/히트 영역·디자인 토큰 API·z-index 계층·인라인/CSS 모듈 규칙·상태·오버레이 등 **문서에 적힌 구현 제약**을 파악한다. (구체 파일명은 저장소마다 다르므로 문서·코드에서 SSOT 경로를 확인한다.)
   - Figma와 문서가 어긋나면 **문서·기존 코드 패턴을 우선**하고, 필요 시 사용자에게 확인한다.
 - **구현 추가정보**에 참고 파일이 있으면 해당 파일들을 읽는다.
 - 없으면, 추가정보의 **키워드**(예: settings, list, tab)로 `Grep` 또는 `Glob`으로 유사한 페이지·탭·목록 컴포넌트를 찾아 패턴을 파악한다.
-- 확인할 것:  
-  - 스타일 객체·CSS 변수·테마 훅·인라인 스타일 등 이 프로젝트의 관례  
-  - 목록/폼/버튼 등 UI 키트 사용 방식  
-  - i18n 훅·Locale 키 네이밍  
+- 확인할 것:
+  - 스타일 객체·CSS 변수·테마 훅·인라인 스타일 등 이 프로젝트의 관례
+  - 목록/폼/버튼 등 UI 키트 사용 방식 — **새로 만들기 전에 기존 컴포넌트·토큰 재사용을 먼저 검토한다**
+  - i18n 훅·Locale 키 네이밍
   - 라우팅·탭·네비게이션 구조(해당 프레임워크/앱의 진입점·메타데이터 패턴)
 
-### 4. 구현 계획 수립 및 사용자 확인
+### 5. 구현 계획 수립 및 사용자 확인
 
 다음을 정리해 **승인을 받은 뒤** 코드 생성에 들어간다.
 
 - 생성할 파일과 수정할 파일 목록
 - Figma 기준 UI 요소 매핑 (버튼, 테이블 컬럼, 필터, 탭 등)
+- **재사용할 기존 컴포넌트·토큰**과 새로 만들 것의 구분
 - 필요한 Locale(i18n) 키
 - 라우트/탭 변경 사항
 - 당장은 더미/목업인 부분 (API, 스키마 등)
 
 > 사용자 규칙에 "항상 승인을 받은 뒤 코드 생성"이 있으면 이 단계를 생략하지 않는다.
 
-### 5. 구현
+### 6. 구현
 
-1. **신규 컴포넌트/페이지**  
-   - Figma의 컴포넌트·레이아웃·색·간격·타이포를 **문서에 정의된 토큰/테마 API**(예: 디자인 시스템의 `useToken`, CSS 변수)와 프로젝트 스타일 객체 관례로 반영한다.  
-   - 레이어·모달·오버레이는 **문서 또는 코드에 있는 z-index·포털 계층 SSOT**를 따른다.  
+1. **신규 컴포넌트/페이지**
+   - Figma의 컴포넌트·레이아웃·색·간격·타이포를 **문서에 정의된 토큰/테마 API**(예: 디자인 시스템의 `useToken`, CSS 변수)와 프로젝트 스타일 객체 관례로 반영한다.
+   - 레이어·모달·오버레이는 **문서 또는 코드에 있는 z-index·포털 계층 SSOT**를 따른다.
    - 참고 파일과 동일한 import·래핑 패턴(목록/폼/액션 버튼 등)을 따른다.
+   - **아이콘·이미지는 2단계에서 로드한 스킬의 asset 규칙을 그대로 적용한다.**
 
-2. **기존 파일 수정**  
-   - 탭·라우트·사이드바 등: 해당 앱의 **라우트 정의·탭 메타·메뉴 설정**에 새 항목을 추가한다.  
+2. **기존 파일 수정**
+   - 탭·라우트·사이드바 등: 해당 앱의 **라우트 정의·탭 메타·메뉴 설정**에 새 항목을 추가한다.
    - 루트 레이아웃·라우터 진입점에서 하위 경로가 노출되도록 필요한 곳을 수정한다.
 
-3. **번역**  
+3. **번역**
    - 프로젝트 Locale 파일에 새 키를 추가하고, 기존 네이밍 규칙(네임스페이스·접두어)에 맞춘다.
 
-4. **데이터**  
+4. **데이터**
    - API·스키마가 없으면 픽스처·목업 상수 등으로 대체하고, 추후 연동이 필요함을 주석 또는 요약에 명시한다.
 
-### 6. 테스트 작성·검증 (조건부)
+### 7. 테스트 작성·검증 (조건부)
 
 - 구현에 로직(비즈니스 로직, 상태 관리, 데이터 흐름, 계약 검증 등)이 포함됐으면 테스트 작성 필요 여부를 **AskUserQuestion 단일선택**으로 확인한다: `[작성(/devoks-sdlc:test-author) (권장)]` / `[생략 (사유 기록)]`. (HITL 직접 호출 경로 전용 — 비-HITL 오케스트레이션·서브에이전트 경로에선 묻지 않고 위임 계약/정책 기본값을 따른다.)
   - 규모가 작고(단순 CRUD·설정값 변경 등) 테스트 실익이 낮으면 `생략` 선택 시 사유를 기록한다.
@@ -103,19 +131,21 @@ Figma 디자인 링크와 추가 정보를 받아, Figma MCP로 디자인을 조
 - 작성이 필요하면 `devoks-sdlc:test-author`(`test-writer` 에이전트)로 위임한다. `target`에 이번에 구현한 파일을, `context`에 관련 에러 케이스·계약을 전달한다(위임된 `test-writer`가 자체 실행·검증까지 수행한다).
 - 이 구현으로 영향받는 **기존** 테스트가 있으면 `devoks-sdlc:test-run-triage`(또는 대상 파일만 좁혀 직접 실행)로 회귀 여부를 확인한다. 영향받는 테스트가 전혀 없으면(순수 UI 등) 이 항목은 생략한다.
 
-### 7. 마무리
+### 8. 마무리
 
 - 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`)(Bash)로 수정한 파일 검사
 - 프로젝트의 포맷 스크립트(예: `npm run format`, `pnpm format`)(Bash)가 있으면 수정한 파일에 실행. 없으면 생략(요약에 명시)
 - 사용하지 않는 import 제거
 - 구현 요약과, "추후 작업"(API 연동, 상세 페이지 등)을 사용자에게 안내(테스트를 생략했다면 그 사실과 사유를 명시)
+- Figma와 실제 렌더의 시각 충실도를 픽셀 단위로 맞춰야 하면 `devoks-browser:browser-visual-diff`를 이어서 쓰도록 안내한다.
 
 ---
 
 ## Rules
 
+- **Figma 스킬 게이트**: `get_design_context` 호출 전 `figma:figma-design-to-code`를 로드한다. 로드 실패 시 추측 구현 대신 중단하고 설치를 안내한다.
 - **`DESIGN.md`(또는 동등 문서)**: UI 작업 시작 시·구현 전에 읽고, 테마·터치/히트 영역·레이어·상태·a11y 등 문서화된 원칙과 맞는지 검토한다. Figma만의 값으로 토큰·접근성·제품 UX 계약을 깨지 않는다.
-- **node-id**: URL의 `node-id`는 항상 `598:562` 형태로 변환해 MCP에 전달
+- **node-id**: URL의 `node-id`는 항상 `598:562` 형태로 변환해 MCP에 전달. `node-id`가 없으면 사용자에게 노드 URL을 요청한다.
 - **Figma 응답**: "sparse metadata"이거나 하위만 ID로 오면, **구현할 구체 노드**에 대해 `get_design_context`를 한 번 더 호출
 - **우선순위**: 디자인/컨벤션 문서 및 기존 코드 패턴 > 임의 하드코딩. Figma와 충돌하면 레이아웃·배치는 Figma를 참고하되, 색·타이포·간격·z-index·터치 영역은 문서·토큰·계층 상수를 우선한다.
 - **i18n**: 노출 문자열은 프로젝트 관례(예: `t('key')`)를 쓰고, Locale 리소스에 키를 추가한다.
@@ -134,22 +164,26 @@ Figma: https://www.figma.com/design/<fileKey>/파일명?node-id=598-562
 
 **실행 순서:**
 
-1. `node-id=598-562` → `598:562` 추출
-2. `get_design_context(598:562)`, `get_screenshot(598:562)` 호출
-3. `DESIGN.md`(또는 저장소 디자인 문서)로 토큰·터치·레이어 기준 확인 후 `ListPage.jsx`, `DetailTab.jsx` 읽고 탭·스타일 패턴 파악
-4. 계획: `ItemsTab.jsx` 생성, 목록 영역에 탭 연결, Locale 키 추가 → 사용자 승인
-5. 구현 후 린트 확인, 요약 안내
+1. `node-id=598-562` → `598:562`, `fileKey` 추출
+2. `Skill(skill="figma:figma-design-to-code")` 로드
+3. `get_design_context(fileKey, 598:562, skillNames="figma-design-to-code")` → `get_screenshot`으로 확인
+4. `DESIGN.md`(또는 저장소 디자인 문서)로 토큰·터치·레이어 기준 확인 후 `ListPage.jsx`, `DetailTab.jsx` 읽고 탭·스타일 패턴 파악
+5. 계획: `ItemsTab.jsx` 생성, 목록 영역에 탭 연결, Locale 키 추가 → 사용자 승인
+6. 구현 후 린트 확인, 요약 안내
 
 ---
 
 ## Checklist
 
-- [ ] Figma URL에서 `node-id` 추출 후 `get_design_context`, `get_screenshot` 호출
+- [ ] Figma URL에서 `fileKey`·`node-id` 추출 (`node-id` 없으면 사용자에게 요청)
+- [ ] **`figma:figma-design-to-code` 로드** — 실패 시 설치 안내 후 중단
+- [ ] `get_design_context` 호출(주 도구) 후 `get_screenshot`으로 확인
 - [ ] 섹션/프레임이면 필요한 하위 노드로 추가 호출
+- [ ] 반환된 참조 코드를 프로젝트 스택으로 변환 (그대로 붙여넣지 않음)
 - [ ] `DESIGN.md`(또는 동등 문서) 읽고 테마·터치·z-index·상태 UI 원칙 반영 여부 확인
-- [ ] 참고 파일·패턴 파악
+- [ ] 참고 파일·패턴 파악, 기존 컴포넌트·토큰 재사용 검토
 - [ ] 구현 계획 작성 후 사용자 승인 (규칙에 따른 경우)
-- [ ] 신규/수정 파일 구현, Locale(i18n) 보완
+- [ ] 신규/수정 파일 구현, 아이콘·이미지 asset 규칙 적용, Locale(i18n) 보완
 - [ ] 로직 포함 시 테스트 작성 필요 여부 확인 → 필요하면 `test-author`(`test-writer`)로 위임, 생략 시 사유 명시
 - [ ] 영향받는 기존 테스트 있으면 `test-run-triage`(또는 직접 실행)로 회귀 확인
 - [ ] 린트·포맷 확인, 미사용 import 정리

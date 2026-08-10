@@ -40,7 +40,7 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 우선순위: 낮음(검증 선행).
 
 - [ ] **진입점 일관화 검토 (command vs skill)**
-  - 팀이 스킬 우선으로 이동 중(`new-feature-verify` 커맨드→스킬 전환). 그러나 `new-feature-draft`/`new-feature-github-issue`/`new-ui-draft`/`code-*` 등은 여전히 커맨드.
+  - 팀이 스킬 우선으로 이동 중(`new-feature-verify` 커맨드→스킬 전환, 2026-08-10 `new-ui-draft` 커맨드→스킬 전환 — 둘 다 커맨드 파일을 남기지 않고 이관). 그러나 `new-feature-draft`/`new-feature-github-issue`/`code-*` 등은 여전히 커맨드.
   - 트리거 기반(자연어) 호출로 통일할지, command는 진입 전용으로 남길지 정책을 한 번 확정.
   - 우선순위: 낮음(정책 결정 먼저).
 

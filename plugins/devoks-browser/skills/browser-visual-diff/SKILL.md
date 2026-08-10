@@ -19,6 +19,7 @@ Phase 1~4는 `browser-visual-diff-capture` 에이전트가 수행하며, 에이�
 | MCP | 역할 | 필수 여부 |
 |-----|------|----------|
 | Figma MCP (`mcp__plugin_figma_figma__*`) | Figma 디자인 캡처 + 메타데이터 추출 | **필수** |
+| `figma:figma-design-to-code` 스킬 (동일 플러그인 번들) | `get_design_context` 호출 시 선행 로드 — asset 재현 규칙·힌트 우선순위 공급 | `get_design_context`를 쓸 때만 |
 | Chrome DevTools MCP (`mcp__chrome-devtools-attach__*`) | 라이브 렌더 캡처 (**기본 도구**) | **필수** |
 | Playwright MCP (`mcp__plugin_playwright_playwright__*`) | 라이브 렌더 캡처 (폴백 도구) | Chrome DevTools MCP 불가 시 사용 |
 
@@ -96,7 +97,7 @@ Phase 0에서 확정된 슬롯 값으로 `browser-visual-diff-capture` 에이전
 - **전달 슬롯**: `<FigmaFileKey>`, `<FigmaNodeId>`, `<DevServerURL>`, `<LiveRoute>`,
   `<ComponentPath>`, `<DesignGuide>`, `<TokenSSOT>`, `<ZIndexSSOT>`, `<BaselineViewport>`
 - **에이전트 수행 내용**:
-  - Phase 1 — Figma reference 캡처 (`references/figma-capture.md` 참조)
+  - Phase 1 — Figma reference 캡처 (`references/figma-capture.md` 참조). `get_design_context`로 코드 힌트까지 받을 때는 **호출 전 `figma:figma-design-to-code` 스킬을 먼저 로드**한다(에이전트 내부 규칙). 미로드 시 코드 힌트를 생략하고 리포트에 기록한다.
   - Phase 2 — 라이브 렌더 캡처 (`references/live-capture.md`, `references/state-patch-pattern.md` 참조)
   - Phase 3 — Multimodal 시각 diff (`references/diff-checklist.md` 참조)
   - Phase 4 — 프로젝트 디자인 가이드 정합성 검증 (`references/design-guide-mapping.md` 참조)
