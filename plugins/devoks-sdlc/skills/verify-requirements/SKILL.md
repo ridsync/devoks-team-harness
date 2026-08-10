@@ -2,7 +2,7 @@
 description: 요구사항을 체크리스트로 구조화하고 구현 충실도를 검증한다. 구현 전 요구사항을 [REQ-카테고리-번호] ID로 추출해 체크리스트를 만들고(checklist 모드), 구현 후 diff와 대조해 커버리지 갭을 심각도별로 보고한다(verify 모드). "요구사항 검증", "구현 충실도 확인", "요구사항 체크리스트", "스펙 커버리지", "구현이 요구를 만족하는지", "requirement verification", "spec compliance" 요청에서 사용한다. 데이터 흐름 정합성은 devoks-sdlc:verify-data-flow, 코드 품질 리뷰는 devoks-sdlc:code-review-diff-branch, 실제 앱 조작을 통한 실동작 확인은 devoks-sdlc:verify-acceptance-test 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.0.1
+  version: 1.0.2
 ---
 
 # verify-requirements — 요구사항 체크리스트·구현 충실도 검증
@@ -133,6 +133,8 @@ S4에서 추출한 각 요구사항 항목에 대해:
 3. 부분/미구현 항목은 아래 심각도 기준으로 판정한다.
 
 ### V3. 심각도 판정 기준
+
+> 심각도 분류 SSOT: `.claude/refs/code-review.md §8`. 아래는 요구사항 커버리지 갭 맥락으로 좁힌 특수화이며, SSOT의 일반 정의(보안/데이터손실/시스템오류 등)와 축은 동일하다.
 
 | 심각도 | 기준 |
 |--------|------|

@@ -9,18 +9,19 @@ DevOks 팀 하네스의 스킬·커맨드가 사용하는 MCP 서버와 외부 �
 DevOks 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·CodeGraph·context7 등)를 **번들하지 않는다**. 플러그인마다 같은 서버를 중복 선언하면 user/project scope에 이미 설치된 서버와 충돌하고(서로 다른 인스턴스·포트·파일락), 사용 가능한 도구 수가 환경마다 달라지기 때문이다.
 
 - **원칙**: 공유 MCP는 **user 또는 project scope에 1회만** 설치한다. 플러그인은 그 단일 서버를 참조만 한다.
-- **예외**: `devoks-browser`의 `chrome-devtools-attach`(`:9269` 연결 전용 고유 설정)만 플러그인이 번들한다. `devoks-rn`의 `metro-devtools`는 `/devoks-setup-mcp` Step 5로 user scope에 설치한다 (Metro URL 자동 조회, 재시작 자동 적응).
+- **예외**: `devoks-browser`의 `chrome-devtools-attach`(`:9269` 연결 전용 고유 설정)만 플러그인이 번들한다. `devoks-rn`의 `metro-devtools`는 `/devoks-core:setup-mcp` Step 5로 user scope에 설치한다 (Metro URL 자동 조회, 재시작 자동 적응).
 - **자동 안내**: `devoks-core`의 SessionStart 훅(`hooks/check-setup-state.sh`)이 매 세션 시작 시 권장 MCP의 설치 여부를 점검하고, **누락 항목만** 설치 명령과 함께 안내한다. 모두 설치돼 있으면 아무것도 출력하지 않는다(멱등·non-blocking).
 - **도구 네임스페이스 주의**: 설치 방식에 따라 도구 prefix가 다르다 — 플러그인 설치 → `mcp__plugin_<plugin>_<server>__*`, `claude mcp add` → `mcp__<server>__*`. 스킬이 하드코딩한 prefix(Figma=`mcp__plugin_figma_figma__*`, Playwright=`mcp__plugin_playwright_playwright__*`)와 맞추려면 해당 서버는 **플러그인으로 설치**한다.
 
 ---
 
-## 빠른 설치 (`/devoks-setup-mcp`)
+## 빠른 설치 (`/devoks-core:setup-mcp`)
 
-`devoks-core`의 `/devoks-setup-mcp` 커맨드를 실행하면 누락된 권장 MCP를 현재 상태에 맞춰 한 번에 설치한다.
+`devoks-core`의 `/devoks-core:setup-mcp` 커맨드를 실행하면 누락된 권장 MCP를 현재 상태에 맞춰 한 번에 설치한다.
 
-- **자동(shell)**: context7·codegraph·serena 를 `claude mcp add --scope user`로 설치(serena는 현재 프로젝트 경로 자동 적용).
-- **안내(플러그인)**: figma·playwright 는 prefix 일치를 위해 `/plugin install` 경로를 안내한다(자동 설치하지 않음).
+- **자동(shell)**: context7·codegraph 를 `claude mcp add --scope user`로 설치.
+- **안내(플러그인)**: figma·playwright·serena 는 `/plugin install` 경로를 안내한다(자동 설치하지 않음) —
+  figma·playwright는 prefix 일치, serena는 bare `claude mcp add`의 PyPI 패키지명 충돌 회피가 이유다.
 - 이미 설정된 항목은 건너뛰고, 전역 설정 변경 전 실행 명령을 보여주고 확인받는다.
 
 수동 설치가 필요하거나 각 서버의 세부 옵션·인증·초기화가 궁금하면 아래 절을 참고한다.
@@ -40,9 +41,9 @@ DevOks 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 | **devoks-sdlc** (verify-data-flow) | Chrome DevTools MCP | Playwright MCP |
 | **devoks-sdlc** (code review/refactor/security) | CodeGraph MCP, Serena MCP | context-mode MCP |
 | **devoks-sdlc** (test author/triage) | — | context-mode MCP |
-| **devoks-browser** (chrome-devtools) | Chrome DevTools MCP + `~/.claude.json` | — |
+| **devoks-browser** (chrome-devtools) | Chrome DevTools MCP(devoks-browser 설치 시 자동 번들, 단독 사용 시 `~/.claude.json` 수동 등록) | — |
 | **devoks-browser** (visual-diff) | Figma MCP, Chrome DevTools MCP (attach) | Playwright MCP (폴백) |
-| **devoks-rn** (`metro-devtools-attach`) | `devoks-rn` 플러그인, Metro 실행 중 | `metro-devtools` (user scope — `/devoks-setup-mcp` Step 5); `adb` / `xcrun simctl` (스크린샷) |
+| **devoks-rn** (`metro-devtools-attach`) | `devoks-rn` 플러그인, Metro 실행 중 | `metro-devtools` (user scope — `/devoks-core:setup-mcp` Step 5); `adb` / `xcrun simctl` (스크린샷) |
 
 ---
 
@@ -97,15 +98,14 @@ Figma 계정 연결은 최초 도구 호출 시 브라우저 OAuth 플로우로 
 
 `devoks-browser:browser-devtools` 스킬, `devoks-browser:browser-visual-diff`의 라이브 렌더 캡처(**기본 도구**), `devoks-sdlc:verify-data-flow`(browser 환경)에 필요합니다.
 
-### 3-1. 플러그인 설치 (스킬 파일 로딩)
+### 3-1. devoks 사용자 — 별도 설치 불필요
 
-```
-/plugin install chrome-devtools-mcp@chrome-devtools-plugins
-```
+`devoks-browser` 플러그인이 `chrome-devtools-attach`(`:9269` attach 전용 설정)를 `plugin.json`의
+`mcpServers`로 직접 번들한다(2026-06-17 도입). **`/plugin install devoks-browser@devoks-plugins`만
+설치하면 자동으로 사용 가능** — `~/.claude.json` 수동 등록이나 별도 `chrome-devtools-mcp` 플러그인
+설치는 필요 없다.
 
-> 이 명령은 SKILL.md를 로드할 뿐입니다. 실제 MCP 연결 설정은 3-2가 필요합니다.
-
-### 3-2. `~/.claude.json`에 MCP 서버 추가 (필수)
+### 3-2. devoks 없이 단독으로 쓰는 경우 — `~/.claude.json`에 직접 등록
 
 ```json
 {
@@ -120,12 +120,16 @@ Figma 계정 연결은 최초 도구 호출 시 브라우저 OAuth 플로우로 
 ```
 
 > ⚠ **주의**: `~/.claude.json`과 `~/.claude/settings.json`은 다른 파일입니다.
-> MCP 서버 등록은 `~/.claude.json`에 해야 합니다.
+> MCP 서버 등록은 `~/.claude.json`에 해야 합니다. (공식 `chrome-devtools-mcp` 플러그인의 스킬 파일만
+> 필요하면 `/plugin install chrome-devtools-mcp@claude-plugins-official` — 마켓플레이스는
+> `chrome-devtools-plugins`가 아니라 `claude-plugins-official`이다. 2026-08-10 확인.)
 
 ### 3-3. Chrome 디버그 모드로 실행
 
-> 아래 명령은 `plugins/devoks-core/commands/setup-mcp.md` Step 6에도 그대로 inline돼 있다(대상 프로젝트에
-> 설치된 커맨드는 이 문서에 접근할 수 없어 자기완결적이어야 함). 한쪽을 고치면 반드시 다른 쪽도 갱신한다.
+> 같은 명령이 `plugins/devoks-core/commands/setup-mcp.md` Step 6에도 실려 있지만, 두 문서는 SSOT-미러
+> 관계가 아니다 — `setup-mcp.md`는 대상 프로젝트에 설치되는 실행형 지침(플러그인 루트 밖 참조 불가라
+> 자기완결적이어야 함)이고, 이 문서는 harness 저장소 자체의 유지보수자용 배경 설명이다. 목적이 달라
+> 동기화 의무 없이 각자 독립적으로 고친다.
 
 ```bash
 # macOS
@@ -155,21 +159,13 @@ mcp__chrome-devtools-attach__*
 ### 설치
 
 ```
-/plugin install @playwright/playwright-mcp
+/plugin install playwright@claude-plugins-official
 ```
 
-또는 `~/.claude.json`:
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": ["@playwright/playwright-mcp@latest"],
-      "type": "stdio"
-    }
-  }
-}
-```
+> ⚠️ **`@playwright/playwright-mcp` 형식이나 `claude mcp add` 수동 등록으로 설치하지 마세요.**
+> 마켓플레이스 참조 형식은 `<플러그인>@<마켓플레이스>`이며(예: `figma@claude-plugins-official`),
+> `@playwright/playwright-mcp`는 존재하지 않는 참조라 실패합니다(2026-08-10 확인 — 과거엔 맞았을
+> 수 있으나 현재는 아니다). SSOT: `plugins/devoks-core/commands/setup-mcp.md` Step 4.
 
 ---
 
@@ -179,33 +175,21 @@ mcp__chrome-devtools-attach__*
 
 ### 설치 및 초기화
 
-CodeGraph는 먼저 프로젝트를 인덱싱해야 합니다:
+공식 플러그인이 없어 CLI를 직접 설치해야 합니다:
 
 ```bash
-# CodeGraph CLI 설치 (npx 또는 전역 설치)
-npm install -g @codegraph/mcp-server  # 실제 패키지명은 팀 내 설정 확인
+# CodeGraph CLI 설치 (GitHub → npm 전역 설치, 실제 패키지명 @colbymchenry/codegraph)
+npm install -g colbymchenry/codegraph
 
-# 프로젝트 인덱싱 (프로젝트 루트에서)
-codegraph index .
+# MCP 서버로 등록
+claude mcp add codegraph --scope user -- codegraph serve --mcp
 
-# Claude Code에 MCP 서버 등록
-/mcp add codegraph
+# 프로젝트 인덱싱 (선택)
+codegraph install "$CLAUDE_PROJECT_DIR"
 ```
 
-또는 `~/.claude.json`:
-```json
-{
-  "mcpServers": {
-    "codegraph": {
-      "command": "codegraph",
-      "args": ["serve"],
-      "type": "stdio"
-    }
-  }
-}
-```
-
-> ⚠ CodeGraph의 정확한 설치 명령은 팀 내 설정을 확인하세요. 프로젝트마다 다를 수 있습니다.
+SSOT: `plugins/devoks-core/commands/setup-mcp.md` Step 3(codegraph). (2026-08-10 확인·정정 —
+과거 버전은 `codegraph-mcp`라는 별개 패키지명을 안내했으나 실제 CLI는 위 명령으로 동작한다.)
 
 ---
 
@@ -215,30 +199,18 @@ codegraph index .
 
 ### 설치
 
-Serena는 Python 기반 LSP MCP 서버입니다:
-
-```bash
-# uv 설치 (없는 경우)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Serena 설치
-uvx install serena
+```
+/plugin install serena@claude-plugins-official
 ```
 
-`~/.claude.json`에 추가:
-```json
-{
-  "mcpServers": {
-    "serena": {
-      "command": "uvx",
-      "args": ["serena@latest", "--project", "/path/to/your/project"],
-      "type": "stdio"
-    }
-  }
-}
-```
-
-> Serena는 프로젝트 경로를 `--project`로 지정해야 합니다. 프로젝트마다 설정이 다릅니다.
+> ⚠️ **`claude mcp add`나 `~/.claude.json` 수동 등록(`uvx serena@latest`)으로 설치하지 마세요.**
+> PyPI의 `serena` 패키지는 이 도구(`oraios/serena` 코드 심볼탐색 에이전트)와 **무관한 별개
+> 프로젝트**(AMQP 0-9-1 클라이언트)입니다 — 이름이 같을 뿐입니다(2026-08-10 확인,
+> `pypi.org/project/serena`). 그대로 실행하면 엉뚱한 패키지가 설치됩니다.
+>
+> 프로젝트 경로는 설치 시점 CLI 플래그(`--project`)가 아니라 **런타임 `activate_project`/
+> `onboarding` 도구 호출**로 지정합니다 — SessionStart 훅이 `.serena/project.yml` 부재 시
+> 이 도구 사용을 안내합니다. SSOT: `plugins/devoks-core/commands/setup-mcp.md` Step 4.
 
 ---
 
@@ -253,7 +225,7 @@ uvx install serena
 /reload-plugins
 ```
 
-### 7-2. metro-devtools MCP 설치 (`/devoks-setup-mcp` Step 5)
+### 7-2. metro-devtools MCP 설치 (`/devoks-core:setup-mcp` Step 5)
 
 `devoks-rn` 플러그인에 번들된 `metro-mcp.js`를 `~/.devoks/mcp/`에 복사한 뒤 user scope에 등록합니다.  
 Metro `/json` 엔드포인트로 WebSocket URL을 **자동 조회**하므로, Metro 재시작 후 별도 갱신 없이 자동 적응합니다.
@@ -282,7 +254,7 @@ mcp__metro-devtools__*
 
 > `mcp__plugin_devoks-rn_metro-devtools__*` 및 `mcp__chrome-devtools-attach__*` 와 혼용하지 마세요.
 
-자세한 디버깅 패턴·트러블슈팅 → `devoks-rn:metro-devtools-attach` 스킬 또는 `/devoks-setup-mcp` 커맨드.
+자세한 디버깅 패턴·트러블슈팅 → `devoks-rn:metro-devtools-attach` 스킬 또는 `/devoks-core:setup-mcp` 커맨드.
 
 ---
 
@@ -293,21 +265,12 @@ mcp__metro-devtools__*
 ### 설치
 
 ```
-/plugin install context-mode
+/plugin install context-mode@context-mode
 ```
 
-또는 `~/.claude.json`:
-```json
-{
-  "mcpServers": {
-    "context-mode": {
-      "command": "npx",
-      "args": ["context-mode-mcp@latest"],
-      "type": "stdio"
-    }
-  }
-}
-```
+> 서드파티 플러그인(`mksglu/context-mode` 마켓플레이스)이며, 별도 마켓플레이스 등록이 먼저 필요할
+> 수 있습니다(`claude plugin marketplace add mksglu/context-mode`). 마켓플레이스 이름 없이
+> `/plugin install context-mode`만 실행하면 실패할 수 있습니다(2026-08-10 확인).
 
 ---
 
@@ -371,14 +334,15 @@ brew install gh && gh auth login
 ```bash
 # 최소 구성 +
 /plugin install devoks-sdlc@devoks-plugins
-# ~/.claude.json에 codegraph, serena 추가
+/plugin install serena@claude-plugins-official
+# codegraph는 공식 플러그인이 없음 — CLI 직접 설치 (5절 참조)
 ```
 
 ### React Native 구성
 ```bash
 # 최소 구성 +
 /plugin install devoks-rn@devoks-plugins
-# Metro 실행 후 /devoks-setup-mcp Step 5 실행 — metro-devtools user scope 등록 (7절 참조)
+# Metro 실행 후 /devoks-core:setup-mcp Step 5 실행 — metro-devtools user scope 등록 (7절 참조)
 ```
 
 ### 풀 구성
@@ -392,7 +356,9 @@ brew install gh && gh auth login
 
 # MCP 설치
 /plugin install figma@claude-plugins-official
-/plugin install @playwright/playwright-mcp
-# ~/.claude.json에 chrome-devtools-attach, codegraph, serena 추가
-# RN 프로젝트: /devoks-setup-mcp Step 5 실행 — metro-devtools user scope 등록 (7절 참조)
+/plugin install playwright@claude-plugins-official
+/plugin install serena@claude-plugins-official
+# chrome-devtools-attach는 devoks-browser에 이미 번들됨(3절 참조) — 별도 설치 불필요
+# codegraph는 공식 플러그인이 없음 — CLI 직접 설치 (5절 참조)
+# RN 프로젝트: /devoks-core:setup-mcp Step 5 실행 — metro-devtools user scope 등록 (7절 참조)
 ```

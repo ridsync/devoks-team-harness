@@ -2,7 +2,7 @@
 description: DevOks 권장 MCP 서버를 현재 상태에 맞춰 user scope에 1회 설치·초기화한다.
 ---
 
-# DevOks MCP Setup (`/devoks-setup-mcp`)
+# DevOks MCP Setup (`/devoks-core:setup-mcp`)
 
 ## SSOT
 
@@ -20,8 +20,12 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
 - `claude mcp add` → `mcp__<server>__*`
 - 플러그인 설치 → `mcp__plugin_<plugin>_<server>__*`
 
-스킬이 하드코딩한 prefix와 맞추기 위해 **figma·playwright는 반드시 플러그인으로** 설치하고
-(`claude mcp add`로 깔면 prefix 불일치로 스킬이 깨진다), context7·codegraph·serena는 `claude mcp add`로 설치한다.
+스킬이 하드코딩한 prefix와 맞추기 위해 **figma·playwright는 반드시 플러그인으로** 설치한다
+(`claude mcp add`로 깔면 prefix 불일치로 스킬이 깨진다). **serena도 플러그인으로 설치한다** — prefix
+문제는 아니지만, bare `claude mcp add`가 쓰는 PyPI 패키지명 `serena`가 이 도구(`oraios/serena`)와
+무관한 별개 프로젝트(AMQP 클라이언트)와 이름이 충돌해 `uvx serena@latest`가 잘못된 패키지를 설치한다
+(2026-08-10 확인, `pypi.org/project/serena`). context7·codegraph는 `claude mcp add`로 설치한다
+(codegraph는 공식 플러그인이 없어 CLI 직접 설치가 유일한 경로).
 
 ## Steps
 
@@ -32,7 +36,7 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
 2. **설치 계획 제시 및 확인**
    - `~/.claude.json`은 전역 설정이므로, 실제로 실행할 `claude mcp add` 명령 목록을 먼저 사용자에게 보여주고
      **확인을 받은 뒤** 실행한다.
-   - 사용자가 특정 항목만 선택할 수 있게 한다(예: context7만, serena 제외 등).
+   - 사용자가 특정 항목만 선택할 수 있게 한다(예: context7만, codegraph 제외 등).
 
 3. **user scope 설치 (shell — 직접 실행)**
    - **context7** (문서조회, 선택):
@@ -52,21 +56,17 @@ DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
        ```bash
        codegraph install "$CLAUDE_PROJECT_DIR"
        ```
-   - **serena** (심볼 탐색·리팩토링, 권장):
-     - 먼저 `uvx` 존재를 확인한다(`command -v uvx`). 없으면 설치를 안내한다:
-       `curl -LsSf https://astral.sh/uv/install.sh | sh`.
-     - 프로젝트 경로는 **현재 프로젝트 절대경로**(`$CLAUDE_PROJECT_DIR`)로 채운다:
-       ```bash
-       claude mcp add serena --scope user -- uvx serena@latest --project "$CLAUDE_PROJECT_DIR"
-       ```
-     - ⚠ user scope에 `--project`를 고정하므로 **다른 프로젝트로 전환하면 재설정이 필요**함을 사용자에게 알린다.
 
-4. **플러그인 설치 (figma·playwright — prefix 일치를 위해 플러그인 경로 유지)**
-   - 이들은 `claude mcp add`로 깔지 **않는다**(prefix가 달라져 스킬이 깨짐). 다음 슬래시 명령을 안내한다:
+4. **플러그인 설치 (figma·playwright·serena — prefix 일치/패키지명 충돌 회피를 위해 플러그인 경로 유지)**
+   - 이들은 `claude mcp add`로 깔지 **않는다**. 다음 슬래시 명령을 안내한다:
      - figma (UI 구현·visual-diff 필수): `/plugin install figma@claude-plugins-official`
-     - playwright (visual-diff 폴백, 선택): `/plugin install @playwright/playwright-mcp`
+     - playwright (visual-diff 폴백, 선택): `/plugin install playwright@claude-plugins-official`
+     - serena (심볼 탐색·리팩토링, 권장): `/plugin install serena@claude-plugins-official`
    - `/plugin install`은 대화형 Claude Code 명령이므로 shell로 자동 실행하지 말고, 위 명령을 그대로 안내한다.
    - figma는 최초 도구 호출 시 브라우저 OAuth로 인증된다.
+   - serena는 프로젝트별 초기화가 설치 시점 CLI 플래그(`--project`)가 아니라 **런타임 도구 호출**로
+     이뤄진다 — 설치 후 `activate_project` 또는 `onboarding` 도구를 사용하도록 안내한다(SessionStart
+     훅이 `.serena/project.yml` 부재 시 이미 이 안내를 출력한다).
 
 5. **metro-devtools (React Native 전용 — devoks-rn 플러그인 필요)**
    - RN 프로젝트에서 `devoks-rn:metro-devtools-attach` 스킬 사용 시 필요하다 (JS 콘솔·Zustand·TanStack Query 조회).

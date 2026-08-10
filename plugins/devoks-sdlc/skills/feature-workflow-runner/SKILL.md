@@ -2,7 +2,7 @@
 description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-sdlc:feature-frd-author / devoks-sdlc:feature-plan-author / devoks-sdlc:feature-plan-executor 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.6.0
+  version: 1.6.1
 ---
 
 # feature-workflow-runner
@@ -32,7 +32,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 - **추적성 우선** — 모든 `AC/CTR/EDGE`는 최소 한 Task의 `traces`에 등장한다(누락 0). 근거 없는 Task도 두지 않는다.
 - **검증 가능한 요구** — AC는 EARS로 써서 그대로 테스트가 된다. 통과/실패를 판정 못 하는 문장은 요구가 아니다.
-- **설계는 제안 후 확인** — 요구 누락은 묻고(추측 금지), 설계 공백은 합리적 안을 먼저 제안한 뒤 확인한다. 복잡도 임계(파일 3개 초과(기계적 일괄 변경 제외)·신규 모듈/계층·아키텍처 변경·새 패턴·상태 소유 위치 변경) 초과 시 FRD §4에 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. → `references/design-spec.md`
+- **설계는 제안 후 확인** — 요구 누락은 묻고(추측 금지), 설계 공백은 합리적 안을 먼저 제안한 뒤 확인한다. 복잡도 임계 초과 시(신호 목록·기준: `references/design-spec.md`) FRD §4에 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다.
 - **증분 분해·PR 분리** — 머지해도 안 깨지는 크기로 쪼개고, 필요할 때만(기본은 PR 1개) 독립 가치/위험 단위로 PR을 나눈다.
 - **PLAN이 진행 SSOT** — 완료는 검증 통과 후에만 `[x]`. 세션 도구는 미러일 뿐 PLAN을 이긴다.
 - **실행은 태스크까지** — 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용) 후, 태스크 구현·검증은 `size` 라우팅(S 직접/M 위임/L 분해 재검토)에 따라 `code-implementer` 위임(기본 경로)·직접 실행으로 처리하고, 리포트 판정·인계 노트 윈도잉·진행 갱신은 메인 루프가 수행. → `references/branch-issue-precheck.md`, `references/task-delegation.md`. 태스크 실행 중엔 자동 커밋/PR·타 커맨드 오케스트레이션을 하지 않는다. **단 Phase 4 마무리에서 사용자가 AskUserQuestion으로 명시 선택한 항목**(검증·리뷰·테스트·커밋·PR)은 메뉴 순서대로 위임 실행한다(HITL 선택 실행 — `references/post-implementation-checklist.md`).

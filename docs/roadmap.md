@@ -3,23 +3,30 @@
 DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-07-30
+> 최종 갱신: 2026-08-10
 
 ---
 
 ## 우선순위 한눈에
 
 
-| 우선순위   | 항목                                                                                                                                                                                     |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **높음** | UI 작업 분리 검토 · `**devoks-sdlc-orchestration` 신설(비-HITL SDLC)**                                                                                                                          |
-| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · 심각도 분류 SSOT 통합 · FRD §4 임계 신호 SSOT 수렴 · MCP 버전 고정 검토 · MCP 가이드 이중 관리 정리 · MCP project-scope 표준화 검토 · `git-commit-msg` 스킬+haiku 위임 전환 검토 |
-| **낮음** | 구현자 세션 지속(continuation) · 진입점 일관화 · `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 · plugin 버전 메타 정합 · `git-create-issue`/`git-pull-request` 스킬 전환 검토                                                 |
+| 우선순위 | 항목 |
+| ---- | ---- |
+| **높음** | UI 작업 분리 검토 · `**devoks-sdlc-orchestration` 신설(비-HITL SDLC)** |
+| **중**  | `aware-react-app` 스모크테스트 스킬·에이전트 생성 · 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · MCP 버전 고정 검토 · MCP project-scope 표준화 검토 · `git-commit-msg` 스킬+haiku 위임 전환 검토 |
+| **낮음** | 구현자 세션 지속(continuation) · 진입점 일관화 · `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 · plugin 버전 메타 정합 · `git-create-issue`/`git-pull-request` 스킬 전환 검토 |
 
 
 ---
 
 ## 마이그레이션 / 구조
+
+- [ ] **`aware-react-app` 스모크테스트 스킬·에이전트 생성**
+  - 대상: 설치된 React 프로젝트에서 개발 서버 상태·기본 제공 기능(라우팅, 상태 관리, API 연동 등)을 빠르게 검증하는 베이스 스킬 및 에이전트.
+  - 목표: 신규 피처 구현 후 regression 방지, dev server 상태 감시, e2e 테스트 선행 전 smoke test로 활용 가능한 기본 틀 제공.
+  - 설계 방향: (1) 프로젝트의 `aware-react-app` 모듈이 제공하는 debug API/상태 확인 인터페이스 활용. (2) Chrome DevTools MCP로 live 렌더 검증. (3) 스킬(`devoks-sdlc:smoke-test-aware-react-app`)과 전담 에이전트(`smoke-test-runner`)로 구성, 기존 `verify-acceptance-test` 패턴 재사용.
+  - 선행 조건: `aware-react-app` 모듈의 debug API 스펙 확정.
+  - 우선순위: 중(다른 피처 검증의 기초 자산이 되고, 반복 재사용 가치 높음).
 
 - [ ] **컨벤션 preset 확장 (신규 stack)**
   - management 고도화(provenance hash 기반 stale 감지, 플러그인 번들링 버그 수정)는 2026-07-14 완료 — 완료 섹션 참고.
@@ -180,17 +187,6 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - eval 러너 스크립트가 없음(데이터만 존재) → 공용 러너 도입 검토.
   - 우선순위: 중.
 
-- [ ] **FRD §4 복잡도 임계 신호 목록 SSOT 수렴**
-  - 임계 신호 목록이 **4곳에 인라인 복제** 중: `feature-workflow-runner/references/design-spec.md`(SSOT) · 같은 스킬 `SKILL.md`(핵심 원칙 절) · `feature-frd-author/SKILL.md`(절차 6) · `assets/FRD.template.md`(§4 안내 주석).
-  - 2026-07-30 임계 보강(신호 1개 추가 + 한정구 1개)에서 4곳을 모두 손으로 동기화해야 했다 — 성공했지만 drift 표면이 그만큼 넓다는 것이 확인됐다. `심각도 분류 SSOT 통합`과 동일 성격의 문제.
-  - 검토 방향: 미러 3곳의 나열을 제거하고 "복잡도 임계 초과 시(신호 목록: `design-spec.md`)" 수준의 포인터만 남긴다. 단, 미러가 존재하는 이유(각 문서를 단독으로 읽는 사람이 임계를 즉시 알 수 있게)를 잃지 않는 선인지 판단이 필요하다 — 전면 제거 vs 축약 표기 유지 중 선택.
-  - 우선순위: 중(당장 깨지지 않았으나 다음 임계 변경에서 누락 위험이 반복됨).
-
-- [ ] **심각도 분류 SSOT 통합**
-  - `code-review`·`code-security-review`·`verify-requirements`·`test-run-triage`가 각자 🔴🟠🟡🔵 표/기준을 본문에 둠 → 정의가 갈라질 위험.
-  - `.claude/refs/code-review.md §8` 단일 참조로 수렴하고 각 스킬은 링크만.
-  - 우선순위: 중(DRY/SSOT 위반 소지).
-
 - [ ] `**code-security-review` references/ 보강 (선택)**
   - 단일 SKILL.md → 시크릿 패턴 카탈로그·카테고리별 체크리스트를 `references/`로 분리(feature-data-verification 패턴 참고).
   - 우선순위: 낮음.
@@ -204,11 +200,6 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 검토 방향: 특정 버전 핀 vs `@latest` 유지의 트레이드오프(보안 패치 지연 vs 팀 일관성) 판단 후 `plugins/devoks-core/commands/setup-mcp.md`·`docs/mcp-setup-guide.md` 갱신.
   - 우선순위: 중(당장 깨지는 이슈 아님 — 팀 규모 커질 때 재검토).
 
-- [ ] **MCP 설치 가이드 이중 관리 정리 (`setup-mcp.md` ↔ `mcp-setup-guide.md`)**
-  - Chrome 디버그 실행 커맨드가 두 문서에 inline 중복(플러그인 루트 외부 참조 금지 제약 때문에 불가피하게 선택한 트레이드오프)돼 있고, 현재는 문서 내 주석("한쪽 고치면 반드시 다른 쪽도 갱신")으로 수동 동기화 중.
-  - 검토 방향: 위 "카탈로그 자동 생성" 항목과 유사하게 단일 원본에서 생성하는 방식 검토, 혹은 현재 수동 동기화가 실제로 더 간단한지 재확인.
-  - 우선순위: 중.
-
 - [ ] **MCP project-scope 표준화 검토 (`.mcp.json` 팀 공유)**
   - 현재 공유 MCP(context7·codegraph·serena 등)는 user-scope 개별 설치 방식 — 팀원마다 설치 시점·옵션이 달라질 수 있음.
   - 검토 방향: 리포에 커밋되는 project-scope `.mcp.json` 전환 시 이점(팀 일관성) vs 리스크(동일 서버가 user-scope에도 있을 때 병합/중복 동작이 실제로 어떻게 되는지 미검증)를 먼저 실험으로 확인한 뒤 판단.
@@ -218,6 +209,33 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **MCP 설치 명령 정합성 감사 — serena/playwright/codegraph 실제 동작과 불일치 3건 발견·수정** (2026-08-10, `devoks-core` `1.2.2 → 1.2.3`, `devoks-browser` `1.2.0 → 1.2.1`)
+  - 배경: 사용자가 "`setup-mcp.md`는 자체적으로 정상 동작하는 상태인가?"라고 물어 실제 `claude mcp list`/`claude plugin list` 등록 상태와 문서의 명령을 대조 검증했다. 이어서 사용자가 "이전엔 문제없던 가이드인데 변경한 기억이 없다"며 git 히스토리로 회귀 여부를 확인해 달라고 요청.
+  - **🔴 serena — 확정 버그(day 1부터)**: `claude mcp add serena --scope user -- uvx serena@latest --project ...`가 참조하는 PyPI `serena` 패키지는 이 도구(`oraios/serena` 코드 심볼탐색 에이전트)와 **무관한 별개 프로젝트**(AMQP 0-9-1 클라이언트, 작성자 Lura Skye)였다 — PyPI API로 직접 확인. 최초 커밋(`d194b65`, 2026-06-18)부터 한 번도 고쳐지지 않았다. 실제 동작 중인 serena는 공식 플러그인(`serena@claude-plugins-official`, 내부적으로 `uvx --from git+https://github.com/oraios/serena`)이었다.
+  - **🟠 playwright — 확정 버그(day 1부터)**: `/plugin install @playwright/playwright-mcp`는 존재하지 않는 참조 형식. `claude plugin list` 확인 결과 실제 등록은 `playwright@claude-plugins-official`(`<플러그인>@<마켓플레이스>` 형식, figma와 동일). 흥미롭게도 커밋 `58a1ad1`(2026-07-12)이 figma의 동일한 옛 형식(`@figma/figma-mcp`)을 `figma@claude-plugins-official`로 고치면서 **바로 옆 줄의 playwright는 그대로 두고 지나갔다** — 같은 파일 같은 라운드에서 형제 항목 하나만 놓친 사례.
+  - **🟡 codegraph — 부분 수정 후 전파 누락**: `setup-mcp.md`는 `58a1ad1`에서 `npm install -g colbymchenry/codegraph` + `codegraph serve --mcp`로 정정됐고 이는 실제 동작과 일치(로컬 확인: `@colbymchenry/codegraph@1.4.1`). 그러나 같은 플러그인의 `check-setup-state.sh`(SessionStart 훅 인라인 안내)와 `docs/mcp-setup-guide.md` §5는 갱신되지 않아, 각각 `npx -y codegraph-mcp@latest`·`npm install -g @codegraph/mcp-server`(플레이스홀더 주석 포함)라는 다른 명령을 안내하고 있었다.
+  - **파생 발견 — devoks-browser 자체에 동일 계열 버그**: `plugins/devoks-browser/skills/browser-devtools/SKILL.md`의 "환경 셋업" 절이 `/plugin install chrome-devtools-mcp@chrome-devtools-plugins`(존재하지 않는 마켓플레이스)로 수동 설치를 안내하고 있었는데, 이 안내는 커밋 `6d13a7a`(2026-06-16)에서 작성됐고 **바로 다음 날** `c026652`(2026-06-17)에서 `devoks-browser`가 `chrome-devtools-attach`를 `plugin.json`에 직접 번들하도록 바뀌면서 통째로 불필요해졌다 — 이후 약 2개월간 갱신 없이 방치. harness 문서가 아니라 **실제 설치되는 플러그인 산출물**이라 mcp-setup-guide.md 쪽 문제보다 영향이 크다.
+  - **결론(사용자 우려에 대한 답)**: 최근에 누가 실수로 고친 게 아니라, 이 4곳 모두 **애초에 검증 없이 작성됐거나(serena·playwright) 부분 수정이 다른 파일로 전파되지 않은(codegraph) 오래된 잠재 결함**이다 — git blame으로 각 라인의 최초/최종 수정 커밋을 확인해 회귀가 아님을 확정했다.
+  - 반영: `plugins/devoks-core/commands/setup-mcp.md`(serena를 Step 3→Step 4 플러그인 설치로 이동 + 사유 명시, playwright 참조 수정, `--project` 대신 런타임 `activate_project` 안내), `plugins/devoks-core/hooks/check-setup-state.sh`(serena·codegraph 인라인 안내 정정), `plugins/devoks-browser/skills/browser-devtools/SKILL.md`(수동 설치 절 전체 삭제 → "자동 번들, 별도 설치 불필요"로 교체), `docs/mcp-setup-guide.md`(§3-1 마켓플레이스명·§4 playwright·§5 codegraph·§6 serena·§8 context-mode 마켓플레이스명·하단 조합 예시 2곳 정정, 각 절에 SSOT 포인터 추가), `shared/setup/claude.json.template`(serena 블록 제거 → `_serena_note` 경고로 교체). `claude plugin validate --strict` 양 플러그인 통과, 전량 재검색으로 실제 안내문 중 잔존 오류 패턴 0건 확인(경고성 예시 텍스트만 남음).
+  - 의도적으로 변경하지 않음: context7 관련 명령(검증 결과 정확), figma 관련 명령(이미 정확), README/README.ko/marketplace.json/plugin-management.md(이 구체적 명령을 인용하지 않아 비대상 — grep 확인).
+
+- [x] **MCP 설치 가이드 이중 관리 재정의 — "SSOT-미러"가 아니라 "목적이 다른 별개 문서"로 재구성** (2026-08-10, `plugins/` 미변경 — 저장소 루트 문서만)
+  - 배경: `setup-mcp.md`(대상 프로젝트에 설치되는 실행형 지침) ↔ `mcp-setup-guide.md`(harness 저장소 자체의 유지보수자용 배경 설명)가 Chrome 디버그 명령을 inline 중복 보유하면서, "한쪽을 고치면 반드시 다른 쪽도 갱신한다"는 SSOT-미러 동기화 의무 주석을 달고 있었다.
+  - 사용자 지적으로 전제 자체를 재검토: 두 문서는 **목적이 다르다** — `plugins/*`는 설치·실행 대상 산출물(플러그인 루트 밖 참조 금지로 자기완결적이어야 함), `docs/*`는 harness 저장소 자신을 위한 유지보수자 참고 문서다. 우연히 같은 실행 명령을 담을 뿐, 하나가 다른 하나의 미러여서 동기화 의무를 지는 관계가 아니다 — 이 원칙은 `doc/*` ↔ `plugins/*` 전반에 적용된다.
+  - 실제로 이 원칙이 이미 지켜지던 곳도 확인: `setup-mcp.md` 11행은 이미 "`docs/mcp-setup-guide.md`는 harness 저장소 자체 전용, 대상 프로젝트엔 미설치 — 이 커맨드 실행에 필요한 내용을 그 문서에 미루지 않는다"고 명시하고 있었다. 위반은 `mcp-setup-guide.md` 쪽의 "동기화 의무" 주석 하나뿐이었다(`code-analyze-module.md`의 `docs/` 언급은 대상 프로젝트 자신의 문서를 가리키는 다른 맥락, `orchestration-run/SKILL.md`의 `docs/orchestration-design.md` 인용은 "(유지보수자용)" 라벨이 이미 붙어 있어 문제 없음 — grep으로 전량 확인).
+  - 반영: `docs/mcp-setup-guide.md` §3-3의 "한쪽을 고치면 반드시 다른 쪽도 갱신한다" 문구를 "목적이 달라 SSOT-미러 관계가 아니다 — 동기화 의무 없이 각자 독립적으로 고친다"로 교체. `setup-mcp.md`는 변경 없음(이미 정확한 서술 보유). `plugins/` 미변경이므로 버전 bump 비대상.
+  - 후속 여지: "`doc/*`와 `plugins/*`는 목적이 다르다"는 원칙을 이번엔 이 한 쌍에만 적용했다 — 다른 `doc/*` ↔ `plugins/*` 쌍에 유사한 오류가 있는지의 전면 감사는 이번 스코프 밖(요청 시 별도 진행).
+
+- [x] **FRD §4 복잡도 임계 신호 목록 SSOT 수렴** (2026-08-10, `devoks-sdlc` `1.15.0 → 1.15.1`)
+  - 미러 3곳(`feature-workflow-runner/SKILL.md` 핵심 원칙 절 · `feature-frd-author/SKILL.md` 절차 6 · `assets/FRD.template.md` §4 안내 주석)의 신호 인라인 나열을 제거하고 "복잡도 임계 초과 시(신호 목록·기준: `design-spec.md`)" 포인터로 축약 — 로드맵이 제시한 두 방향("전면 제거" vs "축약 표기 유지") 중 전면 제거를 채택했다. 3곳 모두 SSOT 링크가 이미 인접해 있어 정보 손실이 미미한 반면, 2026-07-30에 실제로 4곳 수동 동기화가 필요했던 drift 표면이 이번 개정으로 사라진다.
+  - SSOT(`design-spec.md`)는 무변경. `claude plugin validate --strict` 통과, grep으로 SSOT 외 잔존 나열 0건 확인.
+  - 반영: `skills/feature-workflow-runner/SKILL.md`(`1.6.0 → 1.6.1`), `skills/feature-frd-author/SKILL.md`(`1.2.0 → 1.2.1`), `skills/feature-workflow-runner/assets/FRD.template.md`, `plugin.json`. README/README.ko/marketplace.json은 스킬 이름·description 불변이라 비대상.
+
+- [x] **심각도 분류 SSOT 통합** (2026-08-10, `devoks-sdlc` `1.15.0 → 1.15.1`, 위 FRD §4 항목과 같은 라운드)
+  - 재조사 결과 `code-review`·`code-security-review`는 2026-07-20에 이미 `.claude/refs/code-review.md §8`을 SSOT로 참조 중이었음을 확인(로드맵 기록이 낡아 있었다) — 실제 미반영은 `verify-requirements`·`test-run-triage` 2곳.
+  - `verify-requirements`의 "V3. 심각도 판정 기준" 표는 일반 SSOT의 **도메인 특수화**(요구사항 커버리지 갭 맥락)라 내용 삭제는 부적절 — 표 삭제 대신 "SSOT는 §8, 아래는 그 맥락 특수화"임을 명시하는 1줄만 추가해 정의가 갈라진 게 아니라 좁혀진 것임을 밝혔다. `test-run-triage`는 정의 자체가 없이 이모지만 표에 있었으므로 참고 기준 문서 절에 SSOT 포인터 1줄만 추가.
+  - 반영: `skills/verify-requirements/SKILL.md`(`1.0.1 → 1.0.2`), `skills/test-run-triage/SKILL.md`(`1.1.0 → 1.1.1`), `plugin.json`.
 
 - [x] **`workflow-map` 스킬 신설 — SDLC 흐름·진입점 조회 맵 + README 파이프라인 차트** (2026-08-07, `devoks-sdlc` `1.13.0 → 1.14.0`)
   - 배경: HITL 작업 중 "지금 어디쯤이고 다음에 뭘 부르나"를 즉시 답하는 진입점이 없었다. 흐름 정보가 세 곳에 흩어져 있었고 어느 것도 그 질문에 답하지 못했다 — README 카탈로그는 **평면 나열**이라 순서가 없고 harness 저장소 문서라 설치 대상 프로젝트에서 접근 불가, `post-implementation-checklist.md`는 **검증→커밋→PR 꼬리 부분만** 담으며 `feature-workflow-runner` 실행 중에만 로드, 각 SKILL.md의 "관련 스킬" 문구는 인접 1~2개만 가리킨다.

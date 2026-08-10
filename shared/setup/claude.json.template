@@ -1,5 +1,6 @@
 {
-  "_note": "수동 참조용 예시입니다. 플러그인은 공유 MCP를 번들하지 않으므로 user scope에 1회 설치해야 합니다. 자동 설치는 /devoks-setup-mcp 커맨드를, 방식·prefix 규칙은 docs/mcp-setup-guide.md 를 참고하세요.",
+  "_note": "수동 참조용 예시입니다. 플러그인은 공유 MCP를 번들하지 않으므로 user scope에 1회 설치해야 합니다. 자동 설치는 /devoks-core:setup-mcp 커맨드를, 방식·prefix 규칙은 docs/mcp-setup-guide.md 를 참고하세요.",
+  "_serena_note": "serena는 여기 수동 등록하지 마세요 — PyPI의 동명 무관 패키지(uvx serena@latest 실행 시 오라이오스 serena가 아닌 별개 AMQP 클라이언트가 설치됨)와 충돌합니다. /plugin install serena@claude-plugins-official 로 설치하세요.",
   "mcpServers": {
     "chrome-devtools-attach": {
       "command": "npx",
@@ -16,16 +17,6 @@
       "args": ["-y", "@upstash/context7-mcp@latest"],
       "type": "stdio",
       "_comment": "라이브러리 문서 조회 (선택). devoks-feature/code 스킬에서 사용."
-    },
-    "serena": {
-      "command": "uvx",
-      "args": [
-        "serena@latest",
-        "--project",
-        "/path/to/your/project"
-      ],
-      "type": "stdio",
-      "_comment": "심볼 단위 코드 편집. devoks-code 커맨드 권장. --project 경로를 실제 프로젝트 경로로 교체."
     }
   }
 }

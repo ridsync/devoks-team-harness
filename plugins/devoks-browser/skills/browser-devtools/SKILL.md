@@ -4,27 +4,12 @@ description: "이미 실행 중인 Chrome 브라우저(--remote-debugging-port=9
 
 ## 전제 조건
 
-### 환경 셋업 (신규 머신 기준)
+### 환경 셋업
 
-**1단계 — 플러그인 설치** (스킬 파일 로딩)
-```sh
-/plugin install chrome-devtools-mcp@chrome-devtools-plugins
-```
-
-**2단계 — `~/.claude.json`에 MCP 서버 추가** (실제 9269 연결)
-```json
-{
-  "mcpServers": {
-    "chrome-devtools-attach": {
-      "command": "npx",
-      "args": ["chrome-devtools-mcp@latest", "--browserUrl", "http://127.0.0.1:9269"],
-      "type": "stdio"
-    }
-  }
-}
-```
-> 플러그인만 설치하면 스킬은 로드되지만 `mcp__chrome-devtools-attach__*` 도구가 없어 동작하지 않는다.
-> `~/.claude.json` 수동 추가가 반드시 필요하다.
+`devoks-browser` 플러그인 자체가 `chrome-devtools-attach`(`:9269` attach 전용 설정)를 `plugin.json`의
+`mcpServers`로 번들한다 — **`devoks-browser`를 설치하면 별도 MCP 등록 없이 자동으로 사용 가능**하다.
+`~/.claude.json` 수동 추가나 별도 `chrome-devtools-mcp` 플러그인 설치는 **불필요**하다(과거엔 수동
+설정이 필요했으나, plugin.json에 직접 번들되도록 바뀐 뒤로 무효화됐다).
 
 ### 런타임 전제
 

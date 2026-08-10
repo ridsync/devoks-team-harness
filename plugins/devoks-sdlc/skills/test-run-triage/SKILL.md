@@ -2,7 +2,7 @@
 description: 전체 또는 지정 범위의 테스트 스위트를 실행하고, 실패를 회귀·플래키·스펙불일치·환경 범주로 분류해 원인 추정과 수정안을 리포트한다. 테스트 출력은 대용량이므로 context-mode로 실행해 실패만 surface한다. "테스트 돌려줘", "테스트 실행하고 실패 분석", "왜 테스트가 깨지지", "test 실패 원인", "스위트 돌려봐", "run tests", "test failures" 요청에서 사용한다. 새 테스트 작성은 devoks-sdlc:test-author 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # test-run-triage — 테스트 실행·실패 triage
@@ -99,4 +99,5 @@ metadata:
 
 - **프로젝트 규칙**: `.claude/rules/agent-principles.md`(Tests Pass / Fail Fast), 프로젝트 active convention `.claude/rules/project-convention.md`, 필요 시 `.claude/CLAUDE.md`.
 - **품질 기준**: `../test-author/references/test-quality-bar.md`(§3 결정성 — 플래키 원인 체크리스트).
+- **심각도 분류 SSOT**: `.claude/refs/code-review.md §8`.
 - 관련 스킬: `devoks-sdlc:test-author`(테스트 작성/확장).

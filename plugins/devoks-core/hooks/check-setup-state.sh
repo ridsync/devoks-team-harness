@@ -76,8 +76,8 @@ add_missing_project() { missing_project="${missing_project}${missing_project:+\n
 add_setup_step() { setup_steps="${setup_steps}${setup_steps:+\n}$1"; }
 
 have "context7"   || add_missing_mcp '- context7 (문서조회, 선택): 미설정 시 WebSearch 폴백. 설치: claude mcp add context7 --scope user -- npx -y @upstash/context7-mcp@latest'
-have "serena"     || add_missing_mcp '- serena (코드 심볼탐색·리팩토링, 권장): 설치: claude mcp add serena --scope user -- uvx serena@latest --project <프로젝트_절대경로>'
-have "codegraph"  || add_missing_mcp '- codegraph (코드그래프, 선택): 설치: claude mcp add codegraph --scope user -- npx -y codegraph-mcp@latest'
+have "serena"     || add_missing_mcp '- serena (코드 심볼탐색·리팩토링, 권장): 설치: /plugin install serena@claude-plugins-official (claude mcp add 금지 — PyPI serena 패키지명 충돌, 상세: /devoks-core:setup-mcp)'
+have "codegraph"  || add_missing_mcp '- codegraph (코드그래프, 선택): 설치: npm install -g colbymchenry/codegraph && claude mcp add codegraph --scope user -- codegraph serve --mcp (상세: /devoks-core:setup-mcp)'
 have "figma"      || add_missing_mcp '- figma (UI 구현·visual-diff 필수): 공식 Figma 플러그인 설치 → mcp__plugin_figma_figma__* 도구 제공'
 have "playwright" || add_missing_mcp '- playwright (visual-diff 폴백 캡처, 선택): Playwright 플러그인 설치 → mcp__plugin_playwright_playwright__* 도구 제공'
 # chrome-devtools-attach 는 devoks-browser 플러그인이 번들한다. 직접 등록(~/.claude.json·project)이거나
@@ -95,7 +95,7 @@ while IFS= read -r -d '' _pkg; do
   fi
 done < <(find "${PROJECT_DIR}" -maxdepth 3 -name "package.json" -not -path "*/node_modules/*" -print0 2>/dev/null)
 if $_rn_detected; then
-  have "metro-devtools" || add_missing_mcp '- metro-devtools (RN JS 콘솔·상태 조회, devoks-rn 스킬 필요): /devoks-setup-mcp Step 5 실행 — devoks-rn 플러그인의 metro-mcp.js를 ~/.devoks/mcp/에 복사 후 user scope 등록 (Metro URL 자동 조회, 재시작 불필요)'
+  have "metro-devtools" || add_missing_mcp '- metro-devtools (RN JS 콘솔·상태 조회, devoks-rn 스킬 필요): /devoks-core:setup-mcp Step 5 실행 — devoks-rn 플러그인의 metro-mcp.js를 ~/.devoks/mcp/에 복사 후 user scope 등록 (Metro URL 자동 조회, 재시작 불필요)'
 fi
 
 if have "serena" && ! serena_project_ready; then

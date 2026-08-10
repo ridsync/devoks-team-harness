@@ -20,13 +20,13 @@ description: "React Native 앱 디버깅 — 에뮬레이터/시뮬레이터 스
 
 ### MCP 도구 Prefix
 
-`/devoks-setup-mcp` Step 5로 설치하면 user scope에 등록된다:
+`/devoks-core:setup-mcp` Step 5로 설치하면 user scope에 등록된다:
 
 ```
 mcp__metro-devtools__<tool>
 ```
 
-미설치 시 `/devoks-setup-mcp`를 실행한다. **`mcp__chrome-devtools-attach__`와 절대 혼용 금지.**
+미설치 시 `/devoks-core:setup-mcp`를 실행한다. **`mcp__chrome-devtools-attach__`와 절대 혼용 금지.**
 
 ---
 
@@ -61,7 +61,7 @@ xcrun simctl io booted screenshot /tmp/rn_screen.png
 
 ## Step 2: Metro CDP 연결 확인 (선택 — JS 상태 조회 필요 시)
 
-`/devoks-setup-mcp` Step 5로 설치된 `metro-mcp.js`는 Metro URL을 자동 조회하므로 수동 설정이 불필요하다.
+`/devoks-core:setup-mcp` Step 5로 설치된 `metro-mcp.js`는 Metro URL을 자동 조회하므로 수동 설정이 불필요하다.
 
 ### 2-1. Metro 상태 확인
 
@@ -141,7 +141,7 @@ AsyncStorage 확인:
 | `get_metro_status` — Metro not reachable | Metro 미실행 또는 포트 불일치 | `pnpm start` / `npx expo start` 실행 후 재시도 |
 | JS eval 무응답 | 앱 background 상태 | 앱을 foreground로 전환 |
 | `evaluate_script` 에러 | Hermes strict mode | `require()` 대신 빌드 시 import한 모듈 참조 |
-| `mcp__metro-devtools__*` 도구 없음 | metro-devtools user scope 미등록 | `/devoks-setup-mcp` Step 5 실행 |
+| `mcp__metro-devtools__*` 도구 없음 | metro-devtools user scope 미등록 | `/devoks-core:setup-mcp` Step 5 실행 |
 | `get_metro_status` → "WebSocket is not defined" | Node.js 20에서 `--experimental-websocket` 플래그 없이 등록됨 | `~/.devoks/mcp/metro-mcp.js` 재등록: `claude mcp add metro-devtools --scope user -- node --experimental-websocket ~/.devoks/mcp/metro-mcp.js` |
 | `evaluate_script` → "Property 'global' doesn't exist" | Hermes에서 `global` 전역 없음 | `global.xxx` → `globalThis.xxx` 로 교체 |
 | adb 없음 | PATH 미설정 | `~/Library/Android/sdk/platform-tools` PATH 추가 |
