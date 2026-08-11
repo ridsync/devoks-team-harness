@@ -193,6 +193,8 @@ flowchart TD
 | `/devoks-git:git-create-issue` | GitHub 이슈 생성 |
 | `/devoks-git:git-pull-request` | PR 생성 (CODEOWNERS 기반 리뷰어 할당) |
 
+> PreToolUse 훅(`hooks/remind-commit-convention.sh`)이 `git commit` 실행 직전 Footer author 컨벤션을 non-blocking으로 리마인드합니다 — 커맨드를 거치지 않은 즉흥 커밋에도 적용됩니다.
+
 ### devoks-sdlc
 
 | 커맨드 | 설명 |
@@ -237,7 +239,9 @@ devoks-team-harness/
 │   │   ├── rules/                     # base rules: agent-principles, memory-policy (+ 운영 계약)
 │   │   ├── refs/                      # setup 시 주입하는 reference docs
 │   │   └── conventions/               # 기술스택별 project convention preset (번들, ${CLAUDE_PLUGIN_ROOT}로 참조)
-│   ├── devoks-git/commands/           # Git 커맨드 — commit · issue · PR
+│   ├── devoks-git/
+│   │   ├── hooks/                     # PreToolUse(Bash) → git commit 컨벤션 리마인더 (non-blocking)
+│   │   └── commands/                  # Git 커맨드 — commit · issue · PR
 │   ├── devoks-sdlc/                    # SDLC — 기능 · 테스트 · 코드리뷰/보안 · 검증
 │   ├── devoks-browser/               # 브라우저 도구 — DevTools attach · visual diff
 │   └── devoks-rn/                    # React Native 디버깅 — Metro CDP attach

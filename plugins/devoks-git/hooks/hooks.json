@@ -1,0 +1,18 @@
+{
+  "description": "git commit 실행 직전 커밋 컨벤션(Footer author 트레일러)을 리마인드한다.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/remind-commit-convention.sh",
+            "args": [],
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

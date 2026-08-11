@@ -36,7 +36,7 @@ Staged 변경을 검토한 뒤, SSOT에 맞는 커밋 메시지를 작성하고,
   - 변경에 따른 결과·효과를 기재.
 - **Footer (이 커맨드)**:
   - 이슈 번호가 있으면(선택) `Resolved #이슈번호` 등으로 연결.
-  - 이 커밋을 진행한 Agent 정보를 `by {$AgentName} AI Agent 🤖` 형식으로 기재한다(필수). `{$AgentName}`은 실제 에이전트 이름(예: Cursor)으로 치환.
+  - 이 커밋을 진행한 Agent 정보를 `by Neo Agent (${AgentName}) 🤖` 형식으로 기재한다(필수). `Neo Agent`는 고정 리터럴(언어·이름 치환 금지), `${AgentName}`은 실제 커밋을 수행한 에이전트/도구 이름(예: Claude Code, Cursor, Codex)으로 치환.
 - **제목 길이**: 가독을 위해 **100자 이내 권장** (SSOT은 길이를 고정하지 않음).
 
 ## 예시 (형식 참고 — 상세 타입 설명은 SSOT)

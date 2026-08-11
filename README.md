@@ -193,6 +193,8 @@ flowchart TD
 | `/devoks-git:git-create-issue` | Create a GitHub issue |
 | `/devoks-git:git-pull-request` | Create a PR (CODEOWNERS-based reviewer assignment) |
 
+> A PreToolUse hook (`hooks/remind-commit-convention.sh`) reminds the Footer author convention right before `git commit` runs, non-blocking — this also covers ad-hoc commits that don't go through the command.
+
 ### devoks-sdlc
 
 | Command | Description |
@@ -237,7 +239,9 @@ devoks-team-harness/
 │   │   ├── rules/                     # base rules: agent-principles, memory-policy (+ management contract)
 │   │   ├── refs/                      # setup 시 주입하는 reference docs
 │   │   └── conventions/               # stack-specific project convention presets (bundled, referenced via ${CLAUDE_PLUGIN_ROOT})
-│   ├── devoks-git/commands/           # Git commands — commit · issue · PR
+│   ├── devoks-git/
+│   │   ├── hooks/                     # PreToolUse(Bash) → git commit convention reminder (non-blocking)
+│   │   └── commands/                  # Git commands — commit · issue · PR
 │   ├── devoks-sdlc/                    # SDLC — feature · test · code review/security · verify
 │   ├── devoks-browser/               # browser tools — DevTools attach · visual diff
 │   └── devoks-rn/                    # React Native debugging — Metro CDP attach
