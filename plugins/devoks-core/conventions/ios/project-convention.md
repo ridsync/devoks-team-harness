@@ -197,6 +197,7 @@ func shouldReorderStock(remainingQty: Int, thresholdQty: Int) throws -> Bool {
 | `@MainActor`/`Task` 경계 혼재 | race condition, UI 경합 | concurrency contract 명시 |
 | Keychain/UserDefaults 기준 불명확 | 보안·데이터 drift | 저장소 SSOT 명시 |
 | environment/provider 경계 문서화 누락 | 주입 순서/범위 버그 | Provider Header + active convention 명시 |
+| 제출·결제·삭제 버튼의 재진입을 막지 않음 | 연타 시 중복 확정(주문 2건 등) | 진행 중 플래그로 탭 차단 + 서버 멱등성 키. 판정 기준은 `.claude/refs/interaction-integrity.md` §1·C4 |
 
 ---
 

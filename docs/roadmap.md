@@ -3,7 +3,7 @@
 DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-08-10
+> 최종 갱신: 2026-08-19
 
 ---
 
@@ -209,6 +209,16 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **반복·동시 트리거 정합성 커버리지 신설 — 심화 SSOT + SDLC 5단계 전개** (2026-08-19, `devoks-core` `1.2.3 → 1.3.0`, `devoks-sdlc` `1.15.1 → 1.16.0`, `devoks-git` `1.1.0 → 1.1.1`)
+  - 배경: 연타 시 수치 유실 버그의 근본원인 분석 결과, 전체 플러그인에서 관련 키워드 grep이 1건뿐이라 리뷰·테스트·검증 어디에서도 이 결함군을 잡지 못했다. 사건에서 관측된 3종(코얼레싱 부재·응답 역류·stale closure 갱신유실)에 더해, 같은 "연타" 행동에서 나오는 **중복 확정(C4)·응답 순서 뒤바뀜(C5)** 이 누락돼 있어 결함 클래스를 7종으로 확장했다.
+  - **아키텍처(4레이어)**: 심화 SSOT `refs/interaction-integrity.md` 신설(결함 7종·조작 의미 3분류 판별표·대응 패턴별 함정·검증 축 4개) → 소비처는 **판정 질문 + 결함 ID(C1~C7) 참조만**. 메커니즘 설명·패턴은 소비처에 복사 금지(§6에 인용 규칙 명문화) → 패턴이 바뀌어도 **고칠 파일은 L1 하나**.
+  - **과적용 방지**: §1을 AND 게이트(반복이 실제 사용 패턴인가 ∧ 상태 확정·I/O를 유발하는가) + **명시적 제외 예시**(표시만 바꾸는 조작·I/O 없는 단발 조작)로 설계. 대상이어도 §2 의미 분류로 해당 결함만 적용한다. 과다/과소 적용 비용이 대칭이라 정량 임계 대신 정성 판별 질문을 택했다.
+  - **전개 위치(SDLC 5단계)**: 스펙 `feature-frd-author`+`FRD.template.md` / 구현 `conventions/react-web`·`react-native`(+`android`·`ios`는 C4 1행) / 테스트 `test-quality-bar.md` §6 + `code-implementer` §6 인용 / 리뷰 `refs/code-review.md` 6곳 / 실동작검증 `verify-acceptance-test` 2곳 + `verify-data-flow`.
+  - **🔴 부수 발견·수정: `acceptance-test-runner` 에이전트의 MCP 도구 차단** — frontmatter `tools:`가 화이트리스트로 동작하는데 `Read, Bash, Edit, ToolSearch`만 있어, `scenario-execution.md`가 지시하는 `mcp__chrome-devtools-attach__*` 호출이 **에이전트 내부에서 전부 차단**돼 있었다(= verify-acceptance-test의 Phase 1~4 전체가 동작 불가). 형제 에이전트 `browser-visual-diff-capture`에서 **동일 결함을 `62a7d0a`(2026-07-29)로 이미 고쳤으나**, 그보다 먼저 추가돼 있던(`dcdb81e`, 2026-07-23) 이 에이전트에는 적용되지 않았다. `mcp__chrome-devtools-attach__*` 추가로 해소. permission은 `devoks-browser`의 `settings.permissions.allow`가 이미 커버(devoks-sdlc가 dependency로 보유). **재발 방지: 에이전트를 추가·수정할 때 그 에이전트가 읽는 스킬/reference의 `mcp__` 호출 지시와 frontmatter `tools:`를 항상 대조한다**(유지보수 스킬 Step 6에 해당하나, 에이전트-스킬 쌍 단위 대조는 명시돼 있지 않았다).
+  - 부수 수정 3건: (1) `code-implementer`가 `test-quality-bar.md`를 §7·§9만 인용해 **PLAN 인라인 테스트 경로로 케이스 설계 규칙이 전파되지 않던** 갭 — §6 인용 추가. (2) `verify-acceptance-test`가 최종값만 대조해 **코얼레싱 부재를 원리상 검출 못하던** 갭 — I/O 횟수 관측·대기 중 이탈 절차 추가(`list_network_requests` 도구 로드 포함). (3) react-web preset의 기존 pitfall "파생 가능한 값을 state로 중복 보관"과 신규 ref 원천 규칙의 표면적 충돌 — "단방향(ref → state)일 때만 허용" 경계 명시.
+  - **기각: `engineering-principles.md`에 원칙 추가(Coalesced Effects)** — 작업 중 추가했다가 철회했다. 사유 3가지: (1) 나머지 23개가 스택·도메인 무관 설계 원칙인데 이 항목만 "state에 즉시 반영하고 I/O는 코얼레싱하라"는 **구체 처방**이라 추상화 수준이 다르다(문장 길이도 2배). (2) 10번 `Idempotent Actions`와 부분 중복 — C4(중복 확정)는 사실상 그 원칙의 위반이다. (3) 이 문서는 frontmatter가 `alwaysApply: false` + "참조용 보관"이고 실제 소비도 `code-refactoring.md`가 이름으로 4개 인용하는 정도라, 한 줄 추가로 바뀌는 에이전트 동작이 없다. 반면 번호 삽입은 이후 전 항목 재번호를 강제한다 — **이득 0에 비용만 남는 변경**. 커버리지 손실은 없다(L1 SSOT + 5단계가 이미 담당). 재제안 시 위 3가지를 먼저 반박할 것.
+  - 상세 설계·근거: `~/.claude/plans/devoks-interaction-integrity-design.md`.
 
 - [x] **MCP 설치 명령 정합성 감사 — serena/playwright/codegraph 실제 동작과 불일치 3건 발견·수정** (2026-08-10, `devoks-core` `1.2.2 → 1.2.3`, `devoks-browser` `1.2.0 → 1.2.1`)
   - 배경: 사용자가 "`setup-mcp.md`는 자체적으로 정상 동작하는 상태인가?"라고 물어 실제 `claude mcp list`/`claude plugin list` 등록 상태와 문서의 명령을 대조 검증했다. 이어서 사용자가 "이전엔 문제없던 가이드인데 변경한 기억이 없다"며 git 히스토리로 회귀 여부를 확인해 달라고 요청.

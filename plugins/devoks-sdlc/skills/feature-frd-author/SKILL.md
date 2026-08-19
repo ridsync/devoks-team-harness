@@ -25,7 +25,7 @@ metadata:
 1. **골격 로드** — `../feature-workflow-runner/assets/FRD.template.md` 를 읽어 형식을 따른다.
 2. **요구 추출** — 초안에서 Goal·Context·요구사항 후보를 뽑는다.
 3. **EARS 정형화** — 각 요구를 `REQ-xxx` + `AC-xxx-y`(정상 WHEN/WHILE + 예외 IF 최소 1쌍)로. → `../feature-workflow-runner/references/ears-acceptance-criteria.md`
-4. **분리 기재** — 수치/세팅/상태전이 → §5 Contract(`CTR-xxx`), 예외 상황 → §8 Edge(`EDGE-xxx`). 요구가 **기존 데이터의 특정 필드/형태**(비교 키, 마이그레이션 폴백, 다른 기능이 이미 채워놓은 값 등)에 의존하면, 그 필드가 실환경에 실제로 그 형태로 존재하는지 확인하는 항목을 `EDGE-xxx`로 반드시 추가한다 — 유닛테스트는 mock 데이터로 통과해도 실데이터 형태가 다르면 기능이 아예 발동하지 않을 수 있다.
+4. **분리 기재** — 수치/세팅/상태전이 → §5 Contract(`CTR-xxx`), 예외 상황 → §8 Edge(`EDGE-xxx`). 요구가 **기존 데이터의 특정 필드/형태**(비교 키, 마이그레이션 폴백, 다른 기능이 이미 채워놓은 값 등)에 의존하면, 그 필드가 실환경에 실제로 그 형태로 존재하는지 확인하는 항목을 `EDGE-xxx`로 반드시 추가한다 — 유닛테스트는 mock 데이터로 통과해도 실데이터 형태가 다르면 기능이 아예 발동하지 않을 수 있다. 같은 방식으로, 요구가 **사용자가 의도적으로 반복 트리거하는 조작**(증감 스테퍼, 연속 제출, 검색어 입력, 스크롤 페이징 등)을 포함하고 그 조작이 **상태를 확정하거나 I/O를 유발**하면(`.claude/refs/interaction-integrity.md` §1 적용 대상 판정), 연타 시의 기대 동작을 `EDGE-xxx`로 반드시 추가한다 — 조작의 의미(누적 → 입력 횟수만큼 반영 / 최종값 → 마지막 값만 / 단발 → 1회만 확정)와 I/O 코얼레싱 기대치를 함께 적는다. 단발 조작만 명세하면 저사양 기기에서만 드러나는 유실·중복을 스펙 단계에서 놓친다. 표시만 바꾸는 조작은 대상이 아니다.
 5. **착수 리소스** — §6(참고 코드·외부 문서·시안·API), §7 Constraints(위험/의존 제약·기술 제약)를 채운다. PR 분리 여부·개수는 이 단계에서 정하지 않는다(PLAN 단계 — `../feature-workflow-runner/references/task-pr-splitting.md`).
 6. **§4 설계 스펙** — 복잡도 임계 초과 시(신호 목록·기준: `../feature-workflow-runner/references/design-spec.md`) 코드 패턴을 먼저 탐색하고 **설계안을 제안·확인**한 뒤 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. 단순 기능은 §4.1만 간결히.
 7. **확인 후 작성** — 누락 슬롯은 한 번에 모아 사용자에게 확인(추측 금지 — 요구는 묻고, 설계는 제안 후 확인) → `<out>/FRD.md` 작성.
@@ -35,6 +35,7 @@ metadata:
 - 모든 REQ가 검증 가능한 AC를 가짐(통과/실패 판정 가능).
 - 측정값은 CTR로, 예외는 EDGE로 분리됨.
 - 기존 데이터 의존 로직이 있는 요구는 그 데이터 리얼리즘(실환경 필드/형태 존재 여부)을 확인하는 EDGE case가 최소 1개 있음.
+- 반복 트리거 조작이 상태 확정·I/O를 유발하는 요구는 연타 시 기대 동작을 규정한 EDGE case가 최소 1개 있음.
 - 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨.
 - ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능.
 - `FRD.md` 작성 완료 시 frontmatter `status: draft → review`. → `../feature-workflow-runner/references/progress-tracking.md`

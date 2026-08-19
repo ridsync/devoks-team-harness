@@ -194,6 +194,7 @@ object ProductModule { /* ... */ }
 | main thread에서 I/O 수행 | jank, ANR | `Dispatchers.IO`로 분리 |
 | flavor/build setting 분산 관리 | 환경 drift | 중앙 설정 SSOT 유지 |
 | DI/provider scope 문서화 누락 | 객체 생명주기 버그 | Provider Header + scope 명시 |
+| 제출·결제·삭제 버튼의 재진입을 막지 않음 | 연타 시 중복 확정(주문 2건 등) | 진행 중 플래그로 클릭 차단 + 서버 멱등성 키. 판정 기준은 `.claude/refs/interaction-integrity.md` §1·C4 |
 
 ---
 

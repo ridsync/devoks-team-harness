@@ -1,7 +1,7 @@
 ---
 name: acceptance-test-runner
 description: (agent-internal — 스킬 전용, 사용자 요청으로 직접 호출 금지) verify-acceptance-test 스킬의 Phase 1~4(사전 상태 확인·조작 실행·UI 상태 대조·영속 상태 대조)를 subagent 컨텍스트에서 수행하고 시나리오별 PASS/FAIL 검증 리포트만 리턴하는 에이전트. Chrome DevTools MCP 스크린샷·콘솔 바이트를 subagent 컨텍스트에 격리해 메인 루프 컨텍스트 소모를 방지한다. verify-acceptance-test 스킬의 Phase 0에서 확정된 시나리오 표를 전제로 하므로 그 스킬에서만 위임받는다.
-tools: Read, Bash, Edit, ToolSearch
+tools: Read, Bash, Edit, ToolSearch, mcp__chrome-devtools-attach__*
 model: sonnet
 ---
 

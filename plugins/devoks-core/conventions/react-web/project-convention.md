@@ -293,6 +293,25 @@ const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 - Dynamic import: 대형 페이지/컴포넌트 지연 로딩
 - motion 애니메이션은 `layout`/`AnimatePresence` 남용 시 리렌더 비용이 커질 수 있어 목록 규모에 따라 사용 범위를 제한한다
 
+### 반복 입력 대응 (적용 대상일 때만)
+
+먼저 `.claude/refs/interaction-integrity.md` **§1 적용 대상 판정**을 통과하는지 확인한다 — 통과하지 못하면 아래를 적용하지 않는다.
+라우트 이동·모달 토글처럼 표시만 바꾸는 조작, I/O 없는 단발 조작은 대상이 아니다(단발 조작은 `disabled` 한 줄로 충분).
+
+대상이면 §2 의미 분류에 따라 **필요한 것만** 적용한다.
+
+| 조작 의미 | 적용 |
+|---|---|
+| 누적 (스테퍼·수량) | 이벤트 핸들러는 `useRef` 버퍼 또는 `setState(prev => …)` 함수형 갱신으로 다음 값을 계산한다. I/O만 debounce로 코얼레싱 |
+| 최종값 (슬라이더·검색어) | state는 입력 즉시 반영하고, I/O는 debounce. 진행 중 요청은 `AbortController`로 취소하거나 요청 순번을 대조해 최신 응답만 반영 |
+| 단발 (제출·결제) | 진행 중 플래그로 재진입 차단 + 서버 멱등성 키. 클라이언트 가드만으로는 부족하다 |
+
+I/O를 코얼레싱하는 경우 공통으로 지킨다.
+
+- 응답을 기다렸다 state를 반영하지 않는다 — 늦게 도착한 과거 응답이 더 새로운 입력을 덮어쓴다.
+- 저장 실패 시 마지막 확정값으로 롤백하고 사용자에게 알린다(silent catch 금지 — Error Handling 절과 동일 규칙).
+- 대기 중 unmount·라우트 이탈 시 `useEffect` cleanup에서 즉시 flush한다.
+
 ---
 
 ## Testing
@@ -415,6 +434,8 @@ export function useToolbarOrThrow() {
 | Tailwind v4 토큰을 `tailwind.config.js`와 `@theme` 양쪽에 중복 정의 | 토큰 drift | v4는 `@theme` CSS 블록이 SSOT, config 파일에 재정의 금지 |
 | 테스트 전용 라우트를 프로덕션 빌드에 노출 | 예기치 못한 진입점 노출 | 라우트 가드 또는 빌드 분기로 제외 |
 | Contract 위반 시 `typeof` 가드로 조용히 처리 | 에러 은폐 | `*OrThrow` 헬퍼 사용 |
+| 반복 트리거 조작에서 입력마다 즉시 저장/요청 | 저사양 기기에서 I/O 큐 적체 → 터치 반응 지연 | state는 즉시 반영, I/O는 debounce로 코얼레싱 |
+| 이벤트 핸들러가 클로저에 캡처된 state로 다음 값 계산 | 이벤트가 한 배치로 몰릴 때 갱신 유실(N번 눌러도 1번 반영) | 이벤트 경로는 `useRef` 버퍼 또는 함수형 갱신에서 읽는다. **ref는 "이벤트 경로의 누적 원천", state는 그 파생 렌더값 — 단방향(ref → state)일 때만 허용한다. 양방향으로 동기화하면 위의 "파생 가능한 값을 state로 중복 보관"에 해당한다** |
 
 ---
 
