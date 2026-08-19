@@ -137,7 +137,9 @@ flowchart TD
 
 **Order matters in step 4.** Cheap static checks run first so structural problems surface before expensive live verification; `verify-acceptance-test` runs last, as the final gate right before commit, so it sees the code that every earlier step already amended. Conditions and the Critical/High interlock (stop before commit/PR) live in `plugins/devoks-sdlc/skills/feature-workflow-runner/references/post-implementation-checklist.md`.
 
-**One-off tasks (no fixed order):** `code-analyze-module` · `code-refactoring` · `code-review-general` · `code-security-review` · `test-author` · `new-ui-draft`, plus `new-feature-draft` / `new-feature-github-issue` for lightweight feature work that skips the `FRD.md` / `PLAN.md` artifacts.
+**Optional, project-owned smoke test (reference only):** some installed projects maintain their own pre-release smoke-test skill outside `devoks-sdlc` — route/screen structure differs per project, so `devoks-sdlc` can't ship one generically. Example: `aware-react-app`'s `verify-app-smoke-test` (`.claude/skills/verify-app-smoke-test/SKILL.md`). If a project doesn't have one yet, `/devoks-sdlc:new-smoke-test-draft` scans that project's own route/screen files and generates a one-time starter skill into its `.claude/skills/`. Either way, `devoks-sdlc` only ships the generator — the resulting skill is immediately project-owned: `devoks-sdlc` doesn't own, execute, maintain, or delegate to it, and it stays outside the verification chain's execution menu above. See the project's own skill docs for how it runs.
+
+**One-off tasks (no fixed order):** `code-analyze-module` · `code-refactoring` · `code-review-general` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, plus `new-feature-draft` / `new-feature-github-issue` for lightweight feature work that skips the `FRD.md` / `PLAN.md` artifacts.
 
 ---
 
@@ -158,6 +160,7 @@ flowchart TD
 | `test-author` | `/devoks-sdlc:test-author` *(agent-internal only)* | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
 | `new-ui-draft` | `/devoks-sdlc:new-ui-draft` | devoks-sdlc |
+| `new-smoke-test-draft` | `/devoks-sdlc:new-smoke-test-draft` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
 | `project-convention-manage` | `/devoks-core:project-convention-manage` | devoks-core |

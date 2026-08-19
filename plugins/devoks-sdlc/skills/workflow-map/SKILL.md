@@ -3,7 +3,7 @@ name: workflow-map
 description: DevOks SDLC 작업의 전체 흐름(단계 순서)과 각 단계의 진입 스킬·커맨드를 한 장의 표로 보여준다. 파이프라인(준비→요구정의→작업분해→구현→검증체인→커밋/PR)과 순서 없는 단발 작업을 구분해 제시한다. "워크플로우 맵", "SDLC 흐름 보여줘", "스킬 표", "어떤 스킬 써야 해", "다음 단계 뭐야", "작업 순서 알려줘", "스킬 목록 정리해줘" 같은 조회성 요청에서 사용한다. 표를 출력할 뿐 어떤 단계도 실행하지 않는다 — 실제 실행은 표에 적힌 각 스킬을 직접 호출한다.
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.0.2
 ---
 
 # workflow-map — SDLC 워크플로우 흐름 맵
@@ -67,10 +67,18 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 | 4 | UI 시각 품질 | `/devoks-browser:browser-visual-diff` | UI 컴포넌트/스타일링 변경이 있을 때 |
 | 5 | 브라우저 실동작 | `/devoks-sdlc:verify-acceptance-test` | AC에 UI 조작+상태 영속이 걸려 있을 때 — **커밋 직전 최종 게이트** |
 | 6 | 테스트 스위트 회귀 | `/devoks-sdlc:test-run-triage` | 전체 스위트 회귀를 따로 확인할 때 |
+| 옵션 | 프로젝트 전용 스모크 테스트 (참고) | 프로젝트별 상이 — 예: `aware-react-app`의 `verify-app-smoke-test`(`.claude/skills/verify-app-smoke-test/SKILL.md`). 아직 없다면 `/devoks-sdlc:new-smoke-test-draft`로 화면 목록을 스캔해 초안을 생성할 수 있다 | 해당 프로젝트가 배포 전 스모크 테스트 스킬을 자체 보유(또는 생성)할 때만 |
 
 > 조건·비고·안전 인터록(Critical/High 발견 시 커밋·PR 전 정지)의 SSOT는
 > `${CLAUDE_PLUGIN_ROOT}/skills/feature-workflow-runner/references/post-implementation-checklist.md` 다.
 > 이 표는 그 문서의 **순서와 진입점만** 얕게 비추며, 상세 조건이 다르면 그 문서가 이긴다.
+>
+> **"옵션" 행의 생성 결과는 devoks-sdlc의 위임 대상이 아니다.** devoks-sdlc는 `/devoks-sdlc:new-smoke-test-draft`로
+> 화면 목록을 스캔해 초안(SKILL.md + 체크리스트 + 리포트 템플릿)을 1회 생성해 주는 **생성기만** 소유한다 —
+> 생성된 스킬 자체는 해당 프로젝트 자신이 저작·소유·관리하는 문서로 즉시 넘어가고(라우트·화면 구조가
+> 프로젝트마다 달라 devoks-sdlc가 범용 실행 스킬로 제공할 수 없다), `post-implementation-checklist.md`의
+> 실행 메뉴에도 포함하지 않는다. 생성 이후 완성·실행·유지보수는 프로젝트 몫이며, devoks-sdlc는 생성 시점
+> 이후 그 결과물과 어떤 동기화 관계도 갖지 않는다. 실행 방법은 해당 프로젝트의 스킬 문서를 직접 참고한다.
 
 ## 표 B — 단발 작업 (순서 없음)
 
@@ -84,6 +92,7 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 | 보안 검증 (의존성·시크릿·위협) | `/devoks-sdlc:code-security-review` |
 | 테스트 작성·보강 | `/devoks-sdlc:test-author` |
 | Figma 디자인 → UI 구현 | `/devoks-sdlc:new-ui-draft` |
+| 프로젝트 전용 스모크 테스트 스킬 초안 생성 | `/devoks-sdlc:new-smoke-test-draft` |
 | 간이 기능 구현 (FRD/PLAN 산출물 없이) | `/devoks-sdlc:new-feature-draft` · `/devoks-sdlc:new-feature-github-issue` |
 
 ---

@@ -13,7 +13,7 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 | 우선순위 | 항목 |
 | ---- | ---- |
 | **높음** | UI 작업 분리 검토 · `**devoks-sdlc-orchestration` 신설(비-HITL SDLC)** |
-| **중**  | `aware-react-app` 스모크테스트 스킬·에이전트 생성 · 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · MCP 버전 고정 검토 · MCP project-scope 표준화 검토 · `git-commit-msg` 스킬+haiku 위임 전환 검토 |
+| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · MCP 버전 고정 검토 · MCP project-scope 표준화 검토 · `git-commit-msg` 스킬+haiku 위임 전환 검토 |
 | **낮음** | 구현자 세션 지속(continuation) · 진입점 일관화 · `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 · plugin 버전 메타 정합 · `git-create-issue`/`git-pull-request` 스킬 전환 검토 |
 
 
@@ -21,12 +21,12 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 마이그레이션 / 구조
 
-- [ ] **`aware-react-app` 스모크테스트 스킬·에이전트 생성**
-  - 대상: 설치된 React 프로젝트에서 개발 서버 상태·기본 제공 기능(라우팅, 상태 관리, API 연동 등)을 빠르게 검증하는 베이스 스킬 및 에이전트.
-  - 목표: 신규 피처 구현 후 regression 방지, dev server 상태 감시, e2e 테스트 선행 전 smoke test로 활용 가능한 기본 틀 제공.
-  - 설계 방향: (1) 프로젝트의 `aware-react-app` 모듈이 제공하는 debug API/상태 확인 인터페이스 활용. (2) Chrome DevTools MCP로 live 렌더 검증. (3) 스킬(`devoks-sdlc:smoke-test-aware-react-app`)과 전담 에이전트(`smoke-test-runner`)로 구성, 기존 `verify-acceptance-test` 패턴 재사용.
-  - 선행 조건: `aware-react-app` 모듈의 debug API 스펙 확정.
-  - 우선순위: 중(다른 피처 검증의 기초 자산이 되고, 반복 재사용 가치 높음).
+- [x] ~~`aware-react-app` 스모크테스트 스킬·에이전트 생성~~ → **다른 방식으로 실현됨(2026-08-19 확인)**
+  - 최초 계획(이 항목이 원래 서술하던 것)은 devoks-sdlc가 `smoke-test-aware-react-app` 스킬 + `smoke-test-runner` 에이전트를 자체 소유·배포하는 것이었다.
+  - 실제로는 `aware-react-app` 프로젝트가 라우트·화면 구조에 맞춰 **프로젝트 자신의** `.claude/skills/verify-app-smoke-test/SKILL.md`(+전담 에이전트 `aware-app-smoke-test-runner`)를 직접 저작해 관리 중(버전 1.7.0 확인, 코어 스모크/온디맨드 딥다이브 2모드 보유) — devoks-sdlc가 소유·실행하지 않는다.
+  - 이 방식이 사실상 더 적합하다고 판단: 화면 목록·라우트가 프로젝트마다 달라(원 계획의 "설계 방향"이 이미 이 한계를 내포) devoks-sdlc가 범용 실행 스킬로 제공하기 어렵다.
+  - 반영: `workflow-map`(표 A-1)·README·README.ko의 검증 체인에 "옵션 — 프로젝트 전용 스모크 테스트(참고)" 항목으로 존재만 설명(devoks-sdlc의 위임 대상 아님, `post-implementation-checklist.md` 실행 메뉴에는 미포함).
+  - 후속 과제는 완료 섹션의 "프로젝트 전용 검증 스킬 Draft 생성 스킬 신설 — `new-smoke-test-draft`" 항목에서 처리됨(2026-08-19).
 
 - [ ] **컨벤션 preset 확장 (신규 stack)**
   - management 고도화(provenance hash 기반 stale 감지, 플러그인 번들링 버그 수정)는 2026-07-14 완료 — 완료 섹션 참고.
@@ -209,6 +209,17 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **프로젝트 전용 검증 스킬 Draft 생성 스킬 신설 — `new-smoke-test-draft`(devoks-sdlc)** (2026-08-19, `devoks-sdlc` `1.16.1 → 1.17.0`)
+  - 배경: 위 "`aware-react-app` 스모크테스트 스킬·에이전트 생성" 항목에서 확인했듯 프로젝트마다 라우트·화면 구조가 달라 devoks-sdlc가 범용 실행 스킬로 제공할 수 없다. 그렇다고 매 프로젝트가 완전 백지에서 SKILL.md·체크리스트·리포트 템플릿 구조를 설계하게 두는 것도 비효율이라, 시작점만 생성해 주는 별도 스킬을 신설했다.
+  - **소유 플러그인 결정**: devoks-core(`setup-project-convention`의 preset 복사 인프라 재사용) 대신 **devoks-sdlc**로 결정 — preset 복사는 고정 템플릿을 그대로 옮기는 반면, 이 스킬은 검증 도메인 지식(스모크 테스트 모드·리포트 판정 체계)을 담은 산출물을 생성하므로 검증 스킬 계열(`verify-acceptance-test` 등)과 같은 플러그인에 있는 것이 SSOT 근접성이 높다고 판단.
+  - **이름 결정**: `new-ui-draft`/`new-feature-draft`와 같은 `new-<도메인>-draft` 계열로 `new-smoke-test-draft` 채택 — 이 저장소에서 "draft"는 "미완성 산출물"이 아니라 "한 번에 새 산출물을 직접 만든다"는 의미로 이미 쓰이고 있어 의미가 정확히 들어맞는다(`verify-*`는 검증을 실제로 수행한다는 뜻이라 이 스킬의 "생성만 하고 검증은 안 한다"는 성격과 어긋나 기각).
+  - **v1 스코프를 의도적으로 최소화**: (1) 코어(모드 1) 체크리스트는 실제 스캔 데이터로 채워 생성하고, 딥다이브(모드 2) 체크리스트도 **구조**(화면 목록·섹션 골격)는 함께 생성하되 실제 UX 시나리오 **본문**은 화면 이름·라우트만으로 지어낼 수 없어 TODO로 비워 둔다(2026-08-20 보강 — 최초엔 "표에 행을 추가하라"는 문장 하나로만 언급했으나, `aware-react-app`의 `verify-app-smoke-test`가 코어+딥다이브+리포트 3개 reference 파일로 구성된 실제 사례를 근거로 사용자가 "큰 구조를 갖추는 지시가 있어야 한다"고 지적해 딥다이브 체크리스트 파일 자체를 생성하도록 확장). (2) 전담 서브에이전트(`acceptance-test-runner`/`browser-visual-diff-capture`류 스크린샷·콘솔 바이트 격리 패턴)는 파일로 생성하지 않고, 대신 제안 경로·필수 frontmatter·**"tools: 화이트리스트에 실제 devoks-browser MCP 도구 이름을 빠뜨리면 에이전트가 조용히 차단된다"는 구체적 함정 경고**를 포함한 구조화된 지시로 대체한다(2026-08-20 보강 — 이 함정은 바로 위 "반복·동시 트리거 정합성 커버리지 신설" 항목에서 `acceptance-test-runner` 자신이 실제로 겪은 버그를 일반화한 것이라, 생성기가 대상 프로젝트의 실제 MCP tool 이름을 모른 채 frontmatter를 추측해 쓰면 같은 결함을 재현할 위험이 있어 파일 생성 대신 경고로 대체). (3) `project-convention-manage`류 provenance hash·drift 감지·재적용 관리 스킬은 만들지 않음 — 1회 생성 후 프로젝트가 전적으로 소유·유지보수하는 모델이라 동기화 의무 자체가 없다. 대신 생성된 SKILL.md의 `metadata.generatedBy`/`metadata.generatedFrom`에 생성기·소스 라우트 파일을 1회성 참고 정보로만 남긴다.
+  - **감지 원칙 재사용**: `setup-project-convention` Step 1의 "감지 결과는 추천 근거에만 사용, SSOT로 단정하지 않는다" 원칙을 그대로 적용 — React Router/Next.js/Expo Router·React Navigation 등 스택별 라우트 파일 후보를 스캔하되, 화면 목록은 반드시 사용자 확인을 거쳐 확정하고, 감지가 애매하면(후보 0개 또는 충돌하는 후보 2개 이상) 추측 대신 라우트 파일을 직접 지목하도록 요청한다.
+  - **템플릿 파일 배치**: 대상 프로젝트에 그대로 쓰이는 4개 템플릿(SKILL.md·코어 체크리스트·딥다이브 체크리스트·리포트)은 `feature-workflow-runner/assets/FRD.template.md`와 동일하게 `assets/`에 두고(`references/`는 생성기 자신의 절차 문서만), 플레이스홀더 표기도 FRD.template.md가 쓰는 꺾쇠괄호(`<feature-slug>`류) 스타일을 그대로 따라 이 저장소에 없던 `{{...}}` 문법을 새로 들이지 않았다.
+  - **🟡 부수 발견·수정(2026-08-20, 실제 `aware-react-app`의 `verify-app-smoke-test` reference 4개 파일 전문 대조 감사에서 발견)**: 실제 파일은 화면마다 도메인 접두 ID(`WK-1`/`ST-1`/`PT-1`류)를 부여해 코어 체크리스트·딥다이브 체크리스트("기본 체크리스트 대응 ID" 컬럼)·리포트(화면별 결과 행) 3곳에서 동일 ID로 교차 참조하고, 리포트에는 도메인별 PASS/FAIL/BLOCKED 집계 표도 있었다 — 이 v1 생성기의 템플릿 3개(코어·딥다이브·리포트)에는 **ID 컬럼 자체가 없어** 교차 참조가 불가능했고 도메인 집계 표도 없었다. 이는 도메인 지식이 필요한 "내용 깊이" 문제(위 (1)번, 의도된 경계)와 달리 **라우트 경로 문자열만으로 기계적으로 채울 수 있는 정보**를 빠뜨린 생성기 자체 결함이라 수정 대상으로 판단. `references/screen-detection-heuristics.md`에 §4 "화면 ID 부여" 규칙을 신설(라우트의 첫 세그먼트를 도메인 키로 삼아 도메인이 2개 이상이면 `<DOMAIN>-<N>`, 1개면 `S-<N>` — 업무 의미는 절대 추측하지 않는다)하고, 3개 템플릿 전부에 ID 컬럼과 도메인 집계 표를 추가했다.
+  - 반영: `plugins/devoks-sdlc/skills/new-smoke-test-draft/`(SKILL.md·`references/screen-detection-heuristics.md`(§4 ID 부여 규칙 신설로 §4~5 재배치)·`assets/`템플릿 4개(2026-08-20 `deep-dive-checklist.template.md` 추가 + 전체에 ID/도메인 집계 컬럼 보강)·`evals/evals.json` 신설/갱신), `plugins/devoks-sdlc/skills/workflow-map/SKILL.md`(표 A-1 "옵션" 행·표 B 재작성, `1.0.1 → 1.0.2`), `plugins/devoks-sdlc/.claude-plugin/plugin.json`(`1.16.1 → 1.17.0`), README.md·docs/README.ko.md(검증 체인 문단 재작성 + 스킬 카탈로그 표·단발 작업 목록에 행 추가).
+  - 후속 여지: 실제 설치 대상 프로젝트에서 1회 실행해 생성 결과가 `aware-react-app`의 `verify-app-smoke-test`와 실사용 관점에서 부합하는지 확인 필요(현재는 `evals/evals.json` 프롬프트 기반 동적 검증만 수행) — 6축 체크 동적 축(1·6)의 근본 한계(`enabledPlugins: {}`)는 `workflow-map` 신설 때와 동일.
 
 - [x] **반복·동시 트리거 정합성 커버리지 신설 — 심화 SSOT + SDLC 5단계 전개** (2026-08-19, `devoks-core` `1.2.3 → 1.3.0`, `devoks-sdlc` `1.15.1 → 1.16.0`, `devoks-git` `1.1.0 → 1.1.1`)
   - 배경: 연타 시 수치 유실 버그의 근본원인 분석 결과, 전체 플러그인에서 관련 키워드 grep이 1건뿐이라 리뷰·테스트·검증 어디에서도 이 결함군을 잡지 못했다. 사건에서 관측된 3종(코얼레싱 부재·응답 역류·stale closure 갱신유실)에 더해, 같은 "연타" 행동에서 나오는 **중복 확정(C4)·응답 순서 뒤바뀜(C5)** 이 누락돼 있어 결함 클래스를 7종으로 확장했다.

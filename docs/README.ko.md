@@ -137,7 +137,9 @@ flowchart TD
 
 **4단계는 순서에 의미가 있습니다.** 정적·저비용 검증을 앞에 두어 구조적 문제를 먼저 걸러내고, `verify-acceptance-test` 는 앞선 단계가 유발한 수정이 모두 반영된 코드를 대상으로 **커밋 직전 최종 게이트**로 실행합니다. 각 항목의 조건과 Critical/High 안전 인터록(커밋·PR 전 정지)은 `plugins/devoks-sdlc/skills/feature-workflow-runner/references/post-implementation-checklist.md` 가 SSOT입니다.
 
-**단발 작업(순서 없음):** `code-analyze-module` · `code-refactoring` · `code-review-general` · `code-security-review` · `test-author` · `new-ui-draft`, 그리고 `FRD.md`/`PLAN.md` 산출물 없이 가볍게 구현할 때 쓰는 `new-feature-draft` / `new-feature-github-issue`.
+**옵션 — 프로젝트 전용 스모크 테스트 (참고용):** 일부 설치 대상 프로젝트는 `devoks-sdlc` 밖에서 자체 배포 전 스모크 테스트 스킬을 직접 소유·관리합니다 — 라우트·화면 구조가 프로젝트마다 달라 `devoks-sdlc`가 범용으로 제공하기 어렵기 때문입니다. 예: `aware-react-app`의 `verify-app-smoke-test`(`.claude/skills/verify-app-smoke-test/SKILL.md`). 아직 자체 스킬이 없다면 `/devoks-sdlc:new-smoke-test-draft`가 그 프로젝트의 라우트/화면 정의 파일을 스캔해 `.claude/skills/`에 1회성 초안을 생성해 줍니다. 어느 쪽이든 `devoks-sdlc`는 이 **생성기만** 배포합니다 — 생성된 결과물은 즉시 프로젝트 소유가 되어 `devoks-sdlc`가 소유·실행·유지보수하거나 위임하지 않으며, 위 검증 체인의 실행 메뉴에도 포함되지 않는 참고 항목입니다. 실행 방법은 해당 프로젝트 자신의 스킬 문서를 참고하세요.
+
+**단발 작업(순서 없음):** `code-analyze-module` · `code-refactoring` · `code-review-general` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, 그리고 `FRD.md`/`PLAN.md` 산출물 없이 가볍게 구현할 때 쓰는 `new-feature-draft` / `new-feature-github-issue`.
 
 ---
 
@@ -158,6 +160,7 @@ flowchart TD
 | `test-author` | `/devoks-sdlc:test-author` *(에이전트 내부 전용)* | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
 | `new-ui-draft` | `/devoks-sdlc:new-ui-draft` | devoks-sdlc |
+| `new-smoke-test-draft` | `/devoks-sdlc:new-smoke-test-draft` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
 | `project-convention-manage` | `/devoks-core:project-convention-manage` | devoks-core |
