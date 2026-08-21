@@ -70,6 +70,7 @@
 
 ### devoks-git
 - skill 없이 command만 존재(`git-commit-msg`, `git-create-issue`, `git-pull-request`) — 변경 시 command frontmatter/문서만 대상
+- **이 구성은 확정된 정책이다**(2026-08-21, `docs/roadmap.md` 완료 §「4개 항목 폐기」 폐기 ③·④): 진입점은 **커맨드**, 실행은 **메인 루프**. 근거 — git/gh write 액션은 스킬 auto-trigger 오발동 리스크가 크고, 승인 게이트가 절차의 본질이라 `docs/plugin-management.md` §12 기준 2("승인 게이트형 작업은 의도적으로 메인 루프에서 실행")에 걸리며, 커밋 메시지·PR 본문의 "왜"는 cold diff에서 나오지 않아 서브에이전트 위임 시 품질이 떨어진다. **스킬 전환·haiku 위임 제안이 다시 나오면 그 폐기 근거부터 확인할 것**
 - `gh` CLI 의존, 별도 MCP 서버·prefix 없음
 - devoks-sdlc의 여러 커맨드/스킬이 `/devoks-git:git-commit-msg`, `/devoks-git:git-create-issue`를 텍스트로 참조함(plugin.json `dependencies`엔 미기재) — devoks-git 쪽 커맨드명·규칙을 바꾸면 devoks-sdlc 참조도 함께 확인
 

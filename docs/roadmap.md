@@ -13,8 +13,8 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 | 우선순위 | 항목 |
 | ---- | ---- |
 | **높음** | **`devoks-sdlc` 커맨드·스킬 통합/저사용 정리(진입점 정책 포함)** · UI 작업 분리 검토 · `devoks-sdlc-orchestration` 신설(비-HITL SDLC) |
-| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · `git-commit-msg` 스킬+haiku 위임 전환 검토 |
-| **낮음** | `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 · `git-create-issue`/`git-pull-request` 스킬 전환 검토 |
+| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` |
+| **낮음** | `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 |
 
 
 ---
@@ -40,20 +40,6 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 결합 비용(이번에 보류한 이유): Chrome DevTools MCP 선언이 `devoks-browser/plugin.json`에 있고 Figma MCP·`browser-devtools` 형제 스킬과 묶여 있음 → 이전 시 MCP 의존 선언 이전 또는 cross-plugin 의존 정리가 선행되어야 함.
   - 영향 범위: README/README.ko 카탈로그, `docs/mcp-setup-guide.md`, `devoks-core/hooks/check-setup-state.sh`(chrome-devtools 감지가 "devoks-browser" 문자열도 grep함 — 이전 시 감지 로직 점검).
   - 우선순위: 중.
-
-- [ ] **`git-commit-msg` 커맨드 → 스킬 전환 + haiku 서브에이전트 위임**
-  - 배경(2026-07-29): 커밋 메시지 작성은 SSOT(`.claude/refs/git-convention.md`) 기반 포맷팅 위주 작업이라 모델 지능보다 컨텍스트 처리 방식이 비용을 좌우함 — 메인 에이전트 모델을 토글하면 누적 대화의 prompt cache가 전부 깨지므로(스위치 왕복 2회 = cache miss 2회), 별도 서브에이전트(non-fork, `model: haiku`)에 diff+SSOT 요약만 작은 컨텍스트로 넘기는 쪽이 더 저렴할 것으로 판단.
-  - 주의점:
-    1. fork 타입은 `model` override가 무시되므로(부모 모델 강제 상속) 반드시 non-fork/`general-purpose` 계열로 구성.
-    2. 커밋은 git-write 액션 — "사용자 명시 요청 시에만" 원칙과 SSOT의 "사용자 확인 후 커밋" 요건이 스킬 전환 후에도 그대로 지켜져야 한다. 스킬은 자연어 description 매칭으로 auto-trigger될 수 있어 커맨드보다 오발동 리스크가 크므로, description·본문에 explicit-invoke 전제(또는 최소 확인 게이트)를 baked-in할 것.
-    3. 신규/변경 스킬 품질 체크리스트(축1 — `evals/evals.json` 동적 실행)로 haiku가 Conventional Commits 포맷·타입 매핑·footer 규칙(Agent 서명 등)을 안정적으로 지키는지 먼저 검증 — 실패율이 높으면 sonnet 유지로 되돌린다.
-  - 관련: 아래 이슈/PR 스킬 전환 항목(짝 항목이나 리스크 수준이 달라 별도 판단), 위 "`devoks-sdlc` 커맨드·스킬 통합" 항목의 진입점 정책 절(상위 정책과 연결).
-  - 우선순위: 중(비용 실측·eval 검증 선행 과제).
-
-- [ ] **`git-create-issue`/`git-pull-request` 커맨드 → 스킬 전환**
-  - 배경(2026-07-29): 위 `git-commit-msg` 스킬 전환 논의와 함께 나온 짝 항목.
-  - 커밋과 달리 haiku 서브에이전트 위임은 별도 판단 필요 — 이슈 생성은 label/assignee/issue-type MCP 검증 순서, `### Additional Context` 단일 블록 blockquote 연속 규칙 등 지침이 촘촘해 작은 모델의 실패(재시도) 비용이 커밋보다 클 수 있다. "커맨드→스킬 전환"(진입점 변경)과 "haiku 위임 여부"(모델 변경)를 분리해서 검토할 것.
-  - 우선순위: 낮음(`git-commit-msg` 스킬 전환·eval 검증 결과를 먼저 보고 착수).
 
 ---
 
@@ -130,7 +116,7 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   
   #### 리스크·전제
   - **권한**: 자동 커밋/PR은 repo write·토큰 범위 최소화, draft PR 기본, main 직접 푸시 금지.
-  - **품질**: HITL 제거만큼 게이트·evals·샌드박스 실행이 필수 — `evals` 하니스·스킬 품질 검증(본 문서 §품질) 선행 권장.
+  - **품질**: HITL 제거만큼 게이트·샌드박스 실행이 필수 — 스킬 품질 검증은 `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md` §7(6축)을 그대로 쓴다. 공용 evals 러너는 없다(구 "evals 하니스 확대" 항목은 2026-08-21 폐기 — 아래 폐기 ② 참고: `claude plugin eval`이 early-access 게이트로 실행 불가, `evals.json`과 포맷 비호환). 게이트가 열리면 이 항목의 전제도 함께 재검토할 것.
   - **비용·동시성**: RUN당 토큰·서브에이전트 상한, 큐 백프레셔 정책.
   - **법·컴플라이언스**: 고객 데이터·라이선스가 걸린 변경은 자동화 제외 목록에 명시.
   #### 네이밍 결정
@@ -166,17 +152,6 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 검증 범위: iOS 시뮬레이터 부팅 상태에서 `xcrun simctl io booted screenshot` 스크린샷 캡처 + Metro CDP(`evaluate_script`, `list_console_messages`, `list_network_requests`) 정상 동작 확인, SKILL.md 트러블슈팅 표·전제 조건에 iOS 특이사항 반영.
   - 우선순위: 중.
 
-- [ ] **카탈로그 자동 생성 (drift 방지)**
-  - 현재 `README.md`와 `docs/README.ko.md`의 플러그인·스킬·커맨드 표를 **수기로 이중 관리** → 실제 drift 발생(devoks-test가 한동안 README에 누락됨).
-  - `marketplace.json` + 각 plugin.json/SKILL.md frontmatter에서 카탈로그 표를 생성하는 스크립트를 두고, README는 생성 결과를 포함하도록 전환.
-  - **표면 추가(2026-08-07)**: `devoks-sdlc:workflow-map` 신설로 수기 카탈로그 표면이 **3곳**이 됐다(README.md · docs/README.ko.md · `workflow-map/SKILL.md`). 다만 앞의 둘과 성격이 다르다 — workflow-map이 담는 것은 **단계 순서·진입점**이라 frontmatter에서 생성할 수 없는 정보이고(순서는 어느 메타데이터에도 없다), 생성 대상은 "스킬 이름 목록"뿐이다. 자동 생성 도입 시 workflow-map은 **이름 유효성 검증 대상**(표에 적힌 진입점이 실존하는지 CI 체크)으로만 편입하고 표 본문 생성 대상에서는 제외하는 쪽이 맞다.
-  - 우선순위: 중(반복 비용·정확성 직결).
-
-- [ ] **evals 하니스 확대**
-  - 보유 현황(2026-08-21 재확인): `feature-workflow-runner`·`new-ui-draft`·`new-smoke-test-draft`·`verify-acceptance-test`·`workflow-map`(devoks-sdlc), `orchestration-run`(devoks-sdlc-orchestration) — 신규 스킬 품질 체크리스트 축3이 blocking으로 작동해 신규분은 채워지는 중. 남은 미보유: `test-author`·`test-run-triage`·`code-security-review`·`verify-requirements`·`verify-data-flow`·`code-review`·`feature-frd-author`·`feature-plan-author`·`feature-plan-executor`.
-  - eval 러너 스크립트가 없음(데이터만 존재) → 공용 러너 도입 검토. `claude plugin eval`(CLI 내장)이 이 역할을 대체할 수 있는지 먼저 확인.
-  - 우선순위: 중.
-
 - [ ] `**code-security-review` references/ 보강 (선택)**
   - 단일 SKILL.md → 시크릿 패턴 카탈로그·카테고리별 체크리스트를 `references/`로 분리(`verify-data-flow`의 `references/` 분리 패턴 참고 — 구 `feature-data-verification`).
   - 우선순위: 낮음.
@@ -184,6 +159,36 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **4개 항목 폐기 — 「카탈로그 자동 생성」·「evals 하니스 확대」·「`git-commit-msg` 스킬+haiku 위임 전환」·「`git-create-issue`/`git-pull-request` 스킬 전환」** (2026-08-21, `plugins/` 미변경 — 저장소 루트 문서만)
+  - ①~③은 착수 전 사실 조사를 먼저 수행했고, 그 결과 **투자 대비 효용이 낮거나 외부 요인으로 실행 불가**로 판정돼 추적을 중단했다. ④는 ③의 폐기 근거가 그대로 적용돼 같은 라운드에서 함께 정리했다. 아래는 같은 조사를 반복하지 않기 위한 근거 보존이다.
+
+  - **폐기 ①「카탈로그 자동 생성 (drift 방지)」**
+    - **생성 가능한 표가 5개 중 1개뿐**이다. `Available Skills`(Skill/Invoke/Plugin)만 전부 파생 가능하고, `Available Agents`의 "Delegated by", `Available Commands`·`Plugin Overview`·`Dependency Summary`의 설명 컬럼은 **영·한 각각 손으로 쓴 큐레이션 문구**다. frontmatter `description`은 트리거 매칭용 장문 한국어라 카탈로그 표에 그대로 넣을 수 없다(예: README `Scoped code review` / README.ko `범위 지정 코드리뷰` ↔ frontmatter `사용자가 지정한 파일/폴더/모듈 범위의 코드를 리뷰한다.`).
+    - **이 저장소에 CI가 없다**(`.github/` 부재). 생성기 대신 `--check` 드리프트 검증기를 두더라도 **사람이 호출해야만 동작**하므로, README 갱신을 빠뜨린 것과 정확히 같은 실패 모드가 남는다. 자동화로 해결되는 문제가 아니라 절차 이행 문제였다.
+    - **절차는 이미 있다** — `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md` §2가 "플러그인/skill/command 설명이 바뀔 때 README·README.ko 검토"를 규정한다.
+    - **결정적 반례(2026-08-21 발견)**: 조사 시점에 `devoks-sdlc-orchestration`(플러그인)과 `orchestration-run`(스킬)이 `marketplace.json`에는 있으나 양 README 카탈로그에는 없어 drift로 보였으나, **이는 drift가 아니라 의도된 상태**다 — 해당 플러그인이 아직 작업 중(미완성)이라 사용자-facing 카탈로그에 일부러 넣지 않았다. **자동 생성기를 도입했다면 미완성 플러그인을 카탈로그에 강제 주입했을 것이다.** 카탈로그는 "존재하는 것의 기계적 목록"이 아니라 "팀에 공개할 준비가 된 것의 큐레이션"이므로 자동 생성과 성격이 맞지 않는다.
+    - 구 항목이 담고 있던 `workflow-map` 관련 판단(단계 순서는 어떤 메타데이터에도 없어 생성 불가, 도입 시 이름 유효성 검증 대상으로만 편입)도 함께 종결.
+
+  - **폐기 ②「evals 하니스 확대」**
+    - **러너 질문은 외부 요인으로 종결**: `claude plugin eval` / `claude plugin eval init`은 CLI에 실재하지만(v2.1.238 확인) 실행하면 `` `plugin eval` is currently in early access `` 를 출력하고 종료한다 — **조직 early-access 게이트 미개방**. 우리 쪽에서 할 수 있는 작업이 없다.
+    - **포맷 흡수 불가**: CLI 포맷은 `evals/<case>/prompt.md` + `graders/*.md`(또는 `case.yaml`, `schema_version "1.1"`; grader 타입 `regex|tool_order|tool_used|file_exists|llm|baseline`; 옵션으로 `.claude-plugin/plugin.json`의 `experimental.evals`로 디렉토리 이전 가능)다. CLI 내장 문서가 *"it is unrelated to the `evals/evals.json` format some skill-authoring tools use"* 라고 명시 — 자동 변환 경로가 없고 전량 수기 재작성이다. 게이트가 열리면 그때 이관 비용을 다시 산정할 것.
+    - **커버리지 확대는 YAGNI**: 미보유 9개(`test-author`·`test-run-triage`·`code-security-review`·`verify-requirements`·`verify-data-flow`·`code-review`·`feature-frd-author`·`feature-plan-author`·`feature-plan-executor`)는 모두 안정화된 기존 스킬이다. evals의 실사용 시점은 유지보수 스킬 §7 축1(**스킬이 변경될 때**)인데 그 시점에 "기존 skill 변경 시 evals 작성 권장" 규칙이 다시 걸린다 → 지금 쓰면 비용은 즉시, 효용은 불확실한 미래다. 신규 스킬은 축3이 blocking으로 작동해 구멍이 생기지 않는다(최근 신설 스킬 전부 보유).
+
+  - **폐기 ③「`git-commit-msg` 커맨드 → 스킬 전환 + haiku 서브에이전트 위임」**
+    - **저장소 자신의 SSOT가 반대 방향이다(결정적)**: `docs/plugin-management.md` §12 "서브에이전트 분리·티어링 판단 3기준" 중 **기준 2(인터랙션 필요성)** 는 *"승인 게이트·사용자 질문이 절차의 본질인 작업은 의도적으로 메인 루프·세션 모델에서 실행한다"* 고 규정한다. 커밋은 SSOT가 "반드시 사용자에게 커밋 메시지를 확인받은 후 커밋한다"로 정한 **승인 게이트가 본질인 작업**이고, 서브에이전트는 `workflow-checklist.md` §8에 따라 **질문 금지**라 게이트를 보유할 수 없다. 3기준 중 2개(기준 2 인터랙션, 기준 3 격리 이득)가 위임에 반대하고 1개(기준 1 스펙 완결성)만 찬성.
+    - **비용 절감이 작다(실측)**: 이 저장소 최근 12커밋 diff 중앙값 24,572 chars(≈12k tok), SSOT+커맨드 8,227 chars(≈4k tok). Opus 5 `$5/$25` per MTok · Haiku 4.5 `$1/$5` · 캐시 read `0.1×`/write `2×`(1h TTL) 기준으로 **커밋당 메인 루프 ≈ $0.19 vs 서브에이전트 ≈ $0.05 → 절감 ≈ $0.14(70%)**. 절감률은 크나 절대액이 작고(주 20커밋 → 월 ~$11), 무엇보다 **커밋은 검증 체인의 마지막 액션이라 잔여 턴 수가 거의 0** → 서브에이전트 격리의 본래 이득(누적 캐시 재전송 회피)이 이 워크로드에서는 거의 발생하지 않는다. 이득이 커지는 경우는 **한 세션에서 PR 그룹 단위로 3~4회 커밋하며 계속 작업하는 패턴**뿐이다(4커밋·각 30턴 잔존 시 $1.60 → $0.20).
+    - **품질 리스크가 요구사항과 정면 충돌**: 커맨드 본문이 *"변경에 따른 결과·효과를 기재"* 를 요구하는데, 이는 **의도(why) 정보**라 cold diff만 본 haiku가 쓸 수 없다. 보정하려면 메인 루프가 의도 요약을 작성해 넘겨야 하는데 — 그러면 메시지 가치의 대부분을 메인이 만들고 haiku는 포맷팅만 하게 되어 위임의 근거 자체가 사라진다.
+    - **스킬 전환은 순이익이 없다**: 커맨드를 우회한 즉흥 `git commit` 문제는 이미 `plugins/devoks-git/hooks/remind-commit-convention.sh`(PreToolUse, 2026-08-21 `bd9ce53`)가 커버한다. 스킬 전환으로 남는 건 git-write 액션의 자연어 auto-trigger 오발동 리스크뿐이다.
+    - **재검토 트리거(추적은 하지 않음)**: 한 세션에서 3회 이상 커밋하는 PR-그룹 단위 워크플로가 일상화되면 누적 컨텍스트 비용이 위 계산과 달라지므로 그때 다시 판단한다.
+    - 짝 항목 `git-create-issue`/`git-pull-request` 스킬 전환도 같은 라운드에서 함께 폐기 — 아래 폐기 ④.
+
+  - **폐기 ④「`git-create-issue`/`git-pull-request` 커맨드 → 스킬 전환」**
+    - 구 배경(2026-07-29): 위 ③과 함께 나온 짝 항목으로, "커맨드→스킬 전환"(진입점 변경)과 "haiku 위임 여부"(모델 변경)를 분리 검토하기로 돼 있었다.
+    - **진입점 전환 근거가 ③과 동일하게 무효**: 스킬은 자연어 description 매칭으로 auto-trigger되므로 **gh-write 액션(이슈 생성·PR 생성)의 오발동 리스크**를 커맨드보다 키운다. 반면 스킬 전환으로 얻으려던 "커맨드를 우회한 즉흥 실행 보정"은 커밋의 경우 이미 `remind-commit-convention.sh` PreToolUse 훅이 담당하고 있고, 이슈·PR은 애초에 즉흥 실행 빈도가 낮다(둘 다 명시적 산출물 생성 액션). 즉 **얻는 것 없이 리스크만 늘어난다.**
+    - **haiku 위임은 커밋보다 근거가 더 약하다**: 이슈 생성은 label/assignee/issue-type MCP 검증 순서, `### Additional Context` 단일 블록 blockquote 연속 규칙 등 지침이 촘촘해 작은 모델의 실패(재시도) 비용이 커밋보다 크다. PR 본문은 추적성·테스트·리스크 요약이라 ③에서 지적한 **"why 정보는 cold diff에서 나오지 않는다"** 문제가 커밋보다 심하다(PR 본문은 커밋 메시지보다 의도 서술 비중이 더 높다).
+    - **§12 기준 2도 동일 적용**: 이슈·PR 생성 역시 사용자 확인 게이트가 절차의 본질이라 `docs/plugin-management.md` §12 "승인 게이트형 작업은 의도적으로 메인 루프에서 실행" 기준에 걸린다.
+    - 결론: `devoks-git`의 3개 커맨드(`git-commit-msg`·`git-create-issue`·`git-pull-request`)는 **모두 커맨드·메인 루프 실행을 유지**한다. 진입점 정책 자체를 다시 다룰 일이 생기면 위 "`devoks-sdlc` 커맨드·스킬 통합" 항목의 진입점 정책 절에서 일괄 판단할 것.
 
 - [x] **로드맵 항목 정리 — 완료 항목 제거 + 4개 항목 폐기** (2026-08-21, `devoks-sdlc` `1.17.0 → 1.17.1`)
   - **제거(완료됨)**: "`aware-react-app` 스모크테스트 스킬·에이전트 생성" — 이미 `[x]`로 종결돼 있었고 후속 과제도 아래 `new-smoke-test-draft` 항목에서 처리 완료. 실질 내용(프로젝트 소유 스모크 테스트가 왜 devoks-sdlc 밖에 있는지)은 `workflow-map` 표 A-1 "옵션" 행과 양 README §검증 체인에 이미 서술돼 있어 로드맵에서 빼도 유실 없음.
@@ -250,7 +255,7 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 - [x] **harness 유지보수 체크표(`workflow-checklist.md`) §4 devoks-sdlc 절 사실 정정** (2026-07-30, 플러그인 번들 외부 — 버전 bump 비대상)
   - 위 `size` 개정의 커밋 전 자체 재감사 중 발견. 이 문서는 devoks-sdlc 변경 시 "영향 범위가 가장 넓다"고 경고하는 근거인데 두 곳이 틀려 있었다.
-  - ⑴ **수치 drift**: "skill 10 + command 8 + agent 2"로 기재됐으나 실제는 skill 11 + command 9 + agent 5. 숫자를 갱신하는 대신 **하드코딩을 제거**하고 확인 명령(`ls skills/*/ commands/*.md agents/*.md`)을 남겼다 — 손으로 유지하는 개수는 반드시 다시 drift하며, 이 저장소는 같은 이유로 "카탈로그 자동 생성(drift 방지)" 항목을 이미 두고 있다.
+  - ⑴ **수치 drift**: "skill 10 + command 8 + agent 2"로 기재됐으나 실제는 skill 11 + command 9 + agent 5. 숫자를 갱신하는 대신 **하드코딩을 제거**하고 확인 명령(`ls skills/*/ commands/*.md agents/*.md`)을 남겼다 — 손으로 유지하는 개수는 반드시 다시 drift한다(당시엔 같은 이유로 "카탈로그 자동 생성(drift 방지)" 항목을 두고 있었으나, 그 항목은 2026-08-21 폐기됐다 — 위 폐기 ① 참고. 하드코딩 제거라는 이 조치 자체는 유효하다).
   - ⑵ **사실 오류**: "`code-reviewer`/`code-security-reviewer` **agent**가 agent-internal only"라고 서술했으나 반대다 — 그 둘은 커맨드·사용자 요청의 **진입점**(직접 트리거 가능)이고, agent-internal인 agent는 `code-implementer`·`acceptance-test-runner`다. agent-internal인 것은 동명의 **skill**(`code-review`/`code-security-review`)이다. skill/agent 층을 혼동한 서술이라 감사자가 잘못된 기준으로 README를 점검하게 된다 → 세 갈래(agent-internal skill / agent-internal agent / 직접 트리거 가능 agent)로 분리 기재하고 확인 grep을 붙였다.
   - 반영: `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md`. `plugins/` 미변경이므로 어떤 플러그인도 버전 bump 비대상.
 
