@@ -3,7 +3,7 @@
 DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-08-19
+> 최종 갱신: 2026-08-21
 
 ---
 
@@ -12,21 +12,22 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 | 우선순위 | 항목 |
 | ---- | ---- |
-| **높음** | UI 작업 분리 검토 · `**devoks-sdlc-orchestration` 신설(비-HITL SDLC)** |
-| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · MCP 버전 고정 검토 · MCP project-scope 표준화 검토 · `git-commit-msg` 스킬+haiku 위임 전환 검토 |
-| **낮음** | 구현자 세션 지속(continuation) · 진입점 일관화 · `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 · plugin 버전 메타 정합 · `git-create-issue`/`git-pull-request` 스킬 전환 검토 |
+| **높음** | **`devoks-sdlc` 커맨드·스킬 통합/저사용 정리(진입점 정책 포함)** · UI 작업 분리 검토 · `devoks-sdlc-orchestration` 신설(비-HITL SDLC) |
+| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · 카탈로그 자동 생성 · evals 하니스 확대 · `git-commit-msg` 스킬+haiku 위임 전환 검토 |
+| **낮음** | `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 · `git-create-issue`/`git-pull-request` 스킬 전환 검토 |
 
 
 ---
 
 ## 마이그레이션 / 구조
 
-- [x] ~~`aware-react-app` 스모크테스트 스킬·에이전트 생성~~ → **다른 방식으로 실현됨(2026-08-19 확인)**
-  - 최초 계획(이 항목이 원래 서술하던 것)은 devoks-sdlc가 `smoke-test-aware-react-app` 스킬 + `smoke-test-runner` 에이전트를 자체 소유·배포하는 것이었다.
-  - 실제로는 `aware-react-app` 프로젝트가 라우트·화면 구조에 맞춰 **프로젝트 자신의** `.claude/skills/verify-app-smoke-test/SKILL.md`(+전담 에이전트 `aware-app-smoke-test-runner`)를 직접 저작해 관리 중(버전 1.7.0 확인, 코어 스모크/온디맨드 딥다이브 2모드 보유) — devoks-sdlc가 소유·실행하지 않는다.
-  - 이 방식이 사실상 더 적합하다고 판단: 화면 목록·라우트가 프로젝트마다 달라(원 계획의 "설계 방향"이 이미 이 한계를 내포) devoks-sdlc가 범용 실행 스킬로 제공하기 어렵다.
-  - 반영: `workflow-map`(표 A-1)·README·README.ko의 검증 체인에 "옵션 — 프로젝트 전용 스모크 테스트(참고)" 항목으로 존재만 설명(devoks-sdlc의 위임 대상 아님, `post-implementation-checklist.md` 실행 메뉴에는 미포함).
-  - 후속 과제는 완료 섹션의 "프로젝트 전용 검증 스킬 Draft 생성 스킬 신설 — `new-smoke-test-draft`" 항목에서 처리됨(2026-08-19).
+- [ ] **`devoks-sdlc` 커맨드·스킬 통합 + 저사용 스킬 정리 (진입점 정책 포함)**
+  - 배경(2026-08-21): `devoks-sdlc`가 스킬 14개·커맨드 8개까지 늘며 관리 부담이 커졌다는 문제 제기로 별도 플러그인 분리(설계/구현 vs 검증/테스트) 및 `workflow-map`/`new-smoke-test-draft` 이전 방안을 검토했으나, 실익이 크지 않다고 판단해 둘 다 폐기 — 현 구조를 유지한다.
+  - 정리 방향: (1) 대응 스킬 없이 자기완결형으로 남아있는 커맨드(`new-feature-draft`·`new-feature-github-issue`·`code-analyze-module`·`code-refactoring`)를 대응 스킬(예: `feature-workflow-runner`)과 통합할지 판단, (2) 스킬 호출용 얇은 커맨드처럼 실질적으로 동일한 커맨드/스킬 쌍을 통합, (3) 사용 빈도가 낮거나 미사용인 스킬·커맨드를 선정해 삭제.
+  - **진입점 정책도 이 항목에서 함께 확정한다** (구 "진입점 일관화 검토(command vs skill)" 항목을 2026-08-21 흡수 — 정리 대상이 동일해 중복이었다): 팀이 스킬 우선으로 이동 중(`new-feature-verify`, 2026-08-10 `new-ui-draft` — 둘 다 커맨드 파일을 남기지 않고 스킬로 이관)이나 `new-feature-draft`/`new-feature-github-issue`/`code-*`는 여전히 커맨드다. 트리거 기반(자연어) 호출로 통일할지, command를 진입 전용으로 남길지 정책을 한 번 확정한다.
+  - 조사 시 참고할 기존 신호: `new-feature-draft`/`new-feature-github-issue`는 `feature-workflow-runner`를 **호출하지 않고**(`branch-issue-precheck.md` 참조만 공유) 진입 경로가 병존한다 — 아래 완료 섹션 `workflow-map` 항목의 "파생 발견" 참고. `code-analyze-module`은 4개 플러그인 통합 merge 커밋 이후 실질 편집 이력이 없어 다른 자기완결형 커맨드보다 활동 신호가 낮음(대리지표일 뿐 확정 증거는 아님).
+  - 사용 여부·삭제 대상 최종 판단은 실사용 확인 후 사용자가 직접 결정 — 대리지표(마지막 커밋 시점 등)만으로 임의 삭제하지 않는다.
+  - 우선순위: 높음.
 
 - [ ] **컨벤션 preset 확장 (신규 stack)**
   - management 고도화(provenance hash 기반 stale 감지, 플러그인 번들링 버그 수정)는 2026-07-14 완료 — 완료 섹션 참고.
@@ -40,24 +41,13 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 영향 범위: README/README.ko 카탈로그, `docs/mcp-setup-guide.md`, `devoks-core/hooks/check-setup-state.sh`(chrome-devtools 감지가 "devoks-browser" 문자열도 grep함 — 이전 시 감지 로직 점검).
   - 우선순위: 중.
 
-- [ ] **구현자 세션 지속 — 에이전트 continuation 기반 PR그룹 단위 위임**
-  - 현재 태스크 단위 cold-start 위임은 인계 노트(요약 채널)로 지식 단절을 완화 중. subagent continuation(재호출 시 컨텍스트 유지)이 팀 배포 환경에서 공식 지원됨이 검증되면, **PR그룹(모듈) 단위로 `code-implementer` 1개를 유지하며 태스크를 순차 투입**하는 방식으로 전환 — 같은 모듈 재독 1회로 축소, 네이밍·패턴 일관성 확보. 인계 노트의 상위 호환.
-  - 선행 조건: Claude Code subagent continuation 공식 문서 확인 + 팀 최소 버전 정책 합의.
-  - 관련 SSOT: `plugins/devoks-sdlc/skills/feature-workflow-runner/references/task-delegation.md`.
-  - 우선순위: 낮음(검증 선행).
-
-- [ ] **진입점 일관화 검토 (command vs skill)**
-  - 팀이 스킬 우선으로 이동 중(`new-feature-verify` 커맨드→스킬 전환, 2026-08-10 `new-ui-draft` 커맨드→스킬 전환 — 둘 다 커맨드 파일을 남기지 않고 이관). 그러나 `new-feature-draft`/`new-feature-github-issue`/`code-*` 등은 여전히 커맨드.
-  - 트리거 기반(자연어) 호출로 통일할지, command는 진입 전용으로 남길지 정책을 한 번 확정.
-  - 우선순위: 낮음(정책 결정 먼저).
-
 - [ ] **`git-commit-msg` 커맨드 → 스킬 전환 + haiku 서브에이전트 위임**
   - 배경(2026-07-29): 커밋 메시지 작성은 SSOT(`.claude/refs/git-convention.md`) 기반 포맷팅 위주 작업이라 모델 지능보다 컨텍스트 처리 방식이 비용을 좌우함 — 메인 에이전트 모델을 토글하면 누적 대화의 prompt cache가 전부 깨지므로(스위치 왕복 2회 = cache miss 2회), 별도 서브에이전트(non-fork, `model: haiku`)에 diff+SSOT 요약만 작은 컨텍스트로 넘기는 쪽이 더 저렴할 것으로 판단.
   - 주의점:
     1. fork 타입은 `model` override가 무시되므로(부모 모델 강제 상속) 반드시 non-fork/`general-purpose` 계열로 구성.
     2. 커밋은 git-write 액션 — "사용자 명시 요청 시에만" 원칙과 SSOT의 "사용자 확인 후 커밋" 요건이 스킬 전환 후에도 그대로 지켜져야 한다. 스킬은 자연어 description 매칭으로 auto-trigger될 수 있어 커맨드보다 오발동 리스크가 크므로, description·본문에 explicit-invoke 전제(또는 최소 확인 게이트)를 baked-in할 것.
     3. 신규/변경 스킬 품질 체크리스트(축1 — `evals/evals.json` 동적 실행)로 haiku가 Conventional Commits 포맷·타입 매핑·footer 규칙(Agent 서명 등)을 안정적으로 지키는지 먼저 검증 — 실패율이 높으면 sonnet 유지로 되돌린다.
-  - 관련: 아래 이슈/PR 스킬 전환 항목(짝 항목이나 리스크 수준이 달라 별도 판단), 위 "진입점 일관화 검토" 항목(상위 정책과 연결).
+  - 관련: 아래 이슈/PR 스킬 전환 항목(짝 항목이나 리스크 수준이 달라 별도 판단), 위 "`devoks-sdlc` 커맨드·스킬 통합" 항목의 진입점 정책 절(상위 정책과 연결).
   - 우선순위: 중(비용 실측·eval 검증 선행 과제).
 
 - [ ] **`git-create-issue`/`git-pull-request` 커맨드 → 스킬 전환**
@@ -99,11 +89,11 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   [트리거] → [Intake/정규화] → [Plan/분해] → [Implement] → [Verify] → [Review] → [Deliver] → [Report]
        ↑            │                │              │            │           │            │
    Linear/GitHub   이슈→RUN         PLAN SSOT    code-implementer  test/req/   code-review/  PR+CI    Slack/이슈
-   Slack/webhook   스펙 자동보완    병렬 라우팅   (continuation)    data-flow   security      merge?   최종 요약
+   Slack/webhook   스펙 자동보완    병렬 라우팅   size 라우팅       data-flow   security      merge?   최종 요약
   ```
   - **트리거(Intake)**: 외부 이슈·라벨·assignee·우선순위를 RUN(실행 단위)으로 매핑. 입력이 빈약하면 템플릿·과거 유사 이슈·코드베이스 스캔으로 스펙 보완(추측 상한·에스컬레이션 규칙 필수).
   - **Plan**: `devoks-sdlc`의 FRD/PLAN·`traces`·PR 분리 규칙을 **재사용**하되, 승인 게이트 제거·`status` 전환 자동화. RUN 메타(`run-id`, `issue-ref`, `policy-version`)를 frontmatter에 고정.
-  - **Implement**: `code-implementer` + continuation(도입 후) + `size` 라우팅. 브랜치 생성·이슈 링크는 사전체크 확인 없이 **정책 기본값** 적용(`devoks-git` 연동).
+  - **Implement**: `code-implementer` + `size` 라우팅. 브랜치 생성·이슈 링크는 사전체크 확인 없이 **정책 기본값** 적용(`devoks-git` 연동).
   - **Verify**: 검증 체인 순서는 `post-implementation-checklist.md`가 SSOT(요구사항→코드리뷰→데이터흐름→UI 시각품질→브라우저 실동작 검증→테스트 회귀). `verify-acceptance-test`(실동작)는 dev server+Chrome(9269) 감지 시 커밋 직전 직렬 게이트, 미감지 시 draft PR 플래그로 위임(D6). 실패 시 자동 수정 루프 상한 N회 후 에스컬레이션.
   - **Review**: `code-review`, `code-security-review` — 심각도 임계 초과 시 PR draft 유지·머지 차단.
   - **Deliver**: Conventional Commits 커밋, PR 본문(추적성·테스트·리스크), CI 워크플로 트리거. `devoks-release`와 경계 협의(릴리스 vs 기능 PR).
@@ -117,7 +107,7 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   | 단계            | 범위                                             | 산출                                  |
   | ------------- | ---------------------------------------------- | ----------------------------------- |
   | **0 — 정책**    | 자동화 허용 범위·금지 경로(시크릿·인프라·DB 마이그레이션)·에스컬레이션 연락처  | 정책 SSOT `plugins/devoks-sdlc-orchestration/references/orchestration-policy.md` (`policy-version 0.2.0`, 번들 단일본) |
-  | **1 — MVP**   | 수동 트리거 1건: 이슈 URL → 브랜치·구현·테스트·draft PR·요약 리포트 | `devoks-sdlc-orchestration` **0.2.0 저작 완료**(2026-07-23): `orchestration-run` 스킬 + `pipeline.md` + 정책 번들. validate ✔. 크로스-플러그인 호출은 post-publish 스모크 대기 |
+  | **1 — MVP**   | 수동 트리거 1건: 이슈 URL → 브랜치·구현·테스트·draft PR·요약 리포트 | `devoks-sdlc-orchestration` 저작 완료(2026-07-23 `0.2.0`, 현재 번들 **`0.2.1`**): `orchestration-run` 스킬 + `pipeline.md` + 정책 번들. validate ✔. 크로스-플러그인 호출은 post-publish 스모크 대기 |
   | **2 — 검증 강화** | 리뷰/보안/요구사항 게이트·재시도(2회)·`blocked` 자동 분류 **저작 완료**(pipeline.md Stage 4) | 이슈 코멘트/Slack 어댑터 배선은 단계 3(MVP 콘솔 fallback) |
   | **3 — 트리거**   | Linear/GitHub 이슈 라벨·웹훅·(선택) Slack 명령           | 이벤트 기반 RUN 큐                        |
   | **4 — 운영**    | RUN 큐·동시성·비용 상한·감사 로그·evals                    | 팀 운영 가이드                            |
@@ -183,35 +173,27 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 우선순위: 중(반복 비용·정확성 직결).
 
 - [ ] **evals 하니스 확대**
-  - 현재 `feature-workflow-runner`만 `evals/evals.json` 보유. `test-author`·`test-run-triage`·`code-security-review`·`verify-requirements`·`verify-data-flow`에도 추가.
-  - eval 러너 스크립트가 없음(데이터만 존재) → 공용 러너 도입 검토.
+  - 보유 현황(2026-08-21 재확인): `feature-workflow-runner`·`new-ui-draft`·`new-smoke-test-draft`·`verify-acceptance-test`·`workflow-map`(devoks-sdlc), `orchestration-run`(devoks-sdlc-orchestration) — 신규 스킬 품질 체크리스트 축3이 blocking으로 작동해 신규분은 채워지는 중. 남은 미보유: `test-author`·`test-run-triage`·`code-security-review`·`verify-requirements`·`verify-data-flow`·`code-review`·`feature-frd-author`·`feature-plan-author`·`feature-plan-executor`.
+  - eval 러너 스크립트가 없음(데이터만 존재) → 공용 러너 도입 검토. `claude plugin eval`(CLI 내장)이 이 역할을 대체할 수 있는지 먼저 확인.
   - 우선순위: 중.
 
 - [ ] `**code-security-review` references/ 보강 (선택)**
-  - 단일 SKILL.md → 시크릿 패턴 카탈로그·카테고리별 체크리스트를 `references/`로 분리(feature-data-verification 패턴 참고).
+  - 단일 SKILL.md → 시크릿 패턴 카탈로그·카테고리별 체크리스트를 `references/`로 분리(`verify-data-flow`의 `references/` 분리 패턴 참고 — 구 `feature-data-verification`).
   - 우선순위: 낮음.
-
-- [ ] **plugin 버전 메타 정합**
-  - 플러그인별 버전이 활동량에 따라 갈라지는 중(예: `devoks-sdlc` 1.2.0, `devoks-browser` 1.1.0, 나머지 1.0.x). 릴리스 정책 확정 시 버전 규칙(개별 semver 유지 vs 하네스 일괄 버전)을 통일.
-  - 우선순위: 낮음.
-
-- [ ] **MCP 서버 버전 고정 검토 (`setup-mcp`)**
-  - 현재 `claude mcp add`로 설치하는 context7·codegraph·serena가 `@latest`를 사용해, 설치 시점에 따라 팀원 간 버전이 달라질 수 있음(번들·user-scope 선택과 무관하게 존재하는 드리프트).
-  - 검토 방향: 특정 버전 핀 vs `@latest` 유지의 트레이드오프(보안 패치 지연 vs 팀 일관성) 판단 후 `plugins/devoks-core/commands/setup-mcp.md`·`docs/mcp-setup-guide.md` 갱신.
-  - 우선순위: 중(당장 깨지는 이슈 아님 — 팀 규모 커질 때 재검토).
-
-- [ ] **MCP project-scope 표준화 검토 (`.mcp.json` 팀 공유)**
-  - 현재 공유 MCP(context7·codegraph·serena 등)는 user-scope 개별 설치 방식 — 팀원마다 설치 시점·옵션이 달라질 수 있음.
-  - 검토 방향: 리포에 커밋되는 project-scope `.mcp.json` 전환 시 이점(팀 일관성) vs 리스크(동일 서버가 user-scope에도 있을 때 병합/중복 동작이 실제로 어떻게 되는지 미검증)를 먼저 실험으로 확인한 뒤 판단.
-  - 관련 배경: 플러그인 번들(plugin.json `mcpServers`) 방식은 2026-07-14 논의에서 기각 — 공유 MCP 인스턴스가 플러그인 수만큼 중복되고 stateful 서버(Playwright·Serena) 리소스/락 충돌 위험이 커짐. `setup-mcp.md`/`docs/mcp-setup-guide.md`의 현재 근거는 유효하다고 판단.
-  - 우선순위: 중.
 
 ---
 
 ## 완료 / 최근 반영
 
+- [x] **로드맵 항목 정리 — 완료 항목 제거 + 4개 항목 폐기** (2026-08-21, `devoks-sdlc` `1.17.0 → 1.17.1`)
+  - **제거(완료됨)**: "`aware-react-app` 스모크테스트 스킬·에이전트 생성" — 이미 `[x]`로 종결돼 있었고 후속 과제도 아래 `new-smoke-test-draft` 항목에서 처리 완료. 실질 내용(프로젝트 소유 스모크 테스트가 왜 devoks-sdlc 밖에 있는지)은 `workflow-map` 표 A-1 "옵션" 행과 양 README §검증 체인에 이미 서술돼 있어 로드맵에서 빼도 유실 없음.
+  - **폐기 ①「구현자 세션 지속 — continuation 기반 PR그룹 단위 위임」**: 실효성이 낮다고 판단해 추적 중단. 현행 태스크 단위 cold-start + 인계 노트 방식을 유지한다. 이 항목을 가리키던 잔여 참조도 함께 제거 — `task-delegation.md` §윈도잉의 "roadmap의 continuation 도입 시 이 윈도잉은 상위 호환으로 완화된다" 1줄 삭제(윈도잉 규칙 자체는 불변, 폐기된 계획을 가리키는 forward-looking 주석만 제거 → `devoks-sdlc` patch bump). 로드맵 orchestration 항목의 Implement 절·파이프라인 다이어그램에 있던 continuation 언급도 `size` 라우팅으로 정리.
+  - **폐기 ②「진입점 일관화 검토(command vs skill)」**: 위 "`devoks-sdlc` 커맨드·스킬 통합" 항목과 정리 대상이 동일해 중복 → 그 항목의 "진입점 정책" 절로 흡수했다.
+  - **폐기 ③「plugin 버전 메타 정합」**: 플러그인별 개별 semver가 갈라지는 것을 문제로 보지 않기로 결정 — 플러그인마다 변경 빈도가 다른 것이 자연스럽고, 하네스 일괄 버전으로 묶으면 무변경 플러그인까지 재설치를 유발한다.
+  - **폐기 ④「MCP 서버 버전 고정 검토」·「MCP project-scope 표준화 검토」**: 공유 MCP는 `/devoks-core:setup-mcp`가 **user scope에 1회 설치**하는 현행 모델을 유지한다. 팀원 간 설치 시점 차이(`@latest` 드리프트)는 감수 가능한 수준으로 판단. 삭제해도 근거는 유실되지 않음 — 번들 방식을 쓰지 않는 이유(번들 MCP와 user-scope MCP는 병합되지 않고 별도 프로세스·다른 prefix로 공존해 중복·충돌)는 `plugins/devoks-core/commands/setup-mcp.md`(15~17행)와 `docs/mcp-setup-guide.md`(9·12행)에 이미 운영 문서로 남아 있다.
+
 - [x] **프로젝트 전용 검증 스킬 Draft 생성 스킬 신설 — `new-smoke-test-draft`(devoks-sdlc)** (2026-08-19, `devoks-sdlc` `1.16.1 → 1.17.0`)
-  - 배경: 위 "`aware-react-app` 스모크테스트 스킬·에이전트 생성" 항목에서 확인했듯 프로젝트마다 라우트·화면 구조가 달라 devoks-sdlc가 범용 실행 스킬로 제공할 수 없다. 그렇다고 매 프로젝트가 완전 백지에서 SKILL.md·체크리스트·리포트 템플릿 구조를 설계하게 두는 것도 비효율이라, 시작점만 생성해 주는 별도 스킬을 신설했다.
+  - 배경: 프로젝트마다 라우트·화면 구조가 달라 devoks-sdlc가 범용 실행 스킬로 제공할 수 없다(`aware-react-app`이 프로젝트 자신의 `verify-app-smoke-test` 스킬을 직접 저작·관리하는 사례에서 확인 — 구 로드맵 항목은 2026-08-21 정리 시 제거). 그렇다고 매 프로젝트가 완전 백지에서 SKILL.md·체크리스트·리포트 템플릿 구조를 설계하게 두는 것도 비효율이라, 시작점만 생성해 주는 별도 스킬을 신설했다.
   - **소유 플러그인 결정**: devoks-core(`setup-project-convention`의 preset 복사 인프라 재사용) 대신 **devoks-sdlc**로 결정 — preset 복사는 고정 템플릿을 그대로 옮기는 반면, 이 스킬은 검증 도메인 지식(스모크 테스트 모드·리포트 판정 체계)을 담은 산출물을 생성하므로 검증 스킬 계열(`verify-acceptance-test` 등)과 같은 플러그인에 있는 것이 SSOT 근접성이 높다고 판단.
   - **이름 결정**: `new-ui-draft`/`new-feature-draft`와 같은 `new-<도메인>-draft` 계열로 `new-smoke-test-draft` 채택 — 이 저장소에서 "draft"는 "미완성 산출물"이 아니라 "한 번에 새 산출물을 직접 만든다"는 의미로 이미 쓰이고 있어 의미가 정확히 들어맞는다(`verify-*`는 검증을 실제로 수행한다는 뜻이라 이 스킬의 "생성만 하고 검증은 안 한다"는 성격과 어긋나 기각).
   - **v1 스코프를 의도적으로 최소화**: (1) 코어(모드 1) 체크리스트는 실제 스캔 데이터로 채워 생성하고, 딥다이브(모드 2) 체크리스트도 **구조**(화면 목록·섹션 골격)는 함께 생성하되 실제 UX 시나리오 **본문**은 화면 이름·라우트만으로 지어낼 수 없어 TODO로 비워 둔다(2026-08-20 보강 — 최초엔 "표에 행을 추가하라"는 문장 하나로만 언급했으나, `aware-react-app`의 `verify-app-smoke-test`가 코어+딥다이브+리포트 3개 reference 파일로 구성된 실제 사례를 근거로 사용자가 "큰 구조를 갖추는 지시가 있어야 한다"고 지적해 딥다이브 체크리스트 파일 자체를 생성하도록 확장). (2) 전담 서브에이전트(`acceptance-test-runner`/`browser-visual-diff-capture`류 스크린샷·콘솔 바이트 격리 패턴)는 파일로 생성하지 않고, 대신 제안 경로·필수 frontmatter·**"tools: 화이트리스트에 실제 devoks-browser MCP 도구 이름을 빠뜨리면 에이전트가 조용히 차단된다"는 구체적 함정 경고**를 포함한 구조화된 지시로 대체한다(2026-08-20 보강 — 이 함정은 바로 위 "반복·동시 트리거 정합성 커버리지 신설" 항목에서 `acceptance-test-runner` 자신이 실제로 겪은 버그를 일반화한 것이라, 생성기가 대상 프로젝트의 실제 MCP tool 이름을 모른 채 frontmatter를 추측해 쓰면 같은 결함을 재현할 위험이 있어 파일 생성 대신 경고로 대체). (3) `project-convention-manage`류 provenance hash·drift 감지·재적용 관리 스킬은 만들지 않음 — 1회 생성 후 프로젝트가 전적으로 소유·유지보수하는 모델이라 동기화 의무 자체가 없다. 대신 생성된 SKILL.md의 `metadata.generatedBy`/`metadata.generatedFrom`에 생성기·소스 라우트 파일을 1회성 참고 정보로만 남긴다.
@@ -260,9 +242,9 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 - [x] **`workflow-map` 스킬 신설 — SDLC 흐름·진입점 조회 맵 + README 파이프라인 차트** (2026-08-07, `devoks-sdlc` `1.13.0 → 1.14.0`)
   - 배경: HITL 작업 중 "지금 어디쯤이고 다음에 뭘 부르나"를 즉시 답하는 진입점이 없었다. 흐름 정보가 세 곳에 흩어져 있었고 어느 것도 그 질문에 답하지 못했다 — README 카탈로그는 **평면 나열**이라 순서가 없고 harness 저장소 문서라 설치 대상 프로젝트에서 접근 불가, `post-implementation-checklist.md`는 **검증→커밋→PR 꼬리 부분만** 담으며 `feature-workflow-runner` 실행 중에만 로드, 각 SKILL.md의 "관련 스킬" 문구는 인접 1~2개만 가리킨다.
-  - 문서가 아니라 **스킬**로 만든 이유: 설치된 대상 프로젝트에서 동작하려면 플러그인 루트 안에 있어야 하고(루트 밖 참조 금지), 커맨드와 달리 스킬은 에이전트가 "다음 단계 제안" 근거로 스스로 참조할 수 있다. 로드맵 "진입점 일관화" 항목의 스킬 우선 방향과도 일치.
+  - 문서가 아니라 **스킬**로 만든 이유: 설치된 대상 프로젝트에서 동작하려면 플러그인 루트 안에 있어야 하고(루트 밖 참조 금지), 커맨드와 달리 스킬은 에이전트가 "다음 단계 제안" 근거로 스스로 참조할 수 있다. 팀의 스킬 우선 방향과도 일치.
   - 설계 결정: (1) **정적 표만** — 진행 상태 판정은 `PLAN.md` 체크박스가 이미 SSOT라 중복 로직을 만들지 않는다. (2) **얕게 담고 링크** — 단계 순서·진입점만 SSOT로 갖고 조건·절차는 `post-implementation-checklist.md`에 위임(그 문서가 이긴다고 본문에 명시). 심각도 분류·FRD §4 임계 신호에서 겪은 인라인 복제 drift를 반복하지 않기 위함. (3) **실제 흐름 전체 범위** — devoks-core(0단계)·devoks-git(5단계)·devoks-browser(4-4)를 포함하되 prefix로 출처 표기, 미설치 시 생략 안내.
-  - 파생 발견: `new-feature-draft`/`new-feature-github-issue` 커맨드가 `feature-workflow-runner`를 **호출하지 않고**(`branch-issue-precheck.md` 참조만 공유) 기능 구현 진입 경로가 사실상 둘로 병존한다. workflow-map 표 B에 "산출물 없는 간이 구현"으로 성격을 명시해 당장의 혼란은 덮었으나, 통합/정리 여부는 위 "진입점 일관화 검토" 항목에서 결정해야 한다.
+  - 파생 발견: `new-feature-draft`/`new-feature-github-issue` 커맨드가 `feature-workflow-runner`를 **호출하지 않고**(`branch-issue-precheck.md` 참조만 공유) 기능 구현 진입 경로가 사실상 둘로 병존한다. workflow-map 표 B에 "산출물 없는 간이 구현"으로 성격을 명시해 당장의 혼란은 덮었으나, 통합/정리 여부는 위 "`devoks-sdlc` 커맨드·스킬 통합" 항목에서 결정해야 한다.
   - 반영: README.md·docs/README.ko.md에 mermaid 파이프라인 차트 섹션 신설(스킬 카탈로그 **앞**에 배치 — 평면 나열을 읽기 전에 순서를 먼저 보게), 양 README 스킬 표에 `workflow-map` 추가, 위 "카탈로그 자동 생성" 항목에 표면 추가 기록.
   - 미완: 6축 스킬 품질 체크의 **동적 축(1·6)** — 이 저장소는 `enabledPlugins: {}`라 어떤 플러그인도 활성화하지 않아 신규 스킬을 세션에서 트리거할 수 없다. publish + 재설치 후 `evals/evals.json` 2케이스로 스모크 필요.
 
