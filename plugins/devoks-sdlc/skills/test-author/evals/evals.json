@@ -1,0 +1,42 @@
+{
+  "skill_name": "devoks-sdlc:test-author",
+  "notes": "사용자 진입 테스트 작성 스킬. 최대 위험은 test-run-triage와의 트리거 혼동이다 — '테스트 작성/보강'은 이 스킬, '테스트 실행/실패 원인'은 test-run-triage다. 그 외 핵심은 (1) 프레임워크를 가정하지 않고 런타임 감지하는지, (2) 프로덕션 코드를 고치지 않고 버그는 보고만 하는지, (3) 자기검증 근거(명령·종료코드·출력 tail)를 원문으로 남기는지다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "write-tests-for-target",
+      "prompt": "src/lib/calibration.ts 에 유닛 테스트 작성해줘",
+      "expected_output": "target이 인자로 확정됐으므로 되묻지 않고 test-writer 에이전트에 위임한다. 에이전트는 프로젝트 테스트 러너·파일 패턴을 먼저 감지하고 그 컨벤션대로 정상/경계/실패 케이스를 작성한 뒤 작성한 테스트만 실행해 자기검증한다. 리포트에 케이스 표와 자기검증 근거(실행 명령·종료코드·출력 tail 원문)가 축약 없이 담긴다.",
+      "files": [],
+      "assertions": [
+        { "text": "테스트 작성을 직접 하지 않고 test-writer 에이전트에 위임한다" },
+        { "text": "특정 테스트 프레임워크를 가정하지 않고 프로젝트 설정을 먼저 감지한다" },
+        { "text": "자기검증 근거를 실행 명령·종료코드·출력 tail 원문으로 남긴다" },
+        { "text": "프로덕션 코드를 수정하지 않는다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "boundary-vs-test-run-triage",
+      "prompt": "테스트가 왜 실패하는지 좀 봐줘",
+      "expected_output": "이 요청은 테스트 작성이 아니라 실행·실패 원인 분류이므로 이 스킬을 쓰지 않고 devoks-sdlc:test-run-triage 로 안내·전환한다. 새 테스트를 작성하기 시작하지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "test-run-triage 가 적합한 스킬임을 식별한다" },
+        { "text": "새 테스트 작성을 시작하지 않는다" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "bug-fix-signal-routes-context",
+      "prompt": "이 버그 재현되는 테스트부터 만들어줘 — parseMarks 가 빈 배열에서 터져",
+      "expected_output": "요청에 버그/재현 신호가 있으므로 Phase 0에서 이를 context에 담아 위임한다. 엔진은 test-quality-bar.md §7 예외를 적용해 수정 전 그 버그를 재현하는 실패 테스트부터 작성하고 실제로 실패함을 확인한다. 프로덕션 코드 수정은 하지 않고 보고만 한다.",
+      "files": [],
+      "assertions": [
+        { "text": "버그 수정 신호를 감지해 context로 전달한다" },
+        { "text": "수정 전 재현 실패 테스트를 먼저 작성하는 순서를 따른다" },
+        { "text": "프로덕션 코드를 직접 수정하지 않고 발견 사실만 보고한다" }
+      ]
+    }
+  ]
+}

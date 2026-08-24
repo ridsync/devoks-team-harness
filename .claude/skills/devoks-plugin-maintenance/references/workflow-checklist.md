@@ -44,6 +44,32 @@
 
 ## 4. 특수 케이스
 
+### 진입점 정책 (command vs skill) — 확정 SSOT, 2026-08-24
+
+새 진입점을 만들거나 기존 진입점을 옮길 때 **이 기준으로만 판단한다.** 논의를 다시 열지 않는다.
+
+> **진입점은 스킬을 기본으로 한다.** 커맨드는 아래 둘 중 **하나 이상**에 해당할 때만 남긴다.
+> 1. **저장소 밖으로 나가는 write 부작용**이 있다(git push, GitHub 이슈·PR 생성 등) — 스킬 auto-trigger 오발동 비용이 비대칭적으로 크다.
+> 2. **승인 게이트가 절차의 본질**이다(`docs/plugin-management.md` §12 기준 2).
+>
+> 스킬 진입 대상은 **읽기 전용 리포트** 또는 **저장소 내 산출물**만 만들고, 범위 확정이 단계별 승인이 아니라 **Phase 0 1회 슬롯 확인**으로 끝나는 작업이다.
+
+판정 결과(현 인벤토리):
+
+| 대상 | 판정 | 근거 |
+|---|---|---|
+| `devoks-git` 3개 커맨드 | 커맨드 유지 | 조건 1+2 — 2026-08-21 확정(아래 §devoks-git) |
+| `new-feature-github-issue` | 커맨드 유지(잠정) | 조건 1(이슈 생성). 스킬로 흡수할 때 이슈 생성 액션 자체는 `/devoks-git:git-create-issue`에 남겨야 정책 정합 |
+| `code-review`·`code-security-review`·`test-author` | **스킬**(2026-08-24 이전 완료) | 읽기 전용 리포트 / 저장소 내 테스트 파일만 생성 |
+| `code-analyze-module`·`code-refactoring` | 스킬 이전 대상(2차 예정) | 부작용 없음 — 고도화 후 이전 |
+
+**스킬 진입 이전 시 체크(누락하면 조용히 깨진다):**
+- 자연어 트리거 문구를 **agent `description` → 진입 skill `description`으로 이관**했는가. 양쪽에 두면 Phase 0 우회, 어디에도 없으면 라우팅 실패.
+- 엔진 절차·리포트 템플릿을 `references/`로 내렸는가(진입 SKILL.md는 트리거마다 메인 루프에 로드된다 — 대용량 템플릿을 본문에 두면 agent 격리 이득이 상쇄된다).
+- 진입 skill의 Phase 0(사용자 질문)과 호출자 측 질문이 **이중 질문**이 되지 않는가. 다른 스킬에서 재사용할 때는 skill 본문이 아니라 **agent에 직접 위임**한다(`new-ui-draft` step 7 참고).
+- 구 커맨드를 참조하던 지점 전부(카탈로그 양 언어·`workflow-map`·`post-implementation-checklist`·다른 skill의 frontmatter `description`·`evals/evals.json` 기대 문구)를 갱신했는가.
+
+
 ### devoks-browser
 - `chrome-devtools-attach` 명칭 유지 여부
 - `settings.permissions.allow` prefix
@@ -60,11 +86,11 @@
 
 ### devoks-sdlc
 - 구 devoks-code/devoks-feature/devoks-test/devoks-verify 통합체 — skill·command·agent 수가 5개 플러그인 중 가장 많아 변경 영향 범위가 가장 넓다(정확한 개수는 하드코딩하지 않는다 — 드리프트하므로 `ls skills/*/ commands/*.md agents/*.md`로 확인)
-- **agent-internal 경계는 skill과 agent가 서로 다르다** — 혼동 주의:
-  - agent-internal **skill**: `code-review`, `code-security-review` (각각 `code-reviewer`/`code-security-reviewer` 에이전트 전용 실행 엔진)
-  - agent-internal **agent**: `code-implementer`, `acceptance-test-runner` (호출 스킬의 특정 Phase에서만 위임)
-  - **직접 트리거 가능한 agent**: `code-reviewer`, `code-security-reviewer`, `test-writer` (커맨드·사용자 요청의 진입점)
-  - 변경 시 각 파일 `description` 앞머리의 `(agent-internal — …)` 표기와 README/문서 설명이 위 구분과 일치하는지 확인(`grep -l "agent-internal" agents/*.md skills/*/SKILL.md`)
+- **agent-internal 경계 (2026-08-24 단순화)** — 이제 `devoks-sdlc`의 **모든 agent가 agent-internal**이고, **agent-internal skill은 없다**:
+  - agent-internal **agent** (전부): `code-reviewer`, `code-security-reviewer`, `test-writer`, `code-implementer`, `acceptance-test-runner` — 호출 스킬의 특정 Phase에서만 위임받는다.
+  - **직접 트리거 가능한 agent: 없음.** 사용자 진입은 전부 스킬이다(진입점 정책 참고). 자연어 트리거 문구는 **진입 스킬의 `description`이 소유**하며 agent `description`에 중복해 두지 않는다 — 두면 스킬 Phase 0(범위 확정)을 건너뛰고 agent로 직행하는 우회 경로가 생긴다(2026-08-24 이전 구조의 실제 결함).
+  - 예외: `devoks-sdlc-orchestration`은 이 agent들을 **이름으로 직접 위임**한다(`references/pipeline.md`). `직접 호출 금지` 마킹은 사용자용 소프트 가드일 뿐이므로 정책 충돌이 아니다 — 대신 **각 agent의 입력 파라미터 표를 자기완결 상태로 유지**해야 한다(진입 스킬 Phase 0에 암묵 의존하는 문장 금지).
+  - 변경 시 각 파일 `description` 앞머리의 `(agent-internal — …)` 표기와 README/문서 설명이 위 구분과 일치하는지 확인(`grep -l "agent-internal" agents/*.md skills/*/SKILL.md` → agent 5개 전부 / skill 0개)
 - `gh` CLI, CodeGraph MCP, Serena MCP 의존 — 플러그인 자체 번들 MCP 아님(일반 MCP 등록형), README dependency summary와 실제 의존 일치 여부 확인
 - skill 간 cross-reference(예: `feature-workflow-runner` ↔ `feature-plan-executor` ↔ `branch-issue-precheck.md`)가 많아 하나만 고치면 다른 곳의 참조·완료 기준 문구가 어긋나기 쉬움 — 관련 SKILL.md 전체를 grep으로 교차 확인
 
@@ -144,4 +170,4 @@
 `devoks-sdlc-orchestration`은 HITL 스킬 본문을 호출하지 않으므로(그 플러그인 `references/pipeline.md`의 불변식) 비-HITL 경로가 애초에 없다.
 그 불변식이 깨지면 그때 억제 플래그를 도입한다.
 
-**현재 적용 스킬(참고):** `devoks-sdlc`의 `new-feature-draft`(테스트 작성 여부)·`feature-plan-executor`/`feature-workflow-runner`(브랜치·이슈 사전체크, PR 그룹핑, 다음 단계). 다음 단계는 사용자가 고른 항목을 메뉴 순서대로 **위임 실행**한다(HITL 선택 실행): 읽기전용 검증/리뷰/테스트는 즉시, 커밋·PR은 git 커맨드 자체 확인 플로를 최종 게이트로 두고 **앞선 검증에서 Critical/High 발견 시 커밋·PR 전 정지** — `post-implementation-checklist.md` 참고. (비-HITL 자동 실행과 구분 — 매 단계가 사용자 선택으로만 시작.)
+**현재 적용 스킬(참고):** `devoks-sdlc`의 `new-ui-draft`(테스트 작성 여부)·`code-review`(mode 갈림길)·`feature-plan-executor`/`feature-workflow-runner`(브랜치·이슈 사전체크, PR 그룹핑, 다음 단계). 다음 단계는 사용자가 고른 항목을 메뉴 순서대로 **위임 실행**한다(HITL 선택 실행): 읽기전용 검증/리뷰/테스트는 즉시, 커밋·PR은 git 커맨드 자체 확인 플로를 최종 게이트로 두고 **앞선 검증에서 Critical/High 발견 시 커밋·PR 전 정지** — `post-implementation-checklist.md` 참고. (비-HITL 자동 실행과 구분 — 매 단계가 사용자 선택으로만 시작.)

@@ -1,0 +1,31 @@
+{
+  "skill_name": "devoks-sdlc:code-security-review",
+  "notes": "사용자 진입 보안 검증 스킬. 핵심 경계는 code-review와의 역할 분리다 — 이 스킬은 변경 여부와 무관하게 repo 전수 + 의존성 audit + 위협 모델링을 보고, code-review는 diff 한정 경량 스크리닝만 한다. scope 기본값(전체 repo)이 명확하므로 되묻지 않고 1줄 안내로 진행해야 한다. 코드 자동 수정은 금지(제안만).",
+  "evals": [
+    {
+      "id": 1,
+      "name": "default-scope-no-question",
+      "prompt": "보안 점검 좀 해줘",
+      "expected_output": "scope 인자가 없으므로 전체 repo를 기본값으로 삼아 되묻지 않고 1줄 안내 후 진행한다. code-security-reviewer 에이전트에 scope=. 를 주입해 위임하고, 카테고리별 결과 표와 심각도별 이슈가 담긴 리포트를 축약 없이 전문 출력한다. 발견된 문제를 자동 수정하지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "scope를 되묻지 않고 전체 repo 기본값으로 진행하며 그 사실을 1줄로 안내한다" },
+        { "text": "스캔을 직접 수행하지 않고 code-security-reviewer 에이전트에 위임한다" },
+        { "text": "리포트를 축약 없이 전문 그대로 출력한다" },
+        { "text": "발견된 취약점을 자동 수정하지 않고 제안만 한다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "boundary-vs-code-review",
+      "prompt": "의존성에 알려진 취약점 있는지 확인하고 하드코딩된 시크릿도 찾아줘",
+      "expected_output": "의존성 audit과 시크릿 전수 스캔은 이 스킬의 범위이므로 code-review로 넘기지 않고 직접(에이전트 위임으로) 수행한다. 패키지 매니저를 먼저 감지해 해당 audit 명령을 실행하고, 시크릿은 범용 패턴으로 전수 스캔한다.",
+      "files": [],
+      "assertions": [
+        { "text": "패키지 매니저를 런타임에 감지한 뒤 해당 audit 명령을 선택한다" },
+        { "text": "특정 프로젝트의 함수명·민감 파일 목록을 가정하지 않는다" },
+        { "text": "이 요청을 code-review(diff 한정 경량 스크리닝)로 넘기지 않는다" }
+      ]
+    }
+  ]
+}

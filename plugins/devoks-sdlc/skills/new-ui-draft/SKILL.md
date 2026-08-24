@@ -3,7 +3,7 @@ name: new-ui-draft
 description: Figma 디자인 링크를 받아 프로젝트 패턴에 맞게 UI를 구현한다. 디자인 컨텍스트 조회 전 공식 figma-design-to-code 스킬을 로드해 asset(아이콘·이미지) 재현 규칙과 힌트 우선순위를 적용하고, DESIGN.md·디자인 토큰·i18n·라우트 등 프로젝트 계약에 맞춰 코드를 생성한다. "이 피그마로 화면 만들어줘", "Figma 디자인 구현해줘", "디자인 링크로 UI 생성", "figma 노드를 컴포넌트로", "design to code" 요청에서 사용한다. 구현 후 Figma와 실제 렌더의 시각 충실도 비교는 devoks-browser:browser-visual-diff 를 쓴다.
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # UI Draft Implement (Figma → 코드 구현)
@@ -125,10 +125,10 @@ Figma 디자인 링크와 추가 정보를 받아, Figma MCP로 디자인을 조
 
 ### 7. 테스트 작성·검증 (조건부)
 
-- 구현에 로직(비즈니스 로직, 상태 관리, 데이터 흐름, 계약 검증 등)이 포함됐으면 테스트 작성 필요 여부를 **AskUserQuestion 단일선택**으로 확인한다: `[작성(/devoks-sdlc:test-author) (권장)]` / `[생략 (사유 기록)]`. (HITL 직접 호출 경로 전용 — 비-HITL 오케스트레이션·서브에이전트 경로에선 묻지 않고 위임 계약/정책 기본값을 따른다.)
+- 구현에 로직(비즈니스 로직, 상태 관리, 데이터 흐름, 계약 검증 등)이 포함됐으면 테스트 작성 필요 여부를 **AskUserQuestion 단일선택**으로 확인한다: `[작성 (권장)]` / `[생략 (사유 기록)]`. (HITL 직접 호출 경로 전용 — 비-HITL 오케스트레이션·서브에이전트 경로에선 묻지 않고 위임 계약/정책 기본값을 따른다.)
   - 규모가 작고(단순 CRUD·설정값 변경 등) 테스트 실익이 낮으면 `생략` 선택 시 사유를 기록한다.
   - 순수 UI/스타일링만 있으면 이 단계 자체를 생략한다(질문을 띄우지 않는다).
-- 작성이 필요하면 `devoks-sdlc:test-author`(`test-writer` 에이전트)로 위임한다. `target`에 이번에 구현한 파일을, `context`에 관련 에러 케이스·계약을 전달한다(위임된 `test-writer`가 자체 실행·검증까지 수행한다).
+- 작성이 필요하면 **`test-writer` 에이전트에 직접 위임한다**(`devoks-sdlc:test-author` 스킬 본문을 거치지 않는다 — 그 스킬의 Phase 0은 대상 확정 질문이라 위 AskUserQuestion과 이중 질문이 된다). `target`에 이번에 구현한 파일을, `context`에 관련 에러 케이스·계약을 전달한다(위임된 `test-writer`가 자체 실행·검증까지 수행한다).
 - 이 구현으로 영향받는 **기존** 테스트가 있으면 `devoks-sdlc:test-run-triage`(또는 대상 파일만 좁혀 직접 실행)로 회귀 여부를 확인한다. 영향받는 테스트가 전혀 없으면(순수 UI 등) 이 항목은 생략한다.
 
 ### 8. 마무리

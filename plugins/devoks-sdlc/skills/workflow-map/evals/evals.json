@@ -11,7 +11,7 @@
       "assertions": [
         { "text": "파이프라인 표에 요구정의(feature-frd-author)→작업분해(feature-plan-author)→구현(feature-plan-executor) 순서가 나타난다" },
         { "text": "feature-workflow-runner를 1~3 통합 진입점으로 표기한다" },
-        { "text": "순서 없는 단발 작업(code-analyze-module·code-refactoring·code-review-general·code-security-review·test-author 등)을 파이프라인과 분리해 제시한다" },
+        { "text": "순서 없는 단발 작업(code-analyze-module·code-refactoring·code-review·code-security-review·test-author 등)을 파이프라인과 분리해 제시한다" },
         { "text": "표를 출력하는 데 그치고, FRD 작성이나 코드 분석 등 실제 단계를 실행하지 않는다" }
       ]
     },
@@ -19,7 +19,7 @@
       "id": 2,
       "name": "post-implementation-verify-chain-order",
       "prompt": "기능 구현까지 끝났어. 이제 뭘 해야 하지? 순서만 알려줘.",
-      "expected_output": "검증 체인 순서를 요구사항 충실도(verify-requirements) → 코드 리뷰(code-review-diff-branch) → 데이터 흐름(verify-data-flow, 조건부) → UI 시각 품질(browser-visual-diff, 조건부) → 실동작(verify-acceptance-test, 커밋 직전 최종 게이트) → 테스트 회귀(test-run-triage, 조건부) 순으로 제시하고, 마지막에 커밋(git-commit-msg)·PR(git-pull-request)을 둔다. 조건부 항목은 조건을 함께 표기한다. 실제 검증은 실행하지 않는다.",
+      "expected_output": "검증 체인 순서를 요구사항 충실도(verify-requirements) → 코드 리뷰(code-review mode=diff-branch) → 데이터 흐름(verify-data-flow, 조건부) → UI 시각 품질(browser-visual-diff, 조건부) → 실동작(verify-acceptance-test, 커밋 직전 최종 게이트) → 테스트 회귀(test-run-triage, 조건부) 순으로 제시하고, 마지막에 커밋(git-commit-msg)·PR(git-pull-request)을 둔다. 조건부 항목은 조건을 함께 표기한다. 실제 검증은 실행하지 않는다.",
       "files": [],
       "assertions": [
         { "text": "코드 리뷰를 데이터 흐름·UI·실동작 검증보다 앞 순서에 둔다" },

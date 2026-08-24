@@ -120,7 +120,7 @@ flowchart TD
     subgraph VERIFY["4 · Verification chain (cheap static checks first, live run last)"]
         direction LR
         V1["Requirement fidelity<br/>verify-requirements"]
-        V2["Code review<br/>code-review-diff-branch"]
+        V2["Code review<br/>code-review (mode=diff-branch)"]
         V3["Data flow · conditional<br/>verify-data-flow"]
         V4["UI visual quality · conditional<br/>browser-visual-diff"]
         V5["Live behavior · final gate<br/>verify-acceptance-test"]
@@ -139,7 +139,7 @@ flowchart TD
 
 **Optional, project-owned smoke test (reference only):** some installed projects maintain their own pre-release smoke-test skill outside `devoks-sdlc` — route/screen structure differs per project, so `devoks-sdlc` can't ship one generically. Example: `aware-react-app`'s `verify-app-smoke-test` (`.claude/skills/verify-app-smoke-test/SKILL.md`). If a project doesn't have one yet, `/devoks-sdlc:new-smoke-test-draft` scans that project's own route/screen files and generates a one-time starter skill into its `.claude/skills/`. Either way, `devoks-sdlc` only ships the generator — the resulting skill is immediately project-owned: `devoks-sdlc` doesn't own, execute, maintain, or delegate to it, and it stays outside the verification chain's execution menu above. See the project's own skill docs for how it runs.
 
-**One-off tasks (no fixed order):** `code-analyze-module` · `code-refactoring` · `code-review-general` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, plus `new-feature-draft` / `new-feature-github-issue` for lightweight feature work that skips the `FRD.md` / `PLAN.md` artifacts.
+**One-off tasks (no fixed order):** `code-analyze-module` · `code-refactoring` · `code-review` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, plus `new-feature-github-issue` for lightweight feature work that skips the `FRD.md` / `PLAN.md` artifacts.
 
 ---
 
@@ -155,9 +155,9 @@ flowchart TD
 | `verify-requirements` | `/devoks-sdlc:verify-requirements` | devoks-sdlc |
 | `verify-data-flow` | `/devoks-sdlc:verify-data-flow` | devoks-sdlc |
 | `verify-acceptance-test` | `/devoks-sdlc:verify-acceptance-test` | devoks-sdlc |
-| `code-review` | `/devoks-sdlc:code-review` *(agent-internal only)* | devoks-sdlc |
-| `code-security-review` | `/devoks-sdlc:code-security-review` *(agent-internal only)* | devoks-sdlc |
-| `test-author` | `/devoks-sdlc:test-author` *(agent-internal only)* | devoks-sdlc |
+| `code-review` | `/devoks-sdlc:code-review` | devoks-sdlc |
+| `code-security-review` | `/devoks-sdlc:code-security-review` | devoks-sdlc |
+| `test-author` | `/devoks-sdlc:test-author` | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
 | `new-ui-draft` | `/devoks-sdlc:new-ui-draft` | devoks-sdlc |
 | `new-smoke-test-draft` | `/devoks-sdlc:new-smoke-test-draft` | devoks-sdlc |
@@ -170,10 +170,10 @@ flowchart TD
 
 | Agent | Plugin | Delegated by |
 |-------|--------|--------------|
-| `code-reviewer` | devoks-sdlc | `code-review-general`, `code-review-diff-branch` commands |
-| `code-security-reviewer` | devoks-sdlc | `code-security-review` command |
+| `code-reviewer` *(agent-internal only)* | devoks-sdlc | `code-review` skill (Phase 1) |
+| `code-security-reviewer` *(agent-internal only)* | devoks-sdlc | `code-security-review` skill (Phase 1) |
 | `code-implementer` *(agent-internal only)* | devoks-sdlc | `feature-plan-executor` skill, `feature-workflow-runner` skill (Phase 3) |
-| `test-writer` | devoks-sdlc | `test-author` command |
+| `test-writer` *(agent-internal only)* | devoks-sdlc | `test-author` skill (Phase 1), `new-ui-draft` skill (step 7) |
 | `acceptance-test-runner` *(agent-internal only)* | devoks-sdlc | `verify-acceptance-test` skill (Phase 1–4) |
 | `browser-visual-diff-capture` *(agent-internal only)* | devoks-browser | `browser-visual-diff` skill (Phase 1–4) |
 
@@ -202,12 +202,7 @@ flowchart TD
 
 | Command | Description |
 |---------|-------------|
-| `/devoks-sdlc:new-feature-draft` | Spec-driven feature implementation |
 | `/devoks-sdlc:new-feature-github-issue` | GitHub issue-driven feature implementation |
-| `/devoks-sdlc:code-review-general` | Scoped code review |
-| `/devoks-sdlc:code-review-diff-branch` | Branch diff code review |
-| `/devoks-sdlc:code-security-review` | Repo / dependency / threat-level security review |
-| `/devoks-sdlc:test-author` | Write / extend automated tests |
 | `/devoks-sdlc:code-refactoring` | Structure, contract, and quality refactoring |
 | `/devoks-sdlc:code-analyze-module` | Module / business logic analysis |
 

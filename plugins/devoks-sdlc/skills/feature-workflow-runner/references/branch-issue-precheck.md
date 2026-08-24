@@ -1,18 +1,18 @@
 # 브랜치·이슈 사전체크 (Precheck & Propose) — SSOT
 
 > 구현 착수 **직전**(첫 코드 변경 전)에 현재 브랜치·연결 이슈 상태를 확인하고, 필요 시 브랜치명·이슈 초안을 **제안 → 사용자 확인 → 적용**한다.
-> 이 규칙은 `feature-workflow-runner`(Phase 3), `feature-plan-executor`, `new-feature-draft`, `new-feature-github-issue`가 공유한다.
+> 이 규칙은 `feature-workflow-runner`(Phase 3), `feature-plan-executor`, `new-feature-github-issue`가 공유한다.
 
 ## 적용 시점
 
-- **최초 1회** — 첫 구현 착수 직전(Phase 3 step 3, executor step 3, draft/github-issue step 3·4).
+- **최초 1회** — 첫 구현 착수 직전(Phase 3 step 3, executor step 3, github-issue step 3·4).
 - Phase 1(FRD)·Phase 2(PLAN) 문서 작성 단계에서는 **적용하지 않는다**.
 
 ## 모드
 
 | 모드 | 적용 대상 | 이슈 체크 |
 |------|-----------|-----------|
-| `full` | `feature-workflow-runner`, `feature-plan-executor`, `new-feature-draft` | 브랜치 + 이슈 모두 |
+| `full` | `feature-workflow-runner`, `feature-plan-executor` | 브랜치 + 이슈 모두 |
 | `branch-only` | `new-feature-github-issue` | 이슈는 이미 SSOT로 주어짐 → **브랜치 제안·확인만** |
 
 ## 절차

@@ -120,7 +120,7 @@ flowchart TD
     subgraph VERIFY["4 · 검증 체인 (정적·저비용 먼저 → 실동작 마지막)"]
         direction LR
         V1["요구사항 충실도<br/>verify-requirements"]
-        V2["코드 리뷰<br/>code-review-diff-branch"]
+        V2["코드 리뷰<br/>code-review (mode=diff-branch)"]
         V3["데이터 흐름 · 조건부<br/>verify-data-flow"]
         V4["UI 시각 품질 · 조건부<br/>browser-visual-diff"]
         V5["실동작 검증 · 최종 게이트<br/>verify-acceptance-test"]
@@ -139,7 +139,7 @@ flowchart TD
 
 **옵션 — 프로젝트 전용 스모크 테스트 (참고용):** 일부 설치 대상 프로젝트는 `devoks-sdlc` 밖에서 자체 배포 전 스모크 테스트 스킬을 직접 소유·관리합니다 — 라우트·화면 구조가 프로젝트마다 달라 `devoks-sdlc`가 범용으로 제공하기 어렵기 때문입니다. 예: `aware-react-app`의 `verify-app-smoke-test`(`.claude/skills/verify-app-smoke-test/SKILL.md`). 아직 자체 스킬이 없다면 `/devoks-sdlc:new-smoke-test-draft`가 그 프로젝트의 라우트/화면 정의 파일을 스캔해 `.claude/skills/`에 1회성 초안을 생성해 줍니다. 어느 쪽이든 `devoks-sdlc`는 이 **생성기만** 배포합니다 — 생성된 결과물은 즉시 프로젝트 소유가 되어 `devoks-sdlc`가 소유·실행·유지보수하거나 위임하지 않으며, 위 검증 체인의 실행 메뉴에도 포함되지 않는 참고 항목입니다. 실행 방법은 해당 프로젝트 자신의 스킬 문서를 참고하세요.
 
-**단발 작업(순서 없음):** `code-analyze-module` · `code-refactoring` · `code-review-general` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, 그리고 `FRD.md`/`PLAN.md` 산출물 없이 가볍게 구현할 때 쓰는 `new-feature-draft` / `new-feature-github-issue`.
+**단발 작업(순서 없음):** `code-analyze-module` · `code-refactoring` · `code-review` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, 그리고 `FRD.md`/`PLAN.md` 산출물 없이 가볍게 구현할 때 쓰는 `new-feature-github-issue`.
 
 ---
 
@@ -155,9 +155,9 @@ flowchart TD
 | `verify-requirements` | `/devoks-sdlc:verify-requirements` | devoks-sdlc |
 | `verify-data-flow` | `/devoks-sdlc:verify-data-flow` | devoks-sdlc |
 | `verify-acceptance-test` | `/devoks-sdlc:verify-acceptance-test` | devoks-sdlc |
-| `code-review` | `/devoks-sdlc:code-review` *(에이전트 내부 전용)* | devoks-sdlc |
-| `code-security-review` | `/devoks-sdlc:code-security-review` *(에이전트 내부 전용)* | devoks-sdlc |
-| `test-author` | `/devoks-sdlc:test-author` *(에이전트 내부 전용)* | devoks-sdlc |
+| `code-review` | `/devoks-sdlc:code-review` | devoks-sdlc |
+| `code-security-review` | `/devoks-sdlc:code-security-review` | devoks-sdlc |
+| `test-author` | `/devoks-sdlc:test-author` | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
 | `new-ui-draft` | `/devoks-sdlc:new-ui-draft` | devoks-sdlc |
 | `new-smoke-test-draft` | `/devoks-sdlc:new-smoke-test-draft` | devoks-sdlc |
@@ -170,10 +170,10 @@ flowchart TD
 
 | 에이전트 | 플러그인 | 위임 주체 |
 |---------|---------|---------|
-| `code-reviewer` | devoks-sdlc | `code-review-general`, `code-review-diff-branch` 커맨드 |
-| `code-security-reviewer` | devoks-sdlc | `code-security-review` 커맨드 |
+| `code-reviewer` *(agent-internal only)* | devoks-sdlc | `code-review` 스킬 (Phase 1) |
+| `code-security-reviewer` *(agent-internal only)* | devoks-sdlc | `code-security-review` 스킬 (Phase 1) |
 | `code-implementer` *(agent-internal only)* | devoks-sdlc | `feature-plan-executor` 스킬, `feature-workflow-runner` 스킬 (Phase 3) |
-| `test-writer` | devoks-sdlc | `test-author` 커맨드 |
+| `test-writer` *(agent-internal only)* | devoks-sdlc | `test-author` 스킬 (Phase 1), `new-ui-draft` 스킬 (7단계) |
 | `acceptance-test-runner` *(agent-internal only)* | devoks-sdlc | `verify-acceptance-test` 스킬 (Phase 1~4) |
 | `browser-visual-diff-capture` *(agent-internal only)* | devoks-browser | `browser-visual-diff` 스킬 (Phase 1~4) |
 
@@ -202,12 +202,7 @@ flowchart TD
 
 | 커맨드 | 설명 |
 |--------|------|
-| `/devoks-sdlc:new-feature-draft` | 스펙 기반 기능 구현 |
 | `/devoks-sdlc:new-feature-github-issue` | GitHub 이슈 기반 기능 구현 |
-| `/devoks-sdlc:code-review-general` | 범위 지정 코드리뷰 |
-| `/devoks-sdlc:code-review-diff-branch` | 브랜치 diff 기반 코드리뷰 |
-| `/devoks-sdlc:code-security-review` | repo·의존성·위협 수준 보안 검증 |
-| `/devoks-sdlc:test-author` | 테스트 작성/확장 |
 | `/devoks-sdlc:code-refactoring` | 구조·계약·품질 리팩토링 |
 | `/devoks-sdlc:code-analyze-module` | 모듈/비즈니스 로직 분석 |
 

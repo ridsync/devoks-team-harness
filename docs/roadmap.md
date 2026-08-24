@@ -3,7 +3,7 @@
 DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-08-21
+> 최종 갱신: 2026-08-24
 
 ---
 
@@ -12,22 +12,26 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 | 우선순위 | 항목 |
 | ---- | ---- |
-| **높음** | **`devoks-sdlc` 커맨드·스킬 통합/저사용 정리(진입점 정책 포함)** · UI 작업 분리 검토 · `devoks-sdlc-orchestration` 신설(비-HITL SDLC) |
-| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` |
-| **낮음** | `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` references 보강 |
+| **높음** | UI 작업 분리 검토 · `devoks-sdlc-orchestration` 신설(비-HITL SDLC) |
+| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` · **`code-analyze-module`/`code-refactoring` 고도화 후 스킬 이전(2차)** |
+| **낮음** | `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` 시크릿 패턴 카탈로그 |
 
 
 ---
 
 ## 마이그레이션 / 구조
 
-- [ ] **`devoks-sdlc` 커맨드·스킬 통합 + 저사용 스킬 정리 (진입점 정책 포함)**
-  - 배경(2026-08-21): `devoks-sdlc`가 스킬 14개·커맨드 8개까지 늘며 관리 부담이 커졌다는 문제 제기로 별도 플러그인 분리(설계/구현 vs 검증/테스트) 및 `workflow-map`/`new-smoke-test-draft` 이전 방안을 검토했으나, 실익이 크지 않다고 판단해 둘 다 폐기 — 현 구조를 유지한다.
-  - 정리 방향: (1) 대응 스킬 없이 자기완결형으로 남아있는 커맨드(`new-feature-draft`·`new-feature-github-issue`·`code-analyze-module`·`code-refactoring`)를 대응 스킬(예: `feature-workflow-runner`)과 통합할지 판단, (2) 스킬 호출용 얇은 커맨드처럼 실질적으로 동일한 커맨드/스킬 쌍을 통합, (3) 사용 빈도가 낮거나 미사용인 스킬·커맨드를 선정해 삭제.
-  - **진입점 정책도 이 항목에서 함께 확정한다** (구 "진입점 일관화 검토(command vs skill)" 항목을 2026-08-21 흡수 — 정리 대상이 동일해 중복이었다): 팀이 스킬 우선으로 이동 중(`new-feature-verify`, 2026-08-10 `new-ui-draft` — 둘 다 커맨드 파일을 남기지 않고 스킬로 이관)이나 `new-feature-draft`/`new-feature-github-issue`/`code-*`는 여전히 커맨드다. 트리거 기반(자연어) 호출로 통일할지, command를 진입 전용으로 남길지 정책을 한 번 확정한다.
-  - 조사 시 참고할 기존 신호: `new-feature-draft`/`new-feature-github-issue`는 `feature-workflow-runner`를 **호출하지 않고**(`branch-issue-precheck.md` 참조만 공유) 진입 경로가 병존한다 — 아래 완료 섹션 `workflow-map` 항목의 "파생 발견" 참고. `code-analyze-module`은 4개 플러그인 통합 merge 커밋 이후 실질 편집 이력이 없어 다른 자기완결형 커맨드보다 활동 신호가 낮음(대리지표일 뿐 확정 증거는 아님).
-  - 사용 여부·삭제 대상 최종 판단은 실사용 확인 후 사용자가 직접 결정 — 대리지표(마지막 커밋 시점 등)만으로 임의 삭제하지 않는다.
-  - 우선순위: 높음.
+- [ ] **`code-analyze-module`·`code-refactoring` 고도화 후 스킬 이전 (2차)**
+  - 1차(2026-08-24)에서 **진입점 정책이 확정**됐고(아래 완료 섹션 참고), 이 두 커맨드는 정책상 **스킬 이전 대상**으로 판정됐다 — 부작용이 없고 Phase 0 1회 확인으로 범위가 끝난다.
+  - 이전 **전에** 커맨드 자체 SDLC 고도화를 먼저 한다(사용자 결정): 에이전트 위임 구조 도입 여부, `references/` 분리, 검증 체인·`test-author`/`code-review` 연계 지점 정리.
+  - `code-analyze-module`은 `docs/plugin-management.md` §12에서 이미 "researcher(sonnet) — 에이전트화 향후 후보"로 매핑돼 있다. 고도화 시 이 매핑을 근거로 쓸 수 있다.
+  - 이전 절차·체크리스트는 `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md` §4「진입점 정책」의 "스킬 진입 이전 시 체크" 4항목을 그대로 쓴다(1차에서 실제로 검증된 목록).
+  - 우선순위: 중.
+
+- [ ] **`new-feature-github-issue` → SDLC 구현 스킬 흡수 (2차)**
+  - 현재는 커맨드가 정책상 정당하다(GitHub 이슈 생성 = 저장소 밖 write 부작용).
+  - 흡수 시 제약: **이슈 생성 액션 자체는 `/devoks-git:git-create-issue`에 남겨야** 진입점 정책과 정합한다. 스킬은 "이슈 본문을 SSOT로 읽어 설계·구현"까지만 소유한다.
+  - 우선순위: 낮음(현 구조로 동작에 문제 없음).
 
 - [ ] **컨벤션 preset 확장 (신규 stack)**
   - management 고도화(provenance hash 기반 stale 감지, 플러그인 번들링 버그 수정)는 2026-07-14 완료 — 완료 섹션 참고.
@@ -152,13 +156,27 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 검증 범위: iOS 시뮬레이터 부팅 상태에서 `xcrun simctl io booted screenshot` 스크린샷 캡처 + Metro CDP(`evaluate_script`, `list_console_messages`, `list_network_requests`) 정상 동작 확인, SKILL.md 트러블슈팅 표·전제 조건에 iOS 특이사항 반영.
   - 우선순위: 중.
 
-- [ ] `**code-security-review` references/ 보강 (선택)**
-  - 단일 SKILL.md → 시크릿 패턴 카탈로그·카테고리별 체크리스트를 `references/`로 분리(`verify-data-flow`의 `references/` 분리 패턴 참고 — 구 `feature-data-verification`).
+- [ ] `**code-security-review` 시크릿 패턴 카탈로그 (선택)**
+  - **`references/` 분리 자체는 2026-08-24 완료** — 스킬 진입 이전 과정에서 `references/security-scan-execution.md`(절차)·`references/report-template.md`(출력)로 분리됐다.
+  - **남은 범위**: 시크릿 탐지 **패턴 카탈로그**(정규식·파일 확장자·엔트로피 기준 등)를 별도 `references/`로 추가. 현재는 "범용 패턴 전수 스캔"이라고만 서술돼 실제 패턴이 에이전트 판단에 맡겨져 있다.
   - 우선순위: 낮음.
 
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **`devoks-sdlc` 커맨드·스킬 통합 1차 + 진입점 정책 확정** (2026-08-24, `devoks-sdlc` `1.17.1 → 2.0.0`)
+  - **확정된 진입점 정책(SSOT는 `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md` §4)**: 진입점은 **스킬을 기본**으로 하고, 커맨드는 ① 저장소 밖으로 나가는 write 부작용이 있거나 ② 승인 게이트가 절차의 본질일 때만 남긴다. 이 정의는 2026-08-21에 확정된 `devoks-git` 커맨드-only 정책의 근거를 판정축으로 뒤집어 쓴 것이라 **기존 상태와 충돌하지 않는다**(로드맵이 요구한 "정책 한 번 확정"을 이 형태로 종결).
+  - **정책을 뒷받침한 조사 사실**: (1) 이 저장소 커맨드 8개 중 `argument-hint`/`allowed-tools`/`disable-model-invocation`을 쓰는 것이 **0개** — 커맨드가 스킬 대비 갖는 고유 기능이 전혀 없었다. (2) 이미 11개 스킬이 `## 호출 방법` + `$ARGUMENTS`로 슬래시 진입을 담당하고, `verify-acceptance-test`·`browser-visual-diff`는 **스킬(Phase 0 합의) → 에이전트(실행) → `references/`(엔진 SSOT)** 구조로 커맨드 없이 완결돼 있었다.
+  - **부수적으로 실제 결함 1건 수정**: `code-reviewer`/`code-security-reviewer`/`test-writer` 에이전트의 `description`이 자연어 트리거를 직접 물고 있어서, "코드리뷰 해줘" 같은 요청이 **커맨드의 Phase 0(범위 확정)을 건너뛰고** 에이전트로 직행할 수 있었다(에이전트는 사용자 질문이 금지돼 범위가 모호해도 받은 대로 진행). 트리거 문구를 진입 스킬 `description`으로 이관하면서 이 우회가 막혔다.
+  - **구조 전환** — 계층 수는 3단 그대로이나 역할이 바뀌었다: `command`(진입+Phase 0) → `agent`(Skill 도구 껍데기) → `skill`(agent-internal 엔진)  ⇒  `skill`(진입+Phase 0+위임+pass-through+후속조치) → `agent`(엔진 실행 주체, `Skill` 도구 제거) → `skill/references/*.md`(엔진 SSOT). 엔진을 `references/`로 내린 이유는 진입 SKILL.md가 **자연어 트리거마다 메인 루프에 로드**되므로 대용량 리포트 템플릿을 본문에 두면 에이전트 격리 이득이 상쇄되기 때문이다.
+  - **이전 완료(커맨드 → 스킬)**: `code-review-general` + `code-review-diff-branch` → **`code-review` 하나로 통합**(`mode=general|diff-branch` 인자 + Phase 0 추론·1줄 확인 — 인자로 확정되면 되묻지 않음), `code-security-review`, `test-author`. 신규 `references/` 5개(`review-execution.md`·`report-template.md`·`security-scan-execution.md`·`report-template.md`·`test-authoring-execution.md`)와 신규 `evals/evals.json` 3개 작성.
+  - **폐기**: `new-feature-draft`(미사용). 연쇄 정리 — `branch-issue-precheck.md`의 공유 대상 목록·`full` 모드 행, `new-feature-github-issue.md` Overview의 참조 문장(자기완결형으로 재작성), `workflow-map` 표 B·"진입점이 둘이다" 문단, maintenance 체크리스트 §8 적용 스킬 목록.
+  - **`commands/` 8개 → 3개**(`code-analyze-module`·`code-refactoring`·`new-feature-github-issue`). 스킬 14개·에이전트 5개는 개수 불변(역할만 전환).
+  - **`major` bump 근거**: 슬래시 진입점 5개가 사라지는 파괴적 변경. deprecation shim은 두지 않기로 결정(내부 팀 마켓플레이스 + 재설치 흐름이 명시돼 있음).
+  - **`devoks-sdlc-orchestration`은 무영향** — 에이전트 **이름·입력 계약이 불변**이고, `docs/orchestration-design.md`가 이미 "`직접 호출 금지` 마킹은 사용자용 소프트 가드일 뿐 스킬/오케스트레이터 위임은 허용"을 명시한다. 대신 각 에이전트의 입력 파라미터 표를 자기완결 상태로 유지하는 것이 제약으로 남는다(체크리스트에 기록).
+  - **미완 잔여** → 위 §마이그레이션의 2차 항목 2개(`code-analyze-module`/`code-refactoring` 고도화 후 이전, `new-feature-github-issue` 흡수).
+  - **검증**: `claude plugin validate --strict` ✔ / 구 이름 잔존 0건 / 스킬 품질 정적 축(2 references 실존·3 evals 보유·5 경로 안전성·6 토큰효율성 105~112줄) ✔. **축 1(동적 트리거 실행)은 이 저장소에서 구조적으로 불가** — `.claude/settings.json`이 `enabledPlugins: {}`라 어떤 플러그인도 활성화되지 않고, 로컬 소스 수정은 push + `/plugin marketplace update` + 재설치 전까지 실행 세션에 반영되지 않는다. **push 이후 별도 세션 스모크로 이월**(작성해 둔 `evals/evals.json` 8개 케이스를 그대로 입력으로 사용).
 
 - [x] **4개 항목 폐기 — 「카탈로그 자동 생성」·「evals 하니스 확대」·「`git-commit-msg` 스킬+haiku 위임 전환」·「`git-create-issue`/`git-pull-request` 스킬 전환」** (2026-08-21, `plugins/` 미변경 — 저장소 루트 문서만)
   - ①~③은 착수 전 사실 조사를 먼저 수행했고, 그 결과 **투자 대비 효용이 낮거나 외부 요인으로 실행 불가**로 판정돼 추적을 중단했다. ④는 ③의 폐기 근거가 그대로 적용돼 같은 라운드에서 함께 정리했다. 아래는 같은 조사를 반복하지 않기 위한 근거 보존이다.

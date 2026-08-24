@@ -1,0 +1,43 @@
+{
+  "skill_name": "devoks-sdlc:code-review",
+  "notes": "사용자 진입 코드리뷰 스킬. 두 mode(diff-branch·general)를 하나의 진입점으로 통합했으므로 핵심은 (1) Phase 0가 mode를 인자/git 상태로 올바르게 확정하는지, (2) 인자로 이미 확정된 경우 되묻지 않는지, (3) 실행을 code-reviewer 에이전트에 위임하고 리포트를 축약 없이 pass-through 하는지다. 심층 보안 검증(code-security-review)·요구사항 판정(verify-requirements)과의 경계도 지켜야 한다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "no-args-infers-diff-branch",
+      "prompt": "코드리뷰 해줘",
+      "expected_output": "Phase 0에서 git branch --show-current 로 현재 브랜치를 확인하고, base 브랜치가 아니면 diff-branch 방식을 1줄로 제안해 확인한다. 확정 후 code-reviewer 에이전트에 mode=diff-branch·scope=<base>를 주입해 위임하고, 돌려받은 리포트를 축약 없이 전문 출력한다.",
+      "files": [],
+      "assertions": [
+        { "text": "리뷰를 직접 수행하지 않고 code-reviewer 에이전트에 위임한다" },
+        { "text": "인자가 없을 때 현재 브랜치를 확인해 mode를 추론하고 1회 확인한다" },
+        { "text": "리포트의 헤더·이슈 필드·표 구조를 축약하지 않고 전문 그대로 출력한다" },
+        { "text": "리뷰 후 반영 범위(전체/High 이상/Medium 이상/Low 이상)를 확인한다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "explicit-scope-skips-mode-question",
+      "prompt": "/devoks-sdlc:code-review mode=general scope=src/features/auth",
+      "expected_output": "mode·scope가 인자로 확정됐으므로 mode를 되묻지 않는다. 리뷰 목적·제외 범위만 필요 시 짧게 확인한 뒤 code-reviewer 에이전트에 mode=general·scope=src/features/auth 를 주입해 위임하고, 리포트를 전문 출력한다.",
+      "files": [],
+      "assertions": [
+        { "text": "인자로 확정된 mode/scope를 다시 묻지 않는다" },
+        { "text": "code-reviewer 에이전트에 mode=general 과 지정된 경로를 그대로 전달한다" },
+        { "text": "diff-branch 관련 base 브랜치 확인 절차를 수행하지 않는다" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "security-escalation-boundary",
+      "prompt": "이번 브랜치 변경사항 리뷰하고, 보안 문제 있으면 알려줘",
+      "expected_output": "diff-branch 리뷰를 위임 수행한다. 리포트의 🔒 보안 점검 요약에서 Critical/High급 보안 이슈가 나오면 🚀 다음 액션 제안의 즉시 항목에 /devoks-sdlc:code-security-review 실행 권장을 포함한다. 이 스킬 안에서 repo 전수 의존성 audit이나 시크릿 전수 스캔을 직접 수행하지는 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "diff/scope 한정 경량 보안 스크리닝만 수행하고 repo 전수 audit을 직접 실행하지 않는다" },
+        { "text": "Critical/High 보안 이슈 발견 시 code-security-review 실행을 권장 문구로 제시한다" },
+        { "text": "code-security-review와의 역할 경계를 흐리지 않는다" }
+      ]
+    }
+  ]
+}
