@@ -70,7 +70,7 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 | 3   | 데이터 흐름 정합성           | `/devoks-sdlc:verify-data-flow`                                                                                                                                                | 입력→계산→저장→재로드 흐름이 있을 때                       |
 | 4   | UI 시각 품질             | `/devoks-browser:browser-visual-diff`                                                                                                                                          | UI 컴포넌트/스타일링 변경이 있을 때                       |
 | 5   | 브라우저 실동작             | `/devoks-sdlc:verify-acceptance-test`                                                                                                                                          | AC에 UI 조작+상태 영속이 걸려 있을 때 — **커밋 직전 최종 게이트** |
-| 6   | 테스트 스위트 회귀           | `/devoks-sdlc:test-run-triage`                                                                                                                                                 | 전체 스위트 회귀를 따로 확인할 때                         |
+| 옵션  | 테스트 스위트 회귀           | `/devoks-sdlc:test-run-triage`                                                                                                                                                 | 전체 스위트 회귀를 따로 확인할 때                         |
 | 옵션  | 프로젝트 전용 스모크 테스트 (참고) | 프로젝트별 상이 — 예: `aware-react-app`의 `verify-app-smoke-test`(`.claude/skills/verify-app-smoke-test/SKILL.md`). 아직 없다면 `/devoks-sdlc:new-smoke-test-draft`로 화면 목록을 스캔해 초안을 생성할 수 있다 | 해당 프로젝트가 배포 전 스모크 테스트 스킬을 자체 보유(또는 생성)할 때만  |
 
 
