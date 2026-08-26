@@ -35,7 +35,7 @@ Phase 1~4는 `browser-visual-diff-capture` 에이전트가 수행하며, 에이�
 ## 호출 방법
 
 ```
-/browser-visual-diff [figma-url=<Figma URL>] [component=<컴포넌트 파일 경로>] [route=<라이브 라우트>] [design-guide=<디자인 가이드 파일 경로>]
+/browser-visual-diff [figma-url=<Figma URL>] [component=<컴포넌트 파일 경로>] [route=<라이브 라우트>] [design-guide=<디자인 가이드 파일 경로>] [out=<활성 작업공간>]
 ```
 
 **예시:**
@@ -60,6 +60,8 @@ Phase 1~4는 `browser-visual-diff-capture` 에이전트가 수행하며, 에이�
 | `<BaselineViewport>` | 라이브 렌더 비교 기준 viewport 크기 | Phase 0 확인 (기본 `1280×720`) |
 | `<DevServerURL>` | 라이브 dev server URL | Phase 0 확인 (기본 `http://localhost:3000`) |
 | `<VerifyCommands>` | 프로젝트 검증 명령 (lint/test/build) | Phase 0 확인 |
+| `<WorkspaceOut>` | 활성 작업공간 경로 | `out` 인자 또는 Phase 0 확인 |
+| `<WorkspaceCapturesDir>` | 최종 캡처 저장 경로 (`<WorkspaceOut>/captures/`) | `<WorkspaceOut>`에서 도출 |
 
 > 슬롯 값은 실행 시점에만 사용되며 SKILL.md 에 저장하지 않는다.
 
@@ -73,17 +75,19 @@ Phase 1~4는 `browser-visual-diff-capture` 에이전트가 수행하며, 에이�
 - **Dev server 직접 기동 금지** — 이미 실행 중인 dev server 를 사용한다. URL/포트 불확실 시 1줄 확인 후 진행.
 - **신규 토큰 정의 금지** — 본 Skill 은 검증 + 미세 조정 전용. 신규 토큰 도입은 사용자 결정 사항(별도 PR).
 - **임시 패치는 반드시 회수** — 에이전트가 캡처 직후 `git restore` 로 회수한다. Phase 6 에서 잔존 여부 재확인.
+- **최종 캡처는 작업공간에 보관** — 최종 화면 캡처는 `<WorkspaceCapturesDir>/`에 저장한다. `/tmp`는 폐기 가능한 임시 파일에만 쓴다.
 
 ---
 
 ## Phase 0 — 사전 준비 (슬롯 합의)
 
 1. `$ARGUMENTS` 에서 슬롯 값 파싱 (Figma URL → `<FigmaFileKey>` + `<FigmaNodeId>` 자동 추출).
-2. 미충족 필수 슬롯이 있으면 **1회** 사용자에게 확인:
+2. `out`이 있으면 `<WorkspaceOut>`으로 사용한다. 없으면 현재 기능의 `.claude/workspace/{feature-name}-{date}/`를 확인하고, 확정되지 않았으면 작업공간 경로를 1회 확인한다. `<WorkspaceCapturesDir>`는 `<WorkspaceOut>/captures/`로 정한다.
+3. 미충족 필수 슬롯이 있으면 **1회** 사용자에게 확인:
    - "Figma 노드 ID / 비교 대상 컴포넌트 경로 / 라이브 라우트 / 프로젝트 디자인 가이드 파일(있다면) / viewport / dev server URL / 검증 명령을 알려주세요."
-3. `<DesignGuide>` 파일이 존재하면 컬러/타이포/spacing/z-index/터치 관련 섹션을 Read.
-4. `<TokenSSOT>` / `<ZIndexSSOT>` 파일이 존재하면 상수 표 파악.
-5. `<LayoutScaleSSOT>` 파일이 존재하면 Figma → device 변환식 확인.
+4. `<DesignGuide>` 파일이 존재하면 컬러/타이포/spacing/z-index/터치 관련 섹션을 Read.
+5. `<TokenSSOT>` / `<ZIndexSSOT>` 파일이 존재하면 상수 표 파악.
+6. `<LayoutScaleSSOT>` 파일이 존재하면 Figma → device 변환식 확인.
 
 ---
 
@@ -95,7 +99,7 @@ Phase 1~4는 `browser-visual-diff-capture` 에이전트가 수행하며, 에이�
 Phase 0에서 확정된 슬롯 값으로 `browser-visual-diff-capture` 에이전트를 호출한다:
 
 - **전달 슬롯**: `<FigmaFileKey>`, `<FigmaNodeId>`, `<DevServerURL>`, `<LiveRoute>`,
-  `<ComponentPath>`, `<DesignGuide>`, `<TokenSSOT>`, `<ZIndexSSOT>`, `<BaselineViewport>`
+  `<ComponentPath>`, `<DesignGuide>`, `<TokenSSOT>`, `<ZIndexSSOT>`, `<BaselineViewport>`, `<WorkspaceCapturesDir>`
 - **에이전트 수행 내용**:
   - Phase 1 — Figma reference 캡처 (`references/figma-capture.md` 참조). `get_design_context`로 코드 힌트까지 받을 때는 **호출 전 `figma:figma-design-to-code` 스킬을 먼저 로드**한다(에이전트 내부 규칙). 미로드 시 코드 힌트를 생략하고 리포트에 기록한다.
   - Phase 2 — 라이브 렌더 캡처 (`references/live-capture.md`, `references/state-patch-pattern.md` 참조)
@@ -129,10 +133,7 @@ Phase 0에서 확정된 슬롯 값으로 `browser-visual-diff-capture` 에이전
    ```bash
    grep -r "TEMP-VISUAL-VERIFY" .
    ```
-3. 캡처 파일 정리 (선택):
-   ```bash
-   rm -f render_*.png figma_*.png
-   ```
+3. 최종 캡처가 `<WorkspaceCapturesDir>/`에 남아 있는지 확인한다. 임시 재시도 캡처만 선택적으로 정리하며, 최종 증빙 파일은 삭제하지 않는다.
 4. 최종 검증 (`<VerifyCommands>` 실행):
    ```bash
    # 프로젝트별 명령으로 치환

@@ -20,7 +20,7 @@ Phase 0의 시나리오 표 각 행에 대해 아래를 반복한다.
    - (b) 호출 사이에 간격(30~50ms)을 둔 반복 — 정상 사용자 조작 경로
 
    **(a)에서만 드러나는 갱신 유실이 있으므로 (b)만 실행하면 통과로 오판한다.** 기대값은 "입력 횟수 × 단위"로 수치화해 대조한다.
-4. **UI 상태 대조** — `wait_for(text=<ExpectedUIState 문구>, timeout=5000)`로 확인. 타임아웃되면 FAIL로 기록하고 `take_screenshot`으로 실패 시점 캡처.
+4. **UI 상태 대조** — `wait_for(text=<ExpectedUIState 문구>, timeout=5000)`로 확인. 타임아웃되면 FAIL로 기록하고 `take_screenshot(filename=<WorkspaceCapturesDir>/acceptance_fail_<ac-id>.png)`으로 실패 시점 캡처.
 5. **영속 상태 대조** — `<PersistenceCheckMethod>`로 실제 저장값을 조회해 `<ExpectedPersistence>`와 대조한다. 얕은 1회 조회로 충분한지 판단하고, 다층 계측이 필요하면 FAIL 대신 "영속 확인 불충분 — verify-data-flow 권장"으로 기록한다.
 6. **반복 입력 시나리오 추가 대조** — 3번에서 (a)/(b)를 실행한 시나리오에만 적용한다.
    - **I/O 횟수 관측** — 저장/요청이 입력 횟수만큼 나가지 않고 코얼레싱되는지 **센다**. `list_network_requests`(서버 저장) 또는 `evaluate_script`로 저장 함수 호출 카운터를 관측한다. **최종값이 맞아도 I/O가 입력 횟수만큼 나갔으면 FAIL이다** — 최종값 대조만으로는 코얼레싱 부재가 검출되지 않는다.

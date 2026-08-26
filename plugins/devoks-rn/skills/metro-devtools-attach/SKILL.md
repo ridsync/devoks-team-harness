@@ -37,16 +37,16 @@ Metro 상태나 JS 디버거 활성화와 무관하게 즉시 사용할 수 있�
 ### Android Emulator
 
 ```bash
-adb exec-out screencap -p > /tmp/rn_screen.png
+adb exec-out screencap -p > .claude/workspace/{feature-name}-{date}/captures/rn_<screen-name>.png
 ```
 
 ### iOS Simulator
 
 ```bash
-xcrun simctl io booted screenshot /tmp/rn_screen.png
+xcrun simctl io booted screenshot .claude/workspace/{feature-name}-{date}/captures/rn_<screen-name>.png
 ```
 
-스크린샷 저장 후 Read tool로 이미지 파일을 읽으면 Claude가 UI를 시각적으로 확인할 수 있다.
+최종 증빙 스크린샷은 활성 작업공간의 `captures/`에 저장한 뒤 Read tool로 읽어 UI를 시각적으로 확인한다. 활성 작업공간이 확정되지 않았으면 캡처 전에 경로를 1회 확인한다. 일회성 확인만 필요하면 `/tmp/rn_screen.png`를 사용하고 끝난 뒤 정리한다.
 
 #### 트러블슈팅
 
@@ -160,8 +160,8 @@ AsyncStorage 확인:
 
 | 목적 | 도구 | 전제 |
 |------|------|------|
-| Android 스크린샷 | `adb exec-out screencap -p > /tmp/rn_screen.png` | adb 연결 |
-| iOS 스크린샷 | `xcrun simctl io booted screenshot /tmp/rn_screen.png` | Xcode CLI |
+| Android 스크린샷 | `adb exec-out screencap -p > .claude/workspace/{feature-name}-{date}/captures/rn_<screen-name>.png` | adb 연결 |
+| iOS 스크린샷 | `xcrun simctl io booted screenshot .claude/workspace/{feature-name}-{date}/captures/rn_<screen-name>.png` | Xcode CLI |
 | Metro 연결 상태 | `mcp__metro-devtools__get_metro_status` | metro-devtools 등록 |
 | 콘솔 에러 | `mcp__metro-devtools__list_console_messages` | 위 동일 |
 | JS 평가 | `mcp__metro-devtools__evaluate_script` | 위 동일 |

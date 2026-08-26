@@ -27,6 +27,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 | `<TokenSSOT>` | 컬러/타이포/spacing 토큰 정의 파일 (있다면) |
 | `<ZIndexSSOT>` | z-index 상수 SSOT 파일 (있다면) |
 | `<BaselineViewport>` | 비교 기준 viewport 크기 (기본 1280×720) |
+| `<WorkspaceCapturesDir>` | 최종 라이브 렌더 캡처 저장 경로 (`.claude/workspace/{feature-name}-{date}/captures/`) |
 
 ---
 
@@ -82,7 +83,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
    ```
    list_pages() → navigate_page(url=<DevServerURL>/<LiveRoute>)
    → wait_for(text=<식별 텍스트>, timeout=5000)
-   → take_screenshot(filename=render_<screen>.png)
+   → take_screenshot(filename=<WorkspaceCapturesDir>/render_<screen>.png)
    ```
 4. **폴백 (Playwright MCP)** — Chrome DevTools MCP 실패 시에만. 폴백 이유를 리포트에 한 줄 기록.
 

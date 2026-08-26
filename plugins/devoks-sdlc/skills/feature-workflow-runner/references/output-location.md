@@ -11,20 +11,26 @@
 ├─ FRD.draft.md     # 본문으로 받은 초안 원문 보존(있을 때)
 ├─ FRD.md           # 정련 FRD
 ├─ PLAN.md          # 작업 분해
-└─ assets/          # 시안·시각 리소스 사본 (RES-ASSET-NNN_<slug>[_<nodeid>].<ext>)
+├─ assets/          # 입력 시안·시각 리소스 사본 (RES-ASSET-NNN_<slug>[_<nodeid>].<ext>)
+├─ captures/        # 최종 화면 캡처·스크린샷
+├─ verification/    # 최종 인수·데이터 흐름·스모크 검증 리포트와 선별 증거
+└─ results/         # captures/·verification/에 속하지 않는 최종 생성물
 ```
 
 - **디렉토리명** — 항상 `{feature-name}-{date}` 형식(하이픈 구분). 임의 변형 금지.
 - `{feature-name}` — FRD의 feature-slug(**kebab-case**). 초안에서 정해지지 않았으면 Goal로부터 짧게 만들고 1회 확인한다.
 - `{date}` — 오늘 날짜 **`yyyyMMdd`** (8자리, 예 `20260609`). 실행 시 `date +%Y%m%d` 로 구한다(추측 금지).
 - 예: `.claude/workspace/saved-filter-views-20260605/`
-- `out` 인자가 주어지면 그 경로가 이 기본값을 덮어쓴다(이 경우에도 위 파일/`assets/` 레이아웃은 동일하게 유지).
+- `out` 인자가 주어지면 그 경로가 이 기본값을 덮어쓴다(이 경우에도 위 파일/`assets/`·`captures/`·`verification/`·`results/` 레이아웃은 동일하게 유지).
 
 ## 워크스페이스에 두는 것 (문서·리소스)
 
-- **스킬이 생성한 문서 산출물**: `FRD.md`, `PLAN.md`, 그 외 보고서/메모 등(워크스페이스 루트).
+- **워크플로우 SSOT 문서**: `FRD.md`, `PLAN.md`, 진행 메모 등은 워크스페이스 루트.
 - **입력받은 초안 사본**: 사용자가 준 FRD 초안 원문(본문으로 받았으면 `FRD.draft.md` 로 보존, 루트).
 - **시각 시안·리소스 사본 → `assets/`**: 작업에 쓰인 figma 스크린샷·노드 캡처·시안 이미지 등 **시각 리소스는 `<out>/assets/` 하위에 사본 저장**한다(아래 네이밍 규칙). 텍스트 메모·스펙 발췌도 여기 둘 수 있다.
+- **최종 화면 캡처 → `captures/`**: 라이브 렌더·에뮬레이터·실동작 검증에서 최종 증빙으로 남길 스크린샷은 `<out>/captures/`에 저장한다. 파일명은 목적이 드러나게 `render_<screen>.png`, `acceptance_fail_<ac-id>.png`처럼 짓는다.
+- **최종 검증 결과 → `verification/`**: 인수·데이터 흐름·스모크 검증 리포트와 결론에 필요한 선별 로그/스냅샷은 `<out>/verification/`에 저장한다. 대용량 원시 로그는 보관 대상이 아니면 임시 위치에서 정리한다.
+- **그 외 최종 생성물 → `results/`**: 위 두 분류에 맞지 않는 최종 파일만 `<out>/results/`에 저장한다. `results/`를 범용 덤프 폴더로 사용하지 않는다.
 - **경로만 기록(사본 생략)**: 시안 외 대용량·무관 바이너리, 또는 저장소 안에 이미 있는 리소스는 복사하지 말고 경로만 기록한다.
 
 ### `assets/` 네이밍 규칙

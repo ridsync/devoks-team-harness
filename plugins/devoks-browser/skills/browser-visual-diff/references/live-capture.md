@@ -24,7 +24,7 @@
 2. 대상 페이지가 있으면 select_page, 없으면 new_page
 3. mcp__chrome-devtools-attach__navigate_page(url=<DevServerURL>/<LiveRoute>)
 4. mcp__chrome-devtools-attach__wait_for(text=<화면 식별 텍스트>)
-5. mcp__chrome-devtools-attach__take_screenshot(filename=render_<screen_name>.png)
+5. mcp__chrome-devtools-attach__take_screenshot(filename=<WorkspaceCapturesDir>/render_<screen_name>.png)
 ```
 
 ### chrome-profile 충돌 해결
@@ -38,8 +38,9 @@ Chrome DevTools MCP 와 사용자 Chrome 인스턴스가 같은 프로파일을 
 
 ### 파일명 규칙
 
-- **상대 경로** 사용 (`render_<screen_name>.png`) — workspace root 에 저장.
-- 절대 경로(`/tmp/...` 등) 는 `allowed roots` 제약으로 실패할 수 있음.
+- **상대 경로** 사용 (`.claude/workspace/{feature-name}-{date}/captures/render_<screen_name>.png`) — 활성 작업공간의 `captures/`에 저장.
+- `<WorkspaceCapturesDir>`는 활성 작업공간의 상대 경로 `.claude/workspace/{feature-name}-{date}/captures`다. 작업공간이 확정되지 않았으면 캡처 전 1회 확인한다.
+- 절대 경로(`/tmp/...` 등)는 `allowed roots` 제약으로 실패할 수 있으며, 최종 캡처 보관 경로로 사용하지 않는다.
 - 파일명 예: `render_result_pass.png`, `render_settings_modal.png`
 
 ### `wait_for` 패턴
@@ -64,14 +65,14 @@ Chrome DevTools MCP 연결이 실패하거나 사용할 수 없을 때 Playwrigh
 ```
 1. mcp__plugin_playwright_playwright__browser_navigate(url=<DevServerURL>/<LiveRoute>)
 2. mcp__plugin_playwright_playwright__browser_wait_for(text=<화면 식별 텍스트>, timeout=5000)
-3. mcp__plugin_playwright_playwright__browser_take_screenshot(filename=render_<screen_name>.png)
+3. mcp__plugin_playwright_playwright__browser_take_screenshot(filename=<WorkspaceCapturesDir>/render_<screen_name>.png)
 ```
 
 ### 주요 파라미터
 
 ```
 browser_take_screenshot({
-  filename: "render_<screen_name>.png",  # 상대 경로
+  filename: "<WorkspaceCapturesDir>/render_<screen_name>.png",  # 활성 작업공간 기준 상대 경로
   fullPage: false                        # viewport 크기로 캡처 (Figma 비교용)
 })
 ```

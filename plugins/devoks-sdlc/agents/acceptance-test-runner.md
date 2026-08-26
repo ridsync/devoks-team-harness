@@ -24,6 +24,8 @@ FRD의 AC를 실행 중인 앱에서 실제로 조작해 확인하는 **실행·
 | `<DevServerURL>` | 이미 실행 중인 dev server URL |
 | `<PersistenceCheckMethod>` | 영속 상태 조회 방법(프로젝트별) |
 | `<AuditMarker>` | 임시 패치 식별 마커 (기본 `ACCEPT-TEMP`) |
+| `<WorkspaceVerificationDir>` | 최종 검증 리포트 저장 경로 (`.claude/workspace/{feature-name}-{date}/verification/`) |
+| `<WorkspaceCapturesDir>` | 실패 시점 캡처 저장 경로 (`.claude/workspace/{feature-name}-{date}/captures/`) |
 
 ---
 
@@ -48,7 +50,7 @@ FRD의 AC를 실행 중인 앱에서 실제로 조작해 확인하는 **실행·
 1. **사전 상태 확인** — 이미 충족돼 있는지 먼저 점검. 충족 안 됐고 세팅도 불가능하면 "사전 상태 세팅 불가"로 기록하고 다음 시나리오로.
 2. **진입** — `navigate_page` → `wait_for`.
 3. **조작** — 시나리오의 조작 순서대로 `click`/`fill`/`press_key`.
-4. **UI 상태 대조** — `wait_for(text=<기대 UI 상태>)`. 타임아웃 시 FAIL + `take_screenshot`.
+4. **UI 상태 대조** — `wait_for(text=<기대 UI 상태>)`. 타임아웃 시 FAIL + `take_screenshot(filename=<WorkspaceCapturesDir>/acceptance_fail_<ac-id>.png)`.
 5. **영속 상태 대조** — `<PersistenceCheckMethod>`로 조회해 기대 영속 상태와 대조. 얕은 1회 조회로 판단이 어려우면 FAIL 대신 "영속 확인 불충분 — verify-data-flow 권장"으로 기록.
 6. 임시 패치가 필요했다면 `// [<AuditMarker>]` 주석 부착 → 시나리오 확인 직후 즉시 `git restore`로 회수 → 회수 실패/잔존 시 리포트에 명시.
 7. 패치로도 목표 상태를 재현 못 하면 FAIL이 아니라 "검증 환경 갭"으로 분류.

@@ -144,7 +144,7 @@ Phase 4 판정은 아래 차원으로 점검한다 (DAMA-DMBOK / ISO/IEC 25012 �
 
 ## Phase 5 — 검증 리포트
 
-`references/report-template.md` 템플릿으로 리포트를 작성한다. 기본 저장 위치는 프로젝트 문서 디렉토리(예: `doc/`)이며, 파일명은 `<대상>-verify-data-flow-result.md`.
+`references/report-template.md` 템플릿으로 리포트를 작성한다. 최종 리포트는 활성 작업공간의 `verification/<대상>-verify-data-flow-result.md`에 저장한다. 작업공간이 확정되지 않았으면 Phase 0에서 경로를 1회 확인한다.
 
 리포트는 반드시 포함한다: **종합 판정(✅/⚠️/❌) → 단계별 대조 표 → 기준 대조(공식 재현) → 발견 사항(severity) → 미검증 경로 → 원시 증거 출처**.
 

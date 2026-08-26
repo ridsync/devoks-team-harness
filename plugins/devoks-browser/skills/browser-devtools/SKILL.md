@@ -84,7 +84,10 @@ mcp__chrome-devtools-attach__get_console_message { "msgid": <id> }
 ```
 mcp__chrome-devtools-attach__take_screenshot
 ```
+- 최종 증빙으로 남길 때: `{ "filePath": ".claude/workspace/{feature-name}-{date}/captures/<screen-name>.png" }`
+- 활성 작업공간이 확정되지 않았으면 최종 캡처 전에 경로를 1회 확인한다.
 - 파일로 저장: `{ "filePath": "/tmp/screen.png" }`
+- `/tmp/screen.png`는 일회성 확인 후 폐기할 임시 캡처에만 사용한다.
 - 전체 페이지: `{ "fullPage": true }`
 
 ### 페이지 구조 (A11y 트리) 확인

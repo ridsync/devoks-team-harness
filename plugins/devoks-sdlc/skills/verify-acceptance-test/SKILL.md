@@ -49,6 +49,8 @@ FRD의 AC를 **실행 중인 앱에서 실제로 조작해** 검증하는 워크
 | `<DevServerURL>`           | 이미 실행 중인 dev server URL                       | Phase 0 확인                     |
 | `<AuditMarker>`            | 임시 패치가 필요할 때 식별 마커                            | 기본 `ACCEPT-TEMP`               |
 | `<VerifyCommands>`         | 임시 패치 회수 후 검증 명령                              | Phase 0 확인                     |
+| `<WorkspaceVerificationDir>` | 최종 검증 리포트 저장 경로 (`<FRDSource>`가 속한 작업공간의 `verification/`) | `<FRDSource>`에서 도출 또는 Phase 0 확인 |
+| `<WorkspaceCapturesDir>` | 실패 시점 캡처 저장 경로 (같은 작업공간의 `captures/`) | `<FRDSource>`에서 도출 또는 Phase 0 확인 |
 
 
 > 슬롯 값은 실행 시점에만 사용하며 SKILL.md에 저장하지 않는다.
@@ -76,9 +78,10 @@ FRD의 AC를 **실행 중인 앱에서 실제로 조작해** 검증하는 워크
 
 1. `$ARGUMENTS`에서 슬롯 파싱.
 2. `<FRDSource>`가 있으면 Read해 AC(EARS)·Contract(CTR)·Edge(EDGE) 중 **UI 조작 + 상태 영속이 걸린 항목만** 선별한다. 순수 로직/타입/설정값만 다루는 AC는 대상에서 제외한다(유닛테스트가 이미 충분히 커버).
-3. 미충족 슬롯을 1회 확인:
+3. `<FRDSource>`가 활성 작업공간 안에 있으면 그 부모의 `verification/`·`captures/`를 각각 `<WorkspaceVerificationDir>`·`<WorkspaceCapturesDir>`로 정한다. 도출할 수 없으면 미충족 슬롯과 함께 경로를 1회 확인한다.
+4. 미충족 슬롯을 1회 확인:
   - "검증할 AC ID, 진입 라우트, 사전 상태 세팅 방법, 영속 상태 조회 방법(예: DB API, 콘솔 evaluate_script)을 알려주세요."
-4. AC별 **시나리오 표**를 작성한다 — 이 표가 Phase 1~4 실행 계획이자 Phase 5 리포트의 뼈대가 된다:
+5. AC별 **시나리오 표**를 작성한다 — 이 표가 Phase 1~4 실행 계획이자 Phase 5 리포트의 뼈대가 된다:
   
   | AC ID    | 진입 경로                  | 사전 상태    | 조작          | 기대 UI 상태   | 기대 영속 상태                       |
   | -------- | ---------------------- | -------- | ----------- | ---------- | ------------------------------ |
@@ -86,7 +89,7 @@ FRD의 AC를 **실행 중인 앱에서 실제로 조작해** 검증하는 워크
   
   - AC가 **빠른 반복 조작**을 포함하면(`.claude/refs/interaction-integrity.md` §1 적용 대상 판정 통과 시) 조작 칸에 **횟수와 간격**을 명시한다 — 예: `"∧ 5회 연타(간격 없음)"` / `"∧ 5회(간격 30ms)"`. 기대 UI 상태는 "입력 횟수만큼 반영"처럼 **수치화**하고, I/O가 걸려 있으면 기대 영속 상태에 "저장 요청 1회로 코얼레싱"을 함께 적는다.
   
-5. devoks-browser 설치 여부를 1회 확인한다(미설치면 Phase 1로 진행하지 않고 안내).
+6. devoks-browser 설치 여부를 1회 확인한다(미설치면 Phase 1로 진행하지 않고 안내).
 
 ---
 
@@ -97,7 +100,7 @@ FRD의 AC를 **실행 중인 앱에서 실제로 조작해** 검증하는 워크
 
 Phase 0에서 확정된 시나리오 표로 `acceptance-test-runner` 에이전트를 호출한다:
 
-- **전달 슬롯**: 시나리오 표 전체, `<DevServerURL>`, `<PersistenceCheckMethod>`, `<AuditMarker>`
+- **전달 슬롯**: 시나리오 표 전체, `<DevServerURL>`, `<PersistenceCheckMethod>`, `<AuditMarker>`, `<WorkspaceVerificationDir>`, `<WorkspaceCapturesDir>`
 - **에이전트 수행 내용**: 시나리오별로 `사전 상태 세팅 확인 → 조작 실행 → UI 상태 대조 → 영속 상태 대조`를 반복(상세 절차는 `references/scenario-execution.md`)
 - **리턴값**: 시나리오별 PASS/FAIL 표 + 불일치 증거 + 임시 패치 회수 여부를 담은 **검증 리포트**
 
@@ -109,8 +112,7 @@ Phase 0에서 확정된 시나리오 표로 `acceptance-test-runner` 에이전�
 ## Phase 5 — 검증 리포트
 
 `references/report-template.md` 템플릿으로 리포트를 작성한다(에이전트가 Phase 1~4 결과로 초안을 만들고,
-메인 루프가 그대로 수령·출력한다). 저장은 선택 — 대상 프로젝트 문서 디렉토리에 남기고 싶으면 파일명은
-`<대상>-verify-acceptance-test-result.md`.
+메인 루프가 그대로 수령·출력한 뒤 `<WorkspaceVerificationDir>/<대상>-verify-acceptance-test-result.md`에 저장한다. `<WorkspaceVerificationDir>`는 `<FRDSource>`가 속한 활성 작업공간의 `verification/`이며, FRD 경로로 도출할 수 없으면 Phase 0에서 1회 확인한다. 실패 시점 스크린샷은 같은 작업공간의 `captures/`에 저장한다.
 
 ---
 
@@ -141,5 +143,3 @@ Phase 0에서 확정된 시나리오 표로 `acceptance-test-runner` 에이전�
 | ---------------------------------- | -------------------------------------------------- | --------------------------- |
 | `references/scenario-execution.md` | 시나리오 실행 절차(사전상태 확인·조작·UI/영속 대조), 프로젝트별 영속 조회 패턴 예시 | acceptance-test-runner 에이전트 |
 | `references/report-template.md`    | 검증 리포트 템플릿                                         | Phase 5                     |
-
-
