@@ -149,6 +149,57 @@
 - 축 5: `grep -n '\.\./' skills/<name>/SKILL.md` 등으로 플러그인 루트 밖 상대경로 참조 여부 확인
 - 축 6: SKILL.md 라인 수(`wc -l`), 본문 내 대용량 코드블록/예시 유무, `references/` 분리 여부 확인
 
+### argument-hint 정합성 (인자 슬롯이 있는 스킬 — 항상 필수, 정적)
+
+`claude plugin validate --strict`는 매니페스트만 검증하고 SKILL.md frontmatter를 파싱하지 않으므로
+아래를 직접 돌린다. 판정 기준은 `docs/plugin-management.md` §4.
+
+```bash
+# (1) frontmatter YAML 파싱 + argument-hint가 String인지 (배열이면 따옴표 누락)
+ruby -ryaml -e '
+Dir.glob("plugins/**/SKILL.md").sort.each do |p|
+  l = File.read(p).split("\n"); c = (1...l.size).find { |i| l[i].strip == "---" }
+  fm = YAML.safe_load(l[1...c].join("\n")); h = fm["argument-hint"]
+  puts format("%-9s %s", h.nil? ? "-" : (h.is_a?(String) ? "OK" : "!!#{h.class}"), p)
+rescue => e then puts "PARSE ERR #{p}: #{e.message.lines.first.strip}" end'
+
+# (2) 힌트 == 본문 "## 호출 방법" usage 인자부 (완전 일치여야 한다)
+for f in $(grep -rl '^argument-hint:' plugins --include=SKILL.md); do
+  hint=$(grep -m1 '^argument-hint:' "$f" | sed 's/^argument-hint: "//; s/"$//')
+  usage=$(awk '/^## 호출/{f=1} f&&/^\/[a-z]/{sub(/^[^ ]+ /,""); print; exit}' "$f")
+  [ -z "$usage" ] && continue   # 위치 인자형(usage 블록 없음) — 아래 예외 참고
+  [ "$hint" = "$usage" ] || { echo "DIFF $f"; echo "  hint : $hint"; echo "  usage: $usage"; }
+done
+```
+
+- 본문에 `## 호출 방법` 슬롯이 있는데 `argument-hint`가 없으면 **누락**으로 본다.
+- 인자 슬롯이 없는 스킬(대화 맥락만으로 동작)에 힌트가 붙어 있으면 **제거 대상**이다.
+- **예외 — 위치 인자형**: `## 호출 방법` usage 블록 대신 `## 입력 파라미터`로 필수 입력을 선언하는 스킬은
+  힌트도 위치형으로 쓴다(`new-ui-draft` → `"<Figma URL> <구현 추가정보>"`). 위 (2)는 `continue`로 건너뛰므로,
+  이 경우 `## 입력 파라미터` 표의 필수/선택 서술과 힌트를 **눈으로** 대조한다.
+
+#### 필수/선택·기본값 표기 판정 (usage string 관례)
+
+| 표기 | 의미 | 판정 근거를 어디서 찾나 |
+|------|------|----------------------|
+| `key=<값>` (대괄호 없음) | **필수** — 값이 확정되지 않으면 실행 불가 | Phase 0의 "미충족 슬롯을 1회 확인" 질문 목록에 포함된 슬롯. Phase 0가 없는 스킬은 그 값 없이 파이프라인이 시작될 수 없는 슬롯 |
+| `[key=<값>]` | 선택 — 없으면 생략·미반영 | 슬롯표에 "(있다면)"·"(선택)" 표기, 또는 Phase 0 질문 목록에 없음 |
+| `[key=<값> (default: X)]` | 선택 + 결정적 기본값 X로 **묻지 않고** 진행 | 본문에 `기본값 =` / `미지정 시` / `없으면 …로 진행` 서술 |
+
+- **legend는 표기법만 정의한다.** 필수 슬롯 생략 시의 처리(되묻기 여부)를 legend에 쓰지 말 것 — 스킬마다 다르다.
+  대부분은 Phase 0에서 되묻지만 비-HITL 파이프라인(`orchestration-run`)은 **중간 승인 없이** 동작해 되묻는 단계가 없다.
+  2026-08-28 재점검에서 legend에 "생략 시 Phase 0에서 확인"을 넣었다가 이 2건(`orchestration-run`·`feature-plan-author`)에서
+  **존재하지 않는 단계를 약속**하는 것을 발견해 표기법만 남기도록 정정했다.
+- 따라서 `key=<값>`(필수)로 표기할 때는 **그 스킬에 값 확정 경로가 실제로 있는지** 확인한다:
+  Phase 0의 확인 질문, 슬롯표의 "인자 또는 Phase 0 확인", 또는 "반드시 제공받는다" 서술 중 하나가 있어야 한다.
+  셋 다 없으면 그 스킬의 **문서 갭**이므로 표기만 바꾸지 말고 갭 자체를 보고한다.
+
+- 기본값 키워드는 `default:` 고정(한국어 `기본` 금지). 단 **usage string이 아닌 산문**(슬롯표 "입력 방법" 열 등)은 한국어 `기본`을 유지한다 — `default:`는 `argument-hint`·본문 usage 라인·legend 3곳 전용이다.
+- `(default: X)`는 콜론+공백을 포함하므로 **따옴표 누락 시 조용한 오파싱 또는 하드 에러**가 된다(`docs/plugin-management.md` §4 표). 위 (1) 스크립트로 String 여부를 반드시 확인한다.
+- 기본값 문구는 **본문에 실제로 서술된 것만** 쓴다. 근거 없이 추정해 넣지 않는다.
+- "인자가 없어도 동작한다"와 `key=<값>`(필수) 표기는 **모순이 아니다** — 인자 생략은 가능하고, 대신 Phase 0이 묻는다.
+- 힌트만 바꾸고 본문 usage를 그대로 두면 필수/선택이 서로 모순된다. **항상 같이 고친다**(위 (2)가 이걸 잡는다).
+
 ## 8. AskUserQuestion 사용 규칙 (스킬 저작 컨벤션 SSOT)
 
 스킬/커맨드 본문에 **사용자 확인 분기**를 넣을 때 `AskUserQuestion` 사용 여부는 아래 기준으로 판단한다.

@@ -1,5 +1,6 @@
 ---
 description: "리포지토리·의존성·위협 수준의 전용 보안 검증을 수행한다. scope를 대상으로 의존성 취약점·시크릿 하드코딩·인증인가 경계 우회·인젝션/XSS/SSRF·민감 데이터 노출·안전하지 않은 설정을 repo 전수로 점검하고 심각도별 리포트를 낸다. \"보안 점검\", \"보안 검토\", \"취약점 스캔\", \"시크릿 노출 확인\", \"의존성 취약점 확인\", \"security review\", \"security audit\" 요청에서 사용한다. 이번 변경분(diff) 단위의 경량 보안 스크리닝은 devoks-sdlc:code-review에 포함된 별개 기능이다."
+argument-hint: "[scope=<경로> (default: . 전체 repo)] [focus=<중점 영역>]"
 metadata:
   author: ridsync
   version: 2.0.0
@@ -37,8 +38,10 @@ metadata:
 ## 호출 방법
 
 ```
-/devoks-sdlc:code-security-review [scope=<경로|.>] [focus=<중점 영역>]
+/devoks-sdlc:code-security-review [scope=<경로> (default: . 전체 repo)] [focus=<중점 영역>]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 **예시:**
 

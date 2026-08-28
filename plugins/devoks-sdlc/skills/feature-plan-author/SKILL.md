@@ -1,5 +1,6 @@
 ---
 description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)로 만든다. 요구사항을 단일·검증가능·증분 Task로 쪼개고, TASK-ID·`[P]` 병렬 마커·`size` 크기 마커(실행 라우팅 신호)·`test` 테스트 필요 여부 마커·`file:`·`traces:`를 부여하며, PR 단위로 그룹핑하고 의존성 그래프와 Definition of Done을 작성한다. 모든 REQ/AC/CTR/EDGE가 traces로 커버되는지(누락 0) 검증한다. "FRD를 작업으로 분해해줘", "PLAN 짜줘", "태스크/PR 나눠줘", "스펙→태스크 분해", "작업 계획 세워줘" 같은 요청에서 사용한다. 분해 후 실행은 devoks-sdlc:feature-plan-executor, 전체 흐름은 devoks-sdlc:feature-workflow-runner.
+argument-hint: "[frd=<FRD.md 경로> (default: 최근 FRD)] [out=<디렉터리> (default: FRD 워크스페이스)]"
 metadata:
   author: ridsync
   version: 1.3.0
@@ -13,9 +14,12 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 ## 호출 방법
 
 ```
-/devoks-sdlc:feature-plan-author [frd=<FRD.md 경로>] [out=<산출물 디렉터리>]
+/devoks-sdlc:feature-plan-author [frd=<FRD.md 경로> (default: 최근 FRD)] [out=<디렉터리> (default: FRD 워크스페이스)]
 ```
 
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
+
+- `frd` 없으면 가장 최근 `.claude/workspace/*/FRD.md` 를 후보로 제시·확인한다. → `../feature-workflow-runner/references/output-location.md`
 - `out` 기본값 = FRD.md가 있는 워크스페이스(`.claude/workspace/{feature-name}-{date}/`). 산출물 = `<out>/PLAN.md`. → `../feature-workflow-runner/references/output-location.md`
 - PLAN은 워크스페이스에 저장하되, 각 Task의 `file:`은 항상 **프로젝트 본래 코드 위치**를 가리킨다(워크스페이스 아님).
 

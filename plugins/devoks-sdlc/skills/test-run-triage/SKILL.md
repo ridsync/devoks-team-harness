@@ -1,5 +1,6 @@
 ---
 description: 전체 또는 지정 범위의 테스트 스위트를 실행하고, 실패를 회귀·플래키·스펙불일치·환경 범주로 분류해 원인 추정과 수정안을 리포트한다. 테스트 출력은 대용량이므로 context-mode로 실행해 실패만 surface한다. "테스트 돌려줘", "테스트 실행하고 실패 분석", "왜 테스트가 깨지지", "test 실패 원인", "스위트 돌려봐", "run tests", "test failures" 요청에서 사용한다. 새 테스트 작성은 devoks-sdlc:test-author 를 쓴다.
+argument-hint: "[scope=<경로/패턴> (default: 전체 스위트)]"
 metadata:
   author: ridsync
   version: 1.1.1
@@ -28,8 +29,10 @@ metadata:
 ## 호출 방법
 
 ```
-/devoks-sdlc:test-run-triage [scope=<경로/패턴>]
+/devoks-sdlc:test-run-triage [scope=<경로/패턴> (default: 전체 스위트)]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 - `scope` 미지정 시 전체 스위트. 변경 범위만 빠르게 보려면 scope로 좁힌다.
 

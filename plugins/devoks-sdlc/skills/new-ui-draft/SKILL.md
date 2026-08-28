@@ -1,6 +1,7 @@
 ---
 name: new-ui-draft
 description: Figma 디자인 링크를 받아 프로젝트 패턴에 맞게 UI를 구현한다. 디자인 컨텍스트 조회 전 공식 figma-design-to-code 스킬을 로드해 asset(아이콘·이미지) 재현 규칙과 힌트 우선순위를 적용하고, DESIGN.md·디자인 토큰·i18n·라우트 등 프로젝트 계약에 맞춰 코드를 생성한다. "이 피그마로 화면 만들어줘", "Figma 디자인 구현해줘", "디자인 링크로 UI 생성", "figma 노드를 컴포넌트로", "design to code" 요청에서 사용한다. 구현 후 Figma와 실제 렌더의 시각 충실도 비교는 devoks-browser:browser-visual-diff 를 쓴다.
+argument-hint: "<Figma URL> <구현 추가정보>"
 metadata:
   author: ridsync
   version: 1.1.0

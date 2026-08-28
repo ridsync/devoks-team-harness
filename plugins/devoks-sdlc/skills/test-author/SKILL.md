@@ -1,5 +1,6 @@
 ---
 description: "대상 코드·모듈의 자동화 테스트(단위·통합)를 작성하거나 기존 테스트를 확장한다. 프로젝트의 실제 테스트 러너·라이브러리·파일 패턴을 감지하고 그 컨벤션에 맞춰 정상/경계/실패 케이스를 설계·작성한 뒤 작성한 테스트만 실행해 자기검증까지 수행한다. \"테스트 작성해줘\", \"테스트 짜줘\", \"유닛 테스트 추가\", \"테스트 커버리지 보강\", \"이 함수 테스트 만들어줘\" 요청에서 사용한다. 이미 있는 테스트 스위트를 실행하고 실패 원인을 분류하는 일은 devoks-sdlc:test-run-triage, 요구·보안 충족 판정은 devoks-sdlc:verify-requirements / devoks-sdlc:code-security-review 를 쓴다."
+argument-hint: "[target=<파일|모듈|심볼 경로> (default: 직전 변경 범위)] [plan=<PLAN.md 경로>] [frd=<FRD.md 경로>] [context=<추가 힌트>]"
 metadata:
   author: ridsync
   version: 3.0.0
@@ -32,8 +33,10 @@ metadata:
 ## 호출 방법
 
 ```
-/devoks-sdlc:test-author [target=<파일|모듈|심볼 경로>] [plan=<PLAN.md 경로>] [frd=<FRD.md 경로>] [context=<추가 힌트>]
+/devoks-sdlc:test-author [target=<파일|모듈|심볼 경로> (default: 직전 변경 범위)] [plan=<PLAN.md 경로>] [frd=<FRD.md 경로>] [context=<추가 힌트>]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 **예시:**
 

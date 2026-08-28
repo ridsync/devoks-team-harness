@@ -57,6 +57,8 @@ plugins/<plugin-name>/
 
 - `description`(또는 다른 YAML 값)에 `: `(콜론+공백)이 포함되면 YAML 파싱 실패 → **쌍따옴표로 감싼다.**
 - SKILL.md: `name`, `description` 필수.
+- SKILL.md `argument-hint`: 본문에 `## 호출 방법`(또는 `## 호출`) 슬롯이 정의된 스킬은 **필수**, 인자 슬롯이 없는 스킬은 **금지**(없는 인자를 오인시킴). **값은 항상 쌍따옴표** — `[`로 시작하면 YAML flow sequence로 해석된다.
+- `argument-hint` 값은 본문 usage 라인의 **인자부와 완전히 동일한 문자열**로 유지한다(본문이 SSOT). 표기는 usage string 관례 — `key=<값>` 필수 / `[key=<값>]` 선택 / `[key=<값> (default: X)]` 선택+기본값. 기본값 키워드는 `default:` 고정(usage 표기 전용 — 산문에서는 한국어 `기본` 유지), 값은 본문에 서술된 것만 쓰고 추정하지 않는다. 힌트만 고치면 필수/선택이 본문과 모순되므로 **항상 같이 고친다**. 판정 기준·검증 스크립트는 `docs/plugin-management.md` §4 및 `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md` §7.
 - command `.md`: `description` 필수, frontmatter 없으면 `--strict` 검증 실패.
 - agent `.md`: `name`, `description` 필수. `model`/`effort`는 생략 시 세션 상속(`inherit`) — 신규 agent는 반드시 의도적으로 결정하고, `inherit`로 두기로 했어도 명시한다. 모델 선택 기준은 `docs/plugin-management.md` §12.
 
@@ -86,6 +88,7 @@ plugins/<plugin-name>/
 | `plugins/` 번들 내용을 harness 저장소 자신의 `/.claude/`로 복사·동기화 | 위 "과거 사고 사례"처럼 대상-프로젝트용 산출물이 harness 자신의 설정으로 오염 | `/.claude/`는 harness 자신 전용, `plugins/`는 설치 대상 전용 — 자동 동기화 메커니즘을 다시 두지 않는다 |
 | `mcpServers`에 `required`/`optional`/`interactive` 중첩 키 사용 | `Invalid input` 검증 실패 | 서버 이름을 최상위 키로 직접 사용하는 플랫 맵 |
 | `description`에 콜론+공백을 따옴표 없이 사용 | YAML frontmatter 파싱 실패 | 쌍따옴표로 감싸기 |
+| `argument-hint`를 따옴표 없이 작성 | `[`로 시작하면 YAML flow sequence로 해석(다중 슬롯 → `Psych::SyntaxError`, 단일 슬롯 → 조용히 배열). `(default: X)` 표기가 있으면 더 나빠진다 — 대괄호형은 **에러 없이** 배열-of-해시로 오파싱되고, 필수 슬롯(`key=`)으로 시작하는 힌트는 `mapping values are not allowed`로 하드 실패. **`claude plugin validate --strict`는 매니페스트만 검증해 전부 미검출** — 2026-08-28 15개 스킬에 힌트 추가하며 실증·문서화 | 값을 항상 쌍따옴표로 감싸고, 추가 후 frontmatter YAML 파싱을 직접 확인(`ruby -ryaml`) |
 | `marketplace.json`의 `source`에 `..` 포함 | `Path contains ".."` 실패 | 플러그인 루트 기준 상대 경로만 사용 |
 | 플러그인 변경 후 버전 bump/문서 반영 누락 | 마켓플레이스 배포 시 카탈로그 drift | `devoks-plugin-maintenance` 스킬 절차 준수 |
 | `plugins/devoks-core/rules/*`를 "대상 프로젝트에 자동 복사되는 base rule"로 오해 | 실제로는 `agent-principles.md`/`memory-policy.md`만 base rule로 복사됨(`setup-project-convention.md` SSOT 참고) — 그 외 파일을 추가해도 조용히 무시됨 | 복사 대상 여부는 `setup-project-convention.md`의 SSOT 목록과 `check-setup-state.sh`의 `base_rules_ready()`로만 판단 |

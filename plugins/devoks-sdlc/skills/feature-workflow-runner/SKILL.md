@@ -1,5 +1,6 @@
 ---
 description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하고, 이를 추적 가능한 PLAN(작업 분해)으로 만든 뒤, 각 태스크를 의존성 순서대로 단계 실행하는 통합 워크플로. EARS Acceptance Criteria, REQ/AC/CTR/EDGE↔TASK 추적성, `[P]` 병렬 마커, PR 단위 분리, PLAN 체크박스 기반 진행 추적을 한 흐름으로 묶는다. "FRD 초안 줄게 PLAN 짜고 진행해줘", "기능 요구서를 작업으로 분해", "스펙→태스크 분해 후 단계 실행", "PLAN 만들고 태스크 추적하며 구현", "FRD/PLAN 워크플로" 같은 요청에서 사용한다. 단계별로 따로 돌리고 싶으면 devoks-sdlc:feature-frd-author / devoks-sdlc:feature-plan-author / devoks-sdlc:feature-plan-executor 를 쓴다.
+argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
   version: 1.6.2
@@ -21,8 +22,10 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 ## 호출 방법
 
 ```
-/devoks-sdlc:feature-workflow-runner [frd=<FRD 초안 경로 또는 본문>] [out=<산출물 디렉터리>]
+/devoks-sdlc:feature-workflow-runner [frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 - `frd` 없으면 현재 대화에서 초안을 받는다.
 - `out` 없으면 기본 워크스페이스 **`.claude/workspace/{feature-name}-{date}/`**. → `references/output-location.md`

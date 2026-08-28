@@ -1,6 +1,7 @@
 ---
 name: new-smoke-test-draft
 description: 설치된 대상 프로젝트의 라우트/화면 정의 파일을 스캔해, 배포 전 스모크 테스트용 프로젝트 소유 스킬 초안(SKILL.md + 코어 스크린 체크리스트 + 딥다이브 체크리스트 스텁 + 리포트 템플릿)을 그 프로젝트의 `.claude/skills/`에 1회 생성한다. 생성 후 완성·실행·유지보수는 대상 프로젝트 자신이 맡으며, devoks-sdlc는 이 생성기만 소유한다. 감지된 라우트 파일은 추천 근거일 뿐이며 화면 목록은 반드시 사용자 확인을 거쳐 확정한다. "스모크 테스트 스킬 만들어줘", "배포 전 검증 스킬 초안 생성", "화면 목록으로 스모크 체크리스트 만들어줘", "verify-app-smoke-test 같은 거 초안 생성", "smoke test skill draft" 요청에서 사용한다. 생성된 스킬을 실제로 실행하려면(devoks-browser 플러그인 필요) 그 프로젝트 자신의 스킬 문서를 참고한다.
+argument-hint: "[scan=<스캔 시작 경로> (default: 저장소 루트)] [name=<스킬 이름> (default: verify-app-smoke-test)]"
 metadata:
   author: ridsync
   version: 1.0.0
@@ -32,8 +33,10 @@ metadata:
 ## 호출 방법
 
 ```
-/devoks-sdlc:new-smoke-test-draft [scan=<스캔 시작 경로>] [name=<생성될 스킬 이름>]
+/devoks-sdlc:new-smoke-test-draft [scan=<스캔 시작 경로> (default: 저장소 루트)] [name=<스킬 이름> (default: verify-app-smoke-test)]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 두 인자 모두 선택이며 비어 있으면 Phase 0~2에서 확인한다.
 

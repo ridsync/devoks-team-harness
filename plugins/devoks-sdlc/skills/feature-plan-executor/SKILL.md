@@ -1,5 +1,6 @@
 ---
 description: PLAN.md(작업 분해)를 받아 각 태스크를 의존성 순서대로 단계 실행하고 진행 상태를 추적한다. 선행이 끝난 Task부터 `size` 마커로 라우팅해(S 직접·M 위임·L 분해 재검토) code-implementer 에이전트에 구현·검증을 위임(기본 경로) → done 리포트의 검증 근거·인계 노트 확인 → PLAN 체크박스 `[x]`·frontmatter status 갱신. PLAN.md를 진행 SSOT로 삼아 세션이 끊겨도 재개 가능. "PLAN대로 진행해줘", "태스크 단계 실행", "작업 계획 따라 구현", "PLAN 체크리스트 진행", "다음 태스크 이어서" 같은 요청에서 사용한다. 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용)를 수행한다. 커밋·푸시·PR 생성은 하지 않는다(별도 도구·사용자 명시 요청). 전체 흐름은 devoks-sdlc:feature-workflow-runner.
+argument-hint: "[plan=<PLAN.md 경로> (default: 최근 PLAN)] [pr=<PR 그룹> (default: 전체)] [task=<TASK-ID> (default: 전체)]"
 metadata:
   author: ridsync
   version: 1.6.0
@@ -17,8 +18,10 @@ PLAN.md를 SSOT로 태스크를 의존성 순서대로 실행하고 진행을 �
 ## 호출 방법
 
 ```
-/devoks-sdlc:feature-plan-executor [plan=<PLAN.md 경로>] [pr=<특정 PR 그룹만>] [task=<특정 TASK-ID만>]
+/devoks-sdlc:feature-plan-executor [plan=<PLAN.md 경로> (default: 최근 PLAN)] [pr=<PR 그룹> (default: 전체)] [task=<TASK-ID> (default: 전체)]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 - `plan` 없으면 가장 최근 `.claude/workspace/*/PLAN.md` 를 후보로 제시·확인한다. → `../feature-workflow-runner/references/output-location.md`
 - **코드는 PLAN Task의 `file:`(프로젝트 본래 위치)에 작성**한다. 워크스페이스에는 문서(진행 보고 등)만, 코드는 두지 않는다.

@@ -1,6 +1,7 @@
 ---
 name: orchestration-run
 description: "devoks-sdlc-orchestration 비-HITL SDLC 파이프라인 진입점. Linear 이슈(수동 입력)를 받아 중간 승인 없이 intake→plan(EARS·traces)→worktree 병렬 구현→검증 체인(자동 게이트)→draft PR→리포트까지 오케스트레이션한다. 기존 devoks-sdlc 에이전트를 이름으로 재사용(수정 없음)하고 정책(deny-list·격리·한도)을 준수한다. 트리거: 오케스트레이션 실행, orchestration run, 비-HITL 파이프라인, 이슈 자동 구현, 자동 SDLC, RUN 실행."
+argument-hint: "issue=<Linear 이슈 URL/식별자> [budget=<RUN 토큰 예산>]"
 metadata:
   author: ridsync
   version: 0.2.0
@@ -24,8 +25,10 @@ metadata:
 ## 호출
 
 ```
-/devoks-sdlc-orchestration:orchestration-run [issue=<Linear 이슈 URL/식별자>] [budget=<RUN 토큰 예산>]
+/devoks-sdlc-orchestration:orchestration-run issue=<Linear 이슈 URL/식별자> [budget=<RUN 토큰 예산>]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 ## 실행 절차
 

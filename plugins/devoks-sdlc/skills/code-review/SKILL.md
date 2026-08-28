@@ -1,5 +1,6 @@
 ---
 description: "코드리뷰를 수행한다. 브랜치 커밋 범위(base 대비 diff) 또는 사용자가 지정한 파일/폴더/모듈 범위 중 하나를 대상으로, 자동화 선행검증(lint·type) → C.L.E.A.R./Layered/체크리스트 리뷰 → 심각도별(Critical/High/Medium/Low) 리포트까지 낸다. \"코드리뷰\", \"코드 리뷰 해줘\", \"변경사항 리뷰\", \"브랜치 리뷰\", \"PR 리뷰\", \"이 파일 리뷰해줘\", \"review this code\" 요청에서 사용한다. repo 전수·의존성 취약점·위협 모델링이 필요한 심층 보안 검증은 devoks-sdlc:code-security-review, 요구사항 충족 판정은 devoks-sdlc:verify-requirements 를 쓴다."
+argument-hint: "[mode=general|diff-branch (default: 브랜치 추론)] [scope=<파일/폴더 경로>] [base=<브랜치> (default: main/develop)]"
 metadata:
   author: ridsync
   version: 2.0.0
@@ -22,8 +23,10 @@ metadata:
 ## 호출 방법
 
 ```
-/devoks-sdlc:code-review [mode=general|diff-branch] [scope=<파일/폴더 경로>] [base=<base 브랜치>]
+/devoks-sdlc:code-review [mode=general|diff-branch (default: 브랜치 추론)] [scope=<파일/폴더 경로>] [base=<브랜치> (default: main/develop)]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 **예시:**
 

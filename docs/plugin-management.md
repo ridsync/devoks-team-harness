@@ -118,12 +118,74 @@ description: 이 커맨드가 수행하는 작업을 한 줄로 설명한다.
 ---
 name: my-skill
 description: "스킬 설명 — 콜론이 포함되면 쌍따옴표 필수."
+argument-hint: "[mode=general|diff-branch] [scope=<파일/폴더 경로>]"
 ---
 
 ## 스킬 본문
 
 ...
 ```
+
+### argument-hint — 인자를 받는 스킬의 필수 항목
+
+`argument-hint`는 `/skill-name` 입력 시 autocomplete에 표시되는 **기대 인자 힌트**다.
+Claude Code의 플러그인 skill은 frontmatter 전 필드를 허용하므로 SKILL.md에서 그대로 쓸 수 있다
+([공식 문서](https://docs.claude.com/en/docs/claude-code/skills) frontmatter reference).
+
+적용 기준:
+
+- 스킬 본문에 `## 호출 방법`(또는 `## 호출`) 슬롯이 정의돼 있으면 **대상**이다.
+- 힌트는 본문 usage 라인의 **인자부와 완전히 동일한 문자열**이어야 한다. 본문이 SSOT이고, 한쪽만 고치면 필수/선택이 서로 모순된다 — 항상 같이 고친다.
+- 인자 슬롯이 없는 스킬(대화 맥락만으로 동작)에는 **넣지 않는다** — 없는 인자를 있는 것처럼 오인시킨다.
+
+### 필수/선택·기본값 표기 (usage string 관례)
+
+```
+/devoks-sdlc:verify-requirements [mode=checklist|verify (default: verify)] [spec=<경로> (default: 자동 탐색)]
+/devoks-sdlc:verify-data-flow target=<데이터/필드> spec=<기준 문서 경로> env=browser|server|db|cli
+```
+
+| 표기 | 의미 |
+|------|------|
+| `key=<값>` (대괄호 없음) | **필수** — 값이 확정되지 않으면 실행할 수 없다 |
+| `[key=<값>]` | 선택 — 없으면 생략·미반영 |
+| `[key=<값> (default: X)]` | 선택 + 결정적 기본값 X로 **묻지 않고** 진행 |
+
+**필수 슬롯을 생략했을 때의 처리는 legend에 쓰지 않는다.** 스킬마다 다르기 때문이다 —
+Phase 0에서 되묻는 스킬(`code-review`·`verify-data-flow` 등)이 대부분이지만, 비-HITL 파이프라인
+(`orchestration-run`)은 **중간 승인 없이** 동작하므로 되묻는 단계가 아예 없다.
+legend는 **표기법만** 정의하고, 생략 시 동작은 각 스킬 본문(Phase 0 절차·슬롯표)이 서술한다.
+
+- 기본값 키워드는 `default:`로 **고정**한다. 한국어 본문 안에서 라틴 문자가 시각적 앵커가 되어 값 경계가 또렷해지고,
+  "식별자·CLI 출력은 원문 유지" 규칙과도 맞는다(한국어 `기본`을 쓰지 않는다).
+- 기본값 문구는 **본문에 실제로 서술된 것만** 쓴다(`기본값 =` / `미지정 시` / `없으면 …로 진행`). 추정 금지.
+- "인자가 없어도 동작한다"와 `key=<값>`(필수)는 **모순이 아니다** — 인자 생략은 가능하고, 대신 Phase 0이 묻는다.
+- usage 코드블록 바로 아래에 표기 legend 1줄을 둔다(**모든 스킬에서 동일한 문구** — 스킬별로 변형하지 않는다):
+  `> 표기: \`key=값\` 필수 · \`[key=값]\` 선택 · \`(default: X)\` 미지정 시 X로 진행.`
+- 슬롯표의 "입력 방법" 열처럼 **usage string이 아닌 산문**에서는 한국어 `기본`을 그대로 쓴다 —
+  `default:`는 usage 표기 전용이다(`argument-hint` · 본문 usage 라인 · legend).
+- `key=value` 슬롯 대신 위치 인자를 받는 스킬(`new-ui-draft`)은 힌트도 위치형(`<Figma URL> <구현 추가정보>`)으로 쓴다.
+
+**반드시 쌍따옴표로 감싼다.** 값이 `[`로 시작하면 YAML이 flow sequence로, `default: `(콜론+공백)가 들어가면 mapping으로 해석한다.
+
+| 표기 | YAML 파싱 결과 |
+|------|----------------|
+| `argument-hint: "[a=<x>] [b=<y>]"` | ✅ 문자열 |
+| `argument-hint: [a=<x>] [b=<y>]` | ❌ `Psych::SyntaxError` — frontmatter 전체 파싱 실패 |
+| `argument-hint: [issue-number]` | ⚠️ 문자열이 아니라 배열 `["issue-number"]` |
+| `argument-hint: [a=<x> (default: .)]` | ⚠️ **에러 없이** 배열-of-해시 `[{"a=<x> (default"=>".)"}]` 로 오파싱 |
+| `argument-hint: a=<x> [b=<y> (default: Y)]` | ❌ `mapping values are not allowed in this context` — 필수 슬롯으로 시작하는 힌트는 `default:` 때문에 하드 실패 |
+
+> 마지막 두 행이 특히 위험하다. `(default: X)` 표기를 쓰는 순간 따옴표 누락은 **조용한 오파싱** 또는
+> **하드 에러**로 갈리는데, `--strict`는 둘 다 잡지 못한다. 따옴표는 선택이 아니다.
+
+`claude plugin validate --strict`는 **plugin.json 매니페스트만 검증**하고 SKILL.md frontmatter는 파싱하지 않는다 —
+위 실패를 잡아주지 못하므로 쌍따옴표 여부를 직접 확인해야 한다.
+
+> **주의**: `argument-hint`는 Claude Code 전용 필드다. claude.ai skill 업로드 · Skills API ·
+> `package_skill.py` 패키징 경로는 `name`/`description`/`license`/`compatibility`/`metadata`/`allowed-tools`
+> 6개만 허용하며, 포함 시 `Unexpected key(s) in SKILL.md frontmatter: argument-hint` 하드 에러가 난다.
+> 이 저장소 산출물은 플러그인 배포 경로만 사용하므로 해당되지 않는다.
 
 > **주의**: 플러그인 루트의 `CLAUDE.md`는 설치 후 컨텍스트에 로드되지 않습니다.  
 > 컨텍스트를 주입하려면 반드시 `skills/<name>/SKILL.md`를 사용하세요.
@@ -188,6 +250,7 @@ done
 |--------|------|------|
 | `mcpServers: Invalid input` | `required`/`optional` 중첩 구조 사용 | 플랫 맵으로 변경 |
 | `YAML frontmatter failed to parse` | description 값에 `: ` 포함 | 값을 쌍따옴표로 감쌈 |
+| (검증 통과하지만 스킬 로드 실패) | `argument-hint` 값을 따옴표 없이 `[a] [b]` 로 작성 → YAML flow sequence 오해석. `--strict`는 매니페스트만 보므로 **미검출** | 값을 쌍따옴표로 감쌈 (§4 참고) |
 | `No frontmatter block found` | command/skill 파일에 frontmatter 없음 | `---` 블록 추가 |
 | `version: No version specified` | plugin.json에 `version` 없음 | semver 추가 |
 | `CLAUDE.md at the plugin root is not loaded` | 플러그인 루트 CLAUDE.md | `skills/<name>/SKILL.md`로 이전 |

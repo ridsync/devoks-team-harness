@@ -1,5 +1,6 @@
 ---
 description: 요구사항을 체크리스트로 구조화하고 구현 충실도를 검증한다. 구현 전 요구사항을 [REQ-카테고리-번호] ID로 추출해 체크리스트를 만들고(checklist 모드), 구현 후 diff와 대조해 커버리지 갭을 심각도별로 보고한다(verify 모드). "요구사항 검증", "구현 충실도 확인", "요구사항 체크리스트", "스펙 커버리지", "구현이 요구를 만족하는지", "requirement verification", "spec compliance" 요청에서 사용한다. 데이터 흐름 정합성은 devoks-sdlc:verify-data-flow, 코드 품질 리뷰는 devoks-sdlc:code-review, 실제 앱 조작을 통한 실동작 확인은 devoks-sdlc:verify-acceptance-test 를 쓴다.
+argument-hint: "[mode=checklist|verify (default: verify)] [spec=<요구사항 문서 경로> (default: 자동 탐색)]"
 metadata:
   author: ridsync
   version: 1.0.3
@@ -28,8 +29,10 @@ metadata:
 ## 호출 방법
 
 ```
-/devoks-sdlc:verify-requirements [mode=checklist|verify] [spec=<요구사항 문서 경로>]
+/devoks-sdlc:verify-requirements [mode=checklist|verify (default: verify)] [spec=<요구사항 문서 경로> (default: 자동 탐색)]
 ```
+
+> 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 | 모드 | 시점 | 목적 |
 |------|------|------|
