@@ -1,0 +1,39 @@
+{
+  "skill_name": "devoks-sdlc:new-feature-by-github-issue",
+  "notes": "이슈는 이미 존재한다고 전제하고 읽기만 한다 — 이 스킬은 GitHub 이슈를 생성하지 않는다(git-create-issue와 역할 분리). 계획-승인-실행 상호작용이 절차의 본질이라 메인 루프에서 직접 수행한다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "issue-read-only-no-creation",
+      "prompt": "https://github.com/my-org/my-app/issues/42 이 이슈로 기능 구현해줘",
+      "expected_output": "이슈 URL로 본문을 조회(GitHub MCP 우선, 불가 시 gh issue view)해 고정 헤더로 파싱하고 갭을 확인한다. 이슈를 새로 생성하지 않고 기존 이슈만 읽는다. 갭이 없으면 설계안을 정리해 사용자 승인을 받은 뒤에만 구현에 들어간다.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "새 GitHub 이슈를 생성하지 않고 기존 이슈 #42를 읽기만 한다"
+        },
+        {
+          "text": "설계안에 대해 사용자 승인을 받기 전에는 코드를 작성하지 않는다"
+        },
+        {
+          "text": "구현 전 브랜치 사전체크(branch-only 모드)를 거친다"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "gap-blocks-before-design",
+      "prompt": "my-org/my-app#7 이슈 내용은 '로그인 개선' 딱 한 줄뿐이야. 이걸로 구현해줘",
+      "expected_output": "Description이 플레이스홀더 수준이고 Definition of Done에 측정 가능한 완료 조건이 없으므로, 설계 단계로 넘어가지 않고 갭 표와 확인 질문(1~2개)을 먼저 제시해 차단한다. 추측으로 요구사항을 채워 구현을 시작하지 않는다.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "완료 조건이 불명확한 이슈로 바로 설계·구현을 진행하지 않는다"
+        },
+        {
+          "text": "갭 표와 1~2개의 확인 질문으로 차단한다"
+        }
+      ]
+    }
+  ]
+}

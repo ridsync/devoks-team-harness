@@ -3,7 +3,7 @@ name: devoks-plugin-maintenance
 description: devoks-team-harness 저장소에서 플러그인 기능 변경, 버그 수정, 스킬/커맨드/에이전트 추가·수정, MCP prefix·permission 정책 변경, 카탈로그/문서 정합성 점검이 필요한 작업을 할 때 사용하는 maintainers용 로컬 워크플로우. 사용자가 devoks-browser/devoks-rn/devoks-core 같은 플러그인 변경을 요청하거나, plugin version bump / validate --strict / README·README.ko·marketplace·MCP guide 동기화가 필요해 보이면 반드시 이 스킬을 먼저 사용한다.
 metadata:
   author: ridsync
-  version: 0.2.0
+  version: 0.3.0
 ---
 
 # devoks-plugin-maintenance
@@ -114,7 +114,7 @@ claude plugin validate ./plugins/<plugin> --strict
 
 ### 스킬 품질 체크리스트 (신규/변경 스킬 한정)
 
-Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한다. 상세 판정 기준·체크 명령은 `references/workflow-checklist.md` §7을 따른다. 6축:
+Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한다. 상세 판정 기준·체크 명령은 `references/workflow-checklist.md` §7을 따른다. 8축:
 
 1. **description ↔ 실제 동작 일치(효용성 포함)** — `evals/evals.json` 프롬프트를 서브에이전트로 실제 실행해 `expected_output`과 대조한다. **신규 skill은 이 동적 실행을 생략할 수 없다.** 기존 skill 변경은 권장(트리거 조건이 크게 바뀌면 필수로 격상).
 2. **`references/` 존재** — SKILL.md가 언급하는 `references/*.md`가 실제로 존재하는지 대조한다.
@@ -122,8 +122,10 @@ Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한
 4. **의존 MCP/도구 명시** — Step 6의 MCP/prefix 대조 지점을 그대로 재사용한다(중복 로직 신설 금지).
 5. **설치 후 경로 참조 안전성** — 플러그인 루트 밖 상대경로(`../`) 참조가 없는지, 크로스 참조가 필요하면 `${CLAUDE_PLUGIN_ROOT}`를 쓰는지 확인한다.
 6. **토큰효율성** — SKILL.md 라인 수·인라인 대용량 예시 유무·`references/` 분리 여부를 정적으로 먼저 살피고, 축 1의 동적 실행 시 소모 토큰/턴 수를 함께 관찰한다. 신규 skill은 축 1과 함께 관찰이 필수.
+7. **인접 스킬 경계 명확성(중복 방지)** — 트리거 문구·범위가 인접 스킬과 겹치는지 확인하고, 겹치면 "범위(중요)"·"관련" 섹션에 양방향 라우팅 문구를 둔다(단방향 참조 금지).
+8. **`argument-hint` 정합성** — 인자 슬롯이 있는 스킬은 힌트와 본문 usage가 완전히 일치하는지, YAML로 정상 파싱되는지 확인한다.
 
-축 2·3·4·5는 정적 체크로 항상 필수다. 축 1·6의 동적 실행은 신규 skill에서 필수, 기존 skill의 description/동작 변경에서는 권장이다.
+축 2·3·4·5·7·8은 정적 체크로 항상 필수다(축 7·8은 대상이 있을 때만 — 인접 스킬이 없거나 인자 슬롯이 없으면 해당 없음). 축 1·6의 동적 실행은 신규 skill에서 필수, 기존 skill의 description/동작 변경에서는 권장이다.
 
 > **AskUserQuestion 사용 규칙:** 스킬 본문에 사용자 확인 분기를 넣거나 고칠 때는 `references/workflow-checklist.md` §8의 적용/금지 기준을 따른다(HITL 직접 호출에서만, 비-HITL·서브에이전트 경로에선 기본값 진행 — 가드 문구는 스킬 본문에 baked-in).
 
@@ -202,7 +204,7 @@ Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한
 - [ ] docs/catalog updates
 - [ ] MCP/prefix/permission checks
 - [ ] core sync checks
-- [ ] 스킬 품질 체크(해당 시 — 6축, 신규 skill은 동적 실행 포함)
+- [ ] 스킬 품질 체크(해당 시 — 8축, 신규 skill은 동적 실행 포함)
 
 ### Docs updated
 - <file>

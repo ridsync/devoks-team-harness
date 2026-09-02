@@ -1,52 +1,19 @@
----
-description: 지정된 파일/모듈을 현황 파악→계획→승인→실행→검증 순서로 리팩토링한다.
----
+# refactoring-execution — 리팩토링 실행 절차 (엔진 SSOT)
 
-# 코드 리팩토링 (구조·책임·계약 품질 개선)
-
-## Overview
-
-사용자가 지정한 **파일/폴더/모듈**을 대상으로 현황 파악 → 계획 수립 → 승인 → 실행 → 검증 순으로 리팩토링을 진행한다.
-
-UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집중한다. 리팩토링은 외부 동작을 변경하지 않는 것이 원칙이며, 동작 변경이 불가피할 경우 반드시 명시한다.
+**호출 주체:** `devoks-sdlc:code-refactoring` 스킬 본문(메인 루프에서 직접 수행 — 계획-승인-실행 상호작용이
+절차의 본질이라 서브에이전트로 위임하지 않는다).
+진입 스킬의 Phase 0에서 **대상·목표·제약**이 이미 확정된 상태를 전제한다 — 이 문서 안에서 범위 모호성을
+다시 확인하지 않는다.
 
 ---
 
-## 입력 파라미터
-
-실행 시 아래 정보를 제공받는다.
-
-| 파라미터 | 설명 | 예시 |
-|----------|------|------|
-| **1) 리팩토링 대상** | 파일, 폴더, 모듈 경로 | `src/context/network/AuthProvider.jsx`, `src/pages/settings/` |
-| **2) 리팩토링 목표** | 개선하려는 품질 방향 | `파일 크기 분할`, `Fail-Fast 적용`, `Feature/Provider 분리`, `SSOT 정리` |
-| **3) 제약 조건 (선택)** | 제외 범위, 동작 불변 요구 등 | `API 시그니처 변경 금지`, `테스트 제외` |
-
-목표가 없으면 `.claude/CLAUDE.md` 및 `.claude/rules/agent-principles.md` 우선순위 기준으로 위반 항목 전체를 점검한다.
-
----
-
-## Steps
-
-### 1. 범위 및 목표 확정
-
-1. 대상 파일/모듈 경로 확인
-2. 리팩토링 목표 유형 분류:
-   - **구조**: 계층 혼재, 모듈 책임 초과, Feature/Provider 미분리
-   - **계약**: `require*OrThrow` 누락, Contract 미검증, Fail-Fast 위반
-   - **크기**: 파일 1000자 초과, 함수 비대화
-   - **네이밍**: 제네릭 이름, 도메인 의미 미반영
-   - **코드 품질**: SSOT 위반, 사이드이펙트 미분리, 미사용 코드, import 정렬
-3. 제외 범위 명확화
-4. 범위 또는 목표가 모호하면 재질문
-
-### 2. 현황 파악 (정보 수집)
+## 2. 현황 파악 (정보 수집)
 
 대상 파일을 읽고, 동작 이해에 필요한 **직접 의존 모듈만 최소 범위로** 추가 탐색한다.
 
 다음 기준으로 위반 항목을 도출한다.
 
-#### 2-1. 프로젝트 규칙 기준 점검
+### 2-1. 프로젝트 규칙 기준 점검
 
 `.claude/CLAUDE.md`의 프로젝트 구조, 프로젝트 active convention인 `.claude/rules/project-convention.md`의 `## Comments & Docs` 또는 대응 섹션, `.claude/refs/engineering-principles.md` 전체를 기준으로 점검한다. 핵심 항목:
 
@@ -57,7 +24,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 - 주석 3종 점검: 프로젝트 기본 주석(재사용 API 사용법 누락), Rationale 주석(`[WHY]` 필수 / `[CONTEXT]`·`[TRADE-OFF]` 선택, 코드에 드러나지 않는 WHY만), Provider Header(Context/Provider 파일의 `Domain`/`Contract` 누락)
 - 리팩토링 전 프로젝트 실행 가능 상태 확인
 
-#### 2-2. 프로젝트 규칙 문서 기준 점검
+### 2-2. 프로젝트 규칙 문서 기준 점검
 
 `.claude/rules/` 및 `.claude/refs/` 디렉터리의 규칙 파일을 기준으로 점검한다. 핵심 항목:
 
@@ -66,7 +33,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 
 > **Fail-Fast 예외**: 고빈도 스트림 ingest 등 단일 이벤트 오류로 전체 파이프라인이 중단되면 안 되는 경로가 프로젝트에 있다면, `project-convention.md`/`CLAUDE.md`에 명시된 예외 기준을 따른다.
 
-### 3. 리팩토링 계획 수립 및 승인
+## 3. 리팩토링 계획 수립 및 승인
 
 다음을 정리해 **사용자 승인을 받은 뒤** 코드 변경에 들어간다.
 
@@ -75,7 +42,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 - 동작 불변 보장 전략 또는 동작 변경이 있을 경우 명시
 - 리팩토링 우선순위 (아래 기준 참고)
 
-#### 우선순위 기준
+### 우선순위 기준
 
 | 등급 | 해당 항목 |
 |------|-----------|
@@ -86,25 +53,25 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 
 > 사용자 승인 없이 코드를 변경하지 않는다.
 
-### 4. 실행
+## 4. 실행
 
 우선순위 순서(Critical → High → Medium → Low)로 진행한다.
 
-#### Critical: SSOT·Contract·Fail-Fast
+### Critical: SSOT·Contract·Fail-Fast
 
 - 중복 상태 정의 → 단일 소스로 통합, 참조 경로 갱신
 - 입력 검증 누락 → `require*OrThrow` 또는 `__require*OrThrow` 패턴 추가
 - silent ignore / 과도한 fallback → 즉시 throw로 교체
 - Context 훅 `!ctx`이면 throw 누락 → 추가
 
-#### High: 구조·크기·사이드이펙트
+### High: 구조·크기·사이드이펙트
 
 - 1000자 초과 파일 → 역할 기준으로 분할 (비즈니스 로직 / IO / 상수)
 - 계층 혼재 → Business / IO·Adapter / Config·Const·Utils·Types 순으로 재배치
 - 사이드이펙트 → 명시적·그룹화·격리 처리
 - Feature/Provider 미분리 → 평가 로직은 Feature로, 실행·UI·I/O는 Provider로 분리
 
-#### Medium: 네이밍·주석
+### Medium: 네이밍·주석
 
 - 제네릭 네이밍 → 도메인 + 컨텍스트 + 의도 3단어 이상으로 개선
 - 프로젝트 기본 주석 추가·정리: 다음 중 하나면 Description(필수)/`@param`·`@returns`·`@throws`(선택)로 추가, 자명한 함수·private 헬퍼에는 추가하지 않음
@@ -122,24 +89,24 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
   ```
 - Provider Header 추가·정리: Context/Provider 파일 최상단에 `// Domain: <책임 경계>`(필수, 자명해도 한 줄 작성)와, 배치 순서·환경 제약처럼 코드로 드러나지 않는 전제조건이 있으면 `// Contract: <내용>`(선택) 추가
 
-#### Low: import·console·미사용 코드
+### Low: import·console·미사용 코드
 
 - import 순서 재정렬 (builtin → external → internal → parent → sibling)
 - `console.log` → `console.debug`/`info`/`warn`/`error` 또는 `createDebugger` 교체
 - 미사용 import·변수·함수 제거
 
-### 5. 검증 및 마무리
+## 5. 검증 및 마무리
 
-#### 5-1. 동작 불변 검증 (테스트)
+### 5-1. 동작 불변 검증 (테스트)
 
 - 대상에 기존 테스트가 있으면 `devoks-sdlc:test-run-triage`(또는 대상 파일만 좁혀 직접 실행)로 리팩토링 전후 회귀 여부를 확인한다.
 - 대상에 테스트가 없거나 커버리지가 낮으면, 이번 리팩토링을 되돌아볼 안전망이 없다는 뜻이므로 `devoks-sdlc:test-author`로 테스트 보강을 사용자에게 제안한다(적용 여부는 사용자 결정).
 
-#### 5-2. 린트 검증
+### 5-2. 린트 검증
 
 - 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`)(Bash)로 수정한 파일 린트 확인, 오류 수정.
 
-#### 5-3. 포맷 검증
+### 5-3. 포맷 검증
 
 - 프로젝트의 포맷 스크립트(예: `npm run format`, `pnpm format`, `biome format --write .`)(Bash)가 있으면 수정한 파일에 실행해 포맷을 맞춘다. 변경 파일 범위로 한정 실행 가능하면 그렇게 한다(전체 재포맷팅으로 인한 불필요한 diff 방지).
 - 스크립트가 없는 프로젝트면 이 항목을 생략하고, 마무리 안내에 "포맷 스크립트 없음"을 명시한다(침묵 생략 금지).
@@ -184,21 +151,3 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 3. 계획: `AuthProvider.jsx` → `useAuthCore.js`(로직 분리) + `AuthProvider.jsx`(Provider 잔존), 입력 검증 추가 → 사용자 승인
 4. Critical → High → Medium → Low 순으로 실행
 5. 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`) 확인, 요약 안내
-
----
-
-## Checklist
-
-- [ ] 리팩토링 대상·목표·제약 조건 확정 (모호하면 재질문)
-- [ ] 대상 파일 및 직접 의존 모듈 탐색 완료
-- [ ] `.claude/CLAUDE.md` 및 `.claude/refs/engineering-principles.md` 기준 위반 항목 도출 (코드 크기, 네이밍, 계층, 사이드이펙트)
-- [ ] `.claude/rules/` 및 `.claude/refs/` 규칙 파일 기준 위반 항목 도출
-- [ ] 수정/생성/삭제 파일 목록 및 개선 방향 작성 후 사용자 승인
-- [ ] Critical: SSOT/Contract/Fail-Fast 위반 수정
-- [ ] High: 1000자 초과 분할, 계층 재배치, 사이드이펙트 분리
-- [ ] Medium: 네이밍 개선, 주석 3종(프로젝트 기본 주석/Rationale/Provider Header) 보완(불필요한 주석 제거 포함)
-- [ ] Low: import 정렬, console 정리, 미사용 코드 제거
-- [ ] 동작 불변 검증 — 기존 테스트 있으면 `test-run-triage`로 회귀 확인, 없으면 `test-author` 보강 제안
-- [ ] 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`) 확인, 린트 오류 수정
-- [ ] 프로젝트의 포맷 스크립트(예: `npm run format`, `pnpm format`) 확인·적용 (없으면 생략하고 명시)
-- [ ] 리팩토링 요약 및 추후 작업 안내

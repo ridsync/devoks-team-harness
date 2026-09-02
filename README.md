@@ -139,7 +139,7 @@ flowchart TD
 
 **Optional, project-owned smoke test (reference only):** some installed projects maintain their own pre-release smoke-test skill outside `devoks-sdlc` — route/screen structure differs per project, so `devoks-sdlc` can't ship one generically. Example: `aware-react-app`'s `verify-app-smoke-test` (`.claude/skills/verify-app-smoke-test/SKILL.md`). If a project doesn't have one yet, `/devoks-sdlc:new-smoke-test-draft` scans that project's own route/screen files and generates a one-time starter skill into its `.claude/skills/`. Either way, `devoks-sdlc` only ships the generator — the resulting skill is immediately project-owned: `devoks-sdlc` doesn't own, execute, maintain, or delegate to it, and it stays outside the verification chain's execution menu above. See the project's own skill docs for how it runs.
 
-**One-off tasks (no fixed order):** `code-analyze-module` · `code-refactoring` · `code-review` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, plus `new-feature-github-issue` for lightweight feature work that skips the `FRD.md` / `PLAN.md` artifacts.
+**One-off tasks (no fixed order):** `code-analyze-module` · `code-refactoring` · `code-review` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, plus `new-feature-by-github-issue` for lightweight feature work that skips the `FRD.md` / `PLAN.md` artifacts.
 
 ---
 
@@ -159,6 +159,9 @@ flowchart TD
 | `code-security-review` | `/devoks-sdlc:code-security-review` | devoks-sdlc |
 | `test-author` | `/devoks-sdlc:test-author` | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
+| `code-analyze-module` | `/devoks-sdlc:code-analyze-module` | devoks-sdlc |
+| `code-refactoring` | `/devoks-sdlc:code-refactoring` | devoks-sdlc |
+| `new-feature-by-github-issue` | `/devoks-sdlc:new-feature-by-github-issue` | devoks-sdlc |
 | `new-ui-draft` | `/devoks-sdlc:new-ui-draft` | devoks-sdlc |
 | `new-smoke-test-draft` | `/devoks-sdlc:new-smoke-test-draft` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
@@ -173,6 +176,7 @@ flowchart TD
 | `code-reviewer` *(agent-internal only)* | devoks-sdlc | `code-review` skill (Phase 1) |
 | `code-security-reviewer` *(agent-internal only)* | devoks-sdlc | `code-security-review` skill (Phase 1) |
 | `code-implementer` *(agent-internal only)* | devoks-sdlc | `feature-plan-executor` skill, `feature-workflow-runner` skill (Phase 3) |
+| `code-analyzer` *(agent-internal only)* | devoks-sdlc | `code-analyze-module` skill (Phase 1) |
 | `test-writer` *(agent-internal only)* | devoks-sdlc | `test-author` skill (Phase 1), `new-ui-draft` skill (step 7) |
 | `acceptance-test-runner` *(agent-internal only)* | devoks-sdlc | `verify-acceptance-test` skill (Phase 1–4) |
 | `browser-visual-diff-capture` *(agent-internal only)* | devoks-browser | `browser-visual-diff` skill (Phase 1–4) |
@@ -180,6 +184,8 @@ flowchart TD
 ---
 
 ## Available Commands
+
+`devoks-sdlc` has no commands — every entry point is a skill (as of 2026-09-02, when `code-analyze-module`, `code-refactoring`, and `new-feature-by-github-issue` moved to skills too).
 
 ### devoks-core
 
@@ -197,14 +203,6 @@ flowchart TD
 | `/devoks-git:git-pull-request` | Create a PR (CODEOWNERS-based reviewer assignment) |
 
 > A PreToolUse hook (`hooks/remind-commit-convention.sh`) reminds the Footer author convention right before `git commit` runs, non-blocking — this also covers ad-hoc commits that don't go through the command.
-
-### devoks-sdlc
-
-| Command | Description |
-|---------|-------------|
-| `/devoks-sdlc:new-feature-github-issue` | GitHub issue-driven feature implementation |
-| `/devoks-sdlc:code-refactoring` | Structure, contract, and quality refactoring |
-| `/devoks-sdlc:code-analyze-module` | Module / business logic analysis |
 
 ---
 

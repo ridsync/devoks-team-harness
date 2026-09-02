@@ -139,7 +139,7 @@ flowchart TD
 
 **옵션 — 프로젝트 전용 스모크 테스트 (참고용):** 일부 설치 대상 프로젝트는 `devoks-sdlc` 밖에서 자체 배포 전 스모크 테스트 스킬을 직접 소유·관리합니다 — 라우트·화면 구조가 프로젝트마다 달라 `devoks-sdlc`가 범용으로 제공하기 어렵기 때문입니다. 예: `aware-react-app`의 `verify-app-smoke-test`(`.claude/skills/verify-app-smoke-test/SKILL.md`). 아직 자체 스킬이 없다면 `/devoks-sdlc:new-smoke-test-draft`가 그 프로젝트의 라우트/화면 정의 파일을 스캔해 `.claude/skills/`에 1회성 초안을 생성해 줍니다. 어느 쪽이든 `devoks-sdlc`는 이 **생성기만** 배포합니다 — 생성된 결과물은 즉시 프로젝트 소유가 되어 `devoks-sdlc`가 소유·실행·유지보수하거나 위임하지 않으며, 위 검증 체인의 실행 메뉴에도 포함되지 않는 참고 항목입니다. 실행 방법은 해당 프로젝트 자신의 스킬 문서를 참고하세요.
 
-**단발 작업(순서 없음):** `code-analyze-module` · `code-refactoring` · `code-review` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, 그리고 `FRD.md`/`PLAN.md` 산출물 없이 가볍게 구현할 때 쓰는 `new-feature-github-issue`.
+**단발 작업(순서 없음):** `code-analyze-module` · `code-refactoring` · `code-review` · `code-security-review` · `test-author` · `new-ui-draft` · `new-smoke-test-draft`, 그리고 `FRD.md`/`PLAN.md` 산출물 없이 가볍게 구현할 때 쓰는 `new-feature-by-github-issue`.
 
 ---
 
@@ -159,6 +159,9 @@ flowchart TD
 | `code-security-review` | `/devoks-sdlc:code-security-review` | devoks-sdlc |
 | `test-author` | `/devoks-sdlc:test-author` | devoks-sdlc |
 | `test-run-triage` | `/devoks-sdlc:test-run-triage` | devoks-sdlc |
+| `code-analyze-module` | `/devoks-sdlc:code-analyze-module` | devoks-sdlc |
+| `code-refactoring` | `/devoks-sdlc:code-refactoring` | devoks-sdlc |
+| `new-feature-by-github-issue` | `/devoks-sdlc:new-feature-by-github-issue` | devoks-sdlc |
 | `new-ui-draft` | `/devoks-sdlc:new-ui-draft` | devoks-sdlc |
 | `new-smoke-test-draft` | `/devoks-sdlc:new-smoke-test-draft` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
@@ -173,6 +176,7 @@ flowchart TD
 | `code-reviewer` *(agent-internal only)* | devoks-sdlc | `code-review` 스킬 (Phase 1) |
 | `code-security-reviewer` *(agent-internal only)* | devoks-sdlc | `code-security-review` 스킬 (Phase 1) |
 | `code-implementer` *(agent-internal only)* | devoks-sdlc | `feature-plan-executor` 스킬, `feature-workflow-runner` 스킬 (Phase 3) |
+| `code-analyzer` *(agent-internal only)* | devoks-sdlc | `code-analyze-module` 스킬 (Phase 1) |
 | `test-writer` *(agent-internal only)* | devoks-sdlc | `test-author` 스킬 (Phase 1), `new-ui-draft` 스킬 (7단계) |
 | `acceptance-test-runner` *(agent-internal only)* | devoks-sdlc | `verify-acceptance-test` 스킬 (Phase 1~4) |
 | `browser-visual-diff-capture` *(agent-internal only)* | devoks-browser | `browser-visual-diff` 스킬 (Phase 1~4) |
@@ -180,6 +184,8 @@ flowchart TD
 ---
 
 ## 사용 가능한 커맨드
+
+`devoks-sdlc`는 진입점이 전부 스킬이라 커맨드가 없습니다(2026-09-02, `code-analyze-module`·`code-refactoring`·`new-feature-by-github-issue`까지 스킬로 이전 완료).
 
 ### devoks-core
 
@@ -197,14 +203,6 @@ flowchart TD
 | `/devoks-git:git-pull-request` | PR 생성 (CODEOWNERS 기반 리뷰어 할당) |
 
 > PreToolUse 훅(`hooks/remind-commit-convention.sh`)이 `git commit` 실행 직전 Footer author 컨벤션을 non-blocking으로 리마인드합니다 — 커맨드를 거치지 않은 즉흥 커밋에도 적용됩니다.
-
-### devoks-sdlc
-
-| 커맨드 | 설명 |
-|--------|------|
-| `/devoks-sdlc:new-feature-github-issue` | GitHub 이슈 기반 기능 구현 |
-| `/devoks-sdlc:code-refactoring` | 구조·계약·품질 리팩토링 |
-| `/devoks-sdlc:code-analyze-module` | 모듈/비즈니스 로직 분석 |
 
 ---
 

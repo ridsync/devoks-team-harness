@@ -283,7 +283,7 @@ done
 
 - 위치: `.claude/skills/devoks-plugin-maintenance/SKILL.md`
 - 목적: 플러그인 변경 시 **버전 bump → `validate --strict` → 문서/카탈로그 반영 → MCP prefix / permissions / cross-reference 점검** 순서를 누락 없이 강제
-- 신규 skill 생성 또는 skill `description`/핵심 동작 변경 시에는 **스킬 품질 체크리스트(6축: description-동작 일치·`references/` 존재·`evals` 보유·MCP 명시·경로 참조 안전성·토큰효율성)**를 추가로 적용 — 축 1·6은 신규 skill에서 서브에이전트 실행 기반 동적 검증이 필수
+- 신규 skill 생성 또는 skill `description`/핵심 동작 변경 시에는 **스킬 품질 체크리스트(8축: description-동작 일치·`references/` 존재·`evals` 보유·MCP 명시·경로 참조 안전성·토큰효율성·인접 스킬 경계 명확성·`argument-hint` 정합성)**를 추가로 적용 — 축 1·6은 신규 skill에서 서브에이전트 실행 기반 동적 검증이 필수
 - 성격: `plugins/devoks-*`에 배포되는 기능이 아니라, **이 저장소 maintainers용 로컬 워크플로우**
 
 이 스킬은 특히 아래 상황에서 먼저 사용하는 것을 권장합니다.
@@ -457,7 +457,7 @@ model: sonnet
 | 아키타입 | 권장 모델 | devoks 대응 |
 |---|---|---|
 | explorer (경로·심볼 검색, 요약 반환) | `haiku` | 빌트인 `Explore` 에이전트 사용 — 자체 신설 안 함 |
-| researcher (설계 판단 포함 조사) | `sonnet` | `code-analyze-module` (메인 루프) — 에이전트화는 향후 후보 |
+| researcher (설계 판단 포함 조사) | `sonnet` | `code-analyzer` 에이전트(`code-analyze-module` 스킬 Phase 1에서 위임 — 2026-09-02 에이전트화 완료. 대량 파일 읽기·리포트 작성의 컨텍스트 격리 이득이 커 향후 후보에서 전환) |
 | code-reviewer (일반 품질/버그) | `sonnet` | `code-reviewer` (기존) |
 | security-reviewer (auth·입력검증·동시성·정합성) | `opus` + `effort: high` | `code-security-reviewer` |
 | implementer (스코프 확정 구현) | `sonnet` | `code-implementer`, `test-writer`(테스트 작성 — 동일 근거: 대상 코드에 이미 정의된 동작을 검증하는 실행형) |

@@ -3,7 +3,7 @@ name: workflow-map
 description: DevOks SDLC 작업의 전체 흐름(단계 순서)과 각 단계의 진입 스킬·커맨드를 한 장의 표로 보여준다. 파이프라인(준비→요구정의→작업분해→구현→검증체인→커밋/PR)과 순서 없는 단발 작업을 구분해 제시한다. "워크플로우 맵", "SDLC 흐름 보여줘", "스킬 표", "어떤 스킬 써야 해", "다음 단계 뭐야", "작업 순서 알려줘", "스킬 목록 정리해줘" 같은 조회성 요청에서 사용한다. 표를 출력할 뿐 어떤 단계도 실행하지 않는다 — 실제 실행은 표에 적힌 각 스킬을 직접 호출한다.
 metadata:
   author: ridsync
-  version: 1.1.0
+  version: 1.1.1
 ---
 # workflow-map — SDLC 워크플로우 흐름 맵
 
@@ -92,21 +92,21 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 
 | 목적                         | 진입점                                     |
 | -------------------------- | --------------------------------------- |
-| 기존 모듈·비즈니스 로직 파악 (legacy)  | `/devoks-sdlc:code-analyze-module`      |
-| 리팩토링 (legacy)              | `/devoks-sdlc:code-refactoring`         |
+| 기존 모듈·비즈니스 로직 파악          | `/devoks-sdlc:code-analyze-module`      |
+| 리팩토링                      | `/devoks-sdlc:code-refactoring`         |
 | 범위 지정 코드 리뷰 (파일/폴더)        | `/devoks-sdlc:code-review mode=general` |
 | 보안 검증 (의존성·시크릿·위협)         | `/devoks-sdlc:code-security-review`     |
 | 테스트 작성·보강                  | `/devoks-sdlc:test-author`              |
 | Figma 디자인 → UI 구현          | `/devoks-sdlc:new-ui-draft`             |
 | 프로젝트 전용 스모크 테스트 스킬 초안 생성   | `/devoks-sdlc:new-smoke-test-draft`     |
-| 간이 기능 구현 (FRD/PLAN 산출물 없이) | `/devoks-sdlc:new-feature-github-issue` |
+| 간이 기능 구현 (FRD/PLAN 산출물 없이) | `/devoks-sdlc:new-feature-by-github-issue` |
 
 
 ---
 
 ## 참고 (표와 함께 출력)
 
-- **기능 구현 진입점이 둘이다.** 추적 가능한 산출물(`FRD.md`/`PLAN.md`)과 태스크 단위 진행 추적이 필요하면 **표 A**(`feature-workflow-runner`)를, 산출물 없이 바로 구현하는 가벼운 작업이면 **표 B**의 `new-feature-github-issue`(GitHub 이슈 본문을 SSOT로 삼는 간이 구현)를 쓴다.
+- **기능 구현 진입점이 둘이다.** 추적 가능한 산출물(`FRD.md`/`PLAN.md`)과 태스크 단위 진행 추적이 필요하면 **표 A**(`feature-workflow-runner`)를, 산출물 없이 바로 구현하는 가벼운 작업이면 **표 B**의 `new-feature-by-github-issue`(GitHub 이슈 본문을 SSOT로 삼는 간이 구현)를 쓴다.
 - **타 플러그인 항목**(`/devoks-core:*`, `/devoks-git:*`, `/devoks-browser:*`)은 해당 플러그인이 설치돼 있어야 호출된다. 미설치 환경에서는 그 행을 건너뛴다.
-- **진입점은 스킬이 기본, 커맨드는 예외다.** 위 표의 `/devoks-sdlc:*`는 대부분 스킬이며, 커맨드로 남아 있는 것은 저장소 밖으로 나가는 write 부작용이 있거나 승인 게이트가 절차의 본질인 항목뿐이다(`/devoks-git:*`, `/devoks-sdlc:new-feature-github-issue`). `code-reviewer`·`code-security-reviewer`·`test-writer`·`code-implementer`·`acceptance-test-runner` **에이전트**는 스킬이 특정 Phase에서 위임하는 실행 주체이므로 직접 호출 대상이 아니다.
+- **진입점은 스킬이 기본이다.** `devoks-sdlc`의 위 표 항목은 전부 스킬이다(커맨드 없음, 2026-08-24·2026-09-02 두 차례 이전으로 완료). 저장소 밖으로 나가는 write 부작용이 있거나 승인 게이트가 절차의 본질인 항목은 여전히 커맨드로 남지만(`/devoks-git:*`), `devoks-sdlc`에는 해당 항목이 없다. `code-reviewer`·`code-security-reviewer`·`test-writer`·`code-implementer`·`acceptance-test-runner`·`code-analyzer` **에이전트**는 스킬이 특정 Phase에서 위임하는 실행 주체이므로 직접 호출 대상이 아니다.
 

@@ -59,9 +59,8 @@
 | 대상 | 판정 | 근거 |
 |---|---|---|
 | `devoks-git` 3개 커맨드 | 커맨드 유지 | 조건 1+2 — 2026-08-21 확정(아래 §devoks-git) |
-| `new-feature-github-issue` | 커맨드 유지(잠정) | 조건 1(이슈 생성). 스킬로 흡수할 때 이슈 생성 액션 자체는 `/devoks-git:git-create-issue`에 남겨야 정책 정합 |
 | `code-review`·`code-security-review`·`test-author` | **스킬**(2026-08-24 이전 완료) | 읽기 전용 리포트 / 저장소 내 테스트 파일만 생성 |
-| `code-analyze-module`·`code-refactoring` | 스킬 이전 대상(2차 예정) | 부작용 없음 — 고도화 후 이전 |
+| `code-analyze-module`·`code-refactoring`·`new-feature-by-github-issue` | **스킬**(2026-09-02 이전 완료) | 부작용 없음. `new-feature-by-github-issue`는 애초에 조건 1(이슈 생성)이 적용되지 않았음이 밝혀짐 — 실제 동작은 기존 이슈를 읽기만 하고 생성하지 않음(로드맵의 낡은 근거 정정). `devoks-sdlc`에 커맨드가 0개가 됨 |
 
 **스킬 진입 이전 시 체크(누락하면 조용히 깨진다):**
 - 자연어 트리거 문구를 **agent `description` → 진입 skill `description`으로 이관**했는가. 양쪽에 두면 Phase 0 우회, 어디에도 없으면 라우팅 실패.
@@ -86,11 +85,11 @@
 
 ### devoks-sdlc
 - 구 devoks-code/devoks-feature/devoks-test/devoks-verify 통합체 — skill·command·agent 수가 5개 플러그인 중 가장 많아 변경 영향 범위가 가장 넓다(정확한 개수는 하드코딩하지 않는다 — 드리프트하므로 `ls skills/*/ commands/*.md agents/*.md`로 확인)
-- **agent-internal 경계 (2026-08-24 단순화)** — 이제 `devoks-sdlc`의 **모든 agent가 agent-internal**이고, **agent-internal skill은 없다**:
-  - agent-internal **agent** (전부): `code-reviewer`, `code-security-reviewer`, `test-writer`, `code-implementer`, `acceptance-test-runner` — 호출 스킬의 특정 Phase에서만 위임받는다.
+- **agent-internal 경계 (2026-08-24 단순화, 2026-09-02 agent 1개 추가)** — `devoks-sdlc`의 **모든 agent가 agent-internal**이고, **agent-internal skill은 없다**. 커맨드도 0개다(2026-09-02, `code-analyze-module`·`code-refactoring`·`new-feature-by-github-issue` 스킬 이전 완료로 `commands/` 디렉터리 자체가 사라짐):
+  - agent-internal **agent** (전부): `code-reviewer`, `code-security-reviewer`, `test-writer`, `code-implementer`, `acceptance-test-runner`, `code-analyzer` — 호출 스킬의 특정 Phase에서만 위임받는다.
   - **직접 트리거 가능한 agent: 없음.** 사용자 진입은 전부 스킬이다(진입점 정책 참고). 자연어 트리거 문구는 **진입 스킬의 `description`이 소유**하며 agent `description`에 중복해 두지 않는다 — 두면 스킬 Phase 0(범위 확정)을 건너뛰고 agent로 직행하는 우회 경로가 생긴다(2026-08-24 이전 구조의 실제 결함).
   - 예외: `devoks-sdlc-orchestration`은 이 agent들을 **이름으로 직접 위임**한다(`references/pipeline.md`). `직접 호출 금지` 마킹은 사용자용 소프트 가드일 뿐이므로 정책 충돌이 아니다 — 대신 **각 agent의 입력 파라미터 표를 자기완결 상태로 유지**해야 한다(진입 스킬 Phase 0에 암묵 의존하는 문장 금지).
-  - 변경 시 각 파일 `description` 앞머리의 `(agent-internal — …)` 표기와 README/문서 설명이 위 구분과 일치하는지 확인(`grep -l "agent-internal" agents/*.md skills/*/SKILL.md` → agent 5개 전부 / skill 0개)
+  - 변경 시 각 파일 `description` 앞머리의 `(agent-internal — …)` 표기와 README/문서 설명이 위 구분과 일치하는지 확인(`grep -l "agent-internal" agents/*.md skills/*/SKILL.md` → agent 6개 전부 / skill 0개)
 - `gh` CLI, CodeGraph MCP, Serena MCP 의존 — 플러그인 자체 번들 MCP 아님(일반 MCP 등록형), README dependency summary와 실제 의존 일치 여부 확인
 - skill 간 cross-reference(예: `feature-workflow-runner` ↔ `feature-plan-executor` ↔ `branch-issue-precheck.md`)가 많아 하나만 고치면 다른 곳의 참조·완료 기준 문구가 어긋나기 쉬움 — 관련 SKILL.md 전체를 grep으로 교차 확인
 
@@ -118,7 +117,7 @@
 - [ ] 문서 대상/비대상 판단이 파일별로 남아 있는가
 - [ ] MCP/prefix/permission 대조 지점이 확인되었는가
 - [ ] core sync 영향이 있으면 `.claude/` 사본과 문서까지 함께 봤는가
-- [ ] 신규/변경 skill이면 §7 스킬 품질 체크리스트(6축)를 적용했는가
+- [ ] 신규/변경 skill이면 §7 스킬 품질 체크리스트(8축)를 적용했는가
 
 ## 7. 스킬 품질 체크리스트 (신규/변경 스킬 한정)
 
@@ -132,6 +131,10 @@
 | 4 | 의존 MCP/도구 명시 | 정적 — 위 "3. MCP / prefix / permission 점검 포인트" 대조 지점 재사용 | 필수 |
 | 5 | 설치 후 경로 참조 안전성 | 정적 — 플러그인 루트 밖 상대경로(`../`) grep, `${CLAUDE_PLUGIN_ROOT}` 사용 확인 | 필수 |
 | 6 | 토큰효율성 | 정적(SKILL.md 라인수·인라인 대용량 예시·`references/` 분리 여부) + 동적(축 1 실행 시 토큰/턴수 관찰) | 신규 skill: 필수 / 기존 skill 변경: 권장 |
+| 7 | 인접 스킬 경계 명확성(중복 방지) | 정적 — 아래 "인접 스킬 경계 검사" 절차 | 신규 skill: 필수 / 기존 skill의 description·트리거·범위가 넓어지는 변경: 필수 |
+| 8 | `argument-hint` 정합성 | 정적 — 아래 "argument-hint 정합성" 절차 | 인자 슬롯 있는 스킬: 항상 필수 / 인자 슬롯 없는 스킬: 힌트가 있으면 제거 대상 |
+
+> 2026-09-02: 축 7·8 신설. 축 8(`argument-hint` 정합성)은 이 문서에 원래도 "항상 필수, 정적"으로 존재했으나 위 표에 집계되지 않아 "6축 다 확인" 표기가 실제로는 이 항목을 빠뜨릴 수 있는 구조였다 — 표에 편입해 정정. 축 7은 신규 — 근거는 아래 "인접 스킬 경계 검사" 절 참고. 검토했으나 **채택하지 않은 후보**(2026-09-02 논의): "효용성"을 축 1에서 분리한 별도 축, Step 1의 사전 중복 검색 게이트, eval assertion의 판별력(discriminating power) 검증 — 전부 정성적 판단에 크게 의존해 정적/동적 검증으로 조작화하기 어렵고, 축을 늘릴수록 매 스킬 변경마다 체크 비용이 커지는 트레이드오프가 있어 이번엔 보류. 재론의 시 이 사유부터 반박할 것.
 
 ### 동적 검증(축 1·6) 실행 방법
 
@@ -148,8 +151,22 @@
 - 축 4: 위 §3 "MCP / prefix / permission 점검 포인트" 절차 재사용
 - 축 5: `grep -n '\.\./' skills/<name>/SKILL.md` 등으로 플러그인 루트 밖 상대경로 참조 여부 확인
 - 축 6: SKILL.md 라인 수(`wc -l`), 본문 내 대용량 코드블록/예시 유무, `references/` 분리 여부 확인
+- 축 7: 아래 "인접 스킬 경계 검사" 절차
+- 축 8: 아래 "argument-hint 정합성" 절차
 
-### argument-hint 정합성 (인자 슬롯이 있는 스킬 — 항상 필수, 정적)
+### 인접 스킬 경계 검사 (축 7 — 신규 skill 필수 / 범위 확장 시 필수, 정적)
+
+**배경**: 이 저장소는 스킬을 만들고 난 **뒤에** 인접 스킬과의 경계가 흐려져 재작업한 이력이 여러 번 있다 —
+`code-review`↔`code-security-review`(보안 에스컬레이션 규칙+상호참조 추가, 2026-07-20), `verify-acceptance-test`↔`verify-data-flow`,
+`browser-visual-diff`↔`verify-data-flow`(중복 구현 금지 명시). 이 축은 그 재작업을 **사전에** 줄이기 위한 최소 점검이다 —
+완벽한 중복 탐지가 목적이 아니라, "명백히 겹치는데 아무도 안 봤다"를 막는 것이 목적이다.
+
+1. **트리거 문구 겹침 grep**: 대상 skill의 `description`에서 따옴표로 감싼 예시 트리거 문구를 뽑아, 같은 플러그인(및 `plugin.json`의 `dependencies`로 연결된 플러그인) 내 다른 `SKILL.md`의 `description`과 키워드 단위로 대조한다. 완전히 같은 키워드가 두 스킬 모두에 있으면 겹침 후보로 표시한다.
+2. **범위 섹션 확인**: 대상 skill의 SKILL.md에 "범위(중요) — 한다/안 한다" 또는 "참고 기준 문서 — 관련" 같은 섹션이 있고, 1번에서 찾은 겹침 후보 스킬을 **명시적으로 라우팅**하는지 확인한다(예: "요구 충족 판정은 `verify-requirements`, 코드 품질 리뷰는 `code-review`를 쓴다").
+3. **양방향 확인**: 겹침 후보 스킬 쪽에도 반대 방향 참조가 있는지 확인한다. 한쪽만 참조하는 단방향 구조는 과거 `code-security-review → code-review`만 있고 반대가 없던 것과 같은 결함이다 — 발견하면 반대쪽에도 추가한다.
+4. 겹침이 실제로 있는데 라우팅 문구가 없으면 **문서 갭**으로 보고한다(신규 skill이면 이 단계에서 범위 문구를 추가해 blocking으로 해소, 기존 skill 변경이면 갭만 보고하고 해소 여부는 변경 규모에 따라 판단).
+
+### argument-hint 정합성 (축 8 — 인자 슬롯이 있는 스킬 항상 필수, 정적)
 
 `claude plugin validate --strict`는 매니페스트만 검증하고 SKILL.md frontmatter를 파싱하지 않으므로
 아래를 직접 돌린다. 판정 기준은 `docs/plugin-management.md` §4.

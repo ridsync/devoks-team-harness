@@ -1,0 +1,39 @@
+{
+  "skill_name": "devoks-sdlc:code-analyze-module",
+  "notes": "지정 진입점 범위만 분석하는 스킬. 실행 주체는 code-analyzer 에이전트(대량 파일 읽기 격리)이며, 메인 루프는 완성된 분석 문서를 축약 없이 그대로 출력해야 한다. entry가 명확하면 되묻지 않는다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "explicit-entry-no-question",
+      "prompt": "src/features/checkout 모듈 비즈니스 로직 분석해줘",
+      "expected_output": "entry가 명확히 주어졌으므로 되묻지 않고 code-analyzer 에이전트에 entry=src/features/checkout 을 주입해 위임한다. 에이전트가 반환한 분석 문서(분석 목적과 접근, 1~6절, 부록 A)를 축약 없이 전문 그대로 출력한다.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "entry를 되묻지 않고 바로 code-analyzer 에이전트에 위임한다"
+        },
+        {
+          "text": "분석을 메인 루프가 직접 수행하지 않고 에이전트 리포트를 그대로 출력한다"
+        },
+        {
+          "text": "산출 문서의 6개 섹션 헤딩 구조를 유지한다"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "vague-entry-asks-once",
+      "prompt": "코드 분석 문서 좀 만들어줘",
+      "expected_output": "entry(분석 대상 진입점)가 없으므로 Phase 0에서 어떤 파일/폴더/기능을 분석할지 사용자에게 질문한다. 저장소 전체를 임의로 추측해 분석하지 않는다.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "entry가 없으면 임의로 저장소 전체나 특정 모듈을 추측하지 않고 질문한다"
+        },
+        {
+          "text": "entry 확정 전에는 code-analyzer 에이전트를 호출하지 않는다"
+        }
+      ]
+    }
+  ]
+}

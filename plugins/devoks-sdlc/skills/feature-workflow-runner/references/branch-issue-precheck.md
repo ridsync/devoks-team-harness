@@ -1,11 +1,11 @@
 # 브랜치·이슈 사전체크 (Precheck & Propose) — SSOT
 
 > 구현 착수 **직전**(첫 코드 변경 전)에 현재 브랜치·연결 이슈 상태를 확인하고, 필요 시 브랜치명·이슈 초안을 **제안 → 사용자 확인 → 적용**한다.
-> 이 규칙은 `feature-workflow-runner`(Phase 3), `feature-plan-executor`, `new-feature-github-issue`가 공유한다.
+> 이 규칙은 `feature-workflow-runner`(Phase 3), `feature-plan-executor`, `new-feature-by-github-issue`가 공유한다.
 
 ## 적용 시점
 
-- **최초 1회** — 첫 구현 착수 직전(Phase 3 step 3, executor step 3, github-issue step 3·4).
+- **최초 1회** — 첫 구현 착수 직전(Phase 3 step 3, executor step 3, `new-feature-by-github-issue` Step 3 「브랜치 사전체크」).
 - Phase 1(FRD)·Phase 2(PLAN) 문서 작성 단계에서는 **적용하지 않는다**.
 
 ## 모드
@@ -13,7 +13,7 @@
 | 모드 | 적용 대상 | 이슈 체크 |
 |------|-----------|-----------|
 | `full` | `feature-workflow-runner`, `feature-plan-executor` | 브랜치 + 이슈 모두 |
-| `branch-only` | `new-feature-github-issue` | 이슈는 이미 SSOT로 주어짐 → **브랜치 제안·확인만** |
+| `branch-only` | `new-feature-by-github-issue` | 이슈는 이미 SSOT로 주어짐 → **브랜치 제안·확인만** |
 
 ## 절차
 
@@ -29,7 +29,7 @@
 1. `PLAN.md` frontmatter `issue:` (있으면)
 2. `FRD.md` frontmatter `issue:` (있으면)
 3. 대화·요청 컨텍스트 — 이슈 URL, `owner/repo#번호`, `#123` 형태
-4. `new-feature-github-issue` 입력 이슈(해당 커맨드는 **이미 충족**으로 간주, `branch-only` 모드)
+4. `new-feature-by-github-issue` 입력 이슈(해당 스킬은 **이미 충족**으로 간주, `branch-only` 모드)
 
 못 찾으면 **"연결 없음"**으로 간주한다.
 
@@ -87,7 +87,7 @@
   - FRD/PLAN 워크스페이스가 있으면 해당 문서 frontmatter `issue:` 필드에 반영.
   - 이슈가 **먼저** 생성되고 브랜치도 (C)로 승인됐으면, 브랜치명에 이슈 번호를 반영한 뒤 생성한다.
 
-**`branch-only` 모드 (`new-feature-github-issue`)**
+**`branch-only` 모드 (`new-feature-by-github-issue`)**
 
 - 입력 이슈 번호를 브랜치명에 반영(`타입/이슈번호-슬러그`).
 - 이슈 생성 단계는 **수행하지 않는다**.
