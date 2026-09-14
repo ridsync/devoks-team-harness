@@ -153,6 +153,14 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **`devoks-plugin-maintenance` 축1 방법론에 `claude plugin eval` 온디맨드 옵션 추가** (2026-09-14, 로컬 skill `metadata.version` `0.3.0 → 0.3.1`)
+  - 배경: 사용자가 `code.claude.com/docs/ko/plugin-evals` 문서를 보고 도입 필요성·ROI 검토를 요청. 조사 결과 2026-08-21 폐기 ②(「evals 하니스 확대」)의 근거 ①("`claude plugin eval`이 early-access 게이트로 실행 불가")이 무효화된 사실을 발견 — 2026-09-11 GA(v2.1.269+), 이 세션에서 v2.1.270으로 `--help`/`init --bare` 정상 동작 실측 확인.
+  - **폐기 근거 재검토 — 부분 갱신, 전면 재개 아님**: 근거 ①(게이트)만 무효화됐다. 근거 ②(포맷이 `evals/evals.json`과 완전 무관 — 실측: `prompt.md`+`graders/*.md` 구조, 자동 변환 불가)와 근거 ③(커버리지 확대는 YAGNI)은 여전히 유효하다고 판단해 "모든 플러그인에 상시 evals 스위트 저작"으로는 재개하지 않는다.
+  - **채택한 좁은 용도**: `claude plugin eval <plugin 경로>`의 target 해석이 "installed and skills-dir plugins both resolve"라, `enabledPlugins` 활성화 여부와 무관하게 `plugins/<plugin>` 소스 경로를 직접 가리켜 독립 child 세션에서 검증할 수 있다. 이 도구는 발동 여부(`tool_used` grader) 확인에 그치지 않는다 — 기본 동작(`--ablation with-without`)이 플러그인 있음/없음 두 arm을 비교해 **효용성(Δ)을 자동 측정**하고, `llm`/`regex`/`baseline` grader로 **출력 품질**까지 판정한다. 이는 2026-09-02 항목("6축→8축 확장")에서 *"효용성을 축1에서 분리한 별도 축 후보 — 자동화된 판정 방법이 없어 보류"*로 기록해둔 공백을 부분적으로 메운다(사용자 지적으로 이 세션 내에서 1차 초안의 "발동 여부"로 좁힌 서술을 정정). 축 1이 지금까지 써온 "서브에이전트에 프롬프트를 그대로 전달해 roleplay로 대조"하는 방법보다 강한 증거이므로, 그 방법을 대체하지 않고 **발동·효용성·출력품질까지 의심스러울 때 단일 플러그인 대상으로 즉석 실행하는 선택적 심화 옵션**으로만 추가했다(필수 축 신설은 아님). 케이스는 상시 저작·커밋 대상이 아니며 1회성으로 만들고 지워도 된다.
+  - **명시적으로 하지 않은 것**: 여러 플러그인을 한 번에 스캔하는 배치 실행은 도입하지 않는다 — target이 단수(플러그인 1개)만 받고, 전체 스윕은 실행마다 실비용이 플러그인 수만큼 선형으로 늘어 "필요할 때 하나만" 원칙과 맞지 않는다(사용자 확인).
+  - **반영**: `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md`(§"동적 검증(축 1·6) 실행 방법"에 "보조 옵션" 절 신설), `.claude/skills/devoks-plugin-maintenance/SKILL.md`(Step 4 축1 설명에 참고 문장 추가, `metadata.version`).
+  - **검증**: 두 파일 모두 이 저장소 전용 로컬 skill이라 `claude plugin validate`/`enabledPlugins` 제약 대상이 아님. frontmatter YAML 파싱(`ruby -ryaml`) 확인.
+
 - [x] **`devoks-plugin-maintenance` 스킬 품질 체크리스트 6축 → 8축 확장** (2026-09-02, 로컬 skill `metadata.version` `0.2.0 → 0.3.0`)
   - 배경: 사용자가 "6축 외에 빠진 게 없는지, 특히 효용성·중복 관점에서 찾아보자"고 요청. `workflow-checklist.md §7`을 다시 훑은 결과 두 종류의 문제를 발견.
   - **발견 1 (표기 결함, 재논의 없이 정정)**: `argument-hint 정합성` 절(§7 하위, "항상 필수·정적"로 명시)이 이미 존재하는데 "6축" 표(§7 상단)에 집계되지 않았다 — Step 8 리포트에서 "6축 다 확인" 체크가 이 항목 누락을 가려줄 수 있는 구조였다. **축 8로 표에 편입.**

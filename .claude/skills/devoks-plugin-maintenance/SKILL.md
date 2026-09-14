@@ -3,7 +3,7 @@ name: devoks-plugin-maintenance
 description: devoks-team-harness 저장소에서 플러그인 기능 변경, 버그 수정, 스킬/커맨드/에이전트 추가·수정, MCP prefix·permission 정책 변경, 카탈로그/문서 정합성 점검이 필요한 작업을 할 때 사용하는 maintainers용 로컬 워크플로우. 사용자가 devoks-browser/devoks-rn/devoks-core 같은 플러그인 변경을 요청하거나, plugin version bump / validate --strict / README·README.ko·marketplace·MCP guide 동기화가 필요해 보이면 반드시 이 스킬을 먼저 사용한다.
 metadata:
   author: ridsync
-  version: 0.3.0
+  version: 0.3.1
 ---
 
 # devoks-plugin-maintenance
@@ -116,7 +116,7 @@ claude plugin validate ./plugins/<plugin> --strict
 
 Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한다. 상세 판정 기준·체크 명령은 `references/workflow-checklist.md` §7을 따른다. 8축:
 
-1. **description ↔ 실제 동작 일치(효용성 포함)** — `evals/evals.json` 프롬프트를 서브에이전트로 실제 실행해 `expected_output`과 대조한다. **신규 skill은 이 동적 실행을 생략할 수 없다.** 기존 skill 변경은 권장(트리거 조건이 크게 바뀌면 필수로 격상).
+1. **description ↔ 실제 동작 일치(효용성 포함)** — `evals/evals.json` 프롬프트를 서브에이전트로 실제 실행해 `expected_output`과 대조한다. **신규 skill은 이 동적 실행을 생략할 수 없다.** 기존 skill 변경은 권장(트리거 조건이 크게 바뀌면 필수로 격상). 발동 여부뿐 아니라 효용성(플러그인 있음/없음 비교 Δ)·출력 품질까지 확신이 필요하면 `claude plugin eval <plugin 경로>`로 단일 플러그인 실측 확인을 선택적으로 추가할 수 있다(상세: `references/workflow-checklist.md` §"동적 검증(축 1·6) 실행 방법" 하위 "보조 옵션").
 2. **`references/` 존재** — SKILL.md가 언급하는 `references/*.md`가 실제로 존재하는지 대조한다.
 3. **`evals/evals.json` 보유** — 신규 skill은 최소 1~2개 케이스 작성이 blocking이다(축 1 실행에 그대로 사용).
 4. **의존 MCP/도구 명시** — Step 6의 MCP/prefix 대조 지점을 그대로 재사용한다(중복 로직 신설 금지).
