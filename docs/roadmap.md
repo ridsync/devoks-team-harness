@@ -23,7 +23,8 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 - [ ] **컨벤션 preset 확장 (신규 stack)**
   - management 고도화(provenance hash 기반 stale 감지, 플러그인 번들링 버그 수정)는 2026-07-14 완료 — 완료 섹션 참고.
-  - 남은 범위: `react-web`·`react-native`·`android`·`ios` 4개 외 `nextjs`, `node-backend`, `fastapi`, `spring`, `swiftui-only`, `compose-only` 등 세분 preset 추가.
+  - `python-fastapi` preset 추가는 2026-09-15 완료 — 완료 섹션 참고.
+  - 남은 범위: `react-web`·`react-native`·`android`·`ios`·`python-fastapi` 5개 외 `nextjs`, `node-backend`, `spring`, `swiftui-only`, `compose-only` 등 세분 preset 추가.
   - 우선순위: 낮음(management 인프라는 갖춰졌으니 실제 수요가 생길 때 진행 — blocking 이슈 없음).
 
 - [ ] `**browser-visual-diff` → `devoks-sdlc:verify-visual-diff` 이전**
@@ -152,6 +153,15 @@ DevOks 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **컨벤션 preset 확장 — `python-fastapi` 신설** (2026-09-15, `devoks-core` `1.4.1 → 1.5.0`)
+  - 배경: 사용자가 컨벤션 preset 확장 작업 중 Python/FastAPI(Starlette+Pydantic) preset을 추천·구성해 달라고 요청. 기존 4개 preset(`react-web`/`react-native`/`android`/`ios`)은 전부 프론트엔드·모바일 UI 스택이라, 백엔드 preset을 추가하며 공통 골격("플랫폼·언어·UI·테스트·보안·프로젝트 결정")의 "UI" 자리를 백엔드 스택에 맞게 어떻게 치환할지가 관건이었다.
+  - **스택 확정(논의 후 결정, 근거)**: 패키지 매니저 `uv`(pyproject.toml+lock, FastAPI 커뮤니티에서 빠르게 표준화 중), ORM `SQLAlchemy 2.0(async)+Alembic`(Pydantic 스키마와 DB 모델을 분리해 보여주기 좋음 — `SQLModel`은 모델 중복은 적으나 복잡 쿼리 생태계 성숙도가 낮아 기각), 디렉토리 레이아웃 `Domain/module-first`(`app/<domain>/{router,schemas,models,service,dependencies}.py` — 커뮤니티에서 널리 인용되는 "fastapi-best-practices" 컨벤션과 일치하고, `android` preset의 feature-first 패키지 구조와도 결이 맞음. `react-web`의 layer-first와는 다른 결이나 스택별로 이미 갈려 있던 기존 상태를 그대로 반영), 타입체크 `mypy`(Pydantic mypy plugin 생태계 성숙도 우선, `pyright`는 기각).
+  - **기존 골격과의 매핑**: "UI and Styling" 자리에 "Data & Platform Integration"(DB/설정/백그라운드 작업)을 배치, "Component Pattern" 자리에 Schema/Model/DI/Validation을 담은 "Design Pattern"으로 통합(Android preset과 동일 구조). Comment Rules 3종(기본 주석/Rationale/Provider Header)·Pitfalls·Project Decisions 골격은 그대로 유지.
+  - **`interaction-integrity.md` 인용**: 단발 API(결제·주문 생성 등)의 중복 실행 방지는 서버 계약(Idempotency-Key)이 핵심이라 Android와 동일하게 Pitfalls 표 1행으로 결함 ID(C4)만 인용(메커니즘 설명 복사 금지 규칙 준수).
+  - **반영**: `plugins/devoks-core/conventions/python-fastapi/project-convention.md`(신설), `plugins/devoks-core/conventions/README.md`(Presets 목록에 추가, 공통 골격 문구를 "UI" 고정 표현에서 "핵심 계층(UI 또는 API/데이터 등)"으로 일반화), `plugins/devoks-core/commands/setup-project-convention.md`(Step 1 감지 시그널·Step 2 추천 목록에 Python FastAPI 추가), `plugin.json` 버전.
+  - **비대상**: `README.md`/`docs/README.ko.md`(preset 이름을 나열하지 않고 `plugins/devoks-core/conventions/*` 패턴으로만 서술 — 변경 불필요), `docs/plugin-management.md`(preset을 아예 참조하지 않음), `.claude-plugin/marketplace.json`(플러그인 버전을 핀하지 않고 소스 경로만 참조).
+  - **검증**: `claude plugin validate ./plugins/devoks-core --strict` ✔.
 
 - [x] **`devoks-plugin-maintenance` 축1 방법론에 `claude plugin eval` 온디맨드 옵션 추가** (2026-09-14, 로컬 skill `metadata.version` `0.3.0 → 0.3.1`)
   - 배경: 사용자가 `code.claude.com/docs/ko/plugin-evals` 문서를 보고 도입 필요성·ROI 검토를 요청. 조사 결과 2026-08-21 폐기 ②(「evals 하니스 확대」)의 근거 ①("`claude plugin eval`이 early-access 게이트로 실행 불가")이 무효화된 사실을 발견 — 2026-09-11 GA(v2.1.269+), 이 세션에서 v2.1.270으로 `--help`/`init --bare` 정상 동작 실측 확인.

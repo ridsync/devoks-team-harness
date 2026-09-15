@@ -35,6 +35,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
   - Web/RN: `package.json`, `tsconfig`, `vite.config`, `next.config`, `react-native`, `expo`
   - Android: `android/`, `build.gradle*`, `settings.gradle*`
   - iOS: `ios/`, `Package.swift`, `*.xcodeproj`, `*.xcworkspace`
+  - Python FastAPI: `pyproject.toml`(`fastapi`/`uvicorn` 의존성), `requirements.txt`, `alembic.ini`
 
 감지 결과는 **preset 추천 근거**에만 사용한다. 감지값을 SSOT로 단정하지 않는다.
 
@@ -46,6 +47,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 - React Native
 - Android
 - iOS
+- Python FastAPI
 - Custom
 
 추천 시에는 반드시 근거를 함께 말한다.
@@ -54,6 +56,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 - `package.json`에 `react-native`와 `expo`가 있어 React Native 추천
 - `android/`만 있고 Gradle 설정이 보여 Android 추천
 - `ios/`와 Xcode project가 있어 iOS 추천
+- `pyproject.toml`에 `fastapi`/`uvicorn` 의존성이 있어 Python FastAPI 추천
 
 ### 3. 적용 범위 설명
 
