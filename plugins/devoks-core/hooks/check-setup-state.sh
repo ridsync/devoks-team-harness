@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-setup-state.sh — DevOks 권장 MCP 서버 설치 및 프로젝트 초기화 상태 점검
+# check-setup-state.sh — DevOKs 권장 MCP 서버 설치 및 프로젝트 초기화 상태 점검
 #
 # SessionStart 훅으로 실행. devoks 플러그인은 범용·공유 MCP(context7·figma·
 # serena·codegraph·playwright)를 번들하지 않는다(플러그인별 중복 인스턴스·
@@ -114,7 +114,7 @@ fi
 # 누락 없으면 조용히 종료
 [[ -z "$missing_mcp" && -z "$missing_project" && -z "$setup_steps" ]] && exit 0
 
-ctx='[DevOks] 플러그인 설치 후 필요한 setup 상태를 확인했습니다. 관련 스킬·커맨드 사용 전 아래 안내를 우선 참고하세요.'
+ctx='[DevOKs] 플러그인 설치 후 필요한 setup 상태를 확인했습니다. 관련 스킬·커맨드 사용 전 아래 안내를 우선 참고하세요.'
 
 if [[ -n "$setup_steps" ]]; then
   ctx="${ctx}\n[설치 직후 권장 setup]\n${setup_steps}"

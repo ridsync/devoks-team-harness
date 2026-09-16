@@ -1,11 +1,11 @@
-# DevOks Team Harness
+# DevOKs Team Harness
 
-DevOks 팀 Claude Code 하네스 — 코드리뷰·기능개발·Git 워크플로우·React Native 디버깅 플러그인 모음.
+DevOKs 팀 Claude Code 하네스 — 코드리뷰·기능개발·Git 워크플로우·React Native 디버깅 플러그인 모음.
 
 > **MCP 및 의존성 설치 가이드**: [`mcp-setup-guide.md`](mcp-setup-guide.md)  
 > **플러그인 관리 가이드** (생성·검증·배포): [`plugin-management.md`](plugin-management.md)
 
-![DevOks Team Harness plugin map](../assets/devoks-harness-engineering-final.png)
+![DevOKs Team Harness plugin map](../assets/devoks-harness-engineering-final.png)
 
 ---
 
@@ -208,7 +208,7 @@ flowchart TD
 
 ## 의존성 요약
 
-> DevOks 플러그인은 범용 MCP 서버(Figma·Playwright·Serena·CodeGraph·context7)를 **번들하지 않습니다.** 중복 인스턴스와 로컬 MCP 충돌을 막기 위해 **user/project scope에 1회만** 설치하세요. `devoks-core`의 SessionStart 훅(`hooks/check-setup-state.sh`)이 세션마다 미설치 항목을 감지해 설치를 안내합니다. **예외:** `devoks-browser`는 `chrome-devtools-attach`(`:9269` 연결 전용 설정)만 번들합니다. `devoks-rn`은 Metro WebSocket URL이 동적으로 바뀌므로 `~/.claude.json`에 `metro-devtools`(`--wsEndpoint`)를 수동 등록해야 합니다. 자세한 내용 → [`mcp-setup-guide.md`](mcp-setup-guide.md) → "설치 정책".
+> DevOKs 플러그인은 범용 MCP 서버(Figma·Playwright·Serena·CodeGraph·context7)를 **번들하지 않습니다.** 중복 인스턴스와 로컬 MCP 충돌을 막기 위해 **user/project scope에 1회만** 설치하세요. `devoks-core`의 SessionStart 훅(`hooks/check-setup-state.sh`)이 세션마다 미설치 항목을 감지해 설치를 안내합니다. **예외:** `devoks-browser`는 `chrome-devtools-attach`(`:9269` 연결 전용 설정)만 번들합니다. `devoks-rn`은 Metro WebSocket URL이 동적으로 바뀌므로 `~/.claude.json`에 `metro-devtools`(`--wsEndpoint`)를 수동 등록해야 합니다. 자세한 내용 → [`mcp-setup-guide.md`](mcp-setup-guide.md) → "설치 정책".
 
 | 플러그인 | 필수 | 선택 |
 |---------|------|------|

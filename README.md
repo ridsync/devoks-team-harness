@@ -1,13 +1,13 @@
-# DevOks Team Harness
+# DevOKs Team Harness
 
-Claude Code harness for the DevOks team — plugins for code review, feature development, Git workflows, and React Native debugging.
+Claude Code harness for the DevOKs team — plugins for code review, feature development, Git workflows, and React Native debugging.
 
 > **한국어 문서**: [docs/README.ko.md](docs/README.ko.md)
 > 
 > **MCP & dependency setup**: [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)  
 > **Plugin management** (create, validate, deploy): [`docs/plugin-management.md`](docs/plugin-management.md)
 
-![DevOks Team Harness plugin map](assets/devoks-harness-engineering-final.png)
+![DevOKs Team Harness plugin map](assets/devoks-harness-engineering-final.png)
 
 ---
 
@@ -208,7 +208,7 @@ flowchart TD
 
 ## Dependency Summary
 
-> DevOks plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-setup-state.sh`) detects missing servers each session and prints install guidance. **Exceptions:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). `devoks-rn` requires `metro-devtools` in `~/.claude.json` with a dynamic `--wsEndpoint` (Metro WebSocket URL changes on restart). See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
+> DevOKs plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-setup-state.sh`) detects missing servers each session and prints install guidance. **Exceptions:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). `devoks-rn` requires `metro-devtools` in `~/.claude.json` with a dynamic `--wsEndpoint` (Metro WebSocket URL changes on restart). See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
 
 | Plugin | Required | Optional |
 |--------|----------|----------|

@@ -1,5 +1,5 @@
 {
-  "description": "DevOks 프로젝트 초기화 상태와 권장 MCP 구성을 SessionStart에 점검한다.",
+  "description": "DevOKs 프로젝트 초기화 상태와 권장 MCP 구성을 SessionStart에 점검한다.",
   "hooks": {
     "SessionStart": [
       {

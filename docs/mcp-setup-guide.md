@@ -1,12 +1,12 @@
 # MCP & 의존성 설치 가이드
 
-DevOks 팀 하네스의 스킬·커맨드가 사용하는 MCP 서버와 외부 도구의 설치 방법을 정리합니다.
+DevOKs 팀 하네스의 스킬·커맨드가 사용하는 MCP 서버와 외부 도구의 설치 방법을 정리합니다.
 
 ---
 
 ## 설치 정책 (중요)
 
-DevOks 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·CodeGraph·context7 등)를 **번들하지 않는다**. 플러그인마다 같은 서버를 중복 선언하면 user/project scope에 이미 설치된 서버와 충돌하고(서로 다른 인스턴스·포트·파일락), 사용 가능한 도구 수가 환경마다 달라지기 때문이다.
+DevOKs 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·CodeGraph·context7 등)를 **번들하지 않는다**. 플러그인마다 같은 서버를 중복 선언하면 user/project scope에 이미 설치된 서버와 충돌하고(서로 다른 인스턴스·포트·파일락), 사용 가능한 도구 수가 환경마다 달라지기 때문이다.
 
 - **원칙**: 공유 MCP는 **user 또는 project scope에 1회만** 설치한다. 플러그인은 그 단일 서버를 참조만 한다.
 - **예외**: `devoks-browser`의 `chrome-devtools-attach`(`:9269` 연결 전용 고유 설정)만 플러그인이 번들한다. `devoks-rn`의 `metro-devtools`는 `/devoks-core:setup-mcp` Step 5로 user scope에 설치한다 (Metro URL 자동 조회, 재시작 자동 적응).

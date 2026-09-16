@@ -1,8 +1,8 @@
 ---
-description: DevOks 권장 MCP 서버를 현재 상태에 맞춰 user scope에 1회 설치·초기화한다.
+description: DevOKs 권장 MCP 서버를 현재 상태에 맞춰 user scope에 1회 설치·초기화한다.
 ---
 
-# DevOks MCP Setup (`/devoks-core:setup-mcp`)
+# DevOKs MCP Setup (`/devoks-core:setup-mcp`)
 
 ## SSOT
 
@@ -12,7 +12,7 @@ description: DevOks 권장 MCP 서버를 현재 상태에 맞춰 user scope에 1
 
 ## Overview
 
-DevOks 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright)를 번들하지 않는다.
+DevOKs 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright)를 번들하지 않는다.
 번들 MCP와 user-scope MCP는 병합되지 않고 별도 프로세스 + 다른 도구 prefix로 공존해
 중복·충돌을 일으키기 때문이다. 이 커맨드는 누락된 권장 MCP만 골라 **user scope에 1회 설치**한다.
 

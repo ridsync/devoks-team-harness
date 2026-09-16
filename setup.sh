@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# setup.sh — DevOks Team Harness 폴백 부트스트랩 스크립트
+# setup.sh — DevOKs Team Harness 폴백 부트스트랩 스크립트
 # 플러그인 시스템 없이 .claude/ 로 직접 파일을 복사할 때 사용.
 # project convention preset은 자동 주입하지 않고, 설치 후 명시적으로 구성한다.
 #
@@ -18,7 +18,7 @@ else
   CLAUDE_DIR="$(pwd)/.claude"
 fi
 
-echo "==> DevOks Team Harness 설치"
+echo "==> DevOKs Team Harness 설치"
 echo "    소스: $SCRIPT_DIR"
 echo "    대상: $CLAUDE_DIR"
 echo ""
