@@ -3,7 +3,7 @@
 DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-09-02
+> 최종 갱신: 2026-09-18
 
 ---
 
@@ -139,6 +139,27 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 품질 / 유지보수
 
+- [ ] **외부 도구 의존성 상시 재점검 (CodeGraph · context-mode · ast-grep · Serena)**
+  - **정책 (2026-09-18 확정)**: 하네스가 권하는 외부 도구는 **실측된 효용성**이 있을 때만 유지한다. 유명하거나
+    기능이 그럴듯한 것은 근거가 아니다. 주기적으로 실제 프로젝트에서 재점검해 **유지/제거를 명시적으로 결정**하고,
+    제거로 결정되면 설치 안내뿐 아니라 **그 도구를 전제하는 스킬·규칙·템플릿까지 함께** 걷어낸다.
+  - **왜 전제까지 걷어내야 하나**: 안내만 지우면 "스킬이 전제하는데 하네스는 설치를 권하지 않는다"는 역방향
+    불일치가 남는다. 2026-09-18 context-mode 기각에서 실제로 `test-run-triage` 실행 전략과 `memory-policy.md`
+    계층 표가 여기에 걸렸다(완료 항목 참고).
+  - **제거 시 체크 지점**: `setup-mcp.md` · `check-setup-state.sh` · 스택 preset · `shared/templates` 도구 라우팅 ·
+    `rules/*` · 해당 스킬 `description`과 절차 · `docs/mcp-setup-guide.md`(절 번호 재정렬 포함) · README 양본
+    카탈로그·의존성 표 · `docs/plugin-management.md`.
+  - **판정은 원빈님이 직접 수행** — 하네스는 결정을 반영하는 쪽만 담당한다.
+  - **측정 수단**: 트랜스크립트에서 도구별 tool_use/tool_result 바이트를 귀속시키고(Bash 명령 본문으로 CLI
+    사용도 포함), 훅 주입 구간을 따로 집계하는 스크립트가 `aware-react-app`의
+    `.claude/workspace/tool-usage-audit-20260918/`(`measure.py` + `baseline-20260918.md`)에 있다.
+    **하네스 저장소 밖 + 그 프로젝트 `.claude/`가 gitignore**이므로 런타임 의존으로 삼지 않는다 —
+    유지보수자용 재현 자산 포인터일 뿐이다. 하네스로 흡수할지는 별건.
+  - **다음 재측정: 2026-09말** (협업 세션 보고 기준). 그때 codegraph·ast-grep·serena 판정도 함께 나온다.
+  - **판정 시 볼 것**: 도구 출력 바이트만 보지 말고 **훅·지침 주입 고정비**를 함께 센다 — context-mode
+    기각의 결정적 근거가 "도구를 거의 안 쓰는데 훅 오버헤드는 매 세션 나갔다"였다.
+  - 우선순위: 중 (도구 추가·갱신 시점마다).
+
 - [ ] `**metro-devtools-attach` — iOS 시뮬레이터 디버깅 환경 검증 및 테스트**
   - 대상: `plugins/devoks-rn/skills/metro-devtools-attach/SKILL.md`
   - 현재 `metro-devtools` MCP 검증 완료 기록은 Metro CDP 연결(`get_metro_status`·`evaluate_script`·`list_console_messages`) 동작 확인 위주이며, iOS 시뮬레이터(`xcrun simctl`) 경로는 스크린샷 캡처 외 실기 검증 근거가 명확하지 않음.
@@ -153,6 +174,37 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **실행환경 계층 흡수 — MCP prefix→permissions, provenance 버전, Chrome 런처, ast-grep, setup.sh 폴백 버그** (2026-09-18, `devoks-core` `1.5.1 → 1.6.0`, `devoks-sdlc` `3.0.1 → 3.1.0`)
+  - 배경: `aware-react-app`(이 하네스의 prototype) 전수 점검 결과, 문서·워크플로 계층은 이미 하네스가 소유하는데 **실행환경 계층**(MCP prefix→permission 기입, ast-grep 설정, Chrome 런처)만 프로젝트가 손으로 만든 상태였다. 일반화 가능한 7건을 흡수.
+  - **context-mode 도입 기각 + 기존 전제까지 전량 제거** (사용자 결정): 브리프는 "`test-run-triage`와 `memory-policy.md`가 이미 전제하는데 설치 안내에 없다"는 의존성 구멍을 메우자고 했고 실제로 반영했었다. 그러나 **기존 프로젝트 실측에서 효용성이 확인되지 않아** 원빈님이 도입을 기각했다. 실측(30일 93세션, aware-react-app 트랜스크립트 기준): 훅 주입 오버헤드가 도구 출력과 **별개로** 1,411KB(`context_window_protection` 265회 × 4.6KB + `context_guidance` 398회 × 0.5KB) 나갔는데, 이를 정당화할 `ctx_execute` 계열 호출은 **19회**에 불과했다. 조회 계열도 절감 기전이 아니었다 — `ctx_search` 10KB/회, `ctx_batch_execute` 18.6KB/회로 `Read` 평균 19.1KB와 비슷하거나 더 비싸다. 설치 안내만 되돌리면 "스킬이 전제하는데 하네스는 설치를 권하지 않는다"는 **역방향 불일치**가 남으므로, 전제 지점까지 함께 걷어냈다:
+    - `test-run-triage` Step 1 "실행은 context-mode로" → **"실행과 출력 격리"**(출력을 파일로 리다이렉트 → `tail`로 러너 요약 형식 파악 → 해당 줄만 추출, 전체 Read 금지). 종료코드를 따로 받아 실패 종료가 스크립트를 죽이지 않게 한다. 의존성 0으로 같은 목적을 달성한다. description도 함께 수정(트리거 문구에 박혀 있었음).
+    - `memory-policy.md` 계층 표에서 "context-mode 세션 메모리" 행 제거(3계층 → 2계층). 규칙 4 "승격 패턴"은 출처 계층이 사라져 성립하지 않으므로 삭제. 규칙 2는 **일반화**해 보존했다 — "회상 ≠ 진실원천(context-mode 회상은…)" → "기록 ≠ 현재 사실(메모리에 적힌 내용은 기록 당시의 사실…)". 도구와 무관하게 Claude 파일 메모리에도 그대로 적용되는 규칙이라 이름만 걷어내고 남겼다.
+    - `shared/templates` 도구 라우팅의 "대용량 출력 → context-mode" 항목도 같은 파일 리다이렉트 방식으로 교체 (`test-run-triage`와 동일 지침으로 통일).
+    - `docs/mcp-setup-guide.md` §8 절 전체 삭제 + 절 번호 재정렬(ast-grep 9→8, Context7 10→9, 본문 절 참조 동반 수정), 의존성 매트릭스 4행·풀 구성 블록·README 양본 카탈로그에서 제거.
+  - **permissions 베이스라인 산출 (`setup-mcp` Step 8 신설)** — setup-mcp가 "어떤 방식으로 설치했는지=prefix가 뭔지"를 아는 유일한 지점이라 그 자리에서 `.claude/settings.local.json`의 `permissions.allow`를 산출한다. **자동 기입 금지**(Step 2 패턴: 제시→확인→적용, 항목별 선택). stale prefix 제거 후보를 추가 항목과 **분리해** 제시 — 실측 사고 흔적 2건(`mcp__playwright__*`, `mcp__plugin_chrome-devtools-mcp_chrome-devtools__*`)이 근거.
+  - **provenance `devoksCoreVersion` + 훅 stale 판정** — `presetHash`가 커버하지 않는 base rules/refs 7종의 stale 여부 판정 기준. **브리프의 "버전 문자열 1개 비교" 설계는 채택하지 않았다**: `patch` bump 8건 중 4건이 실제로 base를 변경(1.4.1→`code-review.md`, 1.2.1→`git-convention.md`, 1.1.4→4건)했고 나머지 4건은 무변경이라, 버전 단독 비교는 `devoks-mcp-servers`(1.5.0, 실측 drift 0/7)를 오탐하고 minor-only 비교는 위 4건을 놓친다. → **버전 갭이 있을 때만 `cmp`로 확증**하는 하이브리드. 침묵 경로는 순수 파라미터 확장으로 프로세스 0개, 확증은 갭이 있을 때만 실행. 구버전 provenance는 `source` 경로의 `/devoks-core/<version>/`에서 버전을 회수하므로 재설정 불필요.
+  - **Chrome `:9269` 런처 승격** — 문서 안내 → `~/.devoks/bin/chrome-debug.sh` 생성(Step 5의 `metro-mcp.js`→`~/.devoks/mcp/` 패턴과 동일). 포트·`--user-data-dir` 고정, 시작 URL만 인자, 이미 떠 있으면 재실행 안 함(중복 attach 방지). macOS/Linux 바이너리 탐색 포함.
+  - **ast-grep — opt-in 스캐폴드로 결정** (사용자 결정): 기본은 설정 없는 애드혹(`run -p --lang`), 영속 규칙은 **지금 넣을 규칙이 있을 때만** `sgconfig.yml` 생성. 하네스는 스택별 deprecated API 시드 규칙을 소유하지 않는다(버전 주장 노후화). 5개 preset에 언어 id·예시 패턴만 달리해 동일 절 추가. **실측 함정 표**: `키: $V`는 오브젝트 속성이 아니라 `labeled_statement`로 파싱돼 **조용히 0건**(→ `--debug-query=pattern`, `context`+`selector: pair`) / 규칙 YAML 1개만 깨져도 scan 전체 중단(→ `context`는 큰따옴표) / `--lang` 미지정 시 `.md` 오탐 / `scan`은 `severity: error`일 때만 exit 1. **`ast-grep test`를 스캐폴드 생존 판정으로 채택** — 소스 0개에서도 규칙 정확성을 판정(올바른 규칙 PASS, 틀린 규칙 fail)하므로, `scan`이 0건일 때 "규칙이 죽었는지 코드가 깨끗한지"를 가른다. `testConfigs`는 `ruleDirs`와 달리 `- testDir:` 구조체이고, `ast-grep new project -y`는 세 경로 전부 **절대경로**로 박으므로 상대경로 교정이 필수.
+  - **CodeGraph/Serena 비용 기준** — 템플릿의 "도구→용도" 매핑에 "언제 순이득인가"를 추가. CodeGraph는 다중 파일·다중 홉일 때만(콜당 13~25KB), Serena는 심볼 편집 전용으로 좁힘(순수 조회는 내장 대비 이득 없고 세션당 활성화 고정비 추가). 기존 "과잉 라우팅 금지" 원칙 유지.
+  - **`setup.sh` 설치 중단 버그** — `plugins/devoks-sdlc/commands/*.md` glob이 매치되지 않아(devoks-sdlc는 `skills/`+`agents/`만 보유) `set -e` 하에서 `cp` 실패로 폴백 설치가 중간에 죽었다(실행 재현 확인). 디렉토리 존재를 `compgen -G`로 먼저 확인하는 헬퍼(`copy_flat`/`copy_skill_dirs`)로 교체하고, 플러그인 목록을 단일 `ALL_PLUGINS` 배열로 통합. **함께 수정**: `agents/`를 아예 복사하지 않아 devoks-sdlc 6개 + devoks-browser 1개 에이전트가 폴백 경로에서 누락되던 문제, `devoks-rn` 스킬 미복사, 내용 없는 "추가 MCP 안내" 빈 배너(공백만 제거해 개행이 남던 가드). **`devoks-sdlc-orchestration`은 폴백 대상에서 제외**(리뷰에서 교정) — 헬퍼가 `commands/`·`agents/`·`skills/`만 복사해 플러그인 루트의 `references/`가 따라오지 않는데 `orchestration-run`은 그 자리의 `orchestration-policy.md`(deny-list·격리 allowlist·한도)를 실행 전제로 읽고, 폴백에는 `${CLAUDE_PLUGIN_ROOT}`가 없어 경로도 해석되지 않는다. 비-HITL 파이프라인을 안전 가드 없이 반쪽 설치하느니 플러그인 설치 경로로만 쓴다.
+  - **브리프 범위 밖이나 함께 수정한 것**:
+    - `refs_ready()`가 `interaction-integrity.md`를 체크하지 않아 base 7종 중 1개 누락을 통과시켰다(crema-service가 실제로 이 파일 MISSING인데 침묵). 새 stale 판정이 같은 파일을 보는데 `refs_ready()`만 안 보면 비일관이라 함께 보강.
+    - **greenfield 오탐** — 하네스를 먼저 셋업하고 프로젝트를 나중에 만드는 순서에서는 설치 시점 소스가 0개인데, 훅이 serena/codegraph 인덱싱을 안내해 코드가 생길 때까지 매 세션 반복됐다("정상이면 침묵" 속성 위반). `has_source_files()` 가드 추가(`find -print -quit` 1회, 두 경고가 공유) — 소스가 생기면 다음 세션에 자동 복귀(자가치유). harness 저장소 자신(Markdown+Bash)은 `.sh` 포함으로 기존 동작 유지.
+    - 템플릿에 "언제 채우나" 안내 — greenfield에서 Tech Stack/Architecture/Directory/Commands는 채울 사실이 아직 없으므로 추측 금지, 스택 확정·첫 구조 커밋 후 갱신.
+    - 양 README의 `devoks-rn` 서술이 `~/.claude.json`에 `--wsEndpoint` **수동 등록**이라고 남아 있었으나, 실제로는 `setup-mcp` Step 5가 `metro-mcp.js`를 복사·등록하고 Metro URL을 자동 조회한다(재시작 수동 갱신 불필요) — 낡은 서술 정정.
+  - **제외(브리프 명시)**: lefthook pre-commit 부트스트랩(하네스가 실행환경 아티팩트를 소유하게 되는 경계 문제 — 순서상 먼저 결정할 사안. greenfield엔 `package.json`이 없어 설치 시점 불가라는 점도 확인), Figma PAT(YAGNI — 댓글 QA 스킬 없음), gws/UDP 에뮬레이터/excalidraw/AGENTS.md(일반화 불가), `project-harness-manage` 스킬 신설(기각 — presence·version은 훅, diff·판단은 스킬이라는 기존 분업에서 스킬 칸이 빔), `aware-react-app` 정상화(첫 설치 이후 점진 개선은 정상 동작).
+  - **`setup.sh`의 `~/.claude.json` 기입 — 스키마 정정 + 쉘 프롬프트 승인** (사용자 결정): `merge_mcp_required`/`print_mcp_optional`이 `mcpServers.required`/`optional`/`interactive` **중첩** 스키마를 읽는데 실제 `plugin.json`은 플랫 맵이라(중첩 키는 `Invalid input`으로 검증 실패 — 이 저장소 convention의 Pitfall 항목) **두 함수가 항상 no-op**이었고 `~/.claude.json`이 생성되지 않았다(샌드박스 실행으로 확인). 스키마 정정이 본 수정. 함수를 제거하지 않고 `collect_mcp_candidates`(계산만) + `apply_mcp_merge`(승인 후 기입)로 분리해, 작업 2의 "제시 → 승인 → 실행" 원칙을 폴백 경로에서도 지킨다 — 따라서 "자동 기입 금지"와 충돌하지 않는다.
+    - 추가 후보를 **전 플러그인 합쳐 1회** 제시(플러그인별 반복 프롬프트 없음) → `y/N`, **기본 N**.
+    - `[[ -t 0 ]]`로 tty를 확인해 비대화형(CI·파이프)에서는 기입을 건너뛰고 안내만 출력 — **무응답을 승인으로 해석하지 않는다.**
+    - 병합만 하고 덮어쓰지 않으며, 임시파일 + `os.replace`로 원자적으로 쓴다. 기존 파일이 파싱 불가면 중단하고 원본을 보존한다.
+    - 프로젝트 `.claude/settings.json` 권한 병합은 **항목 형태로 승인 여부를 가른다.** 무승인 병합은 "그 플러그인을 설치한 것 자체가 그 플러그인 도구에 대한 의사표시"라는 논리에 기대는데, 그 논리는 항목이 특정 MCP 서버 네임스페이스로 한정될 때만 성립한다. 현재 선언된 2건(`mcp__chrome-devtools-attach__*`, `mcp__metro-devtools__*`)이 narrow한 건 **플러그인 작성자의 자제일 뿐 구조가 강제하는 게 아니어서**, 나중에 어떤 플러그인이 `Bash(*)`를 선언하면 같은 무승인 경로로 통과한다 — 사후 출력은 이미 벌어진 일을 알리는 것뿐이다. 그래서 정규식 `^mcp__[A-Za-z0-9._-]+(__|$)`로 판정한다 — `mcp__` + 구체적 서버명 + (`__` 가 이어지거나 거기서 끝남):
+      - 매치 → 무승인 병합 + 사후 출력 (현행 2건 해당, **동작 변화 없음**)
+      - 비매치(`Bash(...)`/`Read(...)`/`Edit(...)`, 그리고 **서버명 없는 `mcp__*`·`mcp__**`·`mcp__<server>*`**) → `~/.claude.json`과 동일한 승인 게이트. 서버명 없는 와일드카드를 게이트에 넣은 건 그게 다른 서버의 도구까지 열기 때문이다.
+      - `$` 종료를 허용하는 이유: `mcp__pencil`처럼 **서버명만 쓰는 표기**가 "그 서버 전체 허용"으로 실사용된다(원빈님 `~/.claude/settings.json`에 실재). 스코프가 `mcp__pencil__*`와 같은데 넓은 쪽만 통과시키고 좁아 보이는 쪽을 막으면 비일관이다 — `__` 종료만 강제했던 최초 구현의 오게이트를 교정했다.
+  - **반영**: `plugins/devoks-core/hooks/check-setup-state.sh`, `plugins/devoks-core/commands/setup-mcp.md`(Step 6 런처, Step 7 ast-grep, Step 8 permissions 신설 → 결과보고 Step 9, Step 4에 serena 참조추적 전제 추가 — JS/TS 프로젝트는 `jsconfig.json`/`tsconfig.json`이 없으면 language server가 파일별 inferred project로 떨어져 `find_referencing_symbols`가 **에러 없이 빈 결과**를 돌려준다. 2026-09-18 실측: 추가 전 0건 → 추가 후 37개 파일로 grep 결과와 일치), `plugins/devoks-core/commands/setup-project-convention.md`(Step 6), `plugins/devoks-core/conventions/*/project-convention.md`(5개), `plugins/devoks-core/conventions/README.md`, `plugin.json`, `setup.sh`, `shared/templates/CLAUDE.md.project.template`, `README.md`, `docs/README.ko.md`, `docs/mcp-setup-guide.md`(매트릭스·§3-3·context-mode 절 삭제 후 재정렬 → ast-grep §8·Context7 §9, 풀 구성), `.claude/rules/project-convention.md`(base 7종 정정), `plugins/devoks-core/rules/memory-policy.md`·`plugins/devoks-sdlc/skills/test-run-triage/SKILL.md`(context-mode 전제 제거, 후자는 `metadata.version` `1.1.1 → 1.2.0`), `docs/plugin-management.md`(§12 표 셀), `plugins/devoks-sdlc/agents/code-security-reviewer.md`·`plugins/devoks-sdlc/skills/code-security-review/references/security-scan-execution.md`·`plugins/devoks-sdlc/skills/verify-data-flow/references/collection-by-environment.md`(`ctx_*` 도구 이름으로만 참조해 1차 검색에서 누락됐던 3곳 — 특히 `code-security-reviewer`는 frontmatter `tools:`에 MCP가 없어 그 지시가 **애초에 차단된 죽은 코드**였다), `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md`(§3에 "에이전트 `tools:` 화이트리스트 대조" 신설 — 1차 사고(2026-07-29 `acceptance-test-runner`) 후 재발 방지를 "reference와 frontmatter 대조"로만 적어둬서 **본문에 직접 박힌 경우**가 빠져나갔다. 점검 대상을 references + 에이전트 본문 양쪽으로 확대하고 §6 최종 확인에 체크박스 추가).
+  - **비대상**: `.claude-plugin/marketplace.json`(플러그인 버전을 핀하지 않고 소스 경로·description만 참조 — description 불변), 다른 4개 플러그인 `plugin.json`(번들 내용 불변 — `devoks-sdlc`는 `test-run-triage` 변경으로 bump 대상).
+  - **검증**: `claude plugin validate --strict` 6개 플러그인 전량 PASS. `bash -n` (`setup.sh`, 훅, 문서에 박은 런처 스크립트 추출). 훅 실측 — `devoks-mcp-servers`(1.5.0, drift 0/7) 변경 전 대비 **추가 출력 0줄**, `crema-service`(1.2.0, drift 5/7) 변경 전 **완전 침묵 → 버전 경고 + setup 안내**(`refs_ready()` 보강으로 MISSING인 `interaction-integrity.md`까지 잡히므로 두 블록이 함께 뜨는 게 정확한 동작 — 브리프의 "1줄" 기대치는 이 누락을 모르고 쓴 것), 빈 디렉토리 → serena/codegraph 침묵 후 소스 1개 추가 시 복귀, harness 저장소 자신 회귀 없음. `setup.sh` — `HOME`·`TARGET_DIR` 격리 실행으로 exit 0 + commands 5·agents 7·skills 21·refs 5 복사 확인(orchestration 제외 후 재실행). MCP 기입 6경로 전량 검증(python `pty`로 실제 tty 구동): 비대화형 → 미기입 / tty+N → 미기입 / tty+y → 병합 기입(`_comment` 제거 확인) / 재실행 → "추가할 서버 없음"(멱등) / 기존 최상위 키·기존 서버 보존 / 파싱 불가 파일 → 중단·원본 보존·임시파일 잔재 0. 권한 형태 가드는 분류 규칙 12케이스 단위검증 + 스크래치 저장소 복사본에 `Bash(*)`/`Read(/**)`/`mcp__*`를 주입해 4경로 확인(현행 2건 동작 변화 없음 / 비대화형 → 범용만 건너뜀 / tty+N → 미기입 / tty+y → 기입). 실제 `plugin.json`은 미변경. ast-grep — 5개 preset 예시 패턴 각 1건 매치, `severity: error`→exit 1, 소스 0개에서 `test` PASS/fail 판별. frontmatter YAML 파싱(`ruby -ryaml`) 2개 커맨드 OK.
 
 - [x] **컨벤션 preset 확장 — `python-fastapi` 신설** (2026-09-15, `devoks-core` `1.4.1 → 1.5.0`)
   - 배경: 사용자가 컨벤션 preset 확장 작업 중 Python/FastAPI(Starlette+Pydantic) preset을 추천·구성해 달라고 요청. 기존 4개 preset(`react-web`/`react-native`/`android`/`ios`)은 전부 프론트엔드·모바일 UI 스택이라, 백엔드 preset을 추가하며 공통 골격("플랫폼·언어·UI·테스트·보안·프로젝트 결정")의 "UI" 자리를 백엔드 스택에 맞게 어떻게 치환할지가 관건이었다.

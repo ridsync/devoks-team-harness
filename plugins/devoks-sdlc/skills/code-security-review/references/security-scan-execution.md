@@ -22,7 +22,7 @@
 
 - 전체 repo 또는 지정 scope를 확정한다.
 - 패키지 매니저·언어·프레임워크를 먼저 감지한다(`package.json`/lockfile/설정파일).
-- audit·grep 등 명령은 `ctx_batch_execute` / `ctx_execute`로 실행해 **결과만 surface**한다(대용량 출력 격리).
+- audit·grep 등 명령은 출력을 파일로 리다이렉트해 실행하고(`<명령> > "$OUT" 2>&1; echo "exit=$?"`), 거기서 **필요한 줄만 추출**한다(대용량 출력 격리 — 원문 전체 Read 금지).
 
 ## 2. 프로젝트 고유 정책 감지 (있으면 우선)
 

@@ -42,6 +42,26 @@
 - `plugins/devoks-core/commands/setup-mcp.md`
 - `plugins/devoks-core/hooks/check-setup-state.sh`
 
+### 에이전트 `tools:` 화이트리스트 대조 (prefix 점검과 별개)
+
+agent frontmatter의 `tools:`는 **화이트리스트**다 — 거기 없는 도구 호출은 에이전트 안에서 전부
+차단되고, 문서에 지시가 남아 있어도 **에러 없이 그냥 실행되지 않는다**. `permissions.allow`가
+커버하더라도 화이트리스트에 없으면 무의미하다(두 메커니즘이 별개).
+
+에이전트를 추가·수정할 때 **호출 지시가 있는 모든 곳**을 `tools:`와 대조한다:
+
+- [ ] 에이전트가 읽도록 지시된 `references/*.md`·SKILL.md의 도구 호출
+- [ ] **에이전트 본문에 직접 박힌 도구 호출** ← 여기가 두 번 빠져나갔다
+- [ ] `tools:`에 MCP 와일드카드(`mcp__<server>__*`)가 필요한지
+
+**실제 사고 2건:**
+- 2026-07-29 `acceptance-test-runner` — `tools:`에 MCP가 없어 `references`가 지시하는
+  `mcp__chrome-devtools-attach__*` 호출이 전부 차단, 스킬 Phase 1~4 전체가 동작 불가였다.
+  형제 에이전트에서 같은 결함을 이미 고쳤는데 먼저 추가된 이쪽에 적용되지 않았다.
+- 2026-09-18 `code-security-reviewer` — `tools: Read, Grep, Glob, Bash`인데 **에이전트 본문**이
+  `ctx_batch_execute`/`ctx_execute`를 지시하고 있었다(죽은 코드). 1차 사고 후 재발 방지를
+  "reference와 frontmatter 대조"로만 적어둬서, 본문에 직접 박힌 경우가 빠져나갔다.
+
 ## 4. 특수 케이스
 
 ### 진입점 정책 (command vs skill) — 확정 SSOT, 2026-08-24
@@ -116,6 +136,7 @@
 - [ ] `claude plugin validate ./plugins/<plugin> --strict` 실행 여부가 기록되었는가
 - [ ] 문서 대상/비대상 판단이 파일별로 남아 있는가
 - [ ] MCP/prefix/permission 대조 지점이 확인되었는가
+- [ ] 에이전트를 추가·수정했으면 `tools:` 화이트리스트를 **에이전트 본문과 references 양쪽**의 도구 호출과 대조했는가
 - [ ] core sync 영향이 있으면 `.claude/` 사본과 문서까지 함께 봤는가
 - [ ] 신규/변경 skill이면 §7 스킬 품질 체크리스트(8축)를 적용했는가
 

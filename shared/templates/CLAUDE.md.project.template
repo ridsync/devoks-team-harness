@@ -2,6 +2,12 @@
 
 에이전트용 프로젝트 가이드. 이 파일을 프로젝트에 맞게 수정하세요.
 
+> **언제 채우나** — 하네스를 먼저 셋업하고 프로젝트를 나중에 만드는 경우, 아래
+> Tech Stack / Architecture / Directory Structure / Commands 는 **채울 사실이 아직 없다.**
+> 추측으로 채우지 말고 placeholder를 그대로 두었다가, 스택이 확정되고 첫 구조가 커밋된
+> 뒤에 실제 값으로 갱신한다. Overview / Role & Expertise / Sensitive Files 는 코드와
+> 무관하므로 처음부터 채울 수 있다.
+
 ---
 
 ## Overview
@@ -123,11 +129,26 @@ npm run test       # watch 모드
 - **심볼 단위 정밀 읽기·편집** (단건 body 치환/삽입, rename)
   → **Serena**를 우선 고려 (LSP가 편집 경계에 정확).
 - **구조 패턴 일괄 검색 + 대량 리라이트(코드모드)** (동일 AST 패턴 N건 치환, deprecated prop 제거 등)
-  → **ast-grep**를 우선 고려 (`ast-grep run -p '<pattern>' -r '<rewrite>'`). 단건은 Serena, 동일 패턴 다건은 ast-grep.
+  → **ast-grep**를 우선 고려 (`ast-grep run -p '<pattern>' -r '<rewrite>' --lang <lang>`).
+  단건은 Serena, 동일 패턴 다건은 ast-grep. `--lang`은 항상 명시한다(미지정 시 `.md` 같은 비코드 파일까지 매치된다).
 - **명령 출력·로그·대용량 파일/문서, 검증** (lint/test/build)
-  → **context-mode**를 우선 고려 (raw 바이트를 컨텍스트에 안 올림).
+  → 출력을 **파일로 리다이렉트**하고 거기서 필요한 줄만 뽑아 읽는다
+  (`<명령> > "$OUT" 2>&1; echo "exit=$?"` → `tail`로 형식 파악 → 해당 줄만 추출).
+  원문 전체를 컨텍스트에 올리지 않는다.
 - 정확한 파일 경로가 이미 있고 단순 확인이면 내장 Read/Bash로 충분하면 그대로 쓴다. **과잉 라우팅 금지.**
 - 도구 실패·과도한 지연 시 자유롭게 fallback한다. 각 도구 설명과 충돌하면 도구 설명을 따른다.
+
+### 비용 기준 (언제 순이득인가)
+
+위 매핑은 "무엇에 쓰는가"이고, 아래는 **"쓸 만한 값인가"**다. 두 도구 모두 호출 단가가 내장 도구보다
+높아서, 조건을 안 보고 기본값으로 쓰면 컨텍스트만 태우고 답은 같다.
+
+- **CodeGraph** — **다중 파일·다중 홉**일 때만 순이득이다. 콜당 13~25KB로 Read 평균보다 무겁다.
+  경로를 이미 알거나 단일 파일 조회면 Read/Bash가 싸고 빠르다.
+  즉 "이 심볼이 어디서 어떻게 불리는지 모르겠다"가 질문일 때 쓰고, "저 파일 보자"일 때는 쓰지 않는다.
+- **Serena** — **심볼 단위 편집 전용**으로 좁힌다. 순수 조회(`find_symbol`·`read_file`·`search_for_pattern`)는
+  내장 Read/Grep 대비 이득이 없거나 더 비싸고, 세션당 활성화 고정비(`activate_project` +
+  `initial_instructions`)가 추가로 붙는다. 편집할 게 없으면 활성화하지 않는다.
 
 ---
 

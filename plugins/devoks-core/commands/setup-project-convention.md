@@ -120,7 +120,12 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 - 선택한 preset 원본을 `.claude/rules/project-convention.md`로 복사
 - 필요 시 `Custom` 보정 내용을 같은 파일에 반영
 - preset 원본 파일의 `sha256` 해시를 계산(예: `shasum -a 256 "${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md"`)
-- `.claude/project-convention.json`에 provenance 저장 — 이 해시를 `presetHash`로 함께 기록
+- 적용에 사용한 devoks-core 버전을 확인한다 — 플러그인 캐시 경로가 `.../devoks-core/<version>/` 구조이므로
+  `basename "${CLAUDE_PLUGIN_ROOT}"`가 곧 설치 버전이다. 경로가 버전 형태가 아니면(폴백 설치)
+  `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`의 `version`을 읽는다. 이 경로가 없으면
+  `${CLAUDE_PLUGIN_ROOT}/plugin.json`도 시도한다 — 매니페스트 배치가 마켓플레이스마다 갈린다
+  (devoks-plugins는 `.claude-plugin/` 하위지만 flat 배치를 쓰는 마켓플레이스도 있다).
+- `.claude/project-convention.json`에 provenance 저장 — 해시를 `presetHash`, 버전을 `devoksCoreVersion`으로 함께 기록
 
 metadata 예시:
 
@@ -129,6 +134,7 @@ metadata 예시:
   "preset": "react-web",
   "source": "${CLAUDE_PLUGIN_ROOT}/conventions/react-web/project-convention.md",
   "presetHash": "<sha256>",
+  "devoksCoreVersion": "<설치된 devoks-core 버전, 예: 1.6.0>",
   "managedBy": "devoks-core:setup-project-convention",
   "mode": "fresh-apply"
 }
@@ -136,6 +142,12 @@ metadata 예시:
 
 `presetHash`는 이후 `devoks-core:project-convention-manage`가 "업스트림 preset이 그 사이 바뀌었는지"를
 값싸고 정확하게 판단하는 사전 필터로 쓴다 — preset 원본 내용이 변경될 때만 값이 달라진다.
+
+`devoksCoreVersion`은 **base rules/refs**(`presetHash`가 커버하지 않는 7개 파일)의 stale 여부를
+SessionStart 훅이 판정하는 기준이다. 훅은 이 값이 설치 버전과 다르고 **또한** base 파일 내용이 실제로
+다를 때만 1줄 경고한다 — 버전만 비교하면 base를 건드리지 않은 patch bump에서 오탐이 난다.
+필드가 없는 구버전 provenance는 훅이 `source` 경로의 `/devoks-core/<version>/`에서 회수하므로,
+이 필드를 추가하려고 기존 프로젝트를 재설정할 필요는 없다.
 
 ### 7. 후속 안내
 

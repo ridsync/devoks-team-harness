@@ -37,10 +37,10 @@ DevOKs 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 | **devoks-sdlc** (feature commands) | `gh` CLI | — |
 | **devoks-sdlc** (`new-ui-draft` skill) | Figma MCP + `figma:figma-design-to-code` 스킬 | — |
 | **devoks-sdlc** (feature skills: frd/plan) | — | CodeGraph MCP, Serena MCP |
-| **devoks-sdlc** (feature-workflow-runner) | Figma MCP, context-mode MCP | CodeGraph MCP, Serena MCP |
+| **devoks-sdlc** (feature-workflow-runner) | Figma MCP | CodeGraph MCP, Serena MCP |
 | **devoks-sdlc** (verify-data-flow) | Chrome DevTools MCP | Playwright MCP |
-| **devoks-sdlc** (code review/refactor/security) | CodeGraph MCP, Serena MCP | context-mode MCP |
-| **devoks-sdlc** (test author/triage) | — | context-mode MCP |
+| **devoks-sdlc** (code review/refactor/security) | CodeGraph MCP, Serena MCP | — |
+| **devoks-sdlc** (test author/triage) | — | — |
 | **devoks-browser** (chrome-devtools) | Chrome DevTools MCP(devoks-browser 설치 시 자동 번들, 단독 사용 시 `~/.claude.json` 수동 등록) | — |
 | **devoks-browser** (visual-diff) | Figma MCP, Chrome DevTools MCP (attach) | Playwright MCP (폴백) |
 | **devoks-rn** (`metro-devtools-attach`) | `devoks-rn` 플러그인, Metro 실행 중 | `metro-devtools` (user scope — `/devoks-core:setup-mcp` Step 5); `adb` / `xcrun simctl` (스크린샷) |
@@ -126,10 +126,13 @@ Figma 계정 연결은 최초 도구 호출 시 브라우저 OAuth 플로우로 
 
 ### 3-3. Chrome 디버그 모드로 실행
 
-> 같은 명령이 `plugins/devoks-core/commands/setup-mcp.md` Step 6에도 실려 있지만, 두 문서는 SSOT-미러
-> 관계가 아니다 — `setup-mcp.md`는 대상 프로젝트에 설치되는 실행형 지침(플러그인 루트 밖 참조 불가라
-> 자기완결적이어야 함)이고, 이 문서는 harness 저장소 자체의 유지보수자용 배경 설명이다. 목적이 달라
-> 동기화 의무 없이 각자 독립적으로 고친다.
+> `setup-mcp.md` Step 6은 이 명령을 **런처 스크립트**(`~/.devoks/bin/chrome-debug.sh`)로 만들어
+> 두도록 승격했다(포트·user-data-dir 고정, 시작 URL만 인자, 이미 떠 있으면 재실행 안 함).
+> 아래는 런처 없이 직접 한 번 띄울 때의 최소 명령이다.
+>
+> 두 문서는 SSOT-미러 관계가 아니다 — `setup-mcp.md`는 대상 프로젝트에 설치되는 실행형 지침
+> (플러그인 루트 밖 참조 불가라 자기완결적이어야 함)이고, 이 문서는 harness 저장소 자체의
+> 유지보수자용 배경 설명이다. 목적이 달라 동기화 의무 없이 각자 독립적으로 고친다.
 
 ```bash
 # macOS
@@ -258,19 +261,24 @@ mcp__metro-devtools__*
 
 ---
 
-## 8. context-mode MCP
+## 8. ast-grep CLI (선택 — MCP 아님)
 
-`devoks-sdlc:feature-workflow-runner`(및 test·verify 계열)의 대용량 출력 처리와 세션 지식베이스에 필요합니다.
+동일 AST 패턴 N건을 한 번에 치환할 때 씁니다(코드모드). MCP 서버가 아니라 CLI 의존성입니다.
 
-### 설치
+```bash
+brew install ast-grep          # macOS
+# 또는
+npm install -g @ast-grep/cli
 
+ast-grep --version
 ```
-/plugin install context-mode@context-mode
-```
 
-> 서드파티 플러그인(`mksglu/context-mode` 마켓플레이스)이며, 별도 마켓플레이스 등록이 먼저 필요할
-> 수 있습니다(`claude plugin marketplace add mksglu/context-mode`). 마켓플레이스 이름 없이
-> `/plugin install context-mode`만 실행하면 실패할 수 있습니다(2026-08-10 확인).
+`sgconfig.yml` 스캐폴드는 이 문서도 `setup-mcp.md`도 만들지 않습니다 — 규칙 디렉토리 경로와
+언어 id가 스택·레이아웃에 따라 달라서, 스택을 확정하는 `setup-project-convention`이 적용한
+preset의 "구조 패턴 일괄 치환(ast-grep)" 절이 SSOT입니다(각 preset에 실측 함정 표 포함).
+
+SSOT: `plugins/devoks-core/commands/setup-mcp.md` Step 7 +
+`plugins/devoks-core/conventions/<preset>/project-convention.md`.
 
 ---
 
@@ -360,5 +368,6 @@ brew install gh && gh auth login
 /plugin install serena@claude-plugins-official
 # chrome-devtools-attach는 devoks-browser에 이미 번들됨(3절 참조) — 별도 설치 불필요
 # codegraph는 공식 플러그인이 없음 — CLI 직접 설치 (5절 참조)
+# ast-grep은 MCP가 아니라 CLI — brew install ast-grep (8절 참조)
 # RN 프로젝트: /devoks-core:setup-mcp Step 5 실행 — metro-devtools user scope 등록 (7절 참조)
 ```

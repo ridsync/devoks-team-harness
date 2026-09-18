@@ -49,6 +49,24 @@ codegraph_project_ready() {
   return 0
 }
 
+# 프로젝트에 인덱싱할 코드가 실재하는지. 하네스를 먼저 셋업하고 프로젝트를 나중에
+# 만드는 순서(greenfield)에서는 설치 시점에 소스가 0개인데, 그 상태로 serena/codegraph
+# 인덱싱을 안내하면 코드가 생길 때까지 매 세션 반복되는 오탐이 된다 — 훅의 "정상이면
+# 침묵" 속성이 깨진다. 코드가 생기면 다음 세션에 안내가 자동으로 살아난다(자가치유).
+# -print -quit 으로 첫 매치에서 멈춘다.
+has_source_files() {
+  is_project_dir || return 1
+  local found
+  found="$(find "$PROJECT_DIR" -maxdepth 3 \
+    \( -name node_modules -o -name .git -o -name build -o -name dist -o -name .venv \) -prune -o \
+    -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \
+      -o -name '*.py' -o -name '*.kt' -o -name '*.java' -o -name '*.swift' \
+      -o -name '*.go' -o -name '*.rs' -o -name '*.rb' -o -name '*.sh' \
+      -o -name '*.c' -o -name '*.cc' -o -name '*.cpp' -o -name '*.cs' -o -name '*.php' \) \
+    -print -quit 2>/dev/null)"
+  [[ -n "$found" ]]
+}
+
 base_rules_ready() {
   is_project_dir || return 0
   [[ -f "$CLAUDE_DIR/rules/agent-principles.md" && -f "$CLAUDE_DIR/rules/memory-policy.md" ]]
@@ -59,6 +77,7 @@ refs_ready() {
   [[ -f "$CLAUDE_DIR/refs/code-review.md" \
     && -f "$CLAUDE_DIR/refs/engineering-principles.md" \
     && -f "$CLAUDE_DIR/refs/git-convention.md" \
+    && -f "$CLAUDE_DIR/refs/interaction-integrity.md" \
     && -f "$CLAUDE_DIR/refs/workflow.md" ]]
 }
 
@@ -67,13 +86,89 @@ project_convention_ready() {
   [[ -f "$CLAUDE_DIR/rules/project-convention.md" && -f "$CLAUDE_DIR/project-convention.json" ]]
 }
 
+# devoks-core base 파일 7종(rules 2 + refs 5) — setup-project-convention이 복사하는 집합.
+BASE_FILES=(
+  rules/agent-principles.md
+  rules/memory-policy.md
+  refs/code-review.md
+  refs/engineering-principles.md
+  refs/git-convention.md
+  refs/interaction-integrity.md
+  refs/workflow.md
+)
+
+# 번들 원본 디렉토리. 플러그인 경로가 없으면(폴백 설치·저장소 직접 실행) 훅 자신의 상위를 쓴다.
+bundle_root() {
+  local root="${CLAUDE_PLUGIN_ROOT:-}"
+  if [[ -n "$root" && -d "$root/rules" ]]; then
+    printf '%s' "$root"
+    return 0
+  fi
+  (cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd) 2>/dev/null
+}
+
+# 설치된 devoks-core 버전. 플러그인 캐시 경로가 .../devoks-core/<version>/ 구조라
+# 경로 마지막 세그먼트가 곧 버전이다 — 순수 파라미터 확장이므로 프로세스 기동 0.
+# 경로가 버전 형태가 아닐 때(폴백 설치·저장소 직접 실행)만 매니페스트를 읽는다.
+# 매니페스트 위치는 마켓플레이스마다 다르다 — devoks-plugins는 <root>/.claude-plugin/plugin.json
+# (저장소와 동일)이지만 flat 배치(<root>/plugin.json)를 쓰는 마켓플레이스도 실재하므로 양쪽을 시도한다.
+installed_core_version() {
+  local seg="${CLAUDE_PLUGIN_ROOT:-}"
+  seg="${seg%/}"
+  seg="${seg##*/}"
+  if [[ "$seg" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    printf '%s' "$seg"
+    return 0
+  fi
+
+  local root manifest
+  root="$(bundle_root)" || return 1
+  for manifest in "$root/.claude-plugin/plugin.json" "$root/plugin.json"; do
+    [[ -f "$manifest" ]] || continue
+    sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$manifest" | head -1
+    return 0
+  done
+  return 1
+}
+
+# provenance가 기록한 기준 버전. devoksCoreVersion 필드가 우선이고, 그 필드가 없는
+# 구버전 provenance는 source 경로의 .../devoks-core/<version>/ 에서 회수한다
+# (필드 도입 전 적용분도 재설정 없이 판정 대상에 들어오게 하려는 의도).
+provenance_core_version() {
+  local f="$CLAUDE_DIR/project-convention.json" v
+  [[ -f "$f" ]] || return 1
+
+  v="$(sed -n 's/.*"devoksCoreVersion"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$f" | head -1)"
+  [[ -n "$v" ]] && { printf '%s' "$v"; return 0; }
+
+  v="$(sed -n 's|.*/devoks-core/\([0-9][0-9.]*\)/.*|\1|p' "$f" | head -1)"
+  [[ -n "$v" ]] && { printf '%s' "$v"; return 0; }
+  return 1
+}
+
+# 버전 갭이 실제 base 파일 차이로 이어졌는지 확증. patch bump가 base를 건드리지 않는
+# 경우가 실제로 절반쯤 되므로(1.5.0→1.5.1: 0건, 반면 1.4.1→code-review.md, 1.2.1→
+# git-convention.md, 1.1.4→4건) 버전 문자열만 비교하면 오탐이 난다. 이 확증은 버전
+# 갭이 있을 때만 실행되므로 정상(=버전 일치) 경로에는 비용이 붙지 않는다.
+base_files_differ() {
+  local root rel
+  root="$(bundle_root)" || return 1
+  for rel in "${BASE_FILES[@]}"; do
+    [[ -f "$root/$rel" ]] || continue
+    cmp -s "$root/$rel" "$CLAUDE_DIR/$rel" || return 0
+  done
+  return 1
+}
+
 # JSON 단일 문자열에 들어가므로 큰따옴표·실제 개행 금지. 항목 구분은 리터럴 \n.
 missing_mcp=""
 missing_project=""
 setup_steps=""
+stale_setup=""
 add_missing_mcp() { missing_mcp="${missing_mcp}${missing_mcp:+\n}$1"; }
 add_missing_project() { missing_project="${missing_project}${missing_project:+\n}$1"; }
 add_setup_step() { setup_steps="${setup_steps}${setup_steps:+\n}$1"; }
+add_stale_setup() { stale_setup="${stale_setup}${stale_setup:+\n}$1"; }
 
 have "context7"   || add_missing_mcp '- context7 (문서조회, 선택): 미설정 시 WebSearch 폴백. 설치: claude mcp add context7 --scope user -- npx -y @upstash/context7-mcp@latest'
 have "serena"     || add_missing_mcp '- serena (코드 심볼탐색·리팩토링, 권장): 설치: /plugin install serena@claude-plugins-official (claude mcp add 금지 — PyPI serena 패키지명 충돌, 상세: /devoks-core:setup-mcp)'
@@ -98,11 +193,17 @@ if $_rn_detected; then
   have "metro-devtools" || add_missing_mcp '- metro-devtools (RN JS 콘솔·상태 조회, devoks-rn 스킬 필요): /devoks-core:setup-mcp Step 5 실행 — devoks-rn 플러그인의 metro-mcp.js를 ~/.devoks/mcp/에 복사 후 user scope 등록 (Metro URL 자동 조회, 재시작 불필요)'
 fi
 
-if have "serena" && ! serena_project_ready; then
+# 두 경고가 같은 가드를 쓰므로 find 를 한 번만 돌린다.
+_has_source=false
+if have "serena" || have "codegraph"; then
+  has_source_files && _has_source=true
+fi
+
+if have "serena" && $_has_source && ! serena_project_ready; then
   add_missing_project '- serena project: 현재 프로젝트에 .serena/project.yml 이 없습니다. 필요 시 Serena activate_project 또는 onboarding 흐름으로 프로젝트를 초기화하세요.'
 fi
 
-if have "codegraph" && ! codegraph_project_ready; then
+if have "codegraph" && $_has_source && ! codegraph_project_ready; then
   add_missing_project '- codegraph index: 현재 프로젝트에 유효한 .codegraph 인덱스가 없습니다. 초기화: codegraph init <프로젝트_절대경로>'
 fi
 
@@ -111,8 +212,18 @@ if ! base_rules_ready || ! refs_ready || ! project_convention_ready; then
   add_setup_step '2. /devoks-core:setup-project-convention — base rules/refs 적용 + stack preset 선택'
 fi
 
+# setup을 이미 거친 프로젝트만 대상 — 미완료면 위 setup_steps 안내가 이미 나간다.
+# 버전 문자열이 다르고 && 실제 base 파일도 다를 때만 경고한다(오탐 차단, 상세: base_files_differ 주석).
+if project_convention_ready; then
+  _core_ver="$(installed_core_version)" || _core_ver=""
+  _prov_ver="$(provenance_core_version)" || _prov_ver=""
+  if [[ -n "$_core_ver" && "$_prov_ver" != "$_core_ver" ]] && base_files_differ; then
+    add_stale_setup "- base rules/refs가 devoks-core ${_prov_ver:-미기록} 기준입니다 (현재 ${_core_ver}). /devoks-core:setup-project-convention 재실행 권장 (project-convention.md는 diff 모드로 보존)."
+  fi
+fi
+
 # 누락 없으면 조용히 종료
-[[ -z "$missing_mcp" && -z "$missing_project" && -z "$setup_steps" ]] && exit 0
+[[ -z "$missing_mcp" && -z "$missing_project" && -z "$setup_steps" && -z "$stale_setup" ]] && exit 0
 
 ctx='[DevOKs] 플러그인 설치 후 필요한 setup 상태를 확인했습니다. 관련 스킬·커맨드 사용 전 아래 안내를 우선 참고하세요.'
 
@@ -126,6 +237,10 @@ fi
 
 if [[ -n "$missing_project" ]]; then
   ctx="${ctx}\n[프로젝트 초기화 미완료]\n${missing_project}"
+fi
+
+if [[ -n "$stale_setup" ]]; then
+  ctx="${ctx}\n[setup 갱신 권장]\n${stale_setup}"
 fi
 
 # printf %s 는 백슬래시를 해석하지 않으므로 \n 이 그대로 JSON 이스케이프로 남는다.

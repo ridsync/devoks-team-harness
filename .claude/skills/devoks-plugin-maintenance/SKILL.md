@@ -3,7 +3,7 @@ name: devoks-plugin-maintenance
 description: devoks-team-harness 저장소에서 플러그인 기능 변경, 버그 수정, 스킬/커맨드/에이전트 추가·수정, MCP prefix·permission 정책 변경, 카탈로그/문서 정합성 점검이 필요한 작업을 할 때 사용하는 maintainers용 로컬 워크플로우. 사용자가 devoks-browser/devoks-rn/devoks-core 같은 플러그인 변경을 요청하거나, plugin version bump / validate --strict / README·README.ko·marketplace·MCP guide 동기화가 필요해 보이면 반드시 이 스킬을 먼저 사용한다.
 metadata:
   author: ridsync
-  version: 0.3.1
+  version: 0.3.2
 ---
 
 # devoks-plugin-maintenance
@@ -160,6 +160,11 @@ Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한
 - `docs/mcp-setup-guide.md`
 - `plugins/devoks-core/commands/setup-mcp.md`
 - `plugins/devoks-core/hooks/check-setup-state.sh`
+
+**에이전트를 추가·수정했으면** frontmatter `tools:` 화이트리스트를 그 에이전트가 읽는 `references/`
+**와 에이전트 본문 양쪽**의 도구 호출 지시와 대조한다 — `tools:`에 없는 도구는 **에러 없이** 차단되고,
+`settings.permissions.allow`가 커버해도 무의미하다(두 메커니즘이 별개). 실제 사고 2건과 체크 목록은
+`references/workflow-checklist.md` §3 「에이전트 `tools:` 화이트리스트 대조」.
 
 ### 특수 케이스
 

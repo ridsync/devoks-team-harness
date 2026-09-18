@@ -463,7 +463,7 @@ model: sonnet
 | implementer (스코프 확정 구현) | `sonnet` | `code-implementer`, `test-writer`(테스트 작성 — 동일 근거: 대상 코드에 이미 정의된 동작을 검증하는 실행형) |
 | implementer-hard (크로스파일·설계 변경) | `opus` + `effort: high` | 별도 에이전트 없음 — blocked 에스컬레이션으로 메인 루프(세션 모델)가 담당 |
 | architect (설계·ADR·장기 계획) | `opus` + `effort: high` | 메인 루프 유지 — 승인 게이트가 본질 (`feature-frd-author` 등) |
-| test-runner (실행·실패 원인 해석) | `sonnet` | `test-run-triage` (메인 루프 + context-mode 격리) — 에이전트화는 향후 후보 |
+| test-runner (실행·실패 원인 해석) | `sonnet` | `test-run-triage` (메인 루프 + 출력 파일 격리) — 에이전트화는 향후 후보 |
 | docs-writer (문서 작성·갱신) | `sonnet` | 향후 후보 |
 | lint-formatter (단순 lint·format) | `haiku` + `effort: low` | 향후 후보 (현재 빈도 낮음 — YAGNI) |
 

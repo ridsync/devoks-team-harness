@@ -27,7 +27,7 @@ effort: high
 
 ## 동작
 
-1. `../skills/code-security-review/references/security-scan-execution.md`(실행 절차 SSOT)를 읽고 `scope`·`focus`에 맞춰 수행한다 — 스택 감지 → 프로젝트 고유 정책 감지 → 카테고리 순회 점검. audit·grep 등 대용량 출력 명령은 `ctx_batch_execute` / `ctx_execute`로 실행해 결과만 surface한다.
+1. `../skills/code-security-review/references/security-scan-execution.md`(실행 절차 SSOT)를 읽고 `scope`·`focus`에 맞춰 수행한다 — 스택 감지 → 프로젝트 고유 정책 감지 → 카테고리 순회 점검. audit·grep 등 대용량 출력 명령은 출력을 파일로 리다이렉트하고 거기서 필요한 줄만 추출한다(이 에이전트 자체가 subagent 컨텍스트 격리라, 메인 루프에는 최종 리포트만 올라간다).
 2. `../skills/code-security-review/references/report-template.md`(출력 SSOT)의 템플릿으로 리포트를 작성한다. 이모지를 그대로 포함한다.
 3. 작성한 **리포트 전문**을 그대로 최종 메시지로 출력한다.
 

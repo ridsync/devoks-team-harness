@@ -288,6 +288,74 @@ async def test_create_product(client: AsyncClient):
 
 ---
 
+## 구조 패턴 일괄 치환 (ast-grep)
+
+동일 AST 패턴이 **N건** 있고 그걸 한 번에 바꿔야 할 때만 쓴다. 단건 심볼 편집은 Serena,
+경로를 이미 아는 단순 확인은 내장 Read/Grep이 싸다. 이 스택의 언어 id: `python`.
+
+**기본은 애드혹 — 설정 파일이 필요 없다.**
+
+```bash
+# 조회
+ast-grep run -p 'def $FN($$$ARGS) -> $RET: $$$BODY' --lang python app/
+# (동기 핸들러 전수 조회(async 전환 대상 식별))
+
+# 치환 (-r 추가, --dry-run 으로 먼저 확인)
+ast-grep run -p '<pattern>' -r '<rewrite>' --lang <lang> --dry-run <경로>
+```
+
+**영속 규칙(`sgconfig.yml` + `ruleDirs`)은 지금 넣을 규칙이 있을 때만 만든다.**
+설정만 만들고 규칙을 비워두면 `ast-grep scan`이 영원히 0줄을 출력하며 아무도 이상을 눈치채지
+못한다 — 설정 없는 상태보다 나쁘다.
+
+만들 때는:
+
+1. `ast-grep new project -y` — `sgconfig.yml` + `rules/` + `rule-tests/` + `utils/`를 만든다.
+2. **`sgconfig.yml`의 절대경로를 상대경로로 반드시 교정한다** — 스캐폴드가 절대경로를 박아서
+   팀 공유·CI에서 깨진다. `ruleDirs`·`utilDirs`는 경로 나열이지만 `testConfigs`는
+   `- testDir: <경로>` **구조체**라 형식이 다르다:
+   ```yaml
+   ruleDirs:
+     - rules
+   testConfigs:
+     - testDir: rule-tests
+   utilDirs:
+     - utils
+   ```
+3. `ast-grep new rule <id> -l <lang> -y`로 규칙과 테스트를 함께 만들고, `rule-tests/<id>-test.yml`의
+   `valid:`/`invalid:` 인라인 샘플을 채운다.
+4. **`ast-grep test`가 PASS하는 것을 스캐폴드 완료 판정으로 삼는다.**
+
+4번이 중요하다 — `ast-grep test`는 **프로젝트 소스가 0개여도** 규칙의 정확성을 판정한다
+(인라인 샘플로 검증하므로). 반대로 `ast-grep scan`은 소스가 없거나 패턴이 틀려도 똑같이 0줄을
+출력해 둘을 구분할 수 없다. 규칙을 넣었는데 `scan`이 0건이면 **규칙이 죽었는지 우리 코드가
+깨끗한지를 `test`로 먼저 가른다.**
+
+monorepo면 저장소 루트가 아니라 실제 소스 패키지 루트에 두고, `ast-grep scan`·`test`도
+**`sgconfig.yml`이 있는 그 디렉토리에서** 실행한다.
+
+### 어떤 규칙을 쓸 수 있나
+
+| 종류 | 필요한 전제 | 언제 쓸 수 있나 |
+|------|------------|----------------|
+| **스택 일반** — 프레임워크·라이브러리 deprecated API | 스택·버전 사실만 | 소스가 없어도 작성 가능 |
+| **프로젝트 고유** — 자체 SSOT·컨벤션 위반 검출 | 그 SSOT가 실재하고 합의돼야 함 | 코드가 쌓인 뒤 |
+
+프로젝트 고유 규칙을 SSOT가 확정되기 전에 넣으면 규칙이 곧 거짓이 된다 — 순서를 지킨다.
+
+### 함정 (실측 확인)
+
+| 증상 | 원인 | 대응 |
+|------|------|------|
+| 패턴이 조용히 0건 | `키: $V` 형태는 오브젝트 속성이 아니라 `labeled_statement`로 파싱된다 | `--debug-query=pattern`으로 파싱 형태를 먼저 확인하고, 속성 매칭은 `pattern.context` + `selector: pair`로 쓴다 |
+| `scan`이 전부 안 돌고 에러 | 규칙 YAML **1개**만 깨져도 스캔 전체가 중단된다 | `context` 등 `:`가 들어가는 값은 **큰따옴표로 감싼다** |
+| `.md` 같은 비코드 파일이 매치 | `--lang` 미지정 | `--lang`을 항상 명시한다 |
+| CI에서 통과해버림 | `scan`은 `severity: error` 항목이 있을 때만 exit 1 | 게이트로 쓸 규칙은 `severity: error`로 둔다 |
+
+`node_modules`·`dist`·빌드 산출물은 gitignore를 따라 자동 제외되므로 별도 ignore 설정은 불필요하다.
+
+---
+
 ## Comment Rules
 
 - **한국어** 사용, 자명한 코드에는 금지, 타겟 독자는 5년차 미드레벨 엔지니어

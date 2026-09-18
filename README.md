@@ -208,15 +208,15 @@ flowchart TD
 
 ## Dependency Summary
 
-> DevOKs plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-setup-state.sh`) detects missing servers each session and prints install guidance. **Exceptions:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). `devoks-rn` requires `metro-devtools` in `~/.claude.json` with a dynamic `--wsEndpoint` (Metro WebSocket URL changes on restart). See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
+> DevOKs plugins do **not** bundle general-purpose MCP servers (Figma, Playwright, Serena, CodeGraph, context7). Install them once at **user/project scope** to avoid duplicate instances and conflicts with your local MCP setup. The `devoks-core` SessionStart hook (`hooks/check-setup-state.sh`) detects missing servers each session and prints install guidance. **Exceptions:** `devoks-browser` bundles only `chrome-devtools-attach` (`:9269` attach-specific config). `devoks-rn` needs `metro-devtools` at user scope — install it via `/devoks-core:setup-mcp` Step 5, which copies the bundled `metro-mcp.js` to `~/.devoks/mcp/`; it discovers the Metro URL automatically, so no manual update is needed after a Metro restart. See [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md) → "설치 정책".
 
 | Plugin | Required | Optional |
 |--------|----------|----------|
 | devoks-core | — | — |
 | devoks-git | `gh` CLI | — |
-| devoks-sdlc | `gh` CLI, CodeGraph MCP, Serena MCP | Figma MCP, context-mode MCP |
+| devoks-sdlc | `gh` CLI, CodeGraph MCP, Serena MCP | Figma MCP |
 | devoks-browser | Chrome DevTools MCP + `~/.claude.json` | Playwright MCP, Figma MCP |
-| devoks-rn | `devoks-rn` plugin + Metro running; `metro-devtools` in `~/.claude.json` (dynamic `--wsEndpoint`) | `adb` / `xcrun simctl` (screenshots) |
+| devoks-rn | `devoks-rn` plugin + Metro running; `metro-devtools` at user scope (`/devoks-core:setup-mcp` Step 5) | `adb` / `xcrun simctl` (screenshots) |
 
 Full setup guide → [`docs/mcp-setup-guide.md`](docs/mcp-setup-guide.md)
 
