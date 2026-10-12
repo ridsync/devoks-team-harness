@@ -3,7 +3,7 @@ description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하�
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.6.2
+  version: 1.6.3
 ---
 
 # feature-workflow-runner
@@ -67,12 +67,12 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 0. **워크스페이스 확정 · 초안 원문 보존** — feature-name·date(`yyyyMMdd`)로 `out` 기본 경로 `.claude/workspace/{feature-name}-{date}/` 를 정한다(디렉토리명·날짜·`assets/` 레이아웃 SSOT는 `references/output-location.md`). 시안·시각 리소스 사본은 **`<out>/assets/`** 에 `RES-ASSET-NNN_<slug>` 네이밍으로 저장하고(시안 외 대용량·저장소 안 리소스는 경로만 기록), FRD §6.3 Assets 표 ID와 일치시킨다. **본문으로 받은 거친 초안은 `<out>/FRD.draft.md` 로 원문 그대로 보존**한다: 짧은 출처 헤더(어떤 스킬·호출에서 받았는지) + 초안 원문 verbatim, 정련 중 사용자 확인으로 확정된 결정은 같은 파일 하단에 누적(추측 금지). 정련 결과는 `FRD.md`. → 형식 근거는 `references/output-location.md`(SSOT).
 1. 초안에서 Goal·Context·요구사항 후보를 추출한다.
 2. 각 요구사항을 `REQ-xxx` + EARS `AC-xxx-y` 로 정형화한다(정상 경로 + 예외 경로 최소 1쌍). → `references/ears-acceptance-criteria.md`
-3. 수치·세팅·상태전이를 §5 Contract(`CTR-xxx`)로 빼고, Edge Case를 §8(`EDGE-xxx`)로 정리한다.
+3. 수치·세팅·상태전이를 §5 Contract(`CTR-xxx`)로 빼고, Edge Case를 §8(`EDGE-xxx`)로 정리한다. 요구가 **기존 데이터의 특정 필드/형태**에 의존하면 실환경에 그 형태가 실제로 존재하는지 확인하는 EDGE를, **상태 확정·I/O를 유발하는 반복 트리거 조작**(`.claude/refs/interaction-integrity.md` §1 적용 대상)을 포함하면 연타 시 기대 동작 EDGE를 반드시 추가한다(판정·기재 기준은 `devoks-sdlc:feature-frd-author` 절차 4와 동일).
 4. §6 Resources(참고 코드·외부 문서·시안·API)와 §7 Constraints(위험/의존 제약·기술 제약)를 채운다. PR 분리 여부·개수는 이 단계에서 정하지 않는다(PLAN 단계 — `references/task-pr-splitting.md`).
 5. **§4 설계 스펙** — 복잡도 임계 초과 시 코드 패턴을 먼저 탐색(기존 상태관리·훅·유틸·모델)하고 **설계안을 제안·확인**한 뒤 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. 단순 기능은 §4.1만 간결히. → `references/design-spec.md`
 6. **누락 슬롯은 한 번에 모아 사용자에게 확인**한다(추측 금지 — 요구는 묻고, 설계는 제안 후 확인). 확정되면 `<out>/FRD.md` 작성.
 
-완료 기준: 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능. `FRD.md` 작성 시 frontmatter `status: draft → review`. → `references/progress-tracking.md`
+완료 기준: 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 기존 데이터 의존 요구·반복 트리거 조작 요구는 각각 해당 EDGE가 최소 1개 있음. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능. `FRD.md` 작성 시 frontmatter `status: draft → review`. → `references/progress-tracking.md`
 
 ## Phase 2 — PLAN 작성
 
@@ -86,7 +86,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 5. **커버리지 검증**: FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검(누락 0). → `references/traceability.md` 의 comm 스크립트.
 6. 확정되면 `<out>/PLAN.md` 작성. 누락이 있으면 담당 Task를 추가한 뒤에만 다음 단계로.
 
-완료 기준: 모든 Task가 `file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(기본 1개, 2개 이상이면 §1에 분리 근거 명시·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재. `PLAN.md` 작성 시 frontmatter `status: draft → approved`. → `references/progress-tracking.md`
+완료 기준: 모든 Task가 `size:`·`test:`·`file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `size`/`test` 분포 자기점검 통과(기준: `devoks-sdlc:feature-plan-author` 완료 기준, 부여 기준 SSOT는 `references/task-pr-splitting.md`), `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(기본 1개, 2개 이상이면 §1에 분리 근거 명시·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재. `PLAN.md` 작성 시 frontmatter `status: draft → approved`. → `references/progress-tracking.md`
 
 ## Phase 3 — 태스크 단계 실행
 
@@ -96,7 +96,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 2. **선행이 모두 `[x]`인 Task**를 골라 착수(세션 도구 in_progress). `[P]` Task는 함께 진행 가능.
 3. **브랜치·이슈 사전체크(최초 1회)** — 첫 구현 착수 직전, 현재 브랜치·연결 이슈를 확인하고 브랜치명·이슈 초안을 제안한 뒤 사용자 확인 후 적용한다(모드 `full`; 선택지는 AskUserQuestion 단일선택 — `branch-issue-precheck.md` §4). → `references/branch-issue-precheck.md`
 4. 각 Task: **`size` 마커로 라우팅 후 구현·검증** — `S`는 메인 루프 직접, `M`(및 마커 없음)은 `code-implementer` 위임(기본 경로), `L`은 분해 재검토(못 쪼개면 §1에 기록된 사유로 갈림 — 판단 축은 직접, 스펙 닫힘 축은 위임), 공통 예외(③ 스펙 미완결·① tools 밖 도구·② 사용자 직접 요청)는 직접. 위임 전 공통 예외 ③을 점검한다. 위임 시 Task 블록 원문·`plan`·`frd` 경로·`context`(인계 노트 윈도잉 적용)를 주입하면, 에이전트가 코드 읽기→기존 패턴 재사용 구현→테스트/린트 검증(`test: required` Task는 AC ID를 테스트 설명에 박아 양방향 추적, `test: skip`은 테스트 작성 생략)까지 수행하고 done|blocked 리포트를 리턴한다. 한 번에 한 태스크만. → `references/task-delegation.md`
-5. **리포트 판정 후 진행 갱신(메인 루프 수행)** — `done`은 검증 근거(실행 명령·**종료코드**·출력 **tail 1줄 원문**·`test: required` Task 시 테스트 파일·케이스명) 확인 후에만 PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `approved` → `in-progress`로(첫 착수 시), **인계 노트는 윈도잉 규칙에 맞게 수집해 다음 위임의 `context`에 주입**한다. `blocked`이면 `[x]`로 바꾸지 않고 에스컬레이션(스펙 문제→사용자 확인 후 재위임, 기계적 문제→직접 해소 후 재위임, 스코프 초과→인수·재분해), 막힌 이유를 명시한다.
+5. **리포트 판정 후 진행 갱신(메인 루프 수행)** — `done`은 검증 근거(실행 명령·**종료코드**·출력 **tail 1줄 원문**·포맷 실행 여부·`test: required` Task 시 테스트 파일·케이스명 — 하나라도 빠지면 done 아님, 재실행 트리거 해당 시 동일 명령 재실행) 확인 후에만 PLAN 체크박스 `- [ ]` → `- [x]`, frontmatter `status`를 `approved` → `in-progress`로(첫 착수 시), **인계 노트는 윈도잉 규칙에 맞게 수집해 다음 위임의 `context`에 주입**한다. `blocked`이면 `[x]`로 바꾸지 않고 에스컬레이션(스펙 문제→사용자 확인 후 재위임, 기계적 문제→직접 해소 후 재위임, 스코프 초과→인수·재분해), 막힌 이유를 명시한다.
 6. PR 경계는 **기록만** 한다(어떤 Task가 어느 PR인지). 커밋·푸시·PR 생성은 하지 않는다.
 
 ## Phase 4 — 마무리 / 검증

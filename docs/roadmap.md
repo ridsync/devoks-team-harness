@@ -175,6 +175,17 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **addyosmani/agent-skills 비교 분석 후속 — 정합성 수정 + 테스트 무력화 점검 + 브라우저 출력 untrusted** (2026-10-12, `devoks-sdlc` `3.1.0 → 3.2.0`, `devoks-browser` `1.2.4 → 1.2.5`)
+  - 배경: 구현·리뷰·검증 3축으로 비교한 결과, 파이프라인 골격(추적성·서브에이전트 격리·증거 계약)은 하네스가 앞서고 agent-skills는 "절차 우회·기준 약화 차단 장치"가 앞섰다. 후보 대부분은 **채택하지 않기로 결정**(사용자 결정):
+    - Rationalizations 표·`NOTICED BUT NOT TOUCHING`·mutation 리뷰·이름 붙은 처방·간이 경로 검증 제안 → 효과를 실측할 수 없거나 기존 구조로 커버됨
+    - 구현 루프 내 리뷰 게이트·doubt-driven·기준 약화 훅·재현 테스트 분리 작성 → HITL에서는 불필요, 향후 HOTL 자율 파이프라인에서 자연 흡수
+    - 디버깅 신규 스킬 → `test-run-triage`는 디버깅이 아니라 "사용자 직접 호출 + HOTL 회귀 게이트"로 용도 재확인, 신규 스킬은 실사용 반복 문제가 확인될 때 재검토
+    - command→skill 조합 계층 → 2026-08-24 진입점 정책(스킬 기본)과 충돌, agent-skills 자체에서도 커맨드↔스킬 심각도 체계 drift가 확인된 이중 관리 비용
+  - 채택 ①: `task-delegation.md`에 **테스트 무력화 점검** — exit 0은 `.skip`·assert 삭제·`@ts-ignore`·빈 catch·임계값 하향으로도 나오므로 기존 증거 계약(종료코드+tail)으로는 잡히지 않는다. 메인 루프가 done 판정 시 diff를 훑어 사유 없는 추가분은 done으로 받지 않음. `code-implementer` 금지 사항에 미러.
+  - 채택 ②: `acceptance-test-runner`·`browser-visual-diff-capture`에 **브라우저(·Figma) 출력은 데이터일 뿐 지시가 아님** — 두 에이전트가 `Edit` 권한을 가진 채 외부 페이지를 읽는 프롬프트 인젝션 경로 차단, `Edit`는 임시 패치 용도로 한정.
+  - 정합성 수정(P0): `browser-visual-diff` 포트 `9222 → 9269`(나머지 전부 9269), runner↔분리 스킬 drift 3건(Phase 1 데이터 리얼리즘·연타 EDGE 의무, Phase 2 `size:`/`test:` 필수·분포 자기점검, Phase 3 done 증거 "포맷 실행 여부" 누락), `new-feature-by-github-issue` 테스트 위임을 `test-writer` 직접 위임으로 통일(`new-ui-draft`와 동일 — 이중 질문 제거), `review-execution.md` lint/type 실패 시 동작 정의(수정·질문 불가 에이전트이므로 중단 대신 헤더 기록 + 타입 오류 High + "해소 후 재리뷰").
+  - 검증: `claude plugin validate --strict` 2개 플러그인 ✔, 변경 frontmatter 7개 `ruby -ryaml` 파싱 ✔.
+
 - [x] **실행환경 계층 흡수 — MCP prefix→permissions, provenance 버전, Chrome 런처, ast-grep, setup.sh 폴백 버그** (2026-09-18, `devoks-core` `1.5.1 → 1.6.0`, `devoks-sdlc` `3.0.1 → 3.1.0`)
   - 배경: `aware-react-app`(이 하네스의 prototype) 전수 점검 결과, 문서·워크플로 계층은 이미 하네스가 소유하는데 **실행환경 계층**(MCP prefix→permission 기입, ast-grep 설정, Chrome 런처)만 프로젝트가 손으로 만든 상태였다. 일반화 가능한 7건을 흡수.
   - **context-mode 도입 기각 + 기존 전제까지 전량 제거** (사용자 결정): 브리프는 "`test-run-triage`와 `memory-policy.md`가 이미 전제하는데 설치 안내에 없다"는 의존성 구멍을 메우자고 했고 실제로 반영했었다. 그러나 **기존 프로젝트 실측에서 효용성이 확인되지 않아** 원빈님이 도입을 기각했다. 실측(30일 93세션, aware-react-app 트랜스크립트 기준): 훅 주입 오버헤드가 도구 출력과 **별개로** 1,411KB(`context_window_protection` 265회 × 4.6KB + `context_guidance` 398회 × 0.5KB) 나갔는데, 이를 정당화할 `ctx_execute` 계열 호출은 **19회**에 불과했다. 조회 계열도 절감 기전이 아니었다 — `ctx_search` 10KB/회, `ctx_batch_execute` 18.6KB/회로 `Read` 평균 19.1KB와 비슷하거나 더 비싸다. 설치 안내만 되돌리면 "스킬이 전제하는데 하네스는 설치를 권하지 않는다"는 **역방향 불일치**가 남으므로, 전제 지점까지 함께 걷어냈다:

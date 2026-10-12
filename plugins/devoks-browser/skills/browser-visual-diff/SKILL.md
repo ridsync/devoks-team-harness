@@ -3,7 +3,7 @@ description: Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 �
 argument-hint: "figma-url=<URL> component=<경로> route=<라이브 라우트> [design-guide=<경로>] [out=<디렉터리> (default: 활성 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # browser-visual-diff
@@ -30,7 +30,7 @@ Phase 1~4는 `browser-visual-diff-capture` 에이전트가 수행하며, 에이�
 
 1. **Chrome DevTools MCP 스키마를 먼저 로드한다.**
 2. **디버깅 가능한 Chrome 브라우저 연결 상태를 사전 확인한다** (`list_pages` 호출):
-   - 연결 실패 → 에이전트가 리포트에 "Chrome DevTools MCP 연결 실패" 기록 → 이 스킬(메인 루프)에서 사용자에게 1줄 요청: `"Chrome 브라우저를 --remote-debugging-port=9222 옵션으로 실행해 주세요."` 후 재시도.
+   - 연결 실패 → 에이전트가 리포트에 "Chrome DevTools MCP 연결 실패" 기록 → 이 스킬(메인 루프)에서 사용자에게 1줄 요청: `"Chrome 브라우저를 --remote-debugging-port=9269 옵션으로 실행해 주세요."` 후 재시도.
 3. **Chrome DevTools MCP 호출이 실패한 경우에만** Playwright MCP로 폴백.
 
 ## 호출 방법
@@ -113,7 +113,7 @@ Phase 0에서 확정된 슬롯 값으로 `browser-visual-diff-capture` 에이전
 에이전트가 리포트를 리턴하면 그대로 수령한다.
 
 **예외 처리**: 에이전트 리포트에 "Chrome DevTools MCP 연결 실패"가 포함된 경우,
-사용자에게 1줄로 요청한다: `"Chrome 브라우저를 --remote-debugging-port=9222 옵션으로 실행해 주세요."` → 확인 후 에이전트 재시도.
+사용자에게 1줄로 요청한다: `"Chrome 브라우저를 --remote-debugging-port=9269 옵션으로 실행해 주세요."` → 확인 후 에이전트 재시도.
 
 ---
 
