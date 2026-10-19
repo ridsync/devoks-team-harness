@@ -218,7 +218,7 @@ if project_convention_ready; then
   _core_ver="$(installed_core_version)" || _core_ver=""
   _prov_ver="$(provenance_core_version)" || _prov_ver=""
   if [[ -n "$_core_ver" && "$_prov_ver" != "$_core_ver" ]] && base_files_differ; then
-    add_stale_setup "- base rules/refs가 devoks-core ${_prov_ver:-미기록} 기준입니다 (현재 ${_core_ver}). /devoks-core:setup-project-convention 재실행 권장 (project-convention.md는 diff 모드로 보존)."
+    add_stale_setup "- base rules/refs가 devoks-core ${_prov_ver:-미기록} 기준입니다 (현재 ${_core_ver}). /devoks-core:project-convention-manage 로 base 갱신 권장 (preset 재선택 불필요, project-convention.md는 건드리지 않음)."
   fi
 fi
 

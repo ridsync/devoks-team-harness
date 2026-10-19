@@ -147,14 +147,15 @@ metadata 예시:
 SessionStart 훅이 판정하는 기준이다. 훅은 이 값이 설치 버전과 다르고 **또한** base 파일 내용이 실제로
 다를 때만 1줄 경고한다 — 버전만 비교하면 base를 건드리지 않은 patch bump에서 오탐이 난다.
 필드가 없는 구버전 provenance는 훅이 `source` 경로의 `/devoks-core/<version>/`에서 회수하므로,
-이 필드를 추가하려고 기존 프로젝트를 재설정할 필요는 없다.
+이 필드를 추가하려고 기존 프로젝트를 재설정할 필요는 없다. 경고가 나오면 이 커맨드를 다시 돌리지 않고
+`devoks-core:project-convention-manage`의 "base 갱신"으로 base 7종만 교체한다(preset 재선택 불필요).
 
 ### 7. 후속 안내
 
 적용 후 아래를 짧게 안내한다.
 
 - `.claude/rules/project-convention.md`는 이제 **프로젝트 active convention**이며 자동 overwrite 되지 않음
-- preset 전환 / diff / selective apply는 `devoks-core:project-convention-manage` 흐름으로 수행
+- preset 전환 / diff / selective apply, devoks-core 업데이트 후 base rules/refs 갱신은 `devoks-core:project-convention-manage` 흐름으로 수행
 - `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files가 비어 있으면 함께 정리 권장
 - preset은 starter이므로 placeholder와 pitfall 섹션을 프로젝트 실정에 맞게 채워야 함
 

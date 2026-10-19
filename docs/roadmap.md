@@ -175,6 +175,11 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **base rules/refs 갱신 경로 신설 — `project-convention-manage` "base 갱신"** (2026-10-19, `devoks-core` `1.7.0 → 1.8.0`)
+  - 배경: 1.7.0에서 `agent-principles.md`를 바꾼 뒤 대상 프로젝트에서 `project-convention-manage`를 돌렸지만 반영되지 않았다. 이 스킬은 `project-convention.md`(presetHash)만 관리했고, base 7종을 복사하는 경로는 `setup-project-convention` 재실행(preset 재선택·convention diff 질문 포함)뿐이었다.
+  - 반영: `project-convention-manage`에 "base 갱신" 작업 유형을 추가했다. 7종을 파일 단위 `cmp`로 비교하고, diff 요약 → 확인 → `command cp -f` → `devoksCoreVersion` 갱신 순으로 진행한다. 로컬 수정 흔적은 덮어쓰기 경고와 함께 `project-convention.md`로 옮기도록 제안한다. "점검" 요청에도 base 최신 여부를 포함한다. SessionStart 훅의 stale 안내와 `setup-project-convention` 후속 안내도 이 경로를 가리키도록 바꿨다.
+  - 검증: 훅 스모크 3케이스(버전 갭+파일 차이 → 경고 1건, 파일만 맞춤 → 0, 버전 갱신 후 → 0), `bash -n`, `validate --strict`. 스모크 중 `cp -i` 별칭이 덮어쓰기를 거부하는 함정을 발견해 절차에 `command cp -f`를 명시했다.
+
 - [x] **ponytail 비교 검토 후속 — 안전 하한·재사용 사다리·미확인/리스크 보고·리뷰 Lean·테스트 필요 판정** (2026-10-19, `devoks-core` `1.6.0 → 1.7.0`, `devoks-sdlc` `3.2.0 → 3.3.0`)
   - 배경: `DietrichGebert/ponytail` v5.3.2(YAGNI·최소 코드 페르소나 플러그인)를 검토했다. 플러그인 자체는 병행 가능하지만 SubagentStart 주입이 devoks 에이전트의 리포트 스키마·테스트 설계 계약과 충돌하고, band·코드베이스 맵은 claude-hud·codegraph와 중복되어 채택하지 않았다. 규칙 문구만 흡수했다.
   - 채택: `agent-principles.md` — YAGNI 문장에서 "error handling"을 제거하고 **Safety Floor**를 신설(ponytail 자체 벤치마크에서 맨 YAGNI 프롬프트가 안전 가드를 빠뜨림), **Reuse-First Ladder** 신설, #6에 테스트 필요 신호, #8에 미확인·리스크 1~2줄. `code-implementer` 2단계에 재사용 사다리 inline. `task-delegation.md` done 스키마에 **미확인·리스크(필수)** 필드를 추가하고, runner/executor 마무리 보고에서 수집. `task-pr-splitting.md`의 `test: required` 신호(반복·파싱·금액/보안·버그 수정·신규 스크립트)와 하한(깨지면 실패하는 테스트 1개). `code-review` 로컬 체크리스트 6항목(Lean)·가정한 부하·통번호·먼저 고칠 항목(공유 SSOT `refs/code-review.md`는 2026-07-20 결정대로 불변).

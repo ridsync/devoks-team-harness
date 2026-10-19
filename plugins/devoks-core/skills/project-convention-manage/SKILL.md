@@ -1,12 +1,16 @@
 ---
-description: 현재 프로젝트의 active convention을 점검하고, preset provenance 확인·diff·selective apply·재적용·스택 전환을 안전하게 수행한다.
+description: 현재 프로젝트의 active convention을 점검하고, preset provenance 확인·diff·selective apply·재적용·스택 전환과 devoks-core 업데이트 후 base rules/refs 갱신을 안전하게 수행한다.
 ---
 
 # Project Convention Manage
 
 ## Overview
 
-이 스킬은 현재 프로젝트의 `.claude/rules/project-convention.md`를 관리한다.
+이 스킬은 현재 프로젝트의 두 가지를 관리한다.
+
+- **active convention** — `.claude/rules/project-convention.md` (preset에서 출발해 프로젝트가 커스터마이징하는 파일)
+- **base rules/refs 7종** — `setup-project-convention`이 복사한 devoks-core 원본 사본. devoks-core가 업데이트되면 여기서 갱신한다(preset 재선택 불필요)
+
 핵심 원칙은 **자동 overwrite 금지**이며, 항상 현황 파악 → diff 설명 → 사용자 확인 → 적용 순서를 따른다.
 
 ---
@@ -14,8 +18,9 @@ description: 현재 프로젝트의 active convention을 점검하고, preset pr
 ## SSOT
 
 - 프로젝트 active convention: `.claude/rules/project-convention.md`
-- preset provenance metadata: `.claude/project-convention.json`
+- preset provenance metadata: `.claude/project-convention.json` (`presetHash` = preset 기준, `devoksCoreVersion` = base 기준)
 - preset 원본: `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md`
+- base rules/refs 원본(7종, 목록 SSOT는 `hooks/check-setup-state.sh`의 `BASE_FILES`): `${CLAUDE_PLUGIN_ROOT}/rules/{agent-principles,memory-policy}.md`, `${CLAUDE_PLUGIN_ROOT}/refs/{code-review,engineering-principles,git-convention,interaction-integrity,workflow}.md` → 프로젝트 `.claude/rules/`·`.claude/refs/` 같은 이름
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
 
 ---
@@ -29,6 +34,7 @@ description: 현재 프로젝트의 active convention을 점검하고, preset pr
 - React Web / React Native / Android / iOS / Custom 간 전환
 - `.claude/CLAUDE.md`와 convention 사이의 stack drift 점검
 - legacy convention이 bundled copy 잔재인지, 실제 프로젝트 커스터마이징인지 추정
+- devoks-core 업데이트 후 base rules/refs 7종 갱신 (아래 "base 갱신" 절)
 
 ---
 
@@ -72,6 +78,9 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - **전환**: 다른 preset으로 변경
 - **정리**: 현재 convention을 구조적으로 정돈
 - **선택 반영**: 일부 섹션만 가져오기
+- **base 갱신**: devoks-core 업데이트분을 base rules/refs 7종에 반영 — 아래 "base 갱신" 절로 바로 간다(3~5단계는 project-convention.md 전용)
+
+"점검" 요청이면 base 7종의 최신 여부(아래 절 1단계)도 함께 보고한다.
 
 ### 3. drift / provenance 판단
 
@@ -124,6 +133,21 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - 유지한 로컬 커스터마이징
 - 추가로 프로젝트 실제 값으로 바꿔야 할 preset 예시 항목 (Stack, Project Decisions 등)
 - 필요 시 다음 액션 (`CLAUDE.md` 보강, 테스트 스택 명시, UI guideline SSOT 연결 등)
+
+---
+
+## base 갱신
+
+base 7종은 프로젝트가 커스터마이징하는 파일이 아니라 devoks-core 원본의 사본이다. 그래서 preset 선택·섹션 단위 selective apply 없이 **파일 단위**로 비교·교체한다.
+
+1. **차이 확인** — 7종 각각에 대해 `cmp -s "${CLAUDE_PLUGIN_ROOT}/<rel>" ".claude/<rel>"`로 비교해 `동일 / 변경 / 프로젝트에 없음`으로 분류한다. 설치된 devoks-core 버전(`basename "${CLAUDE_PLUGIN_ROOT}"`, 버전 형태가 아니면 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `${CLAUDE_PLUGIN_ROOT}/plugin.json`의 `version`)과 provenance의 `devoksCoreVersion`도 함께 보여준다. 전부 동일하면 "base 최신"으로 보고하고 끝낸다(버전만 다르면 4단계의 `devoksCoreVersion` 갱신만 제안).
+2. **diff 요약** — `변경` 파일마다 `diff -u <프로젝트 사본> <원본>`을 읽고, 추가·삭제된 규칙을 파일당 1~3줄로 요약한다. raw diff를 통째로 던지지 않는다.
+   - 프로젝트 사본에만 있는 줄(로컬 수정 흔적)이 보이면 **덮어쓰면 사라진다**고 명시한다. 프로젝트 고유 규칙은 base가 아니라 `project-convention.md`에 두도록 이전을 제안한다.
+3. **사용자 확인** — 갱신할 파일을 확인받는다(기본: `변경`·`프로젝트에 없음` 전부, 사용자가 일부 제외 가능).
+4. **적용** — 확인된 파일만 원본으로 복사(`command cp -f` — 사용자 셸 프로필의 `cp -i` 별칭이 덮어쓰기를 조용히 거부하는 것을 피한다)하고, `.claude/project-convention.json`의 `devoksCoreVersion`을 설치 버전으로 갱신한다(다른 필드는 그대로). 일부 파일을 제외했으면 그 사실을 리포트에 남긴다 — 이 경우에도 버전은 갱신해 SessionStart 경고가 반복되지 않게 하되, 제외 목록을 리포트에 명시한다.
+5. **리포트** — 갱신한 파일·제외한 파일·버전 변화(`<이전> → <현재>`)·이전이 필요한 로컬 수정 흔적.
+
+`project-convention.md`는 이 절에서 건드리지 않는다. provenance(`.claude/project-convention.json`)가 없는 프로젝트는 setup을 거치지 않은 것이므로 `/devoks-core:setup-project-convention`으로 안내한다.
 
 ---
 
