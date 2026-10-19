@@ -218,7 +218,25 @@ if project_convention_ready; then
   _core_ver="$(installed_core_version)" || _core_ver=""
   _prov_ver="$(provenance_core_version)" || _prov_ver=""
   if [[ -n "$_core_ver" && "$_prov_ver" != "$_core_ver" ]] && base_files_differ; then
-    add_stale_setup "- base rules/refs가 devoks-core ${_prov_ver:-미기록} 기준입니다 (현재 ${_core_ver}). /devoks-core:project-convention-manage 로 base 갱신 권장 (preset 재선택 불필요, project-convention.md는 건드리지 않음)."
+    add_stale_setup "- base rules/refs가 devoks-core ${_prov_ver:-미기록} 기준입니다 (현재 ${_core_ver}). /devoks-core:setup-preset-manage 로 base 갱신 권장 (preset 재선택 불필요, project-convention.md는 건드리지 않음)."
+  fi
+fi
+
+# setup-mcp가 ~/.devoks에 복사한 스크립트도 플러그인 업데이트를 따라가지 않는다.
+# 사본이 있을 때(=setup을 거쳤을 때)만 비교한다 — 없으면 설치 안내는 위 MCP 점검이 맡는다.
+script_stale() { [[ -f "$1" && -f "$2" ]] && ! cmp -s "$1" "$2"; }
+_root="$(bundle_root)" || _root=""
+if [[ -n "$_root" ]]; then
+  script_stale "$_root/assets/chrome-debug.sh" "$HOME/.devoks/bin/chrome-debug.sh" &&
+    add_stale_setup "- ~/.devoks/bin/chrome-debug.sh 가 devoks-core 번들 런처와 다릅니다. /devoks-core:setup-preset-manage 로 갱신 권장."
+
+  # devoks-rn은 다른 플러그인이라 CLAUDE_PLUGIN_ROOT로 닿지 않는다. 캐시 구조
+  # (cache/<marketplace>/<plugin>/<version>/)상 같은 marketplace 아래 형제이고,
+  # 저장소 직접 실행이면 plugins/ 아래 형제다. 버전 디렉토리가 여럿이면 최신만 본다.
+  if [[ -f "$HOME/.devoks/mcp/metro-mcp.js" ]]; then
+    _rn_src="$(ls -d "$_root"/../../devoks-rn/*/scripts/metro-mcp.js "$_root"/../devoks-rn/scripts/metro-mcp.js 2>/dev/null | sort -V | tail -1)"
+    [[ -n "$_rn_src" ]] && script_stale "$_rn_src" "$HOME/.devoks/mcp/metro-mcp.js" &&
+      add_stale_setup "- ~/.devoks/mcp/metro-mcp.js 가 설치된 devoks-rn 원본과 다릅니다. /devoks-core:setup-preset-manage 로 갱신 권장 (갱신 후 Claude Code 재시작)."
   fi
 fi
 

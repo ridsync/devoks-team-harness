@@ -102,6 +102,7 @@ agent frontmatter의 `tools:`는 **화이트리스트**다 — 거기 없는 도
 ### devoks-core
 - `rules/`, `refs/`, hook 변경 시 루트 `.claude/` 사본과 관계
 - `check-setup-state.sh`, explicit setup/sync 정책 문서와 설명 일치 여부
+- **setup 산출물 등록** — 플러그인 밖(대상 프로젝트 `.claude/`, `~/.devoks/` 등)으로 파일을 복사하는 변경(어느 플러그인이든)은 `skills/setup-preset-manage/SKILL.md` Overview 표 + 갱신 절차와 `check-setup-state.sh` stale 감지에 함께 등록한다. 미등록 산출물은 플러그인 업데이트 후 조용히 옛 버전으로 남는다(2026-10-19 base rules 미반영 사례). 복사 대상은 번들 원본과 바이트 동일하게 유지한다(사용자별 값은 별도 파일로 — `chrome-debug.url` 패턴)
 
 ### devoks-sdlc
 - 구 devoks-code/devoks-feature/devoks-test/devoks-verify 통합체 — skill·command·agent 수가 5개 플러그인 중 가장 많아 변경 영향 범위가 가장 넓다(정확한 개수는 하드코딩하지 않는다 — 드리프트하므로 `ls skills/*/ commands/*.md agents/*.md`로 확인)

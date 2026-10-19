@@ -16,7 +16,7 @@ metadata:
 
 - **생성기 vs 산출물 소유가 다르다.** devoks-sdlc는 이 생성기(`new-smoke-test-draft`)만 소유·유지보수한다.
   생성된 스킬은 쓰이는 즉시 **완전히 대상 프로젝트 소유**로 넘어간다 — devoks-sdlc는 그 이후 어떤 동기화·재적용
-  관계도 갖지 않는다(`devoks-core:project-convention-manage`류 drift 감지·재적용 스킬을 만들지 않는다).
+  관계도 갖지 않는다(`devoks-core:setup-preset-manage`류 drift 감지·재적용 스킬을 만들지 않는다).
 - **이 스킬은 "설치된 대상 프로젝트"에서 쓰라고 만든 것이다.** 이 harness 저장소(`devoks-team-harness`)
   자신에는 스캔할 실제 앱 라우트가 없으므로 이 저장소 자기 자신을 대상으로 실행하지 않는다.
 - 라우트 감지는 **추천 근거일 뿐 SSOT가 아니다** — 화면 목록은 반드시 쓰기 전에 사용자 확인을 거친다

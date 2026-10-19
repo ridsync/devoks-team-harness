@@ -175,6 +175,11 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **`project-convention-manage` → `setup-preset-manage` 개명 + setup 산출물 4종 통합 관리** (2026-10-19, `devoks-core` `1.8.0 → 2.0.0`, `devoks-sdlc` `3.3.0 → 3.3.1`)
+  - 배경: 플러그인 스킬은 업데이트를 따라가지만, setup이 플러그인 밖으로 복사한 파일은 남는다. 조사 결과 base rules/refs 외에 `~/.devoks/bin/chrome-debug.sh`와 `~/.devoks/mcp/metro-mcp.js`도 업데이트 감지가 없었다. 자동 동기화(3-way 해시)는 구조 복잡도 때문에 **기각**하고(사용자 결정, `1ac291e`의 명시적 setup 원칙 유지), **수동 갱신 + 훅 감지**로 누락을 막는다. 근거: 공식 문서상 설치/업데이트 훅이 없고 SessionStart가 유일한 시점이다.
+  - 반영: 스킬을 `setup-preset-manage`로 개명했다(호출명 변경 → major). Overview에 산출물 4종 표를 두고, "~/.devoks 스크립트 갱신" 절과 "업데이트 후 일괄 점검" 작업 유형을 추가했다. `chrome-debug.sh`는 `setup-mcp` 본문 인라인에서 `assets/chrome-debug.sh` 번들 파일로 분리했고, 기본 URL을 `~/.devoks/chrome-debug.url`로 빼서 사본이 원본과 바이트 동일하게 유지되게 했다(구버전 URL 이전은 스킬 절차에 포함). 훅은 두 스크립트의 원본 대비 차이를 감지한다. devoks-rn 원본은 공식 캐시 구조상 형제 디렉토리에서 찾고(`installed_plugins.json`은 비공개 포맷이라 미사용), 저장소 직접 실행 폴백도 지원한다. maintainer 체크리스트에 "setup 산출물 등록" 항목을 추가했다.
+  - 검증: 훅 스모크 5케이스(사본 없음 → 0, 구버전 런처+stale metro → 2(`sort -V`로 1.10.0 선택), 갱신 후 → 0, 저장소 폴백 stale → 1, 폴백 동일 → 0), `bash -n`, `validate --strict` 2/2, frontmatter 파싱.
+
 - [x] **base rules/refs 갱신 경로 신설 — `project-convention-manage` "base 갱신"** (2026-10-19, `devoks-core` `1.7.0 → 1.8.0`)
   - 배경: 1.7.0에서 `agent-principles.md`를 바꾼 뒤 대상 프로젝트에서 `project-convention-manage`를 돌렸지만 반영되지 않았다. 이 스킬은 `project-convention.md`(presetHash)만 관리했고, base 7종을 복사하는 경로는 `setup-project-convention` 재실행(preset 재선택·convention diff 질문 포함)뿐이었다.
   - 반영: `project-convention-manage`에 "base 갱신" 작업 유형을 추가했다. 7종을 파일 단위 `cmp`로 비교하고, diff 요약 → 확인 → `command cp -f` → `devoksCoreVersion` 갱신 순으로 진행한다. 로컬 수정 흔적은 덮어쓰기 경고와 함께 `project-convention.md`로 옮기도록 제안한다. "점검" 요청에도 base 최신 여부를 포함한다. SessionStart 훅의 stale 안내와 `setup-project-convention` 후속 안내도 이 경로를 가리키도록 바꿨다.

@@ -101,7 +101,7 @@ DevOKs 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
 
    4. Claude Code를 재시작하면 `mcp__metro-devtools__*` 도구가 활성화된다.
 
-   ⚠ `devoks-rn` 플러그인 업데이트 후에는 2·3단계를 재실행해 스크립트를 갱신한다.
+   ⚠ `devoks-rn` 플러그인 업데이트 후에는 `/devoks-core:setup-preset-manage`로 스크립트를 갱신한다(SessionStart 훅이 차이를 감지하면 안내한다). MCP 등록(3단계)은 경로가 같으므로 다시 할 필요가 없다.
 
 6. **chrome-devtools-attach (visual-diff·data-verify 필수 — figma·playwright와 동일하게 플러그인 경로)**
    - 이 서버는 `devoks-browser` 플러그인이 번들한다(`:9269` attach 고유 설정, prefix `mcp__chrome-devtools-attach__*`).
@@ -117,50 +117,16 @@ DevOKs 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
    (프로젝트마다 dev server 포트가 다르다).
 
    1. 시작 URL의 기본값을 사용자에게 **확인받는다** — 추정하지 않는다(현재 실행 중인 dev server 주소).
-      기존 `~/.devoks/bin/chrome-debug.sh`가 있으면 덮어쓰기 전에도 확인받는다(로컬에서 손봤을 수 있다).
+      확인받은 값을 `~/.devoks/chrome-debug.url`에 한 줄로 저장한다(런처가 인자 없이 실행될 때 읽는 기본값).
 
-   2. 아래 내용을 `~/.devoks/bin/chrome-debug.sh`로 **생성**하고 `chmod +x`한다.
-      `<기본_URL>`은 1단계에서 확인받은 값으로 치환한다(shell 히어독으로 붙여넣지 말고 파일로 직접 쓴다 —
-      들여쓰기된 히어독은 종료 구분자가 0열이 아니어서 깨진다).
-
-```bash
-#!/usr/bin/env bash
-# chrome-debug.sh — chrome-devtools-attach(:9269) 전용 Chrome 실행기
-#
-# 포트와 user-data-dir은 devoks-browser 번들이 attach 대상으로 기대하는 값이라 고정이다.
-# 전용 user-data-dir을 쓰는 이유: 평소 프로필로 디버그 포트를 열면 이미 떠 있는
-# Chrome 인스턴스에 흡수돼 포트가 열리지 않는다.
-set -euo pipefail
-
-PORT=9269
-USER_DATA_DIR="$HOME/.claude/chrome-dev-mcp"
-START_URL="${1:-<기본_URL>}"
-
-# 이미 떠 있으면 재실행하지 않는다 — 같은 포트에 두 인스턴스가 붙으면 attach가 충돌한다.
-if curl -sf -m 2 "http://127.0.0.1:${PORT}/json/version" >/dev/null 2>&1; then
-  echo "이미 :${PORT} 에서 디버그 모드로 실행 중입니다."
-  exit 0
-fi
-
-case "$(uname -s)" in
-  Darwin) CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ;;
-  Linux)  CHROME="$(command -v google-chrome || command -v chromium || true)" ;;
-  *)      echo "지원하지 않는 OS: $(uname -s)" >&2; exit 1 ;;
-esac
-
-if [[ -z "${CHROME:-}" || ! -x "$CHROME" ]]; then
-  echo "Chrome 실행 파일을 찾지 못했습니다: ${CHROME:-<없음>}" >&2
-  exit 1
-fi
-
-mkdir -p "$USER_DATA_DIR"
-"$CHROME" \
-  --remote-debugging-port="$PORT" \
-  --user-data-dir="$USER_DATA_DIR" \
-  "$START_URL" >/dev/null 2>&1 &
-
-echo "Chrome 디버그 모드 실행: :${PORT} → ${START_URL}"
-```
+   2. 번들 런처를 devoks 관리 경로에 복사하고 실행 권한을 준다. 기존 `~/.devoks/bin/chrome-debug.sh`가
+      있고 번들과 다르면 덮어쓰기 전에 확인받는다(로컬에서 손봤을 수 있다). 런처 본문에는 URL을 넣지 않는다 —
+      번들 원본과 바이트 동일해야 `devoks-core:setup-preset-manage`가 업데이트 여부를 판정할 수 있다.
+      ```bash
+      mkdir -p ~/.devoks/bin
+      command cp -f "${CLAUDE_PLUGIN_ROOT}/assets/chrome-debug.sh" ~/.devoks/bin/chrome-debug.sh
+      chmod +x ~/.devoks/bin/chrome-debug.sh
+      ```
 
    3. 실행·연결 확인:
       ```bash

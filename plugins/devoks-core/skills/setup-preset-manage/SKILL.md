@@ -1,17 +1,24 @@
 ---
-description: 현재 프로젝트의 active convention을 점검하고, preset provenance 확인·diff·selective apply·재적용·스택 전환과 devoks-core 업데이트 후 base rules/refs 갱신을 안전하게 수행한다.
+name: setup-preset-manage
+description: devoks setup(setup-project-convention·setup-mcp)이 플러그인 밖에 남긴 산출물을 점검·갱신한다 — active convention의 preset provenance 확인·diff·selective apply·재적용·스택 전환, devoks 플러그인 업데이트 후 base rules/refs와 ~/.devoks 스크립트(chrome-debug.sh·metro-mcp.js) 갱신. "devoks 업데이트 후 갱신", "base 갱신", "convention 점검", "preset 전환" 요청에서 사용한다.
 ---
 
-# Project Convention Manage
+# Setup Preset Manage
 
 ## Overview
 
-이 스킬은 현재 프로젝트의 두 가지를 관리한다.
+플러그인 스킬·에이전트·훅은 플러그인 업데이트와 함께 자동으로 최신이 되지만, setup이 **플러그인 밖으로 복사한 파일은 그대로 남는다.**
+이 스킬은 그 산출물 전부를 한 곳에서 점검·갱신한다. devoks 플러그인을 업데이트한 뒤 이 스킬을 한 번 실행하는 것이 표준 절차다.
 
-- **active convention** — `.claude/rules/project-convention.md` (preset에서 출발해 프로젝트가 커스터마이징하는 파일)
-- **base rules/refs 7종** — `setup-project-convention`이 복사한 devoks-core 원본 사본. devoks-core가 업데이트되면 여기서 갱신한다(preset 재선택 불필요)
+| 산출물 | 위치 | 원본 | 성격 | 다루는 절 |
+|---|---|---|---|---|
+| active convention | `.claude/rules/project-convention.md` | `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/` | preset에서 출발해 **프로젝트가 커스터마이징** | Steps 1~6 (섹션 단위) |
+| base rules/refs 7종 | `.claude/rules/`·`.claude/refs/` | `${CLAUDE_PLUGIN_ROOT}/rules·refs/` | 원본 사본 | "base 갱신" (파일 단위) |
+| `chrome-debug.sh` | `~/.devoks/bin/` | `${CLAUDE_PLUGIN_ROOT}/assets/chrome-debug.sh` | 원본 사본 (기본 URL은 `~/.devoks/chrome-debug.url`에 별도) | "~/.devoks 스크립트 갱신" |
+| `metro-mcp.js` | `~/.devoks/mcp/` | devoks-rn 플러그인 `scripts/metro-mcp.js` | 원본 사본 | "~/.devoks 스크립트 갱신" |
 
 핵심 원칙은 **자동 overwrite 금지**이며, 항상 현황 파악 → diff 설명 → 사용자 확인 → 적용 순서를 따른다.
+SessionStart 훅(`hooks/check-setup-state.sh`)은 위 산출물이 원본과 달라졌을 때 이 스킬을 안내만 하고, 직접 고치지 않는다.
 
 ---
 
@@ -35,6 +42,7 @@ description: 현재 프로젝트의 active convention을 점검하고, preset pr
 - `.claude/CLAUDE.md`와 convention 사이의 stack drift 점검
 - legacy convention이 bundled copy 잔재인지, 실제 프로젝트 커스터마이징인지 추정
 - devoks-core 업데이트 후 base rules/refs 7종 갱신 (아래 "base 갱신" 절)
+- devoks-core·devoks-rn 업데이트 후 `~/.devoks` 스크립트 갱신 (아래 "~/.devoks 스크립트 갱신" 절)
 
 ---
 
@@ -79,8 +87,10 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - **정리**: 현재 convention을 구조적으로 정돈
 - **선택 반영**: 일부 섹션만 가져오기
 - **base 갱신**: devoks-core 업데이트분을 base rules/refs 7종에 반영 — 아래 "base 갱신" 절로 바로 간다(3~5단계는 project-convention.md 전용)
+- **스크립트 갱신**: `~/.devoks` 스크립트를 최신 원본으로 교체 — 아래 "~/.devoks 스크립트 갱신" 절로 바로 간다
+- **업데이트 후 일괄 점검**("devoks 업데이트했어", "전부 최신인지 봐줘"): 4종 모두의 최신 여부를 한 표로 보여준 뒤, 달라진 항목만 해당 절로 진행한다
 
-"점검" 요청이면 base 7종의 최신 여부(아래 절 1단계)도 함께 보고한다.
+"점검" 요청이면 convention 외에 base 7종과 `~/.devoks` 스크립트의 최신 여부(각 절 1단계)도 함께 보고한다.
 
 ### 3. drift / provenance 판단
 
@@ -151,6 +161,25 @@ base 7종은 프로젝트가 커스터마이징하는 파일이 아니라 devoks
 
 ---
 
+## ~/.devoks 스크립트 갱신
+
+`setup-mcp`가 사용자 홈에 복사한 실행 스크립트다. 프로젝트와 무관한 user 단위 산출물이므로 provenance 없이 원본과 직접 비교한다. **사용자 파일이 없으면 setup을 안 한 것이므로 건너뛴다**(새로 만들지 않는다 — 설치는 `/devoks-core:setup-mcp` 소관).
+
+1. **원본 위치 확인**
+   - `chrome-debug.sh`: `${CLAUDE_PLUGIN_ROOT}/assets/chrome-debug.sh`
+   - `metro-mcp.js`: devoks-rn은 다른 플러그인이라 `${CLAUDE_PLUGIN_ROOT}`로 닿지 않는다. 공식 캐시 구조(`~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/`)에서 찾는다 — `setup-mcp` Step 5와 같은 방식:
+     ```bash
+     find ~/.claude/plugins/cache/devoks-plugins/devoks-rn -name metro-mcp.js -path "*/scripts/*" 2>/dev/null | sort -V | tail -1
+     ```
+     결과가 없으면 devoks-rn 미설치로 보고하고 이 항목은 건너뛴다.
+2. **차이 확인** — `cmp -s <원본> <사용자 파일>`로 `동일 / 변경`을 판정한다. `변경`이면 `diff -u <사용자 파일> <원본>`을 읽고 1~3줄로 요약한다.
+   - **`chrome-debug.sh` 구버전 이전**: devoks-core 2.0.0 이전 런처는 기본 URL을 본문(`START_URL="${1:-<URL>}"`)에 박아 넣었다. 그 줄에서 URL을 추출해 `~/.devoks/chrome-debug.url`이 없으면 그 값으로 만들도록 함께 제안한다(교체 후에도 인자 없는 실행이 그대로 동작하게).
+   - 그 외 사용자가 손댄 흔적이 보이면 덮어쓰면 사라진다고 명시한다.
+3. **사용자 확인 후 적용** — `command cp -f <원본> <사용자 파일>` 후 `chmod +x`(`chrome-debug.sh`). MCP 등록은 경로가 그대로이므로 다시 하지 않는다. `metro-mcp.js`를 교체했으면 **Claude Code 재시작 후 반영**된다고 안내한다(MCP 서버 프로세스가 기존 파일로 떠 있다).
+4. **리포트** — 항목별 `동일 / 교체 / 건너뜀(사유)`.
+
+---
+
 ## Rules
 
 - preset은 시작점이지 프로젝트 절대 진실이 아니다.
@@ -158,3 +187,4 @@ base 7종은 프로젝트가 커스터마이징하는 파일이 아니라 devoks
 - 감지 결과와 `.claude/CLAUDE.md` 사실이 충돌하면 사용자에게 확인한다.
 - 대규모 재적용은 diff 요약 없이 바로 수행하지 않는다.
 - 가능하면 full overwrite보다 selective apply를 먼저 검토한다.
+- 새 setup 산출물(플러그인 밖으로 복사되는 파일)을 추가하는 플러그인 변경은 이 스킬의 Overview 표와 SessionStart 훅 감지에 함께 등록한다 — 등록하지 않으면 업데이트 누락이 다시 생긴다.

@@ -48,4 +48,4 @@ ast-grep 절은 스택별로 **언어 id와 예시 패턴만** 다르고 나머�
 2. `.claude/rules/project-convention.md`로 프로젝트 규약을 확인한다.
 3. 세부 절차가 필요하면 `.claude/refs/*` 또는 프로젝트 고유 SSOT 문서를 읽는다.
 
-프로젝트 convention이 없거나 오래된 흔적이 의심되면, `devoks-core:setup-project-convention` / `devoks-core:project-convention-manage` 흐름으로 재정렬을 제안한다.
+프로젝트 convention이 없거나 오래된 흔적이 의심되면, `devoks-core:setup-project-convention` / `devoks-core:setup-preset-manage` 흐름으로 재정렬을 제안한다.

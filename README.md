@@ -166,7 +166,7 @@ flowchart TD
 | `new-smoke-test-draft` | `/devoks-sdlc:new-smoke-test-draft` | devoks-sdlc |
 | `browser-devtools` | `/devoks-browser:browser-devtools` | devoks-browser |
 | `browser-visual-diff` | `/devoks-browser:browser-visual-diff` | devoks-browser |
-| `project-convention-manage` | `/devoks-core:project-convention-manage` | devoks-core |
+| `setup-preset-manage` | `/devoks-core:setup-preset-manage` | devoks-core |
 | `metro-devtools-attach` | `/devoks-rn:metro-devtools-attach` | devoks-rn |
 
 ## Available Agents
