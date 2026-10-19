@@ -119,6 +119,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 - base rules/refs 를 명시적으로 복사
 - 선택한 preset 원본을 `.claude/rules/project-convention.md`로 복사
 - 필요 시 `Custom` 보정 내용을 같은 파일에 반영
+- **원본 스냅샷 기록** — 복사한 base 원본 7종과 preset 원본을 `.claude/.devoks-base/`에 그대로 둔다(`rules/`·`refs/`는 같은 이름, preset은 `preset/project-convention.md`). 다음 업데이트 때 `devoks-core:setup-preset-manage`가 이 스냅샷을 merge base로 써서 upstream 변경과 로컬 커스터마이징을 구분한다(구버전 플러그인 캐시는 업데이트 14일 뒤 삭제되므로 캐시에 의존하지 않는다). 복사는 `command cp -f`로 한다(셸 프로필의 `cp -i` 별칭 회피)
 - preset 원본 파일의 `sha256` 해시를 계산(예: `shasum -a 256 "${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md"`)
 - 적용에 사용한 devoks-core 버전을 확인한다 — 플러그인 캐시 경로가 `.../devoks-core/<version>/` 구조이므로
   `basename "${CLAUDE_PLUGIN_ROOT}"`가 곧 설치 버전이다. 경로가 버전 형태가 아니면(폴백 설치)

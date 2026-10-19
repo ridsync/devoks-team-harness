@@ -175,6 +175,10 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **복사 산출물 변경 이력(CHANGELOG) + 원본 스냅샷 기반 3-way base 갱신** (2026-10-19, `devoks-core` `2.0.0 → 2.1.0`)
+  - 배경: aware-react-app 세션이 2.0.0 base 갱신을 하다가 막혔다. 버전별로 무엇이 왜 바뀌었는지 기록이 없었고, 사본이 로컬에서 수정돼 있어 2-way diff로는 upstream 변경과 로컬 커스터마이징을 구분할 수 없었다. 남은 플러그인 캐시(1.6.0~)로 기준점을 추정했지만, 구버전 캐시는 업데이트 14일 뒤 삭제되므로 재현 가능한 방법이 아니다. 실제로 그 세션은 1.1.4에서 upstream이 삭제한 `workflow.md` APK 섹션과 `(auth, brew, sensor-ingest)` 예시를 로컬 커스터마이징으로 오판했다.
+  - 반영: `plugins/devoks-core/CHANGELOG.md`를 신설했다. 플러그인 내부에 두어 설치 프로젝트에서도 읽을 수 있고, 1.1.4~2.1.0을 git 이력으로 소급 작성했다(복사 산출물은 파일 › 섹션 › 사유, 거부 가능 변경 표시). `setup-project-convention`은 적용 시 원본 스냅샷을 `.claude/.devoks-base/`에 기록한다. `setup-preset-manage` base 갱신은 상태 6분류 → CHANGELOG 사유 → `git merge-file` 3-way → 파일별 반영/거부/보류(거부도 스냅샷 전진) 순서로 바꿨고, 스냅샷 없는 프로젝트용 1회 이전 절차(캐시 기반 기준 추정 + CHANGELOG 대조)를 추가했다. preset 재적용도 스냅샷으로 upstream 변경 섹션만 식별한다. 훅은 스냅샷이 있으면 스냅샷 ↔ 번들로 판정한다. maintainer 절차에 CHANGELOG 기재를 필수로 넣었다.
+
 - [x] **`project-convention-manage` → `setup-preset-manage` 개명 + setup 산출물 4종 통합 관리** (2026-10-19, `devoks-core` `1.8.0 → 2.0.0`, `devoks-sdlc` `3.3.0 → 3.3.1`)
   - 배경: 플러그인 스킬은 업데이트를 따라가지만, setup이 플러그인 밖으로 복사한 파일은 남는다. 조사 결과 base rules/refs 외에 `~/.devoks/bin/chrome-debug.sh`와 `~/.devoks/mcp/metro-mcp.js`도 업데이트 감지가 없었다. 자동 동기화(3-way 해시)는 구조 복잡도 때문에 **기각**하고(사용자 결정, `1ac291e`의 명시적 setup 원칙 유지), **수동 갱신 + 훅 감지**로 누락을 막는다. 근거: 공식 문서상 설치/업데이트 훅이 없고 SessionStart가 유일한 시점이다.
   - 반영: 스킬을 `setup-preset-manage`로 개명했다(호출명 변경 → major). Overview에 산출물 4종 표를 두고, "~/.devoks 스크립트 갱신" 절과 "업데이트 후 일괄 점검" 작업 유형을 추가했다. `chrome-debug.sh`는 `setup-mcp` 본문 인라인에서 `assets/chrome-debug.sh` 번들 파일로 분리했고, 기본 URL을 `~/.devoks/chrome-debug.url`로 빼서 사본이 원본과 바이트 동일하게 유지되게 했다(구버전 URL 이전은 스킬 절차에 포함). 훅은 두 스크립트의 원본 대비 차이를 감지한다. devoks-rn 원본은 공식 캐시 구조상 형제 디렉토리에서 찾고(`installed_plugins.json`은 비공개 포맷이라 미사용), 저장소 직접 실행 폴백도 지원한다. maintainer 체크리스트에 "setup 산출물 등록" 항목을 추가했다.

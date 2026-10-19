@@ -95,6 +95,7 @@ metadata:
   - `patch`: 버그 수정, 설명 정정, 동작 불변 개선
   - `minor`: 새 기능, 새 skill, 새 command, 새 선택적 동작
   - `major`: 호환성 깨짐, 이름/호출 방식/정책의 파괴적 변경
+- `devoks-core`를 bump하면 `plugins/devoks-core/CHANGELOG.md`에 같은 버전 절을 반드시 추가한다(복사 산출물 변경은 파일·섹션·사유까지 — 기준: `references/workflow-checklist.md` devoks-core 절).
 
 ## Step 4 — 구조/스키마 검증
 

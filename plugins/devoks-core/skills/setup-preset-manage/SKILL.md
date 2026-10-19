@@ -28,6 +28,8 @@ SessionStart 훅(`hooks/check-setup-state.sh`)은 위 산출물이 원본과 달
 - preset provenance metadata: `.claude/project-convention.json` (`presetHash` = preset 기준, `devoksCoreVersion` = base 기준)
 - preset 원본: `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md`
 - base rules/refs 원본(7종, 목록 SSOT는 `hooks/check-setup-state.sh`의 `BASE_FILES`): `${CLAUDE_PLUGIN_ROOT}/rules/{agent-principles,memory-policy}.md`, `${CLAUDE_PLUGIN_ROOT}/refs/{code-review,engineering-principles,git-convention,interaction-integrity,workflow}.md` → 프로젝트 `.claude/rules/`·`.claude/refs/` 같은 이름
+- 적용 당시 원본 스냅샷(3-way merge base): `.claude/.devoks-base/` — `rules/`·`refs/`(base 7종)와 `preset/project-convention.md`. setup·이 스킬이 원본을 반영할 때마다 함께 갱신한다. `.claude/rules/`와 같은 git 추적 정책을 따른다(팀이 rules를 커밋하면 스냅샷도 커밋)
+- 버전별 변경 사유: `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
 
 ---
@@ -103,7 +105,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 
 ### 4. diff 제시
 
-코드/문서 변경 전 반드시 아래를 요약한다.
+코드/문서 변경 전 반드시 아래를 요약한다. preset 스냅샷(`.claude/.devoks-base/preset/project-convention.md`)이 있으면 스냅샷 ↔ 새 preset diff로 **upstream이 바꾼 섹션만** 먼저 골라내고(사유는 `CHANGELOG.md`), 그 섹션에 한해 현재 convention과 비교한다 — 스냅샷 ↔ 현재 convention 차이는 로컬 커스터마이징이므로 유지 대상이다.
 
 - 바뀌는 섹션
 - 유지되는 로컬 커스터마이징
@@ -130,6 +132,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 
 - `.claude/rules/project-convention.md`를 직접 덮어쓸 수 있는 작업은 반드시 사용자 확인 후에만 수행
 - provenance metadata를 함께 갱신 — `presetHash`도 현재 preset 원본의 최신 해시로 갱신
+- preset 스냅샷(`.claude/.devoks-base/preset/project-convention.md`)을 반영한 preset 원본으로 갱신(`command cp -f`) — 일부 섹션만 반영했어도 거부한 섹션이 다시 제안되지 않도록 갱신한다
 - preset 전환 후에는 `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files도 drift 여부를 점검
 - `Custom` 흐름은 가장 가까운 preset + 사용자 보정값으로 처리
 
@@ -148,16 +151,60 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 
 ## base 갱신
 
-base 7종은 프로젝트가 커스터마이징하는 파일이 아니라 devoks-core 원본의 사본이다. 그래서 preset 선택·섹션 단위 selective apply 없이 **파일 단위**로 비교·교체한다.
+base 7종은 devoks-core 원본의 사본이지만, 프로젝트가 일부 줄을 고쳐 쓰는 경우가 있다. 사본과 새 원본만 비교하는 2-way diff로는 "upstream이 바꾼 줄"과 "로컬에서 고친 줄"을 구분할 수 없으므로, **적용 당시 원본 스냅샷**을 기준(merge base)으로 3-way 판정한다. 각 변경의 **사유**는 `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`에서 가져온다.
 
-1. **차이 확인** — 7종 각각에 대해 `cmp -s "${CLAUDE_PLUGIN_ROOT}/<rel>" ".claude/<rel>"`로 비교해 `동일 / 변경 / 프로젝트에 없음`으로 분류한다. 설치된 devoks-core 버전(`basename "${CLAUDE_PLUGIN_ROOT}"`, 버전 형태가 아니면 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `${CLAUDE_PLUGIN_ROOT}/plugin.json`의 `version`)과 provenance의 `devoksCoreVersion`도 함께 보여준다. 전부 동일하면 "base 최신"으로 보고하고 끝낸다(버전만 다르면 4단계의 `devoksCoreVersion` 갱신만 제안).
-2. **diff 요약** — `변경` 파일마다 `diff -u <프로젝트 사본> <원본>`을 읽고, 추가·삭제된 규칙을 파일당 1~3줄로 요약한다. raw diff를 통째로 던지지 않는다.
-   - 프로젝트 사본에만 있는 줄(로컬 수정 흔적)이 보이면 **덮어쓰면 사라진다**고 명시한다. 프로젝트 고유 규칙은 base가 아니라 `project-convention.md`에 두도록 이전을 제안한다.
-3. **사용자 확인** — 갱신할 파일을 확인받는다(기본: `변경`·`프로젝트에 없음` 전부, 사용자가 일부 제외 가능).
-4. **적용** — 확인된 파일만 원본으로 복사(`command cp -f` — 사용자 셸 프로필의 `cp -i` 별칭이 덮어쓰기를 조용히 거부하는 것을 피한다)하고, `.claude/project-convention.json`의 `devoksCoreVersion`을 설치 버전으로 갱신한다(다른 필드는 그대로). 일부 파일을 제외했으면 그 사실을 리포트에 남긴다 — 이 경우에도 버전은 갱신해 SessionStart 경고가 반복되지 않게 하되, 제외 목록을 리포트에 명시한다.
-5. **리포트** — 갱신한 파일·제외한 파일·버전 변화(`<이전> → <현재>`)·이전이 필요한 로컬 수정 흔적.
+### 1. 상태 판정
 
-`project-convention.md`는 이 절에서 건드리지 않는다. provenance(`.claude/project-convention.json`)가 없는 프로젝트는 setup을 거치지 않은 것이므로 `/devoks-core:setup-project-convention`으로 안내한다.
+설치 버전(`basename "${CLAUDE_PLUGIN_ROOT}"`, 버전 형태가 아니면 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `${CLAUDE_PLUGIN_ROOT}/plugin.json`의 `version`)과 provenance의 `devoksCoreVersion`을 함께 보여준다. 7종 각각에 대해 사본(`.claude/<rel>`)·스냅샷(`.claude/.devoks-base/<rel>`)·새 원본(`${CLAUDE_PLUGIN_ROOT}/<rel>`)을 `cmp -s`로 비교해 하나로 분류한다.
+
+| 상태 | 조건 | 처리 |
+|---|---|---|
+| 최신 | 사본 = 새 원본 | 없음 (스냅샷이 다르면 새 원본으로 맞춰 둔다) |
+| upstream만 변경 | 사본 = 스냅샷 ≠ 새 원본 | 새 원본으로 교체 가능 |
+| 로컬만 변경 | 스냅샷 = 새 원본 ≠ 사본 | 없음 — 로컬 커스터마이징 유지 |
+| 양쪽 변경 | 셋 다 다름 | 3단계 병합 |
+| 신규 | 사본 없음 | 새 원본 복사 |
+| 스냅샷 없음 | 스냅샷 파일 없음 | 아래 "스냅샷 없는 프로젝트(이전)" 절차 |
+
+전부 `최신`·`로컬만 변경`이면 "upstream 변경 없음"으로 보고하고 끝낸다(버전만 다르면 `devoksCoreVersion` 갱신만 제안).
+
+### 2. 변경 사유 제시
+
+`upstream만 변경`·`양쪽 변경`·`신규` 파일에 대해 CHANGELOG에서 `devoksCoreVersion` **초과** ~ 설치 버전 **이하** 구간의 해당 파일 항목을 모아 `파일 › 섹션: 변경 — 사유`로 보여준다. CHANGELOG에 항목이 없는데 내용이 다르면 그 사실을 명시한다(기록 누락 — harness에 보고 대상).
+
+CHANGELOG가 "거부해도 된다"고 적은 변경(예: 1.6.0 `memory-policy.md` context-mode 행 삭제)이나 프로젝트 환경과 맞지 않는 변경은 사용자가 **거부**할 수 있음을 알린다.
+
+### 3. 병합 (`양쪽 변경`)
+
+```bash
+git merge-file -p -L 로컬 -L 기준 -L 새원본 .claude/<rel> .claude/.devoks-base/<rel> "${CLAUDE_PLUGIN_ROOT}/<rel>" > <임시파일>
+```
+
+- 종료코드 0 = 충돌 없이 병합됨, 양수 = 충돌 블록 수, 음수 = 실행 오류. git 저장소 밖에서도 동작한다.
+- 충돌 블록마다 로컬·새 원본 양쪽 내용과 CHANGELOG 사유를 함께 보여주고 어느 쪽을 쓸지 확인받는다. 충돌 표시(`<<<<<<<`)가 남은 채로 쓰지 않는다.
+
+### 4. 사용자 확인 후 적용
+
+파일별로 **반영 / 거부 / 보류** 중 하나를 확인받는다.
+
+- **반영** — `upstream만 변경`·`신규`는 `command cp -f <새 원본> .claude/<rel>`(셸 프로필의 `cp -i` 별칭이 덮어쓰기를 조용히 거부하는 것을 피한다), `양쪽 변경`은 병합 결과로 사본을 쓴다.
+- **거부** — 사본은 그대로 둔다. upstream 변경을 의도적으로 받지 않은 것이므로 다음 갱신 때 다시 제안되지 않게 스냅샷은 갱신한다.
+- **보류** — 사본·스냅샷 모두 그대로 둔다(다음 갱신 때 다시 제안된다).
+
+반영·거부한 파일은 스냅샷을 새 원본으로 갱신한다(`command cp -f <새 원본> .claude/.devoks-base/<rel>`). 마지막으로 `.claude/project-convention.json`의 `devoksCoreVersion`을 설치 버전으로 갱신한다(다른 필드는 그대로) — 보류한 파일이 있어도 갱신하고, 리포트에 보류 목록을 남긴다.
+
+### 5. 리포트
+
+파일별 상태·처리(반영/거부/보류/유지)·근거가 된 CHANGELOG 항목·버전 변화(`<이전> → <현재>`)를 표로 남긴다.
+
+### 스냅샷 없는 프로젝트(이전)
+
+devoks-core 2.1.0 이전에 setup했거나 provenance(`.claude/project-convention.json`) 자체가 없는 프로젝트(레거시 자동 동기화 시절 사본 포함)는 merge base가 없다. 1회만 아래 절차로 기준을 추정하고, 그 뒤로는 스냅샷을 기록해 3-way로 운영한다.
+
+1. **기준 추정** — 플러그인 캐시에 남아 있는 devoks-core 버전들(`ls -d ~/.claude/plugins/cache/*/devoks-core/*/`)의 각 파일과 사본을 `diff`로 비교해, 차이가 가장 작은 버전을 그 파일의 기준 후보로 삼는다. 구버전 캐시는 업데이트 14일 뒤 정리되므로 남아 있는 버전으로만 판단할 수 있다.
+2. **CHANGELOG 대조** — 사본과 새 원본의 차이 줄을 CHANGELOG의 과거 항목과 대조해 "upstream 원본의 잔재"와 "로컬 커스터마이징"을 구분한다. 예: 1.1.4에서 삭제된 `workflow.md` APK 섹션이나 `agent-principles.md`의 `(auth, brew, sensor-ingest)` 예시가 사본에 남아 있다면 로컬 커스터마이징이 아니라 upstream 잔재다. 어느 쪽인지 판정할 수 없는 줄은 그렇다고 표시한다(추측으로 분류하지 않는다).
+3. **추정 기준을 스냅샷으로 써서** 위 1~5단계를 그대로 진행한다. 캐시에 쓸 만한 버전이 없으면 2단계 판정만 근거로 파일별 반영 여부를 확인받는다.
+4. provenance가 없었으면 preset을 사용자에게 확인받아 `.claude/project-convention.json`을 생성한다(`managedBy`: `devoks-core:setup-preset-manage`, `mode`: `base-merge`). preset 원본 스냅샷도 함께 기록한다 — `project-convention.md` 자체는 이 절에서 바꾸지 않는다.
 
 ---
 

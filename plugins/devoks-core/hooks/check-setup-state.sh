@@ -150,12 +150,16 @@ provenance_core_version() {
 # 경우가 실제로 절반쯤 되므로(1.5.0→1.5.1: 0건, 반면 1.4.1→code-review.md, 1.2.1→
 # git-convention.md, 1.1.4→4건) 버전 문자열만 비교하면 오탐이 난다. 이 확증은 버전
 # 갭이 있을 때만 실행되므로 정상(=버전 일치) 경로에는 비용이 붙지 않는다.
+# 원본 스냅샷(.claude/.devoks-base/)이 있으면 사본 대신 스냅샷과 비교한다 — 사본과의 차이는
+# 로컬 커스터마이징일 수 있어서, upstream이 실제로 바뀌었는지는 "스냅샷 ≠ 번들"이어야 확정된다.
 base_files_differ() {
-  local root rel
+  local root rel ref
   root="$(bundle_root)" || return 1
   for rel in "${BASE_FILES[@]}"; do
     [[ -f "$root/$rel" ]] || continue
-    cmp -s "$root/$rel" "$CLAUDE_DIR/$rel" || return 0
+    ref="$CLAUDE_DIR/.devoks-base/$rel"
+    [[ -f "$ref" ]] || ref="$CLAUDE_DIR/$rel"
+    cmp -s "$root/$rel" "$ref" || return 0
   done
   return 1
 }
