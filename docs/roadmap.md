@@ -175,6 +175,11 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **ponytail 비교 검토 후속 — 안전 하한·재사용 사다리·미확인/리스크 보고·리뷰 Lean·테스트 필요 판정** (2026-10-19, `devoks-core` `1.6.0 → 1.7.0`, `devoks-sdlc` `3.2.0 → 3.3.0`)
+  - 배경: `DietrichGebert/ponytail` v5.3.2(YAGNI·최소 코드 페르소나 플러그인)를 검토했다. 플러그인 자체는 병행 가능하지만 SubagentStart 주입이 devoks 에이전트의 리포트 스키마·테스트 설계 계약과 충돌하고, band·코드베이스 맵은 claude-hud·codegraph와 중복되어 채택하지 않았다. 규칙 문구만 흡수했다.
+  - 채택: `agent-principles.md` — YAGNI 문장에서 "error handling"을 제거하고 **Safety Floor**를 신설(ponytail 자체 벤치마크에서 맨 YAGNI 프롬프트가 안전 가드를 빠뜨림), **Reuse-First Ladder** 신설, #6에 테스트 필요 신호, #8에 미확인·리스크 1~2줄. `code-implementer` 2단계에 재사용 사다리 inline. `task-delegation.md` done 스키마에 **미확인·리스크(필수)** 필드를 추가하고, runner/executor 마무리 보고에서 수집. `task-pr-splitting.md`의 `test: required` 신호(반복·파싱·금액/보안·버그 수정·신규 스크립트)와 하한(깨지면 실패하는 테스트 1개). `code-review` 로컬 체크리스트 6항목(Lean)·가정한 부하·통번호·먼저 고칠 항목(공유 SSOT `refs/code-review.md`는 2026-07-20 결정대로 불변).
+  - 미채택: `shortcut:` 주석 규약·부채 장부(#8로 대부분 커버, #15와 예외 관계 비용), band/board/webhook, 코드베이스 맵, lite/full/ultra 레벨.
+
 - [x] **addyosmani/agent-skills 비교 분석 후속 — 정합성 수정 + 테스트 무력화 점검 + 브라우저 출력 untrusted** (2026-10-12, `devoks-sdlc` `3.1.0 → 3.2.0`, `devoks-browser` `1.2.4 → 1.2.5`)
   - 배경: 구현·리뷰·검증 3축으로 비교한 결과, 파이프라인 골격(추적성·서브에이전트 격리·증거 계약)은 하네스가 앞서고 agent-skills는 "절차 우회·기준 약화 차단 장치"가 앞섰다. 후보 대부분은 **채택하지 않기로 결정**(사용자 결정):
     - Rationalizations 표·`NOTICED BUT NOT TOUCHING`·mutation 리뷰·이름 붙은 처방·간이 경로 검증 제안 → 효과를 실측할 수 없거나 기존 구조로 커버됨

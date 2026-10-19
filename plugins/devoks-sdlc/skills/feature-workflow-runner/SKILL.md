@@ -106,7 +106,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
    - 핵심 로직 테스트 통과를 실제 실행 출력으로 확인.
    - Edge case 처리 확인.
 2. 모든 Task `[x]` + DoD 충족 시 frontmatter `status: done`.
-3. 미완 Task·임시 코드·추후 작업(예: 커밋/PR, 추가 테스트)을 명시적으로 보고한다(은폐 금지).
+3. 미완 Task·임시 코드·추후 작업(예: 커밋/PR, 추가 테스트)을 명시적으로 보고한다(은폐 금지). 각 done 리포트의 **미확인·리스크** 항목("없음" 제외)도 Task별로 모아 함께 보고한다(`references/task-delegation.md`).
 4. **다음 단계 (AskUserQuestion 다중선택 → 선택 항목 위임 실행)** — `references/post-implementation-checklist.md`의 표준 메뉴에서 해당 항목만 골라 검증/마무리 2개 질문의 `multiSelect`로 제시하고, **고른 항목을 메뉴 순서대로 위임 실행**한다(HITL 선택 실행). 읽기전용 검증/리뷰/테스트는 즉시 실행, 커밋·PR은 각 git 커맨드 자체 확인 플로를 최종 게이트로 위임한다. **앞선 검증에서 Critical/High가 나오면 커밋·PR 전에 멈추고 확인**한다. → `references/post-implementation-checklist.md`
 
 ## 재진입 / 분기

@@ -40,7 +40,7 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 - `[P]` 가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음).
 - `size: L` Task가 남아 있으면 §1에 분해 불가 사유 명시 — **스펙 닫힘 축인지 판단 축(설계 변경·인터페이스 파급)인지 밝혔는지** 확인(실행 라우팅의 위임/직접 판정 근거).
 - `size` 분포 자기점검 — 양방향으로 확인한다. ⑴ `S`가 부여 기준의 **`S` 열거를 벗어나지 않았고** `test: required` Task에 `S`가 붙지 않았는지(**`required` ⇒ 최소 `M`**), ⑵ 그 열거에 해당하는 후보가 있는데도 전부 `M`으로만 부여되지 않았는지 — 열거 원문은 `../feature-workflow-runner/references/task-pr-splitting.md`(부여 기준 SSOT)에서 확인하고 여기에 복제하지 않는다.
-- `test` 분포 자기점검 — `skip`을 부여한 Task에 실제로 로직(비즈니스 로직·상태 전이·데이터 흐름·계약 검증·조건부 분기)이 없는지 재확인. 애매해서 `skip`으로 몰아넣지 않았는지 확인 — 부여 기준: `../feature-workflow-runner/references/task-pr-splitting.md`.
+- `test` 분포 자기점검 — `skip`을 부여한 Task에 실제로 로직(비즈니스 로직·상태 전이·데이터 흐름·계약 검증·조건부 분기·반복·파싱·금액/보안·버그 수정)이 없는지 재확인. 애매해서 `skip`으로 몰아넣지 않았는지 확인 — 부여 기준: `../feature-workflow-runner/references/task-pr-splitting.md`.
 - 1개 이상 PR 생성(기본 1개). 2개 이상이면 §1에 분리 근거(기능/위험/리뷰 부담 중 하나) 명시 + PR 간 의존 단방향 준수.
 - 커버리지 점검 출력 공백(누락 0), DoD 섹션 존재.
 - `PLAN.md` 작성 완료 시 frontmatter `status: draft → approved`. → `../feature-workflow-runner/references/progress-tracking.md`

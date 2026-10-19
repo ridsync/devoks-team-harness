@@ -40,7 +40,7 @@ PLAN.md를 SSOT로 태스크를 의존성 순서대로 실행하고 진행을 �
 
 - DoD 각 항목 점검 후 `[x]`: 커버리지 누락 0 재점검(`../feature-workflow-runner/references/traceability.md`), 핵심 테스트 통과 확인, Edge case 확인.
 - 모든 Task `[x]` + DoD 충족 시 `status: done`.
-- 미완 Task·임시 코드·추후 작업(커밋/PR 포함)을 명시적으로 보고(은폐 금지).
+- 미완 Task·임시 코드·추후 작업(커밋/PR 포함)을 명시적으로 보고(은폐 금지). 각 done 리포트의 **미확인·리스크** 항목("없음" 제외)도 Task별로 모아 함께 보고한다(`../feature-workflow-runner/references/task-delegation.md`).
 - **다음 단계 (AskUserQuestion 다중선택 → 선택 항목 위임 실행)** — `../feature-workflow-runner/references/post-implementation-checklist.md`의 표준 메뉴에서 해당 항목만 골라 검증/마무리 2개 질문의 `multiSelect`로 제시하고, **고른 항목을 메뉴 순서대로 위임 실행**한다(HITL 선택 실행). 읽기전용 검증/리뷰/테스트는 즉시 실행, 커밋·PR은 각 git 커맨드 자체 확인 플로를 최종 게이트로 위임한다. **앞선 검증에서 Critical/High가 나오면 커밋·PR 전에 멈추고 확인**한다.
 
 ## 재개

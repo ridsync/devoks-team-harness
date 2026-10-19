@@ -27,7 +27,7 @@ model: sonnet
 
 ## 동작
 
-1. `../skills/code-review/references/review-execution.md`(실행 절차 SSOT)를 읽고 `mode`·`scope`에 맞춰 수행한다 — 코드 수집 → lint/type 선행 게이트 → 리뷰 가이드·필수 체크리스트 5항목 적용.
+1. `../skills/code-review/references/review-execution.md`(실행 절차 SSOT)를 읽고 `mode`·`scope`에 맞춰 수행한다 — 코드 수집 → lint/type 선행 게이트 → 리뷰 가이드·필수 체크리스트 6항목 적용.
 2. `../skills/code-review/references/report-template.md`(출력 SSOT)의 템플릿으로 리포트를 작성한다. 이모지를 그대로 포함하고 `📋 리뷰 대상` 헤더는 `mode`별로 분기한다.
 3. 작성한 **리포트 전문**을 그대로 최종 메시지로 출력한다.
 
