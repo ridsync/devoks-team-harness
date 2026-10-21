@@ -3,7 +3,7 @@ description: "지정된 파일/폴더/모듈을 대상으로 현황 파악 → �
 argument-hint: "target=<파일|폴더|모듈 경로> [goal=<개선 목표>] [constraints=<제외 범위·동작 불변 요구 등>]"
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # code-refactoring — 코드 리팩토링 (구조·책임·계약 품질 개선)

@@ -3,7 +3,7 @@ description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하�
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.7.0
+  version: 1.7.1
 ---
 
 # feature-workflow-runner
@@ -84,7 +84,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 3. Task를 **PR 그룹**으로 묶는다 — 기본값 PR 1개. FRD의 메모는 참고일 뿐, `task-pr-splitting.md` 기준으로 이 단계에서 직접 재판단한다. 기본값이 명확하면 묻지 말고 진행하고, **애매할 때만 AskUserQuestion 단일선택**(`[PR 1개 (권장)]` / `[독립 가치·위험 단위로 분리]`; HITL 전용 — 비-HITL 경로에선 기본값 PR 1개). 분리 시 §1에 근거 1줄. → `references/task-pr-splitting.md`
 4. §4 의존성 그래프(mermaid, **사이클 금지**)와 §5 DoD를 작성한다.
 5. **커버리지 검증**: FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검(누락 0). → `references/traceability.md` 의 comm 스크립트.
-6. 확정되면 `<out>/PLAN.md` 작성. 누락이 있으면 담당 Task를 추가한 뒤에만 다음 단계로.
+6. 확정되면 `<out>/PLAN.md` 작성. 누락이 있으면 담당 Task를 추가한 뒤에만 다음 단계로. 기존 PLAN.md가 `in-progress`이거나 미체크 Task가 남아 있으면 덮어쓰지 않는다(처리: `devoks-sdlc:feature-plan-author` 절차 7 "진행 중 PLAN 보호"와 동일).
 
 완료 기준: 모든 Task가 `size:`·`test:`·`file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `size`/`test` 분포 자기점검 통과(기준: `devoks-sdlc:feature-plan-author` 완료 기준, 부여 기준 SSOT는 `references/task-pr-splitting.md`), `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(기본 1개, 2개 이상이면 §1에 분리 근거 명시·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재. `PLAN.md` 작성 시 frontmatter `status: draft → approved`. → `references/progress-tracking.md`
 

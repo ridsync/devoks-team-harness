@@ -4,7 +4,7 @@ description: Figma 디자인 링크를 받아 프로젝트 패턴에 맞게 UI�
 argument-hint: "<Figma URL> <구현 추가정보>"
 metadata:
   author: ridsync
-  version: 1.1.0
+  version: 1.2.0
 ---
 
 # UI Draft Implement (Figma → 코드 구현)
@@ -103,6 +103,7 @@ Figma 디자인 링크와 추가 정보를 받아, Figma MCP로 디자인을 조
 - 필요한 Locale(i18n) 키
 - 라우트/탭 변경 사항
 - 당장은 더미/목업인 부분 (API, 스키마 등)
+- **화면 상태 목록** — loading / empty / error / 권한 없음 중 이 화면에 해당하는 것과 각각의 표시 방식(Figma에 없으면 기존 화면의 처리 방식을 근거로 제안). 정상 상태만 구현하면 나머지는 런타임에 빈 화면·깨진 레이아웃으로 드러난다
 
 > 사용자 규칙에 "항상 승인을 받은 뒤 코드 생성"이 있으면 이 단계를 생략하지 않는다.
 
@@ -137,6 +138,7 @@ Figma 디자인 링크와 추가 정보를 받아, Figma MCP로 디자인을 조
 - 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`)(Bash)로 수정한 파일 검사
 - 프로젝트의 포맷 스크립트(예: `npm run format`, `pnpm format`)(Bash)가 있으면 수정한 파일에 실행. 없으면 생략(요약에 명시)
 - 사용하지 않는 import 제거
+- 접근성·상태 셀프체크 — 5단계 화면 상태 목록이 모두 구현됐는지, 아이콘만 있는 버튼에 접근 가능한 이름(`aria-label` 등)이 있는지, 키보드로 조작·포커스 이동이 되는지, 상태를 색만으로 구분하지 않는지(기준: `.claude/refs/code-review.md` §6 UI Component). 못 맞춘 항목은 요약에 명시
 - 구현 요약과, "추후 작업"(API 연동, 상세 페이지 등)을 사용자에게 안내(테스트를 생략했다면 그 사실과 사유를 명시)
 - Figma와 실제 렌더의 시각 충실도를 픽셀 단위로 맞춰야 하면 `devoks-browser:browser-visual-diff`를 이어서 쓰도록 안내한다.
 

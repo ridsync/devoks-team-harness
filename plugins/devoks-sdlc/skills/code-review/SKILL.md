@@ -3,7 +3,7 @@ description: "코드리뷰를 수행한다. 브랜치 커밋 범위(base 대비 
 argument-hint: "[mode=general|diff-branch (default: 브랜치 추론)] [scope=<파일/폴더 경로>] [base=<브랜치> (default: main/develop)]"
 metadata:
   author: ridsync
-  version: 2.0.2
+  version: 2.1.0
 ---
 
 # code-review — 코드리뷰

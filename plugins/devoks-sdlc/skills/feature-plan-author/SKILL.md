@@ -3,7 +3,7 @@ description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)�
 argument-hint: "[frd=<FRD.md 경로> (default: 최근 FRD)] [out=<디렉터리> (default: FRD 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.3.0
+  version: 1.4.0
 ---
 
 # plan-author — PLAN 작성 (Phase 2)
@@ -33,6 +33,7 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 5. **그래프·DoD** — §4 mermaid 의존성 그래프(사이클 금지), §5 Definition of Done.
 6. **커버리지 검증(누락 0)** — FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검. → `../feature-workflow-runner/references/traceability.md` 의 comm 스크립트.
 7. **작성** — 누락이 없을 때만 `<out>/PLAN.md` 작성. 있으면 담당 Task 추가 후 재검증.
+   - **진행 중 PLAN 보호** — `<out>/PLAN.md`가 이미 있고 frontmatter `status`가 `in-progress`이거나 미체크(`- [ ]`) Task가 남아 있으면 **덮어쓰지 않는다**. 같은 기능의 재계획(사용자가 수정·확장을 요청)이면 기존 파일을 제자리에서 고치되 `[x]` 체크와 완료 Task는 보존하고, 그 외에는 멈추고 확인한다(AskUserQuestion 단일선택: `[기존 PLAN 이어서 실행]` / `[기존 PLAN을 PLAN.<날짜>.bak.md로 보존 후 새로 작성]` / `[취소]` — HITL 직접 호출 전용, 비-HITL 경로에선 덮어쓰지 않고 blocked로 보고). 미체크 Task는 다른 세션에서 실행 중일 수 있고, 그 진행 상태는 PLAN.md 밖에 없다.
 
 ## 완료 기준
 
