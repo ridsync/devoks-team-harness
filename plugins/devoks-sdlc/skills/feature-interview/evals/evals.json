@@ -1,0 +1,45 @@
+{
+  "skill_name": "devoks-sdlc:feature-interview",
+  "notes": "다회 턴 HITL이라 첫 턴 행동(의도 공백 → 질문 1개+예상 답 / 방향 갈래 → HMW·변형안 또는 질문)과 승인 후 연결(정련 요약을 초안으로 frd-author 즉시 실행, 별도 파일 미생성)을 나눠 검증한다. 2026-10-21 feature-intent-interview·feature-idea-refine 통합.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "vague-request-intent-first-turn",
+      "prompt": "우리 팀 지표용 대시보드 하나 만들어줘. 요즘 다들 대시보드 쓰잖아.",
+      "expected_output": "첫 응답에 한 문장 가설과 확신도(%)가 있고 70% 미만이면 비어 있는 항목이 이유로 붙는다. 의도가 비었으므로 질문은 정확히 1개이고 '예상:' 형태의 가설 답과 근거가 붙는다. FRD·PLAN·구현안·파일을 만들지 않고 frd-author도 실행하지 않는다. AskUserQuestion 선택지로 묻지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "첫 응답에 한 문장 가설과 확신도(%)가 있다" },
+        { "text": "확신도가 70% 미만이면 비어 있는 항목이 이유로 붙어 있다" },
+        { "text": "질문이 정확히 1개이고 예상 답과 근거가 붙어 있다" },
+        { "text": "FRD·PLAN·구현안·파일 생성, frd-author 실행을 하지 않는다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "multi-direction-idea-first-turn",
+      "prompt": "야간 근무 간호사들이 자는 동안 비긴급 알림 때문에 깨는 문제가 있어. 성공 기준은 수면 시간대 비긴급 알림 0건이고, 알림 내용 개편은 이번 범위가 아니야. 근데 어떤 방식으로 풀지는 아직 모르겠어 — 방법을 같이 넓혀서 봐줘.",
+      "expected_output": "의도(누구·성공·안 할 것)는 이미 주어졌으므로 의도 질문을 반복하지 않고 방향 탐색으로 간다. HMW 한 문장으로 문제를 고정하고 서로 다른 변형안 5~8개를 각자 존재 이유와 함께 제시한다(코드베이스가 비어 있으면 그 사실을 밝힘). 사용자가 방향을 고르기 전이므로 정련 요약 승인 요청이나 frd-author 실행, 파일 생성을 하지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "이미 주어진 User·Success·Out of scope를 다시 묻지 않는다" },
+        { "text": "HMW 형태의 한 문장 문제 진술이 있다" },
+        { "text": "변형안이 5~8개이고 각각 존재 이유가 있다" },
+        { "text": "방향 선택 전에 frd-author를 실행하거나 파일을 만들지 않는다" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "approved-summary-hands-off-to-frd-author",
+      "prompt": "네, 이 요약 그대로 좋아요. 진행해 주세요.\n\n(직전 정련 요약)\n## 기능 정련 요약 — 실험 목록\n- Outcome: 진행 중인 실험 목록을 한곳에서 본다\n- User: 그로스 PM 본인\n- Why now: 분기 실험이 12개로 늘어 문서가 흩어짐\n- Success: 실험 추가·종료가 1분 안에 반영되고 주간 회의에서 이 목록만 본다\n- Constraint: 사내 SSO 뒤에서만 접근\n- Out of scope: 실험 결과 지표 시각화, 팀원 공유\n- 논의 중 결정: 종료된 실험은 숨기지 않고 상태 필터로 구분\n- 가정: 실험마다 담당자는 1명이다 — 기존 문서에서 확인\n- 남은 질문: '준비 중' 상태가 필요한가\n\n(이 대화는 /devoks-sdlc:feature-interview 를 단독 호출해 시작했다)",
+      "expected_output": "명시 승인이므로 다시 묻지 않고 같은 흐름에서 devoks-sdlc:feature-frd-author 를 frd 인자 없이(대화 초안 = 승인된 요약) 실행한다. feature-interview 자체는 FRD.draft.md나 다른 파일을 따로 만들지 않는다(보존은 frd-author 절차 0이 한다). frd-author 쪽에서는 요약 값(User·Success·Out of scope·논의 중 결정)을 다시 묻지 않고, 남은 슬롯·정책만 모아 확인하거나 FRD.md를 작성하며 '준비 중' 질문은 확인 질문 또는 §10에 남는다.",
+      "files": [],
+      "assertions": [
+        { "text": "승인 뒤 '넘어갈까요?' 같은 재확인 없이 frd-author로 이어진다" },
+        { "text": "feature-interview 단계에서 별도 파일을 만들지 않는다(FRD.draft.md는 frd-author 절차 0에서 보존)" },
+        { "text": "frd-author가 요약에 있는 User·Success·Out of scope·논의 중 결정을 다시 묻지 않는다" },
+        { "text": "'준비 중' 상태 질문이 확인 질문 또는 §10에 나타난다" }
+      ]
+    }
+  ]
+}

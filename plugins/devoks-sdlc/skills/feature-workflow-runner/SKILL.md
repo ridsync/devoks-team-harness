@@ -3,7 +3,7 @@ description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하�
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.7.1
+  version: 1.8.0
 ---
 
 # feature-workflow-runner
@@ -64,13 +64,15 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 거친 초안을 `assets/FRD.template.md` 형식으로 완성한다.
 
-0. **워크스페이스 확정 · 초안 원문 보존** — feature-name·date(`yyyyMMdd`)로 `out` 기본 경로 `.claude/workspace/{feature-name}-{date}/` 를 정한다(디렉토리명·날짜·`assets/` 레이아웃 SSOT는 `references/output-location.md`). 시안·시각 리소스 사본은 **`<out>/assets/`** 에 `RES-ASSET-NNN_<slug>` 네이밍으로 저장하고(시안 외 대용량·저장소 안 리소스는 경로만 기록), FRD §6.3 Assets 표 ID와 일치시킨다. **본문으로 받은 거친 초안은 `<out>/FRD.draft.md` 로 원문 그대로 보존**한다: 짧은 출처 헤더(어떤 스킬·호출에서 받았는지) + 초안 원문 verbatim, 정련 중 사용자 확인으로 확정된 결정은 같은 파일 하단에 누적(추측 금지). 정련 결과는 `FRD.md`. → 형식 근거는 `references/output-location.md`(SSOT). `FRD.draft.md`가 이미 있으면(앞단 `feature-intent-interview`·`feature-idea-refine`의 `## 확정 결정 — …` 포함) 덮어쓰지 않고 먼저 읽어, 확정 결정을 다시 묻지 않고 §1·§10의 근거로 쓴다.
+**의도·방향 게이트(조건부)** — 초안만으로 §1의 대상 사용자·Success·Non-goals를 추측해야만 채울 수 있거나 방향이 여러 갈래면, `devoks-sdlc:feature-interview`에 진입해 정련 요약을 승인받은 뒤 그 요약을 초안으로 아래 0부터 이어간다(판정·처리 기준은 `devoks-sdlc:feature-frd-author` Phase 0과 동일).
+
+0. **워크스페이스 확정 · 초안 원문 보존** — feature-name·date(`yyyyMMdd`)로 `out` 기본 경로 `.claude/workspace/{feature-name}-{date}/` 를 정한다(디렉토리명·날짜·`assets/` 레이아웃 SSOT는 `references/output-location.md`). 시안·시각 리소스 사본은 **`<out>/assets/`** 에 `RES-ASSET-NNN_<slug>` 네이밍으로 저장하고(시안 외 대용량·저장소 안 리소스는 경로만 기록), FRD §6.3 Assets 표 ID와 일치시킨다. **본문으로 받은 거친 초안은 `<out>/FRD.draft.md` 로 원문 그대로 보존**한다: 짧은 출처 헤더(어떤 스킬·호출에서 받았는지) + 초안 원문 verbatim, 정련 중 사용자 확인으로 확정된 결정은 같은 파일 하단에 누적(추측 금지). 정련 결과는 `FRD.md`. → 형식 근거는 `references/output-location.md`(SSOT). 초안이 `feature-interview`의 승인된 정련 요약이면 그 값을 다시 묻지 않고 §1·§2·§3·§10의 근거로 쓴다. `FRD.draft.md`가 이미 있으면 덮어쓰지 않고 먼저 읽는다.
 1. 초안에서 Goal(대상 사용자·Why now·Success·Non-goals 포함)·Context·요구사항 후보를 추출한다.
 2. 각 요구사항을 `REQ-xxx` + EARS `AC-xxx-y` 로 정형화한다(정상 경로 + 예외 경로 최소 1쌍). → `references/ears-acceptance-criteria.md`
 3. 수치·세팅·상태전이를 §5 Contract(`CTR-xxx`)로 빼고, Edge Case를 §8(`EDGE-xxx`)로 정리한다. 요구가 **기존 데이터의 특정 필드/형태**에 의존하면 실환경에 그 형태가 실제로 존재하는지 확인하는 EDGE를, **상태 확정·I/O를 유발하는 반복 트리거 조작**(`.claude/refs/interaction-integrity.md` §1 적용 대상)을 포함하면 연타 시 기대 동작 EDGE를 반드시 추가한다(판정·기재 기준은 `devoks-sdlc:feature-frd-author` 절차 4와 동일).
 4. §6 Resources(참고 코드·외부 문서·시안·API)와 §7 Constraints(위험/의존 제약·기술 제약)를 채운다. PR 분리 여부·개수는 이 단계에서 정하지 않는다(PLAN 단계 — `references/task-pr-splitting.md`).
 5. **§4 설계 스펙** — 복잡도 임계 초과 시 코드 패턴을 먼저 탐색(기존 상태관리·훅·유틸·모델)하고 **설계안을 제안·확인**한 뒤 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. 단순 기능은 §4.1만 간결히. → `references/design-spec.md`
-6. **누락 슬롯은 한 번에 모아 사용자에게 확인**한다(추측 금지 — 요구는 묻고, 설계는 제안 후 확인). 검증되지 않은 가정·보류 질문은 §10에 남긴다. §1의 대상 사용자·Success·Non-goals를 추측해야만 채울 수 있으면(의도 수준 공백) 슬롯 질문에 섞지 말고 `/devoks-sdlc:feature-intent-interview`를 먼저 제안한다(판정 기준은 `devoks-sdlc:feature-frd-author` 절차 7과 동일). 확정되면 `<out>/FRD.md` 작성.
+6. **누락 슬롯은 한 번에 모아 사용자에게 확인**한다(추측 금지 — 요구는 묻고, 설계는 제안 후 확인). 검증되지 않은 가정·보류 질문은 §10에 남긴다. 여기서 모아 묻는 것은 슬롯·정책이고, 의도 수준 공백은 위 게이트가 맡는다. 확정되면 `<out>/FRD.md` 작성.
 
 완료 기준: §1에 대상 사용자·Success·Non-goals(최소 1개)가 있고 §10이 채워짐(없으면 "없음"). 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 기존 데이터 의존 요구·반복 트리거 조작 요구는 각각 해당 EDGE가 최소 1개 있음. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능. `FRD.md` 작성 시 frontmatter `status: draft → review`. → `references/progress-tracking.md`
 

@@ -143,7 +143,7 @@ issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으�
 
 ## 10. Assumptions & Open Questions
 > 검증되지 않은 채 참이라고 두는 것과, 착수 전/중에 답이 필요한 질문. 없으면 "없음"으로 남긴다.
-> `FRD.draft.md`의 확정 결정(인터뷰 "남은 질문", 1-pager의 Assumptions·Open Questions)을 이어받는다.
+> 초안이 `feature-interview`의 정련 요약이면 그 "가정"·"남은 질문"을 이어받는다.
 
 | 구분 | 내용 | 확인 방법 / 담당 |
 |------|------|-----------------|

@@ -109,7 +109,7 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 flowchart TD
     S["0 · 준비 (최초 1회)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
 
-    D["1a · 요구 탐색 (선택)<br/>feature-intent-interview · feature-idea-refine<br/>→ FRD.draft.md"]
+    D["1a · 인터뷰 (선택)<br/>feature-interview<br/>→ 승인된 요약이 1로 이어짐"]
 
     subgraph BUILD["1–3 · feature-workflow-runner (통합 진입점)"]
         direction LR
@@ -152,8 +152,7 @@ flowchart TD
 | 스킬 | 호출 | 플러그인 |
 |------|------|---------|
 | `workflow-map` | `/devoks-sdlc:workflow-map` | devoks-sdlc |
-| `feature-intent-interview` | `/devoks-sdlc:feature-intent-interview` | devoks-sdlc |
-| `feature-idea-refine` | `/devoks-sdlc:feature-idea-refine` | devoks-sdlc |
+| `feature-interview` | `/devoks-sdlc:feature-interview` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
 | `feature-plan-author` | `/devoks-sdlc:feature-plan-author` | devoks-sdlc |
 | `feature-plan-executor` | `/devoks-sdlc:feature-plan-executor` | devoks-sdlc |

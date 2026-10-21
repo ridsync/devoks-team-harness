@@ -1,9 +1,9 @@
 ---
-description: 거친 기능 아이디어나 FRD 초안을 받아, EARS Acceptance Criteria·Contract(파라미터/상태전이)·Resource 체크리스트·Edge Case·Testing Strategy를 갖춘 정련된 FRD.md로 완성한다. "FRD 초안 정리해줘", "기능 요구서 다듬기", "요구사항을 EARS로 정형화", "AC/Contract 정리", "스펙 문서 작성" 같은 요청에서 사용한다. 원하는 것 자체가 불명확하면 devoks-sdlc:feature-intent-interview, 방향이 여러 갈래인 막연한 아이디어면 devoks-sdlc:feature-idea-refine 을 먼저 쓴다. FRD→PLAN→실행 전체를 한 번에 돌리려면 devoks-sdlc:feature-workflow-runner, 작성 후 작업 분해는 devoks-sdlc:feature-plan-author 를 쓴다.
+description: 거친 기능 아이디어나 FRD 초안을 받아, EARS Acceptance Criteria·Contract(파라미터/상태전이)·Resource 체크리스트·Edge Case·Testing Strategy를 갖춘 정련된 FRD.md로 완성한다. "FRD 초안 정리해줘", "기능 요구서 다듬기", "요구사항을 EARS로 정형화", "AC/Contract 정리", "스펙 문서 작성" 같은 요청에서 사용한다. 초안의 의도(누구·왜·성공 기준·하지 않을 것)가 비었거나 방향이 여러 갈래면 Phase 0에서 devoks-sdlc:feature-interview 로 먼저 정련한 뒤 이어서 진행한다. FRD→PLAN→실행 전체를 한 번에 돌리려면 devoks-sdlc:feature-workflow-runner, 작성 후 작업 분해는 devoks-sdlc:feature-plan-author 를 쓴다.
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.3.0
+  version: 1.4.0
 ---
 
 # frd-author — FRD 정련 (Phase 1)
@@ -24,8 +24,11 @@ metadata:
 
 ## 절차
 
+**Phase 0 — 의도·방향 게이트 (조건부, HITL)** — 초안을 읽고 §1의 대상 사용자·Success·Non-goals를 **추측해야만** 채울 수 있거나(의도 공백), 무엇을 만들지 **방향이 여러 갈래**로 열려 있으면, 슬롯 질문으로 메우지 않고 Skill 도구로 `devoks-sdlc:feature-interview`에 진입한다(그 스킬 절차를 이 흐름 안에서 수행). 사용자가 정련 요약을 승인하면 그 요약을 초안으로 아래 절차 0부터 이어간다. 초안이 이미 승인된 정련 요약이거나 의도·방향이 분명하면 게이트를 건너뛴다. 사용자가 인터뷰를 원치 않으면 아래 절차 7의 일괄 확인으로 진행한다. 비-HITL 경로에서는 게이트를 열지 않고 의도 공백을 blocked로 보고한다.
+
 0. **워크스페이스 확정 · 초안 원문 보존** — `out` 경로 `.claude/workspace/{feature-name}-{date}/`(date=`yyyyMMdd`)를 정한다. 시안·시각 리소스 사본은 **`<out>/assets/`** 에 `RES-ASSET-NNN_<slug>` 네이밍으로 저장하고(시안 외 대용량·저장소 안 리소스는 경로만 기록), FRD §6.3 Assets 표 ID와 일치시킨다. **본문으로 받은 초안은 `<out>/FRD.draft.md` 로 원문 그대로 보존**한다: 짧은 출처 헤더 + 초안 원문 verbatim + 정련 중 사용자 확인으로 확정된 결정 누적(추측 금지). 정련 결과는 `FRD.md`. → 디렉토리·`assets/`·보존 형식 근거는 `../feature-workflow-runner/references/output-location.md`(SSOT).
-   - `FRD.draft.md`가 이미 있으면(앞단 `feature-intent-interview`·`feature-idea-refine`이 남긴 `## 확정 결정 — …` 섹션 포함) 덮어쓰지 않고 먼저 읽는다. 확정 결정은 사용자가 승인한 값이므로 다시 묻지 않고 §1(대상 사용자·Why now·Success·Non-goals)과 §10(가정·남은 질문)의 근거로 쓴다.
+   - 초안이 `feature-interview`의 **승인된 정련 요약**(`## 기능 정련 요약`)이면 그 값은 사용자가 승인한 것이므로 다시 묻지 않고 §1(Outcome·User·Why now·Success·Out of scope → 대상 사용자·Success·Non-goals), §2·§3(방향·논의 중 결정), §10(가정·남은 질문)의 근거로 쓴다. 요약도 다른 초안과 똑같이 `FRD.draft.md`로 보존한다(요약 첫 줄의 "원래 요청"이 인터뷰 전 원문이다). 요약의 "남은 질문"은 사용자가 보류한 것이라 절차 7 슬롯 확인에 한 번 더 넣어도 되고, 다시 보류되면 §10으로 넘긴다.
+   - `FRD.draft.md`가 이미 있으면 덮어쓰지 않고 먼저 읽는다.
 1. **골격 로드** — `../feature-workflow-runner/assets/FRD.template.md` 를 읽어 형식을 따른다.
 2. **요구 추출** — 초안에서 Goal(대상 사용자·Why now·Success·Non-goals 포함)·Context·요구사항 후보를 뽑는다.
 3. **EARS 정형화** — 각 요구를 `REQ-xxx` + `AC-xxx-y`(정상 WHEN/WHILE + 예외 IF 최소 1쌍)로. → `../feature-workflow-runner/references/ears-acceptance-criteria.md`
@@ -33,7 +36,7 @@ metadata:
 5. **착수 리소스** — §6(참고 코드·외부 문서·시안·API), §7 Constraints(위험/의존 제약·기술 제약)를 채운다. PR 분리 여부·개수는 이 단계에서 정하지 않는다(PLAN 단계 — `../feature-workflow-runner/references/task-pr-splitting.md`).
 6. **§4 설계 스펙** — 복잡도 임계 초과 시(신호 목록·기준: `../feature-workflow-runner/references/design-spec.md`) 코드 패턴을 먼저 탐색하고 **설계안을 제안·확인**한 뒤 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. 단순 기능은 §4.1만 간결히.
 7. **확인 후 작성** — 누락 슬롯은 한 번에 모아 사용자에게 확인(추측 금지 — 요구는 묻고, 설계는 제안 후 확인) → `<out>/FRD.md` 작성. 검증되지 않은 가정과 답이 보류된 질문은 §10에 남긴다.
-   - **의도 수준 공백은 슬롯 일괄 확인으로 메우지 않는다** — §1의 대상 사용자·Success·Non-goals를 초안·`FRD.draft.md`로 판단할 수 없으면(추측해야만 채워지면) 슬롯 질문에 섞지 말고 `/devoks-sdlc:feature-intent-interview`를 먼저 제안한다(한 번에 하나씩 묻는 인터뷰가 맞는 문제다). 사용자가 원치 않으면 일괄 확인으로 진행한다.
+   - **질문 단위 규칙** — 여기서 한 번에 모아 묻는 것은 **슬롯·정책**(필드 구성, 상태값, 편집 범위, 이관, 인증 방식 등)이다. 의도 수준 공백은 여기 섞지 않는다 — Phase 0 게이트(`feature-interview`, 한 번에 하나씩)가 맡는다.
 
 ## 완료 기준
 

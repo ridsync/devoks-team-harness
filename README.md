@@ -109,7 +109,7 @@ The HITL flow, from setup to PR. Run `/devoks-sdlc:workflow-map` in any session 
 flowchart TD
     S["0 · Setup (once)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
 
-    D["1a · Explore requirements (optional)<br/>feature-intent-interview · feature-idea-refine<br/>→ FRD.draft.md"]
+    D["1a · Interview (optional)<br/>feature-interview<br/>→ approved summary flows into 1"]
 
     subgraph BUILD["1–3 · feature-workflow-runner (combined entry point)"]
         direction LR
@@ -152,8 +152,7 @@ flowchart TD
 | Skill | Invoke | Plugin |
 |-------|--------|--------|
 | `workflow-map` | `/devoks-sdlc:workflow-map` | devoks-sdlc |
-| `feature-intent-interview` | `/devoks-sdlc:feature-intent-interview` | devoks-sdlc |
-| `feature-idea-refine` | `/devoks-sdlc:feature-idea-refine` | devoks-sdlc |
+| `feature-interview` | `/devoks-sdlc:feature-interview` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
 | `feature-plan-author` | `/devoks-sdlc:feature-plan-author` | devoks-sdlc |
 | `feature-plan-executor` | `/devoks-sdlc:feature-plan-executor` | devoks-sdlc |
