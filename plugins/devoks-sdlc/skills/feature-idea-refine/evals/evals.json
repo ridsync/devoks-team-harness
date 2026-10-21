@@ -1,0 +1,32 @@
+{
+  "skill_name": "devoks-sdlc:feature-idea-refine",
+  "notes": "다회 턴 HITL이라 Phase 1 첫 턴(HMW·질문 3~5개·코드베이스 근거, 변형안은 대상·성공 기준을 알 때만)과 승인 후 기록(1-pager의 Not Doing 포함, FRD.draft.md 누적)을 나눠 검증한다. 케이스 1은 대상·성공 기준이 비어 있으므로 변형안 전에 질문해야 한다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "vague-idea-phase1-questions-first",
+      "prompt": "우리 앱에 알림 기능을 좀 더 똑똑하게 만들고 싶어. 아이디어 좀 같이 다듬어줘.",
+      "expected_output": "'어떻게 하면 <누가> <무엇을> 할 수 있을까' 형태의 HMW 한 문장으로 재진술하고, 날카로운 질문 3~5개(누구를 위한 것인지, 성공 모습, 제약, 현재 우회책 등)를 던진다. 누구를 위한 것인지·성공 모습이 정해지지 않았으므로 변형안 5~8개는 아직 내지 않거나, 내더라도 질문 답을 받기 전 확정하지 않는다. 코드베이스에서 기존 알림 관련 모듈을 확인하려 시도한다(없으면 없다고 밝힌다). FRD·1-pager·FRD.draft.md를 만들지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "HMW 형태의 한 문장 문제 진술이 있다" },
+        { "text": "질문이 3~5개 범위다(6개 이상이면 실패)" },
+        { "text": "대상 사용자와 성공 모습을 묻는 질문이 포함된다" },
+        { "text": "1-pager·FRD·FRD.draft.md를 이 턴에 만들지 않는다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "approved-onepager-appended-to-draft",
+      "prompt": "2번 방향(기존 알림 설정 화면 안에 '조용한 시간' 규칙 추가)으로 가자. 1-pager 이대로 좋아, 저장해줘.\n\n(직전 1-pager)\n# 조용한 시간 알림 규칙\n## Problem\n어떻게 하면 야간 근무자가 수면 시간에 비긴급 알림으로 깨지 않게 할 수 있을까\n## Recommended Direction\n기존 NotificationSettings 화면에 요일·시간대 규칙을 추가하고, 서버 발송 단계에서 비긴급 알림을 보류한다.\n## Key Assumptions to Validate\n- [ ] 알림에 긴급/비긴급 구분 필드가 이미 있다 — 알림 스키마 조회\n## MVP Scope\n포함: 규칙 1개, 비긴급 보류. 제외: 다중 규칙, 기기별 규칙\n## Not Doing (and Why)\n- AI 기반 자동 분류 — 긴급도 필드로 충분한지 먼저 확인\n## Open Questions\n- 보류된 알림은 규칙 종료 시 묶어서 보낼까 버릴까\n\n워크스페이스 .claude/workspace/quiet-hours-20261021/ 에 이미 FRD.draft.md(인터뷰 확정 결정)가 있어.",
+      "expected_output": "기존 .claude/workspace/quiet-hours-20261021/FRD.draft.md 를 덮어쓰지 않고 맨 아래에 '## 확정 결정 — feature-idea-refine (<날짜>)' 섹션으로 승인된 1-pager(Problem·Direction·Assumptions·MVP·Not Doing·Open Questions)를 추가한다. 이후 /devoks-sdlc:feature-frd-author frd=<out>/FRD.draft.md 를 제안하고 턴을 끝내며 FRD.md를 작성하지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "기존 FRD.draft.md(인터뷰 확정 결정)를 보존하고 아래에 추가한다" },
+        { "text": "추가 섹션 제목이 '## 확정 결정 — feature-idea-refine (날짜)' 형식이다" },
+        { "text": "1-pager에 Not Doing 절이 1개 이상 항목과 함께 포함된다" },
+        { "text": "다음 단계로 feature-frd-author 호출을 제안하고 FRD.md를 작성하지 않는다" }
+      ]
+    }
+  ]
+}

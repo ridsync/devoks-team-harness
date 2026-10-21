@@ -1,0 +1,34 @@
+{
+  "skill_name": "devoks-sdlc:feature-intent-interview",
+  "notes": "인터뷰는 다회 턴 HITL이라 단일 실행으로는 첫 턴 행동(가설·확신도·질문 1개+예상 답, 하류 산출물 미생성)과 승인 후 기록 형식(FRD.draft.md 확정 결정 섹션, 기존 내용 보존)을 나눠 검증한다. 케이스 2는 승인된 6줄 정리가 대화에 주어진 상태에서 7단계만 수행하는지 본다.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "vague-dashboard-first-turn",
+      "prompt": "우리 팀 지표용 대시보드 하나 만들어줘. 요즘 다들 대시보드 쓰잖아.",
+      "expected_output": "첫 응답에 한 문장 가설과 확신도(%)가 있고, 확신도가 70% 미만이므로 무엇이 비었는지(누구를 위한 것인지·지표의 의미·성공 모습 등) 이유가 같은 줄에 붙는다. 질문은 정확히 1개이며 '예상:' 형태의 가설 답과 그 이유가 붙는다. '요즘 다들 쓰잖아'는 관습 신호이므로 이후 탐침 대상으로 인지한다. FRD·PLAN·차트 라이브러리 제안·코드·FRD.draft.md 기록을 하지 않는다. AskUserQuestion 선택지 형태로 묻지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "첫 응답에 한 문장 가설과 확신도(%)가 있다" },
+        { "text": "확신도가 70% 미만이면 비어 있는 항목이 이유로 붙어 있다" },
+        { "text": "질문이 정확히 1개다(한 메시지에 질문 2개 이상이면 실패)" },
+        { "text": "질문에 예상 답과 그 근거가 붙어 있다" },
+        { "text": "FRD·PLAN·구현안(차트 라이브러리·레이아웃)·파일 기록을 시작하지 않는다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "approved-intent-recorded-without-overwrite",
+      "prompt": "인터뷰 결과 정리에 동의해. 그대로 기록해줘.\n\n(직전 정리)\n- Outcome: 진행 중인 실험 목록을 한곳에서 본다\n- User: 그로스 PM 본인\n- Why now: 분기 실험이 12개로 늘어 문서가 흩어짐\n- Success: 실험 추가·종료가 1분 안에 반영되고 주간 회의에서 이 목록만 본다\n- Constraint: 사내 SSO 뒤에서만 접근\n- Out of scope: 실험 결과 지표 시각화, 팀원 공유\n\n워크스페이스는 .claude/workspace/experiment-list-20261021/ 이고, 그 안에 이미 FRD.draft.md 가 있어(원래 요청 원문이 들어 있음).",
+      "expected_output": "기존 .claude/workspace/experiment-list-20261021/FRD.draft.md 를 덮어쓰지 않고 맨 아래에 '## 확정 결정 — feature-intent-interview (<날짜>)' 섹션을 추가해 6줄(Out of scope 포함)과 '남은 질문' 줄을 기록한다. 기존 원문은 보존된다. 기록 후 /devoks-sdlc:feature-frd-author frd=<out>/FRD.draft.md (방향이 정해졌으므로) 를 제안하고 턴을 끝내며, 같은 턴에 FRD.md 작성이나 아이디어 확장을 시작하지 않는다.",
+      "files": [],
+      "assertions": [
+        { "text": "기존 FRD.draft.md 내용을 보존하고 맨 아래에 섹션을 추가한다(덮어쓰기 없음)" },
+        { "text": "추가 섹션 제목이 '## 확정 결정 — feature-intent-interview (날짜)' 형식이다" },
+        { "text": "Outcome/User/Why now/Success/Constraint/Out of scope 6줄과 남은 질문이 모두 기록된다" },
+        { "text": "다음 단계로 feature-frd-author 호출을 제안한다" },
+        { "text": "같은 턴에 FRD.md를 작성하지 않는다" }
+      ]
+    }
+  ]
+}

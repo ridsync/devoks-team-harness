@@ -109,6 +109,8 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 flowchart TD
     S["0 · 준비 (최초 1회)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
 
+    D["1a · 요구 탐색 (선택)<br/>feature-intent-interview · feature-idea-refine<br/>→ FRD.draft.md"]
+
     subgraph BUILD["1–3 · feature-workflow-runner (통합 진입점)"]
         direction LR
         F["1 · 요구 정의<br/>feature-frd-author<br/>→ FRD.md"]
@@ -131,6 +133,8 @@ flowchart TD
     C["5 · 마무리<br/>devoks-git:git-commit-msg<br/>→ devoks-git:git-pull-request"]
 
     S --> BUILD
+    S -.-> D
+    D -.-> F
     BUILD --> VERIFY
     VERIFY --> C
 ```
@@ -148,6 +152,8 @@ flowchart TD
 | 스킬 | 호출 | 플러그인 |
 |------|------|---------|
 | `workflow-map` | `/devoks-sdlc:workflow-map` | devoks-sdlc |
+| `feature-intent-interview` | `/devoks-sdlc:feature-intent-interview` | devoks-sdlc |
+| `feature-idea-refine` | `/devoks-sdlc:feature-idea-refine` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
 | `feature-plan-author` | `/devoks-sdlc:feature-plan-author` | devoks-sdlc |
 | `feature-plan-executor` | `/devoks-sdlc:feature-plan-executor` | devoks-sdlc |

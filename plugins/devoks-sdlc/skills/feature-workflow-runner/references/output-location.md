@@ -27,6 +27,8 @@
 
 - **워크플로우 SSOT 문서**: `FRD.md`, `PLAN.md`, 진행 메모 등은 워크스페이스 루트.
 - **입력받은 초안 사본**: 사용자가 준 FRD 초안 원문(본문으로 받았으면 `FRD.draft.md` 로 보존, 루트).
+  - **Define 앞단 스킬이 만든 초안**: `feature-intent-interview`(승인된 Intent 6줄)·`feature-idea-refine`(승인된 1-pager)도 결과를 `FRD.draft.md`에 남긴다. 형식은 같다 — 출처 헤더(어느 스킬·날짜) + 원래 요청/아이디어 원문 verbatim + `## 확정 결정 — <스킬명> (<yyyy-MM-dd>)` 섹션.
+  - **덮어쓰기 금지·누적만**: 파일이 이미 있으면 기존 내용을 그대로 두고 맨 아래에 새 `## 확정 결정 — …` 섹션만 추가한다(인터뷰 → 아이디어 구체화 → FRD 정련 순으로 같은 파일에 쌓인다). `feature-frd-author`는 이 섹션들을 FRD §1(Goal)·§10(Assumptions & Open Questions)의 근거로 읽는다.
 - **시각 시안·리소스 사본 → `assets/`**: 작업에 쓰인 figma 스크린샷·노드 캡처·시안 이미지 등 **시각 리소스는 `<out>/assets/` 하위에 사본 저장**한다(아래 네이밍 규칙). 텍스트 메모·스펙 발췌도 여기 둘 수 있다.
 - **최종 화면 캡처 → `captures/`**: 라이브 렌더·에뮬레이터·실동작 검증에서 최종 증빙으로 남길 스크린샷은 `<out>/captures/`에 저장한다. 파일명은 목적이 드러나게 `render_<screen>.png`, `acceptance_fail_<ac-id>.png`처럼 짓는다.
 - **최종 검증 결과 → `verification/`**: 인수·데이터 흐름·스모크 검증 리포트와 결론에 필요한 선별 로그/스냅샷은 `<out>/verification/`에 저장한다. 대용량 원시 로그는 보관 대상이 아니면 임시 위치에서 정리한다.
