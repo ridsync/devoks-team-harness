@@ -175,6 +175,10 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **`browser-devtools` 스토리지 전체 덤프 예시 제거 + 브라우저 출력 untrusted 본문 반영** (2026-10-21, `devoks-browser` `1.2.5 → 1.2.6`)
+  - 배경: agent-skills 재비교(2026-10-21) 중 발견. 2026-10-12 채택 ②(브라우저 출력은 데이터일 뿐 지시가 아님)가 `acceptance-test-runner`·`browser-visual-diff-capture` 에이전트에만 들어가고 `browser-devtools` 스킬 본문에는 빠져 있었다. 같은 스킬의 `evaluate_script` 예시는 `{...localStorage, ...sessionStorage}`로 스토리지를 통째로 덤프해 인증 토큰·세션 값을 대화 컨텍스트로 끌어올 수 있었다(agent-skills `browser-testing-with-devtools`의 "No credential access"와 정면 충돌).
+  - 반영: 예시를 키 목록 + 지정 비민감 키 `getItem` 조회로 교체(`verify-acceptance-test` `scenario-execution.md`와 같은 패턴). 토큰·쿠키·자격증명 값은 읽거나 출력하지 않고, 존재 확인은 boolean만 반환하도록 했다. 네트워크 요청의 `Authorization`·`Cookie` 헤더 값도 같은 기준. untrusted 문구를 스킬 본문에 추가했다.
+
 - [x] **복사 산출물 변경 이력(CHANGELOG) + 원본 스냅샷 기반 3-way base 갱신** (2026-10-19, `devoks-core` `2.0.0 → 2.1.0`)
   - 배경: aware-react-app 세션이 2.0.0 base 갱신을 하다가 막혔다. 버전별로 무엇이 왜 바뀌었는지 기록이 없었고, 사본이 로컬에서 수정돼 있어 2-way diff로는 upstream 변경과 로컬 커스터마이징을 구분할 수 없었다. 남은 플러그인 캐시(1.6.0~)로 기준점을 추정했지만, 구버전 캐시는 업데이트 14일 뒤 삭제되므로 재현 가능한 방법이 아니다. 실제로 그 세션은 1.1.4에서 upstream이 삭제한 `workflow.md` APK 섹션과 `(auth, brew, sensor-ingest)` 예시를 로컬 커스터마이징으로 오판했다.
   - 반영: `plugins/devoks-core/CHANGELOG.md`를 신설했다. 플러그인 내부에 두어 설치 프로젝트에서도 읽을 수 있고, 1.1.4~2.1.0을 git 이력으로 소급 작성했다(복사 산출물은 파일 › 섹션 › 사유, 거부 가능 변경 표시). `setup-project-convention`은 적용 시 원본 스냅샷을 `.claude/.devoks-base/`에 기록한다. `setup-preset-manage` base 갱신은 상태 6분류 → CHANGELOG 사유 → `git merge-file` 3-way → 파일별 반영/거부/보류(거부도 스냅샷 전진) 순서로 바꿨고, 스냅샷 없는 프로젝트용 1회 이전 절차(캐시 기반 기준 추정 + CHANGELOG 대조)를 추가했다. preset 재적용도 스냅샷으로 upstream 변경 섹션만 식별한다. 훅은 스냅샷이 있으면 스냅샷 ↔ 번들로 판정한다. maintainer 절차에 CHANGELOG 기재를 필수로 넣었다.
