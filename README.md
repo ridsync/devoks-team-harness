@@ -92,7 +92,7 @@ Instead, it uses an **explicit setup/apply model**:
 
 | Type | Source | Applied to project |
 |------|--------|--------------------|
-| **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | copied during explicit setup |
+| **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | copied during explicit setup — common refs always, stack-scoped refs (frontmatter `scope: <preset>`, e.g. `web-security.md` for React Web) only when matching the chosen preset |
 | **refs** | `plugins/devoks-core/refs/*.md` | copied during explicit setup |
 | **stack preset** | `plugins/devoks-core/conventions/<preset>/project-convention.md` | copied to `.claude/rules/project-convention.md` |
 | **project active convention** | `.claude/rules/project-convention.md` | project-owned; no SessionStart overwrite |

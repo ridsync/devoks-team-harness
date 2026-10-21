@@ -5,12 +5,28 @@
 - **복사 산출물** — 플러그인 밖으로 복사되는 파일. 항목 형식: `파일 › 섹션: 추가/변경/삭제 — 사유`
   - base: `rules/agent-principles.md`, `rules/memory-policy.md`, `refs/{code-review,engineering-principles,git-convention,interaction-integrity,workflow}.md`
   - preset: `conventions/<preset>/project-convention.md`
+  - 스택 한정 refs: `refs/*.md` 중 frontmatter `scope: <preset>`이 있는 파일(active preset과 같을 때만 복사) — `refs/web-security.md`(`react-web`)
   - 스크립트: `assets/chrome-debug.sh` (→ `~/.devoks/bin/`)
 - **스킬·커맨드·훅** — 플러그인과 함께 자동 갱신된다. 사용법이 바뀐 경우만 적는다.
 
 변경이 없는 구역은 생략한다. 1.1.4 이전 기록은 없다.
 
 ---
+
+## 2.2.0 — 2026-10-21
+
+### 복사 산출물
+- `refs/web-security.md`: 추가(스택 한정, `scope: react-web`) — React 웹 보안 심화 SSOT(규칙·근거·탐지 시그널, OWASP Top 10:2025 매핑). 2026-07-13 작성분(`a0c0e98`·`1f342ac`)이 브랜치에서 main에 머지되지 않아 누락돼 있던 것을 복원했다. 복원과 함께 §0.1 신뢰 경계 매핑, §7 개인정보 최소화(분석·리플레이·에러 트래킹 payload), §11 파일 업로드, §12 AI/LLM 기능(OWASP LLM Top 10 2025 매핑)을 추가했다. react-web preset이 아니면 복사되지 않는다
+- `refs/engineering-principles.md` › [Security]: 추가 — 20. Never Trust the Client. 이후 [Operations & Improvement] 항목 번호가 20~23 → 21~24로 밀렸다(내용 불변)
+- `refs/code-review.md` › §4 Level 3: 추가 — 위험 싱크·토큰 저장/로그 노출·LLM 출력 신뢰 금지 체크, 스택 한정 보안 ref 참조 포인터
+- `refs/code-review.md` › §6 UI Component: 변경 — XSS 항목에 sanitize 명시, URL 스킴 검증·DOM 직접 조작 금지 2항목 추가
+- `refs/code-review.md` › §9: 변경 — `**/*.tsx` 포함, 보안(XSS·URL 인젝션·위험 싱크) 초점 추가
+- `conventions/react-web/project-convention.md` › Security: 추가 — 클라이언트 검증은 UX뿐·sanitize·URL 스킴·토큰 저장·공개 env·lockfile·postMessage·업로드/LLM 출력·PII 요약과 `web-security.md` 링크(전문은 ref가 소유)
+
+### 스킬·커맨드·훅
+- `setup-project-convention` › refs를 base(frontmatter `scope` 없음)와 스택 한정(`scope: <preset>`)으로 구분, 스택 한정 refs는 선택한 preset과 같을 때만 복사하고 스냅샷에도 기록
+- `setup-preset-manage` › base 갱신 대상에 active preset의 스택 한정 refs 포함(목록은 새 원본 frontmatter에서 매번 구함 — 새로 생긴 스택 한정 ref는 `신규`), preset 전환 시 새 preset의 스택 한정 refs 복사·이전 preset 전용 ref는 삭제 여부 확인
+- `check-setup-state.sh` › base stale 판정에 active preset의 스택 한정 refs 포함(2.2.0 이전에 setup한 react-web 프로젝트는 `web-security.md` 사본이 없어 base 갱신이 안내된다)
 
 ## 2.1.0 — 2026-10-19
 

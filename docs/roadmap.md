@@ -175,6 +175,12 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **web-security 가이드 복원·보강 + 스택 한정 refs 복사 체계 + 보안 심층 리뷰 신뢰 경계·조건부 카테고리** (2026-10-21, `devoks-core` `2.1.0 → 2.2.0`, `devoks-sdlc` `3.3.1 → 3.4.0`)
+  - 배경: 2026-07-13에 작성한 React 웹 보안 가이드(`a0c0e98`·`1f342ac`)가 `docs/react-web-security-by-claude` 브랜치에만 있고 main에 머지되지 않아, 이후 48개 커밋 동안 `refs/web-security.md`와 연동 지점 전부가 빠져 있었다(메모리에는 "적용됨"으로 남아 있어 발견이 늦었다). agent-skills `security-and-hardening` 비교 중 발견했다. main 구조가 그 사이 크게 바뀌어(conventions 경로 이전, 루트 `.claude/refs` 사본 금지, base 스냅샷·3-way 갱신) 브랜치 머지 대신 **본문만 가져오고 연동은 새로 구현**했다. 브랜치는 사용자가 직접 정리한다.
+  - devoks-core: `web-security.md` 복원 + §0.1 신뢰 경계 매핑·§7 PII 최소화·§11 파일 업로드·§12 AI/LLM(OWASP LLM Top 10 2025) 추가(OWASP Top 10:2025 분류명은 공식 페이지로 재확인). 배치는 **스택 한정 refs**(frontmatter `scope: react-web`) — 항상 복사(B안)는 RN·Android·FastAPI에 무관 문서를 넣고, preset 본문 내장(C안)은 매 세션 로드 비용이 커서 기각. `setup-project-convention`·`setup-preset-manage`(base 갱신·전환)·`check-setup-state.sh`(stale 판정)에 스택 한정 refs를 등록. `engineering-principles.md` [Security] 20. Never Trust the Client(이후 21~24 재번호, 번호 참조 없음 확인), `code-review.md` L3·§6·§9, react-web preset Security 요약. CHANGELOG 2.2.0.
+  - devoks-sdlc: `code-security-review`에 점검 전 **신뢰 경계 매핑**과 **조건부 카테고리 5종**(파일 업로드·파괴적 파일 작업·무차별 대입·PII·AI/LLM — 발동 신호가 없으면 `해당 없음`), 스택 보안 ref 감지. `code-review` 보안 요약에 민감정보 노출 행, 참고 문서에 스택 보안 ref.
+  - 검증: 훅 스모크 4케이스(react-web·사본 없음 → 경고 / RN → 0 / react-web 최신 → 0 / 버전 일치 → 0), `bash -n`, `validate --strict` 2/2, frontmatter 6개 파싱, 루트 `.claude/refs` 미생성 확인. `code-security-review` evals 동적 재실행은 미실시(권장 항목).
+
 - [x] **`browser-devtools` 스토리지 전체 덤프 예시 제거 + 브라우저 출력 untrusted 본문 반영** (2026-10-21, `devoks-browser` `1.2.5 → 1.2.6`)
   - 배경: agent-skills 재비교(2026-10-21) 중 발견. 2026-10-12 채택 ②(브라우저 출력은 데이터일 뿐 지시가 아님)가 `acceptance-test-runner`·`browser-visual-diff-capture` 에이전트에만 들어가고 `browser-devtools` 스킬 본문에는 빠져 있었다. 같은 스킬의 `evaluate_script` 예시는 `{...localStorage, ...sessionStorage}`로 스토리지를 통째로 덤프해 인증 토큰·세션 값을 대화 컨텍스트로 끌어올 수 있었다(agent-skills `browser-testing-with-devtools`의 "No credential access"와 정면 충돌).
   - 반영: 예시를 키 목록 + 지정 비민감 키 `getItem` 조회로 교체(`verify-acceptance-test` `scenario-execution.md`와 같은 패턴). 토큰·쿠키·자격증명 값은 읽거나 출력하지 않고, 존재 확인은 boolean만 반환하도록 했다. 네트워크 요청의 `Authorization`·`Cookie` 헤더 값도 같은 기준. untrusted 문구를 스킬 본문에 추가했다.

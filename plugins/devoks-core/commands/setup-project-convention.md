@@ -15,7 +15,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 
 - base rules: `${CLAUDE_PLUGIN_ROOT}/rules/agent-principles.md`, `${CLAUDE_PLUGIN_ROOT}/rules/memory-policy.md`
 - stack preset: `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md`
-- 참조 문서: `${CLAUDE_PLUGIN_ROOT}/refs/*.md`
+- 참조 문서: `${CLAUDE_PLUGIN_ROOT}/refs/*.md` — frontmatter에 `scope`가 **없는** 파일은 base refs(항상 복사, 목록 SSOT는 `hooks/check-setup-state.sh`의 `BASE_FILES`), `scope: <preset>`이 있는 파일은 **스택 한정 refs**(선택한 preset과 같을 때만 복사, 예: `web-security.md` → `react-web`)
 - 프로젝트 active convention: `.claude/rules/project-convention.md`
 - provenance metadata: `.claude/project-convention.json`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
@@ -64,7 +64,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 
 1. `.claude/rules/agent-principles.md` 복사/갱신
 2. `.claude/rules/memory-policy.md` 복사/갱신
-3. `.claude/refs/*.md` 복사/갱신
+3. `.claude/refs/` base refs 복사/갱신 + 선택한 preset의 스택 한정 refs 복사(있을 때만 — 어떤 파일인지 이름을 밝힌다)
 4. 선택한 preset을 `.claude/rules/project-convention.md`로 생성 또는 교체
 5. `.claude/project-convention.json` 생성/갱신
 
@@ -117,9 +117,10 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 
 - `.claude/rules/` 및 `.claude/refs/`가 없으면 생성
 - base rules/refs 를 명시적으로 복사
+- 스택 한정 refs 복사 — `${CLAUDE_PLUGIN_ROOT}/refs/*.md` 중 frontmatter `scope`가 선택한 preset id(`react-web` 등, provenance `preset` 값과 같은 표기)와 같은 파일만. `Custom`은 출발점으로 삼은 preset 기준
 - 선택한 preset 원본을 `.claude/rules/project-convention.md`로 복사
 - 필요 시 `Custom` 보정 내용을 같은 파일에 반영
-- **원본 스냅샷 기록** — 복사한 base 원본 7종과 preset 원본을 `.claude/.devoks-base/`에 그대로 둔다(`rules/`·`refs/`는 같은 이름, preset은 `preset/project-convention.md`). 다음 업데이트 때 `devoks-core:setup-preset-manage`가 이 스냅샷을 merge base로 써서 upstream 변경과 로컬 커스터마이징을 구분한다(구버전 플러그인 캐시는 업데이트 14일 뒤 삭제되므로 캐시에 의존하지 않는다). 복사는 `command cp -f`로 한다(셸 프로필의 `cp -i` 별칭 회피)
+- **원본 스냅샷 기록** — 복사한 base 원본 7종·스택 한정 refs와 preset 원본을 `.claude/.devoks-base/`에 그대로 둔다(`rules/`·`refs/`는 같은 이름, preset은 `preset/project-convention.md`). 다음 업데이트 때 `devoks-core:setup-preset-manage`가 이 스냅샷을 merge base로 써서 upstream 변경과 로컬 커스터마이징을 구분한다(구버전 플러그인 캐시는 업데이트 14일 뒤 삭제되므로 캐시에 의존하지 않는다). 복사는 `command cp -f`로 한다(셸 프로필의 `cp -i` 별칭 회피)
 - preset 원본 파일의 `sha256` 해시를 계산(예: `shasum -a 256 "${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md"`)
 - 적용에 사용한 devoks-core 버전을 확인한다 — 플러그인 캐시 경로가 `.../devoks-core/<version>/` 구조이므로
   `basename "${CLAUDE_PLUGIN_ROOT}"`가 곧 설치 버전이다. 경로가 버전 형태가 아니면(폴백 설치)
@@ -144,7 +145,7 @@ metadata 예시:
 `presetHash`는 이후 `devoks-core:setup-preset-manage`가 "업스트림 preset이 그 사이 바뀌었는지"를
 값싸고 정확하게 판단하는 사전 필터로 쓴다 — preset 원본 내용이 변경될 때만 값이 달라진다.
 
-`devoksCoreVersion`은 **base rules/refs**(`presetHash`가 커버하지 않는 7개 파일)의 stale 여부를
+`devoksCoreVersion`은 **base rules/refs**(`presetHash`가 커버하지 않는 7개 파일 + 스택 한정 refs)의 stale 여부를
 SessionStart 훅이 판정하는 기준이다. 훅은 이 값이 설치 버전과 다르고 **또한** base 파일 내용이 실제로
 다를 때만 1줄 경고한다 — 버전만 비교하면 base를 건드리지 않은 patch bump에서 오탐이 난다.
 필드가 없는 구버전 provenance는 훅이 `source` 경로의 `/devoks-core/<version>/`에서 회수하므로,

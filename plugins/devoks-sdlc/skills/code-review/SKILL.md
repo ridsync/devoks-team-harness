@@ -3,7 +3,7 @@ description: "코드리뷰를 수행한다. 브랜치 커밋 범위(base 대비 
 argument-hint: "[mode=general|diff-branch (default: 브랜치 추론)] [scope=<파일/폴더 경로>] [base=<브랜치> (default: main/develop)]"
 metadata:
   author: ridsync
-  version: 2.0.1
+  version: 2.0.2
 ---
 
 # code-review — 코드리뷰
@@ -112,4 +112,5 @@ Phase 0에서 확정된 값으로 `code-reviewer` 에이전트를 호출한다.
 - **실행 절차·리포트 SSOT**: `references/review-execution.md`, `references/report-template.md`
 - **리뷰 기준 SSOT**: `.claude/refs/code-review.md` (C.L.E.A.R. / Layered / Checklists / §8 Severity)
 - **프로젝트 규칙**: `.claude/refs/engineering-principles.md`, `.claude/refs/interaction-integrity.md`, `.claude/refs/git-convention.md`, `.claude/refs/workflow.md` / `.claude/rules/agent-principles.md`, 프로젝트 active convention `.claude/rules/project-convention.md`, 프로젝트 사실 SSOT `.claude/CLAUDE.md`
+- **스택 보안 기준(존재 시)**: `.claude/refs/*-security.md`(예: `web-security.md`) — setup이 active preset에 맞춰 주입한 스택 한정 보안 ref. 🔒 보안 점검 요약에서 탐지 시그널을 함께 적용한다
 - **관련**: `devoks-sdlc:code-security-review` — 이 스킬은 diff/scope 한정 경량 보안 스크리닝만 수행한다. Critical/High급 보안 이슈 발견 시, 또는 repo 전수·의존성 취약점·위협 모델링이 필요하면 `/devoks-sdlc:code-security-review`(전용 심층 검증, 역할 분리)로 확장한다.

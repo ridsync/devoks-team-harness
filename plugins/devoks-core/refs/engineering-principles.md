@@ -49,12 +49,13 @@ Shared development principles for individuals, teams, and AI agents.
 
 18. **Least Privilege** — Restrict permissions and access scope to the minimum so that mistakes or breaches have a narrow impact.
 19. **Defense in Depth** — Layer multiple defenses rather than relying on a single line so that one breach minimizes damage.
+20. **Never Trust the Client** — Anything running on the client (code, state, validation) can be inspected and tampered with. Client-side checks are UX only; security decisions (authn/authz/input validation) are always enforced on the server.
 
 ---
 
 ## [Operations & Improvement] Continuously Understand and Improve the System
 
-20. **Observability** — Make it possible to see "what happened" via logs, traces, and metrics to enable debugging and operations.
-21. **Drift Detection** — Detect and alert when specs, code, environments, or data diverge over time. Correct the drift.
-22. **Small Batches** — Deploy changes in small, frequent increments to reduce review, rollback, and debugging burden and shorten feedback loops.
-23. **Test as Documentation** — Treat tests as living specifications that record "how the system should behave."
+21. **Observability** — Make it possible to see "what happened" via logs, traces, and metrics to enable debugging and operations.
+22. **Drift Detection** — Detect and alert when specs, code, environments, or data diverge over time. Correct the drift.
+23. **Small Batches** — Deploy changes in small, frequent increments to reduce review, rollback, and debugging burden and shorten feedback loops.
+24. **Test as Documentation** — Treat tests as living specifications that record "how the system should behave."

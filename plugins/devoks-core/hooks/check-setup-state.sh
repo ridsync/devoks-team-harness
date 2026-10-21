@@ -146,6 +146,22 @@ provenance_core_version() {
   return 1
 }
 
+# 스택 한정 refs — frontmatter `scope: <preset>`이 active preset과 같을 때만 복사되는 refs
+# (예: web-security.md → react-web). BASE_FILES에 고정하지 않고 번들 frontmatter에서 매번
+# 구한다: 업데이트로 새 스택 한정 ref가 생기면 사본이 없어 "다름"으로 잡혀야 base 갱신 안내가 뜬다.
+scoped_ref_files() {
+  local root="$1" preset f scope
+  preset="$(sed -n 's/.*"preset"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$CLAUDE_DIR/project-convention.json" 2>/dev/null | head -1)"
+  [[ -n "$preset" ]] || return 0
+  for f in "$root"/refs/*.md; do
+    [[ -f "$f" ]] || continue
+    # 첫 frontmatter 블록 안의 scope만 본다(본문의 우연한 "scope:" 줄 무시).
+    scope="$(awk 'NR==1 && $0!="---" {exit} NR>1 && $0=="---" {exit} /^scope:/ {sub(/^scope:[[:space:]]*/, ""); print; exit}' "$f")"
+    [[ "$scope" == "$preset" ]] && printf 'refs/%s\n' "${f##*/}"
+  done
+  return 0
+}
+
 # 버전 갭이 실제 base 파일 차이로 이어졌는지 확증. patch bump가 base를 건드리지 않는
 # 경우가 실제로 절반쯤 되므로(1.5.0→1.5.1: 0건, 반면 1.4.1→code-review.md, 1.2.1→
 # git-convention.md, 1.1.4→4건) 버전 문자열만 비교하면 오탐이 난다. 이 확증은 버전
@@ -153,9 +169,12 @@ provenance_core_version() {
 # 원본 스냅샷(.claude/.devoks-base/)이 있으면 사본 대신 스냅샷과 비교한다 — 사본과의 차이는
 # 로컬 커스터마이징일 수 있어서, upstream이 실제로 바뀌었는지는 "스냅샷 ≠ 번들"이어야 확정된다.
 base_files_differ() {
-  local root rel ref
+  local root rel ref files=("${BASE_FILES[@]}")
   root="$(bundle_root)" || return 1
-  for rel in "${BASE_FILES[@]}"; do
+  while IFS= read -r rel; do
+    [[ -n "$rel" ]] && files+=("$rel")
+  done < <(scoped_ref_files "$root")
+  for rel in "${files[@]}"; do
     [[ -f "$root/$rel" ]] || continue
     ref="$CLAUDE_DIR/.devoks-base/$rel"
     [[ -f "$ref" ]] || ref="$CLAUDE_DIR/$rel"

@@ -90,3 +90,4 @@
 
 - **리뷰 기준 SSOT**: `.claude/refs/code-review.md` (C.L.E.A.R. / Layered / Checklists / §8 Severity)
 - **프로젝트 규칙**: `.claude/refs/engineering-principles.md`, `.claude/refs/interaction-integrity.md`, `.claude/refs/git-convention.md`, `.claude/refs/workflow.md` / `.claude/rules/agent-principles.md`, 프로젝트 active convention `.claude/rules/project-convention.md` (필요 시 `.claude/CLAUDE.md`로 stack 사실 확인)
+- **스택 보안 기준(존재 시)**: `.claude/refs/*-security.md`(예: `web-security.md`) — 🔒 보안 점검 요약에서 탐지 시그널을 함께 적용한다

@@ -14,6 +14,7 @@ description: devoks setup(setup-project-convention·setup-mcp)이 플러그인 �
 |---|---|---|---|---|
 | active convention | `.claude/rules/project-convention.md` | `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/` | preset에서 출발해 **프로젝트가 커스터마이징** | Steps 1~6 (섹션 단위) |
 | base rules/refs 7종 | `.claude/rules/`·`.claude/refs/` | `${CLAUDE_PLUGIN_ROOT}/rules·refs/` | 원본 사본 | "base 갱신" (파일 단위) |
+| 스택 한정 refs | `.claude/refs/` | `${CLAUDE_PLUGIN_ROOT}/refs/` 중 frontmatter `scope`가 active preset과 같은 파일(예: `react-web` → `web-security.md`) | 원본 사본 | "base 갱신" (파일 단위), 전환 시 추가·제거는 5단계 |
 | `chrome-debug.sh` | `~/.devoks/bin/` | `${CLAUDE_PLUGIN_ROOT}/assets/chrome-debug.sh` | 원본 사본 (기본 URL은 `~/.devoks/chrome-debug.url`에 별도) | "~/.devoks 스크립트 갱신" |
 | `metro-mcp.js` | `~/.devoks/mcp/` | devoks-rn 플러그인 `scripts/metro-mcp.js` | 원본 사본 | "~/.devoks 스크립트 갱신" |
 
@@ -28,7 +29,8 @@ SessionStart 훅(`hooks/check-setup-state.sh`)은 위 산출물이 원본과 달
 - preset provenance metadata: `.claude/project-convention.json` (`presetHash` = preset 기준, `devoksCoreVersion` = base 기준)
 - preset 원본: `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md`
 - base rules/refs 원본(7종, 목록 SSOT는 `hooks/check-setup-state.sh`의 `BASE_FILES`): `${CLAUDE_PLUGIN_ROOT}/rules/{agent-principles,memory-policy}.md`, `${CLAUDE_PLUGIN_ROOT}/refs/{code-review,engineering-principles,git-convention,interaction-integrity,workflow}.md` → 프로젝트 `.claude/rules/`·`.claude/refs/` 같은 이름
-- 적용 당시 원본 스냅샷(3-way merge base): `.claude/.devoks-base/` — `rules/`·`refs/`(base 7종)와 `preset/project-convention.md`. setup·이 스킬이 원본을 반영할 때마다 함께 갱신한다. `.claude/rules/`와 같은 git 추적 정책을 따른다(팀이 rules를 커밋하면 스냅샷도 커밋)
+- 스택 한정 refs 원본: `${CLAUDE_PLUGIN_ROOT}/refs/*.md` 중 frontmatter `scope: <preset>`이 provenance의 `preset`과 같은 파일 → 프로젝트 `.claude/refs/` 같은 이름. `scope`가 없는 refs가 base다. 대상 목록은 매번 **새 원본의 frontmatter에서** 다시 구한다(업데이트로 새로 생긴 스택 한정 ref도 `신규`로 잡히게)
+- 적용 당시 원본 스냅샷(3-way merge base): `.claude/.devoks-base/` — `rules/`·`refs/`(base 7종 + 스택 한정 refs)와 `preset/project-convention.md`. setup·이 스킬이 원본을 반영할 때마다 함께 갱신한다. `.claude/rules/`와 같은 git 추적 정책을 따른다(팀이 rules를 커밋하면 스냅샷도 커밋)
 - 버전별 변경 사유: `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
 
@@ -43,7 +45,7 @@ SessionStart 훅(`hooks/check-setup-state.sh`)은 위 산출물이 원본과 달
 - React Web / React Native / Android / iOS / Custom 간 전환
 - `.claude/CLAUDE.md`와 convention 사이의 stack drift 점검
 - legacy convention이 bundled copy 잔재인지, 실제 프로젝트 커스터마이징인지 추정
-- devoks-core 업데이트 후 base rules/refs 7종 갱신 (아래 "base 갱신" 절)
+- devoks-core 업데이트 후 base rules/refs 7종 + 스택 한정 refs 갱신 (아래 "base 갱신" 절)
 - devoks-core·devoks-rn 업데이트 후 `~/.devoks` 스크립트 갱신 (아래 "~/.devoks 스크립트 갱신" 절)
 
 ---
@@ -133,6 +135,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - `.claude/rules/project-convention.md`를 직접 덮어쓸 수 있는 작업은 반드시 사용자 확인 후에만 수행
 - provenance metadata를 함께 갱신 — `presetHash`도 현재 preset 원본의 최신 해시로 갱신
 - preset 스냅샷(`.claude/.devoks-base/preset/project-convention.md`)을 반영한 preset 원본으로 갱신(`command cp -f`) — 일부 섹션만 반영했어도 거부한 섹션이 다시 제안되지 않도록 갱신한다
+- preset 전환 시 스택 한정 refs도 함께 맞춘다 — 새 preset의 스택 한정 refs는 복사하고 스냅샷(`.claude/.devoks-base/refs/`)도 기록한다. 이전 preset 전용 ref(예: `react-web` → `react-native` 전환 시 `web-security.md`)는 **자동 삭제하지 않고** 삭제 여부를 확인받는다(로컬에서 계속 참고할 수 있다). 삭제하면 스냅샷도 함께 지운다
 - preset 전환 후에는 `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files도 drift 여부를 점검
 - `Custom` 흐름은 가장 가까운 preset + 사용자 보정값으로 처리
 
@@ -151,11 +154,11 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 
 ## base 갱신
 
-base 7종은 devoks-core 원본의 사본이지만, 프로젝트가 일부 줄을 고쳐 쓰는 경우가 있다. 사본과 새 원본만 비교하는 2-way diff로는 "upstream이 바꾼 줄"과 "로컬에서 고친 줄"을 구분할 수 없으므로, **적용 당시 원본 스냅샷**을 기준(merge base)으로 3-way 판정한다. 각 변경의 **사유**는 `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`에서 가져온다.
+대상은 base 7종과 active preset의 스택 한정 refs다(이하 "base 파일"). base 파일은 devoks-core 원본의 사본이지만, 프로젝트가 일부 줄을 고쳐 쓰는 경우가 있다. 사본과 새 원본만 비교하는 2-way diff로는 "upstream이 바꾼 줄"과 "로컬에서 고친 줄"을 구분할 수 없으므로, **적용 당시 원본 스냅샷**을 기준(merge base)으로 3-way 판정한다. 각 변경의 **사유**는 `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`에서 가져온다.
 
 ### 1. 상태 판정
 
-설치 버전(`basename "${CLAUDE_PLUGIN_ROOT}"`, 버전 형태가 아니면 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `${CLAUDE_PLUGIN_ROOT}/plugin.json`의 `version`)과 provenance의 `devoksCoreVersion`을 함께 보여준다. 7종 각각에 대해 사본(`.claude/<rel>`)·스냅샷(`.claude/.devoks-base/<rel>`)·새 원본(`${CLAUDE_PLUGIN_ROOT}/<rel>`)을 `cmp -s`로 비교해 하나로 분류한다.
+설치 버전(`basename "${CLAUDE_PLUGIN_ROOT}"`, 버전 형태가 아니면 `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` → `${CLAUDE_PLUGIN_ROOT}/plugin.json`의 `version`)과 provenance의 `devoksCoreVersion`을 함께 보여준다. base 파일 각각에 대해 사본(`.claude/<rel>`)·스냅샷(`.claude/.devoks-base/<rel>`)·새 원본(`${CLAUDE_PLUGIN_ROOT}/<rel>`)을 `cmp -s`로 비교해 하나로 분류한다.
 
 | 상태 | 조건 | 처리 |
 |---|---|---|

@@ -102,7 +102,7 @@ agent frontmatter의 `tools:`는 **화이트리스트**다 — 거기 없는 도
 ### devoks-core
 - `rules/`, `refs/`, hook 변경 시 루트 `.claude/` 사본과 관계
 - `check-setup-state.sh`, explicit setup/sync 정책 문서와 설명 일치 여부
-- **`CHANGELOG.md` 기재(version bump 시 필수)** — `plugins/devoks-core/CHANGELOG.md`에 새 버전 절을 추가한다. 복사 산출물(base 7종·preset·`assets/`)이 바뀌었으면 `파일 › 섹션: 추가/변경/삭제 — 사유`를 **빠짐없이** 적는다 — 설치 프로젝트의 `setup-preset-manage`가 이 기록을 근거로 upstream 변경과 로컬 커스터마이징을 구분하므로, 누락은 곧 잘못된 병합 판단이 된다. 프로젝트 환경에 따라 거부해도 되는 변경은 그렇다고 명시한다. 스킬·커맨드·훅은 사용법이 바뀐 경우만 적는다
+- **`CHANGELOG.md` 기재(version bump 시 필수)** — `plugins/devoks-core/CHANGELOG.md`에 새 버전 절을 추가한다. 복사 산출물(base 7종·스택 한정 refs·preset·`assets/`)이 바뀌었으면 `파일 › 섹션: 추가/변경/삭제 — 사유`를 **빠짐없이** 적는다 — 설치 프로젝트의 `setup-preset-manage`가 이 기록을 근거로 upstream 변경과 로컬 커스터마이징을 구분하므로, 누락은 곧 잘못된 병합 판단이 된다. 프로젝트 환경에 따라 거부해도 되는 변경은 그렇다고 명시한다. 스킬·커맨드·훅은 사용법이 바뀐 경우만 적는다
 - **setup 산출물 등록** — 플러그인 밖(대상 프로젝트 `.claude/`, `~/.devoks/` 등)으로 파일을 복사하는 변경(어느 플러그인이든)은 `skills/setup-preset-manage/SKILL.md` Overview 표 + 갱신 절차와 `check-setup-state.sh` stale 감지에 함께 등록한다. 미등록 산출물은 플러그인 업데이트 후 조용히 옛 버전으로 남는다(2026-10-19 base rules 미반영 사례). 복사 대상은 번들 원본과 바이트 동일하게 유지한다(사용자별 값은 별도 파일로 — `chrome-debug.url` 패턴)
 
 ### devoks-sdlc

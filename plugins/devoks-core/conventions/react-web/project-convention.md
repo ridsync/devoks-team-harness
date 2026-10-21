@@ -355,7 +355,16 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 
 - API key, token, credential 하드코딩 금지
 - Sensitive files 목록 참조 (CLAUDE.md → Sensitive Files)
-- 권한은 RBAC (`hasRoleAccess`) 통해 검증
+- 권한은 RBAC (`hasRoleAccess`) 통해 검증 — 단, 클라이언트 검증은 UX 최적화일 뿐이며 인가 판단은 서버가 재검증
+- `dangerouslySetInnerHTML`은 sanitize(DOMPurify 등) 없이 금지, React 밖 DOM 직접 조작(innerHTML 대입 등)으로 이스케이프 우회 금지
+- 사용자 입력이 `href`/`src`로 흐르면 URL 스킴 검증 (`javascript:`/`data:` 차단)
+- 인증 토큰은 `localStorage`/`sessionStorage` 저장 금지 → HttpOnly+Secure+SameSite 쿠키
+- 공개 prefix env(`VITE_`/`NEXT_PUBLIC_`)에 시크릿 배치 금지, 프로덕션 소스맵 비공개
+- lockfile 커밋 필수, 의존성 audit 정기 실행 (Critical/High 미해결 금지)
+- `postMessage`는 targetOrigin 명시(`'*'` 금지) + 수신 origin 검증
+- 업로드 파일(SVG·HTML 포함)은 앱 origin에서 인라인 렌더 금지, LLM 응답은 사용자 입력과 같은 등급으로 sanitize·스킴 검증
+- 분석·세션 리플레이·에러 트래킹 payload에 PII 미포함
+- 심화 기준·탐지 시그널: `.claude/refs/web-security.md`
 
 ---
 
