@@ -11,7 +11,7 @@
 - 대상 브랜치/리비전: `<branch or commit>`
 - FRD: `<FRDSource>`
 - 진입 라우트: `<EntryRoute>`
-- devoks-browser 연결: 정상 / 실패
+- chrome-devtools-attach 연결: 정상 / 실패
 - 실행 시각: `<YYYY-MM-DD HH:MM ~ HH:MM>`
 
 ## 종합 판정: ✅ 전체 통과 / ⚠️ 일부 실패·갭 / ❌ 실패

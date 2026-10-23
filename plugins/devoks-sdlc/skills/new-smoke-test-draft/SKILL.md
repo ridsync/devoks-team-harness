@@ -1,6 +1,6 @@
 ---
 name: new-smoke-test-draft
-description: 설치된 대상 프로젝트의 라우트/화면 정의 파일을 스캔해, 배포 전 스모크 테스트용 프로젝트 소유 스킬 초안(SKILL.md + 코어 스크린 체크리스트 + 딥다이브 체크리스트 스텁 + 리포트 템플릿)을 그 프로젝트의 `.claude/skills/`에 1회 생성한다. 생성 후 완성·실행·유지보수는 대상 프로젝트 자신이 맡으며, devoks-sdlc는 이 생성기만 소유한다. 감지된 라우트 파일은 추천 근거일 뿐이며 화면 목록은 반드시 사용자 확인을 거쳐 확정한다. "스모크 테스트 스킬 만들어줘", "배포 전 검증 스킬 초안 생성", "화면 목록으로 스모크 체크리스트 만들어줘", "verify-app-smoke-test 같은 거 초안 생성", "smoke test skill draft" 요청에서 사용한다. 생성된 스킬을 실제로 실행하려면(devoks-browser 플러그인 필요) 그 프로젝트 자신의 스킬 문서를 참고한다.
+description: 설치된 대상 프로젝트의 라우트/화면 정의 파일을 스캔해, 배포 전 스모크 테스트용 프로젝트 소유 스킬 초안(SKILL.md + 코어 스크린 체크리스트 + 딥다이브 체크리스트 스텁 + 리포트 템플릿)을 그 프로젝트의 `.claude/skills/`에 1회 생성한다. 생성 후 완성·실행·유지보수는 대상 프로젝트 자신이 맡으며, devoks-sdlc는 이 생성기만 소유한다. 감지된 라우트 파일은 추천 근거일 뿐이며 화면 목록은 반드시 사용자 확인을 거쳐 확정한다. "스모크 테스트 스킬 만들어줘", "배포 전 검증 스킬 초안 생성", "화면 목록으로 스모크 체크리스트 만들어줘", "verify-app-smoke-test 같은 거 초안 생성", "smoke test skill draft" 요청에서 사용한다. 생성된 스킬을 실제로 실행하려면(chrome-devtools-attach MCP 등록 필요) 그 프로젝트 자신의 스킬 문서를 참고한다.
 argument-hint: "[scan=<스캔 시작 경로> (default: 저장소 루트)] [name=<스킬 이름> (default: verify-app-smoke-test)]"
 metadata:
   author: ridsync
@@ -26,8 +26,8 @@ metadata:
 
 - **이 생성기 자신**은 MCP가 필요 없다 — 대상 프로젝트의 라우트 파일을 Read/Grep/Glob으로 스캔하고, 확정된
   내용을 새 파일로 쓰는 것이 전부다.
-- **생성된 초안을 나중에 실행**하려면(이 스킬의 책임 범위 밖) 대상 프로젝트에 `devoks-browser` 플러그인
-  (Chrome DevTools MCP, `mcp__chrome-devtools-attach__*`, 9269 attach)과 실행 중인 dev server가 필요하다 —
+- **생성된 초안을 나중에 실행**하려면(이 스킬의 책임 범위 밖) 대상 프로젝트에 chrome-devtools-attach MCP
+  (`mcp__chrome-devtools-attach__*`, 9269 attach, user scope 등록)와 실행 중인 dev server가 필요하다 —
   생성 단계에서는 필요 없다.
 
 ## 호출 방법
@@ -45,7 +45,7 @@ metadata:
 ## Phase 0 — 스캔 범위 합의
 
 1. `scan` 인자가 있으면 그 경로를, 없으면 저장소 루트를 스캔 시작점으로 삼는다.
-2. 한 줄 통보: "지금은 초안을 생성하는 단계라 devoks-browser·dev server가 필요 없습니다 — 나중에 생성된
+2. 한 줄 통보: "지금은 초안을 생성하는 단계라 chrome-devtools-attach MCP·dev server가 필요 없습니다 — 나중에 생성된
    스킬을 **실행**할 때만 필요합니다."
 3. **모노레포 캡션**: `apps/*`, `packages/*` 같은 구조에서 독립된 앱 루트가 여럿 발견되면 **병합하지 않는다**
    — 후보를 나열하고 이번에 초안을 만들 앱 하나를 확인한다(다른 앱은 이 스킬을 다시 호출해 별도 생성).
@@ -111,9 +111,9 @@ metadata:
      (스펙이 닫힌 실행 역할이라 상위 모델 이득이 없다 — `devoks-sdlc:verify-acceptance-test`의
      `acceptance-test-runner` 패턴과 동일 근거).
   3. **함정 경고를 그대로 포함한다**: "`tools:` frontmatter는 화이트리스트로 동작한다 — 실제 사용할 MCP
-     도구(devoks-browser가 제공하는 Chrome DevTools MCP 등)의 정확한 이름을 하나라도 빠뜨리면 에이전트가
-     그 도구를 호출하는 모든 Phase에서 조용히 차단된다. 만들기 전에 devoks-browser 스킬 문서에서 실제 tool
-     이름을 확인하고, 추측으로 채우지 않는다."
+     도구(Chrome DevTools MCP `chrome-devtools-attach` 등)의 정확한 이름을 하나라도 빠뜨리면 에이전트가
+     그 도구를 호출하는 모든 Phase에서 조용히 차단된다. 만들기 전에 실제로 노출된 tool 이름(ToolSearch, 또는
+     `devoks-browser:browser-devtools`의 도구 목록)을 확인하고, 추측으로 채우지 않는다."
   4. 참고할 기존 패턴 이름만 가리킨다(`verify-acceptance-test`의 `acceptance-test-runner`, 또는
      `browser-visual-diff`의 `browser-visual-diff-capture`) — 에이전트 파일 내용을 복사하지 않는다.
 
@@ -124,8 +124,8 @@ metadata:
   갖지 않습니다"를 명시한다.
 - 생성 결과에 남은 `TODO:` 항목(라우트 파라미터 확보 방법, 담당자 등)이 있으면 첫 실행 전에 채워야 함을
   안내한다.
-- 대상 프로젝트에 `devoks-browser` 플러그인이 안 보이면(차단은 아님) 생성 결과를 실제로 **실행**하기 전에
-  설치가 필요하다고 안내한다.
+- 대상 프로젝트 환경에 `chrome-devtools-attach` MCP가 등록돼 있지 않으면(`claude mcp list`로 확인, 차단은
+  아님) 생성 결과를 실제로 **실행**하기 전에 등록(`/devoks-core:setup-mcp` Step 6)이 필요하다고 안내한다.
 
 ---
 
@@ -138,7 +138,7 @@ metadata:
 - 딥다이브 체크리스트의 시나리오 본문을 화면 목록만으로 지어내지 않는다 — 구조(화면 목록·섹션 골격)만
   생성하고 내용은 TODO로 남긴다.
 - 모노레포에서 여러 앱 후보를 하나로 병합하지 않는다.
-- 이 스킬 자신은 devoks-browser를 요구하지 않는다(생성 단계 한정) — 요구하는 것은 생성 결과를 실행할 때다.
+- 이 스킬 자신은 chrome-devtools-attach MCP를 요구하지 않는다(생성 단계 한정) — 요구하는 것은 생성 결과를 실행할 때다.
 - 생성 후에는 산출물과 어떤 지속 동기화·재적용 관계도 만들지 않는다(1회성 생성).
 
 ---

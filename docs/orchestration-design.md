@@ -95,7 +95,7 @@ Phase 4 후속 메뉴까지 총 7개 지점에서 사람이 멈춰 서는 **HITL
 
 - **공유 자산(devoks-sdlc 재사용):** FRD/PLAN 템플릿, `task-delegation`·`traceability`, EARS AC, 검증·리뷰 스킬(`verify-requirements`·`verify-data-flow`·`code-review`·`code-security-review`·`test-run-triage`·`verify-acceptance-test`), 심각도 SSOT, 에이전트(`code-implementer`·`code-reviewer`·`code-security-reviewer`·`acceptance-test-runner`).
 - **신설(orchestration 전용):** 오케스트레이터 스킬(Workflow 기반), RUN 상태 스키마(`run-id`·`issue-ref`·`policy-version`), 트리거/에스컬레이션 어댑터, 재시도·롤백·deny-list 정책, `devoks-git` 연동.
-- **의존성:** `devoks-core`·`devoks-git`·`devoks-sdlc`(스킬 참조). `verify-acceptance-test`를 쓰므로 **`devoks-browser`가 transitive 의존**(1.10.0에서 devoks-sdlc가 이미 `dependencies`로 선언).
+- **의존성:** `devoks-core`·`devoks-git`·`devoks-sdlc`(스킬 참조). `verify-acceptance-test`를 쓰므로 **`chrome-devtools-attach` MCP(user scope 등록 — `/devoks-core:setup-mcp` Step 6)가 필요**하다. `devoks-browser` 플러그인은 의존하지 않는다(devoks-sdlc 3.8.0부터 `dependencies`에서 제거, 이전엔 1.10.0~3.7.0에서 transitive 의존).
 - **격리 처방 층위:** 대상 프로젝트에 "네트워크 차단 샌드박스 + worktree"를 **필수 전제로 처방/문서화**(플러그인은 OS 샌드박스를 강제 못하므로 정책·가이드로 규정). 실동작 검증 스테이지만 localhost+9269 allowlist 예외(D6).
 
 ---

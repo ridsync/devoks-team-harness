@@ -1,5 +1,5 @@
 ---
-description: FRD의 AC(Acceptance Criteria) 중 UI 조작과 상태 영속이 걸린 항목을, 이미 실행 중인 앱에서 실제로 조작해 검증한다. 단위/통합/E2E 자동화 테스트 스위트와 달리 테스트 코드를 남기지 않는 1회성 실동작 확인이다 — 진입 경로(라우트) → 사전 상태 세팅 → 조작(클릭/입력) → 기대 UI 상태 → 기대 영속 상태(DB 필드 대조) 순으로 실행하고 시나리오별 PASS/FAIL 리포트를 낸다. devoks-browser 플러그인(Chrome DevTools MCP, 9269 attach)이 설치돼 있어야 한다. "실동작 검증", "브라우저로 실제 확인", "AC가 실제로 동작하는지", "기능이 실제 앱에서 되는지", "acceptance test", "실기기/에뮬레이터 확인" 키워드에서 호출한다. 레이어별 계측·3중 대조가 필요한 데이터 정합성 심층 검증은 devoks-sdlc:verify-data-flow를 쓴다.
+description: FRD의 AC(Acceptance Criteria) 중 UI 조작과 상태 영속이 걸린 항목을, 이미 실행 중인 앱에서 실제로 조작해 검증한다. 단위/통합/E2E 자동화 테스트 스위트와 달리 테스트 코드를 남기지 않는 1회성 실동작 확인이다 — 진입 경로(라우트) → 사전 상태 세팅 → 조작(클릭/입력) → 기대 UI 상태 → 기대 영속 상태(DB 필드 대조) 순으로 실행하고 시나리오별 PASS/FAIL 리포트를 낸다. Chrome DevTools MCP(`chrome-devtools-attach`, 9269 attach)가 user scope에 등록돼 있어야 한다. "실동작 검증", "브라우저로 실제 확인", "AC가 실제로 동작하는지", "기능이 실제 앱에서 되는지", "acceptance test", "실기기/에뮬레이터 확인" 키워드에서 호출한다. 레이어별 계측·3중 대조가 필요한 데이터 정합성 심층 검증은 devoks-sdlc:verify-data-flow를 쓴다.
 argument-hint: "ac=<AC-ID 목록> [frd=<FRD.md 경로>] route=<진입 라우트> persistence=<영속 조회 방법>"
 metadata:
   author: ridsync
@@ -14,11 +14,13 @@ FRD의 AC를 **실행 중인 앱에서 실제로 조작해** 검증하는 워크
 1. 목(mock) 데이터로는 드러나지 않는 **실데이터 형태 불일치**(예: 의존하는 필드가 실환경에서 `null`).
 2. 유닛테스트로는 확인할 수 없는 **UI 조작 → 상태 전이 → 영속화의 종단 동작**.
 
-## devoks-browser 의존성
+## Chrome DevTools MCP 전제
 
-이 스킬은 `devoks-browser` 플러그인(Chrome DevTools MCP, `mcp__chrome-devtools-attach__*`, 9269 attach)이
-설치돼 있어야 동작한다 — `plugin.json`의 `dependencies`에 선언돼 있어 devoks-sdlc 설치 시 함께 설치된다.
-미설치 시 리포트에 "devoks-browser 미설치"를 기록하고 설치를 안내한다(추측으로 진행하지 않는다).
+이 스킬은 Chrome DevTools MCP(`chrome-devtools-attach`, 도구 prefix `mcp__chrome-devtools-attach__*`,
+9269 attach)가 **user scope에 등록**돼 있어야 동작한다. `devoks-browser` 플러그인 설치와는 무관하다 —
+MCP는 플러그인이 번들하지 않으며(`devoks-browser` 2.0.0~), `devoks-sdlc`도 `devoks-browser`를 의존하지 않는다.
+미등록·미연결이면 리포트에 "chrome-devtools-attach MCP 미연결"을 기록하고 `/devoks-core:setup-mcp` Step 6
+등록을 안내한다(추측으로 진행하지 않는다).
 
 ## 호출 방법
 
@@ -92,7 +94,7 @@ FRD의 AC를 **실행 중인 앱에서 실제로 조작해** 검증하는 워크
   
   - AC가 **빠른 반복 조작**을 포함하면(`.claude/refs/interaction-integrity.md` §1 적용 대상 판정 통과 시) 조작 칸에 **횟수와 간격**을 명시한다 — 예: `"∧ 5회 연타(간격 없음)"` / `"∧ 5회(간격 30ms)"`. 기대 UI 상태는 "입력 횟수만큼 반영"처럼 **수치화**하고, I/O가 걸려 있으면 기대 영속 상태에 "저장 요청 1회로 코얼레싱"을 함께 적는다.
   
-6. devoks-browser 설치 여부를 1회 확인한다(미설치면 Phase 1로 진행하지 않고 안내).
+6. chrome-devtools-attach MCP 등록·연결 여부를 1회 확인한다(미등록·미연결이면 Phase 1로 진행하지 않고 안내).
 
 ---
 

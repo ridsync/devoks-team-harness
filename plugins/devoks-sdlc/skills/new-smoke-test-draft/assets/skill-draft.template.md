@@ -5,7 +5,7 @@ Phase 3 템플릿 — new-smoke-test-draft 생성기가 이 파일을 읽어 아
 -->
 ---
 name: <생성될 스킬 이름>
-description: "<프로젝트 이름> 배포 전 <도메인 요약> 주요 화면이 정상 동작하는지, 이미 실행 중인 dev server에 devoks-browser(Chrome DevTools MCP, 9269 attach)로 접속해 화면 진입·핵심 요소 노출·콘솔 에러 유무를 스모크 수준으로 점검하고 화면별 PASS/FAIL/BLOCKED 리포트를 낸다. 단위/통합/E2E 자동화 스위트를 대체하지 않는다 — 배포 직전 큰 문제는 없는지 빠르게 훑는 회귀 스모크 확인용. \"배포 전 테스트\", \"스모크 테스트\", \"주요기능 확인\" 키워드에서 호출한다."
+description: "<프로젝트 이름> 배포 전 <도메인 요약> 주요 화면이 정상 동작하는지, 이미 실행 중인 dev server에 chrome-devtools-attach(Chrome DevTools MCP, 9269 attach)로 접속해 화면 진입·핵심 요소 노출·콘솔 에러 유무를 스모크 수준으로 점검하고 화면별 PASS/FAIL/BLOCKED 리포트를 낸다. 단위/통합/E2E 자동화 스위트를 대체하지 않는다 — 배포 직전 큰 문제는 없는지 빠르게 훑는 회귀 스모크 확인용. \"배포 전 테스트\", \"스모크 테스트\", \"주요기능 확인\" 키워드에서 호출한다."
 metadata:
   author: <TODO: 담당자>
   version: 1.0.0
@@ -35,8 +35,8 @@ metadata:
 
 ## 전제
 
-- `devoks-browser` 플러그인(Chrome DevTools MCP, `mcp__chrome-devtools-attach__*`, 9269 attach)이 설치돼
-  있어야 동작한다. 미설치 시 설치를 안내하고 추측으로 진행하지 않는다.
+- Chrome DevTools MCP(`chrome-devtools-attach`, `mcp__chrome-devtools-attach__*`, 9269 attach)가 user scope에
+  등록돼 있어야 동작한다. 미등록 시 `/devoks-core:setup-mcp` Step 6 등록을 안내하고 추측으로 진행하지 않는다.
 - dev server가 이미 실행 중이어야 한다. 꺼져 있으면 이 스킬이 직접 켜지 않고 사용자에게 실행을 요청한다.
 - Chrome이 `--remote-debugging-port=9269`로 이미 실행 중이어야 한다.
 
@@ -56,7 +56,7 @@ metadata:
 ## Phase 0 — 스코프 합의
 
 1. **범위 확인** — 전체 또는 특정 화면만 확인할지 1회 확인한다(요청에 이미 명시돼 있으면 생략).
-2. **연결 확인** — `mcp__chrome-devtools-attach__list_pages`로 devoks-browser 연결 상태와 현재 페이지를
+2. **연결 확인** — `mcp__chrome-devtools-attach__list_pages`로 MCP 연결 상태와 현재 페이지를
    확인한다. 연결 실패 시 Chrome을 `--remote-debugging-port=9269`로 실행해 달라고 안내 후 재시도.
 3. **라우트 대조** — 위 SSOT 파일을 다시 확인해 이 표가 stale하지 않은지 점검하고, 라우트가 추가/제거됐으면
    표를 먼저 갱신한 뒤 실행한다.
@@ -77,9 +77,9 @@ metadata:
 > 1. 제안 파일 경로: `.claude/agents/<생성될 스킬 이름>-runner.md`
 > 2. 필수 frontmatter: `name`, `description`(agent-internal 성격 표기), `tools`, `model: sonnet`
 >    (스펙이 닫힌 실행 역할이라 상위 모델을 쓸 이득이 없습니다).
-> 3. **주의**: `tools:` frontmatter는 화이트리스트로 동작합니다 — 실제 사용할 MCP 도구(devoks-browser가
->    제공하는 Chrome DevTools MCP 등)의 정확한 이름을 하나라도 빠뜨리면 에이전트가 그 도구를 호출하는
->    모든 단계에서 조용히 차단됩니다. 만들기 전에 devoks-browser 스킬 문서에서 실제 tool 이름을 확인하고,
+> 3. **주의**: `tools:` frontmatter는 화이트리스트로 동작합니다 — 실제 사용할 MCP 도구(Chrome DevTools MCP
+>    `chrome-devtools-attach` 등)의 정확한 이름을 하나라도 빠뜨리면 에이전트가 그 도구를 호출하는
+>    모든 단계에서 조용히 차단됩니다. 만들기 전에 실제로 노출된 tool 이름(ToolSearch 등)을 확인하고,
 >    추측으로 채우지 마세요.
 > 4. 참고할 기존 패턴: `devoks-sdlc:verify-acceptance-test`의 `acceptance-test-runner`, 또는
 >    `devoks-browser:browser-visual-diff`의 `browser-visual-diff-capture`(이름만 참고 — 내용을 그대로

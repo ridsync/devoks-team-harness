@@ -80,7 +80,7 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   #### `devoks-sdlc`와의 관계
   - **공유**: 에이전트(`code-implementer`, `code-reviewer`, `code-security-reviewer`), 스킬 자산(PLAN/FRD 템플릿, `task-delegation`, `traceability`, 검증·리뷰 스킬), 심각도 SSOT.
   - **분리**: 오케스트레이터 스킬/커맨드(`orchestration-workflow-runner` 등), RUN 상태 스키마, 트리거·웹훅·권한(쓰기·PR·머지), 에스컬레이션·재시도 정책, 외부 MCP/CLI 어댑터.
-  - **의존성 후보**: `devoks-core`, `devoks-git`, `devoks-sdlc`(스킬 참조 또는 soft dependency). `devoks-browser`는 `verify-acceptance-test`(1.10.0에서 devoks-sdlc가 `dependencies`로 선언) 및 visual diff를 통해 **transitive 의존**.
+  - **의존성 후보**: `devoks-core`, `devoks-git`, `devoks-sdlc`(스킬 참조 또는 soft dependency). `devoks-browser`는 더 이상 transitive 의존이 아니다(devoks-sdlc 3.8.0에서 `dependencies` 제거 — `verify-acceptance-test`가 필요한 것은 플러그인이 아니라 `chrome-devtools-attach` MCP이고 visual diff 호출은 조건부이기 때문). 필요한 MCP는 `/devoks-core:setup-mcp`가 설치한다.
   #### 단계적 도입 (제안)
   
   | 단계            | 범위                                                                    | 산출                                                                                                                                                                     |
@@ -175,10 +175,17 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **`devoks-sdlc` → `devoks-browser` 의존 제거 + 인수 검증 전제를 "MCP 등록"으로 정정** (2026-10-23, `devoks-sdlc` `3.7.0 → 3.8.0`)
+  - 배경: 아래 항목(`devoks-browser` 2.0.0)에서 MCP 번들을 제거하자, sdlc가 `devoks-browser`를 `dependencies`로 둔 근거가 사라졌다. sdlc가 실제로 필요한 것은 플러그인이 아니라 `chrome-devtools-attach` MCP였다(`verify-acceptance-test`는 `acceptance-test-runner`의 `tools:`로 MCP를 직접 호출, `browser-visual-diff` 호출은 `new-ui-draft`·구현 후 체크리스트 4번에서 조건부이고 "또는 육안 확인" 폴백이 있음). 하드 의존은 `devoks-sdlc-orchestration`(비-HITL)에까지 browser를 전이시켰고, README는 `devoks-browser`를 "선택"으로 표시해 선언과 모순이었다.
+  - 반영(사용자 결정 — 의존성을 README 쪽에 맞춤): `dependencies`에서 `devoks-browser` 제거(`plugin.json`·`marketplace.json`). `verify-acceptance-test` description·전제 절·Phase 0 6번을 "devoks-browser 설치 확인" → "chrome-devtools-attach MCP 등록·연결 확인"으로 정정하고 미등록 시 `/devoks-core:setup-mcp` Step 6을 안내. 리포트 템플릿·`acceptance-test-runner`의 "devoks-browser 연결" → "chrome-devtools-attach 연결". `new-smoke-test-draft`(SKILL·템플릿)·`post-implementation-checklist.md`·README 의존 표·`orchestration-design.md`·로드맵 83행의 전제 문구 정리. `devoks-browser`의 `permissions.allow`는 sdlc 설치와 분리되므로, `devoks-browser`를 설치하지 않은 환경은 첫 MCP 호출에 승인 프롬프트가 뜰 수 있다(`setup-mcp` Step 8 베이스라인으로 처리).
+  - 검증: `verify-acceptance-test` evals 2케이스(AC 선별·시나리오 표, MCP 미등록 시 안내)를 서브에이전트로 동적 실행해 전 assertion 충족(eval 1은 EDGE-002도 대상에 포함 — 클릭+영속값 불변이 걸려 합리적). `validate --strict`(devoks-sdlc·marketplace), JSON·frontmatter YAML 파싱 확인.
+  - 의도적 미반영: `workflow-map`의 "타 플러그인 항목은 해당 플러그인이 설치돼 있어야 한다" 문구(visual-diff 행에 여전히 정확하며, 이제 sdlc가 browser를 자동 설치하지 않아 오히려 더 관련됨). `roadmap` 451행의 1.10.0 결정 기록(당시 사실이므로 이력으로 둠).
+  - 후속: `browser-visual-diff → devoks-sdlc:verify-visual-diff` 이전 항목은 "browser 관심사는 `devoks-browser`가 적합"이라는 이번 결론과 전제가 충돌하므로 범위 재검토 대상.
+
 - [x] **`chrome-devtools-attach` 플러그인 번들 제거 → user scope 등록으로 통일** (2026-10-23, `devoks-browser` `1.2.6 → 2.0.0`, `devoks-core` `2.2.0 → 2.3.0`)
   - 배경: 같은 이름의 서버가 `devoks-browser/plugin.json`과 user scope에 이중 정의돼 있었다(동작 이슈는 없고 유지보수성 문제). 또 Node 20.19에서 `chrome-devtools-mcp`의 `get_css_styles`가 `Set.prototype.intersection` 부재로 실패해(`engines`는 `^20.19.0` 허용 — 2026-10-23 실측, Node 22.22.2에서는 통과) Node·PATH를 정할 자리가 필요했는데, 플러그인 캐시 `plugin.json`은 업데이트 때 덮어써져 로컬 설정이 유지되지 않는다. 로드맵 폐기 ④가 정한 "공유 MCP는 `setup-mcp`가 user scope에 1회 설치" 모델에서 chrome-devtools만 예외였다.
   - 반영(사용자 결정): `devoks-browser`에서 `mcpServers` 제거(`settings.permissions.allow`는 유지 — `devoks-rn`·`metro-devtools`와 같은 형태). `setup-mcp` Step 6을 `claude mcp add --scope user` 등록으로 전환하고 구버전 이중 등록 점검·Node 22 권장 안내 추가. `check-setup-state.sh`의 `have "devoks-browser"` 폴백 제거. `browser-devtools` SKILL 환경 셋업 절, `mcp-setup-guide.md` 설치 정책·3절, README/README.ko 정리.
-  - 의도적 미반영: `assets/chrome-debug.sh` 주석의 "devoks-browser 번들" 표현(복사 산출물이라 주석만 고쳐도 `setup-preset-manage`가 갱신 대상으로 판정함). `devoks-sdlc`의 "devoks-browser 플러그인 설치 전제" 문구(`verify-acceptance-test` 등 — 정확한 전제는 이제 "chrome-devtools-attach 등록"이라 후속 정리 대상).
+  - 의도적 미반영: `assets/chrome-debug.sh` 주석의 "devoks-browser 번들" 표현(복사 산출물이라 주석만 고쳐도 `setup-preset-manage`가 갱신 대상으로 판정함). `devoks-sdlc`의 "devoks-browser 플러그인 설치 전제" 문구(정확한 전제는 이제 "chrome-devtools-attach 등록" — 바로 아래 항목에서 정리).
   - 영향: `devoks-browser` 번들에만 의존하던 설치자는 업데이트 후 서버가 사라져 `setup-mcp` Step 6(또는 `claude mcp add`)이 필요하다 — 그래서 major bump.
 
 - [x] **Define 앞단 재구성 — 두 스킬을 `feature-interview`로 통합하고 frd-author Phase 0 게이트로 연결** (2026-10-21, `devoks-sdlc` `3.6.0 → 3.7.0`)

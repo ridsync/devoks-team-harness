@@ -219,7 +219,7 @@ flowchart TD
 |--------|----------|----------|
 | devoks-core | — | — |
 | devoks-git | `gh` CLI | — |
-| devoks-sdlc | `gh` CLI, CodeGraph MCP, Serena MCP | Figma MCP |
+| devoks-sdlc | `gh` CLI, CodeGraph MCP, Serena MCP | Figma MCP; Chrome DevTools MCP (`verify-acceptance-test`, `verify-data-flow`); `devoks-browser` plugin (visual-diff) |
 | devoks-browser | Chrome DevTools MCP + `~/.claude.json` | Playwright MCP, Figma MCP |
 | devoks-rn | `devoks-rn` plugin + Metro running; `metro-devtools` at user scope (`/devoks-core:setup-mcp` Step 5) | `adb` / `xcrun simctl` (screenshots) |
 
