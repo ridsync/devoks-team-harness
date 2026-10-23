@@ -140,7 +140,7 @@ Figma 디자인 링크와 추가 정보를 받아, Figma MCP로 디자인을 조
 - 사용하지 않는 import 제거
 - 접근성·상태 셀프체크 — 5단계 화면 상태 목록이 모두 구현됐는지, 아이콘만 있는 버튼에 접근 가능한 이름(`aria-label` 등)이 있는지, 키보드로 조작·포커스 이동이 되는지, 상태를 색만으로 구분하지 않는지(기준: `.claude/refs/code-review.md` §6 UI Component). 못 맞춘 항목은 요약에 명시
 - 구현 요약과, "추후 작업"(API 연동, 상세 페이지 등)을 사용자에게 안내(테스트를 생략했다면 그 사실과 사유를 명시)
-- Figma와 실제 렌더의 시각 충실도를 픽셀 단위로 맞춰야 하면 `devoks-browser:browser-visual-diff`를 이어서 쓰도록 안내한다.
+- Figma와 실제 렌더의 시각 충실도를 픽셀 단위로 맞춰야 하면 `devoks-browser:browser-visual-diff`를 이어서 쓰도록 안내한다(웹 한정 — RN·네이티브는 육안 확인).
 
 ---
 

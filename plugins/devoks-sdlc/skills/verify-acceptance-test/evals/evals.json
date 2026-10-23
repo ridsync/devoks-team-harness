@@ -26,6 +26,18 @@
         { "text": "등록 안내(/devoks-core:setup-mcp Step 6 또는 claude mcp add chrome-devtools-attach)를 제시한다" },
         { "text": "미등록 상태에서 임의로 Playwright 등 다른 도구로 우회 진행하거나 검증을 생략한 채 PASS로 보고하지 않는다" }
       ]
+    },
+    {
+      "id": 3,
+      "name": "native-app-out-of-scope-manual-checklist",
+      "prompt": "우리 프로젝트는 React Native 앱이야. AC-007-1(저장 버튼 탭 시 완료 토스트 표시 + savedAt 필드 영속)을 에뮬레이터에서 실동작 검증해줘.",
+      "expected_output": "이 스킬은 웹앱(Chrome attach) 전용이라 React Native 앱은 대상이 아님을 알리고, Chrome 등으로 흉내 내거나 PASS를 추측으로 적지 않는다. 대신 AC-007-1을 수동 확인 체크리스트(진입 경로·사전 상태·조작·기대 UI·기대 영속 상태)로 정리해 준다.",
+      "files": [],
+      "assertions": [
+        { "text": "이 스킬이 웹앱 전용이어서 React Native 앱은 대상이 아님을 명확히 밝힌다" },
+        { "text": "Chrome DevTools MCP 등으로 앱을 흉내 내 검증하거나 PASS/FAIL을 추측으로 보고하지 않는다" },
+        { "text": "AC-007-1을 사람이 수동으로 확인할 수 있는 체크리스트(조작·기대 UI 상태·기대 영속 상태 포함)로 정리해 제시한다" }
+      ]
     }
   ]
 }

@@ -13,7 +13,7 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 | 우선순위   | 항목                                                                                                                                          |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **높음** | UI 작업 분리 검토 · `devoks-sdlc-orchestration` 신설(비-HITL SDLC)                                                                                   |
-| **중**  | 컨벤션 preset 확장(신규 stack) · `browser-visual-diff` 이전 · `metro-devtools-attach` |
+| **중**  | 컨벤션 preset 확장(신규 stack) · `metro-devtools-attach` |
 | **낮음** | `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` 시크릿 패턴 카탈로그                                                              |
 
 
@@ -26,13 +26,6 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - `python-fastapi` preset 추가는 2026-09-15 완료 — 완료 섹션 참고.
   - 남은 범위: `react-web`·`react-native`·`android`·`ios`·`python-fastapi` 5개 외 `nextjs`, `node-backend`, `spring`, `swiftui-only`, `compose-only` 등 세분 preset 추가.
   - 우선순위: 낮음(management 인프라는 갖춰졌으니 실제 수요가 생길 때 진행 — blocking 이슈 없음).
-
-- [ ] `**browser-visual-diff` → `devoks-sdlc:verify-visual-diff` 이전**
-  - 시각 diff는 본질적으로 "검증"이므로 devoks-sdlc의 verify 계열로 모으는 것이 도메인상 자연스럽다.
-  - 동반 이동 필요: `browser-visual-diff-capture` 에이전트, `references/` 일체.
-  - 결합 비용(이번에 보류한 이유): Figma MCP·`browser-devtools` 형제 스킬과 묶여 있음 → 이전 시 cross-plugin 의존 정리가 선행되어야 함. (Chrome DevTools MCP 선언은 2026-10-23 `devoks-browser` 2.0.0에서 `plugin.json` 번들을 제거하고 user scope 등록으로 옮겨 이 결합은 해소됨 — 완료 섹션 참고.)
-  - 영향 범위: README/README.ko 카탈로그, `docs/mcp-setup-guide.md`. (`check-setup-state.sh`의 chrome-devtools 감지는 2.3.0에서 `devoks-browser` 문자열 grep 폴백을 제거해 이전 시 점검할 항목이 없어짐.)
-  - 우선순위: 중.
 
 ---
 
@@ -175,12 +168,19 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 완료 / 최근 반영
 
+- [x] **`verify-visual-diff` 이전 폐기 + 구현 후 체크리스트 환경별 분기(안내 수준)** (2026-10-23, `devoks-sdlc` `3.8.0 → 3.9.0`)
+  - 배경: `browser-visual-diff` → `devoks-sdlc:verify-visual-diff` 이전은 "시각 diff는 검증이니 sdlc verify 계열"이라는 도메인 논리였으나, 이 스킬은 Figma·라이브 렌더 캡처와 Phase 5 코드 미세조정을 하는 브라우저 관심사이고 `devoks-browser`가 그 자리다. 이전하면 `devoks-browser`에는 `browser-devtools`만 남고, 직전에 풀어낸 sdlc↔browser 결합을 다시 만든다. 한편 `post-implementation-checklist`가 환경 구분 없이 웹 전용 도구(`browser-visual-diff`·`verify-acceptance-test`)를 RN·네이티브 프로젝트에도 권하고 있었고, `verify-acceptance-test` description의 `"실기기/에뮬레이터 확인"` 트리거는 Chrome 전용 구현과 어긋나는 오트리거였다.
+  - 반영(사용자 결정): **이전 항목 폐기**(우선순위 표·README/README.ko Highlights에서도 제거). 체크리스트에 「환경별 적용」 표를 추가해 활성 convention preset(`.claude/project-convention.json`)이 `react-web`/`react-native`/`android`/`ios`일 때 3·4·5번을 분기한다 — `react-web`만 `browser-visual-diff`·`verify-acceptance-test`를 제안하고, 나머지는 육안 확인·"수동 확인 필요: <AC 목록>" 리포트 한 줄(옵션으로 만들지 않음)로 안내. preset이 없거나 그 외 값이면 현행 유지. `workflow-map` 4·5행, `new-ui-draft` 안내에 react-web 한정 표기. `verify-acceptance-test`는 description에서 `"실기기/에뮬레이터 확인"` 트리거를 빼고 "웹앱 전용"을 명시했으며 「적용 범위」 절을 신설(네이티브 요청이면 실행하지 않고 수동 확인 체크리스트로 정리).
+  - 검증: `verify-acceptance-test` evals 3케이스(웹 시나리오 회귀·MCP 미등록·RN 요청 시 범위 밖 안내 — 신규 eval 3)와 체크리스트 분기 시뮬레이션 2종(`react-native`·preset 미설정)을 서브에이전트로 동적 실행해 전 assertion·기대 동작 충족. `validate --strict`(devoks-sdlc·marketplace), JSON·frontmatter YAML 확인. (체크리스트 시뮬레이션은 `feature-workflow-runner` evals가 FRD→PLAN 생성 전용이라 영구 케이스로 넣지 않고 일회성으로 실행.)
+  - **능력 구축은 후속 — 위 "Android·iOS 네이티브 확장" 항목이 SSOT**: 체크리스트 표의 "자동 도구 없음" 칸(RN·네이티브 실동작 검증, RN·네이티브 UI 시각 비교)은 P2(모바일 acceptance runner·기기 구동 드라이버)가 갖춰질 때 해당 칸을 채운다. RN 쪽은 별도 수요 확인 후 재검토 — 후보: `browser-visual-diff`의 캡처 단계를 `devoks-rn:metro-devtools-attach` 스크린샷으로 대체(비교 로직 `diff-checklist.md`·`figma-capture.md`는 웹 언급이 거의 없어 재사용 가능성이 있으나 코드 확인 전이며, 외부 도구 채택 게이트의 실측 효용성 근거가 필요).
+  - 의도적 미반영: preset 4종 외(`python-fastapi` 등)·미설정 환경의 분기(사용자 결정 — 현행 유지), `README` 워크플로우 다이어그램의 V4·V5 라벨(체크리스트·workflow-map에서 한정 표기).
+
 - [x] **`devoks-sdlc` → `devoks-browser` 의존 제거 + 인수 검증 전제를 "MCP 등록"으로 정정** (2026-10-23, `devoks-sdlc` `3.7.0 → 3.8.0`)
   - 배경: 아래 항목(`devoks-browser` 2.0.0)에서 MCP 번들을 제거하자, sdlc가 `devoks-browser`를 `dependencies`로 둔 근거가 사라졌다. sdlc가 실제로 필요한 것은 플러그인이 아니라 `chrome-devtools-attach` MCP였다(`verify-acceptance-test`는 `acceptance-test-runner`의 `tools:`로 MCP를 직접 호출, `browser-visual-diff` 호출은 `new-ui-draft`·구현 후 체크리스트 4번에서 조건부이고 "또는 육안 확인" 폴백이 있음). 하드 의존은 `devoks-sdlc-orchestration`(비-HITL)에까지 browser를 전이시켰고, README는 `devoks-browser`를 "선택"으로 표시해 선언과 모순이었다.
   - 반영(사용자 결정 — 의존성을 README 쪽에 맞춤): `dependencies`에서 `devoks-browser` 제거(`plugin.json`·`marketplace.json`). `verify-acceptance-test` description·전제 절·Phase 0 6번을 "devoks-browser 설치 확인" → "chrome-devtools-attach MCP 등록·연결 확인"으로 정정하고 미등록 시 `/devoks-core:setup-mcp` Step 6을 안내. 리포트 템플릿·`acceptance-test-runner`의 "devoks-browser 연결" → "chrome-devtools-attach 연결". `new-smoke-test-draft`(SKILL·템플릿)·`post-implementation-checklist.md`·README 의존 표·`orchestration-design.md`·로드맵 83행의 전제 문구 정리. `devoks-browser`의 `permissions.allow`는 sdlc 설치와 분리되므로, `devoks-browser`를 설치하지 않은 환경은 첫 MCP 호출에 승인 프롬프트가 뜰 수 있다(`setup-mcp` Step 8 베이스라인으로 처리).
   - 검증: `verify-acceptance-test` evals 2케이스(AC 선별·시나리오 표, MCP 미등록 시 안내)를 서브에이전트로 동적 실행해 전 assertion 충족(eval 1은 EDGE-002도 대상에 포함 — 클릭+영속값 불변이 걸려 합리적). `validate --strict`(devoks-sdlc·marketplace), JSON·frontmatter YAML 파싱 확인.
   - 의도적 미반영: `workflow-map`의 "타 플러그인 항목은 해당 플러그인이 설치돼 있어야 한다" 문구(visual-diff 행에 여전히 정확하며, 이제 sdlc가 browser를 자동 설치하지 않아 오히려 더 관련됨). `roadmap` 451행의 1.10.0 결정 기록(당시 사실이므로 이력으로 둠).
-  - 후속: `browser-visual-diff → devoks-sdlc:verify-visual-diff` 이전 항목은 "browser 관심사는 `devoks-browser`가 적합"이라는 이번 결론과 전제가 충돌하므로 범위 재검토 대상.
+  - 후속: `browser-visual-diff → devoks-sdlc:verify-visual-diff` 이전 항목은 "browser 관심사는 `devoks-browser`가 적합"이라는 이번 결론과 전제가 충돌해 **폐기**했다 — 바로 위 항목 참고.
 
 - [x] **`chrome-devtools-attach` 플러그인 번들 제거 → user scope 등록으로 통일** (2026-10-23, `devoks-browser` `1.2.6 → 2.0.0`, `devoks-core` `2.2.0 → 2.3.0`)
   - 배경: 같은 이름의 서버가 `devoks-browser/plugin.json`과 user scope에 이중 정의돼 있었다(동작 이슈는 없고 유지보수성 문제). 또 Node 20.19에서 `chrome-devtools-mcp`의 `get_css_styles`가 `Set.prototype.intersection` 부재로 실패해(`engines`는 `^20.19.0` 허용 — 2026-10-23 실측, Node 22.22.2에서는 통과) Node·PATH를 정할 자리가 필요했는데, 플러그인 캐시 `plugin.json`은 업데이트 때 덮어써져 로컬 설정이 유지되지 않는다. 로드맵 폐기 ④가 정한 "공유 MCP는 `setup-mcp`가 user scope에 1회 설치" 모델에서 chrome-devtools만 예외였다.

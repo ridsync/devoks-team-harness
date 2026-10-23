@@ -266,7 +266,7 @@ devoks-team-harness/
 
 ## 로드맵
 
-플러그인 구조·내용 개선 후보는 [`roadmap.md`](roadmap.md)에 TODO 형식으로 추적합니다. 주요 항목: `browser-visual-diff` → `devoks-sdlc:verify-visual-diff` 이전, Deploy/Release 단계용 `devoks-release` 신설, 카탈로그 표 자동 생성(README drift 방지), 심각도 분류 SSOT 통합.
+플러그인 구조·내용 개선 후보는 [`roadmap.md`](roadmap.md)에 TODO 형식으로 추적합니다. 주요 항목: Android·iOS 네이티브 확장(`devoks-android`·`devoks-ios`), Deploy/Release 단계용 `devoks-release` 신설, 카탈로그 표 자동 생성(README drift 방지), 심각도 분류 SSOT 통합.
 
 ---
 
