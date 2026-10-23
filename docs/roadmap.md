@@ -3,7 +3,7 @@
 DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-09-18
+> 최종 갱신: 2026-10-23
 
 ---
 
@@ -13,7 +13,7 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 | 우선순위   | 항목                                                                                                                                          |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **높음** | UI 작업 분리 검토 · `devoks-sdlc-orchestration` 신설(비-HITL SDLC)                                                                                   |
-| **중**  | 컨벤션 preset 확장(신규 stack) · `metro-devtools-attach` |
+| **중**  | 컨벤션 preset 확장(신규 stack) · Android·iOS 네이티브 확장(`devoks-android`·`devoks-ios`) · `metro-devtools-attach` |
 | **낮음** | `devoks-release` 신설 · Operate/Maintain 단계 · `code-security-review` 시크릿 패턴 카탈로그                                                              |
 
 
@@ -26,6 +26,24 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - `python-fastapi` preset 추가는 2026-09-15 완료 — 완료 섹션 참고.
   - 남은 범위: `react-web`·`react-native`·`android`·`ios`·`python-fastapi` 5개 외 `nextjs`, `node-backend`, `spring`, `swiftui-only`, `compose-only` 등 세분 preset 추가.
   - 우선순위: 낮음(management 인프라는 갖춰졌으니 실제 수요가 생길 때 진행 — blocking 이슈 없음).
+
+- [ ] **Android·iOS 네이티브 확장 — `devoks-android`·`devoks-ios` 신설 + 스택 중립 계층 보강**
+  - 배경(2026-10-23 검토): preset(`conventions/android|ios`)과 감지 규칙은 이미 있으나, 실행·검증 계층이 웹(Chrome 9269)·RN(Metro)·`package.json`에 결합돼 있다. 방향은 **sdlc/git/core는 스택 중립 유지 + 네이티브 도구는 별도 플러그인**(`devoks-rn`·`devoks-browser`와 같은 모델) — sdlc 스킬을 네이티브용으로 fork하지 않는다.
+  - **확정 결정**: ① 플러그인은 `devoks-android`/`devoks-ios` **분리**(툴체인·MCP가 서로 겹치지 않고 iOS는 macOS 전제) ② 모바일 acceptance runner는 **`devoks-sdlc`에 위치**(스킬 계약 SSOT가 sdlc) ③ 기기 UI 구동 드라이버는 **mobile-mcp(`@mobilenext/mobile-mcp`)를 우선 후보로 선정**하되 외부 도구 채택 게이트(실측 효용성)를 통과한 뒤 최종 결정 — XcodeBuildMCP·Xcode 내장 MCP(`xcrun mcpbridge`, 26.3+)·Maestro(`maestro mcp`)는 재검토 대상으로 보류. MCP는 번들하지 않고 `setup-mcp`에서 user scope 등록(`devoks-browser` 2.0.0과 동일 원칙).
+  - **P0 — 스택 중립 보강(저비용)**:
+    - `setup-project-convention` 감지: RN 프로젝트에도 `android/`·`ios/`가 있어 네이티브로 오추천될 수 있음 → `package.json`에 `react-native`가 있으면 RN 우선 규칙 추가.
+    - refs `scope` 다중값 지원(현재 `scope: react-web` 단일) → `refs/mobile-security.md`(OWASP MASVS/MASTG 기반)를 `android`·`ios`·`react-native`가 공유. `check-setup-state.sh`·`setup-preset-manage` 판정 동반 수정.
+    - `refs/code-review.md` 파일 패턴 표(`*.jsx`/`*.tsx`만 존재)에 `*.kt`·`*.swift`·`AndroidManifest.xml`·`Info.plist`/`*.entitlements` 행 추가. lint/type 선행검증에 Android Lint·detekt·ktlint·SwiftLint·컴파일 검사.
+    - `test-author`/`test-run-triage`: Gradle(JUnit5, `test/` vs `androidTest/`)·`xcodebuild test`/`swift test` 감지, JUnit XML·`.xcresult` 파싱, 플래키 "기기·에뮬레이터" 범주.
+    - `code-security-review`: Gradle·SwiftPM 의존성 audit(도구 실측 후 선정).
+    - `new-smoke-test-draft` 휴리스틱: Compose Navigation(`NavHost`·`composable(`)·iOS `NavigationStack`/`navigationDestination` 누락분 추가. `verify-data-flow` 계측 예시에 `Log.d`/Timber·`os.Logger` + `adb logcat`/`simctl … log stream` 수집.
+    - `new-ui-draft`: iOS는 Figma 플러그인의 `figma:figma-swiftui` 라우팅, `DESIGN.md` 토큰 → Material3 Theme/Asset Catalog 매핑.
+    - `devoks-git`: 민감파일 점검에 `local.properties`·`*.keystore`/`*.jks`·`GoogleService-Info.plist`·`xcuserdata/`.
+  - **P1 — 플러그인 신설**: `devoks-android`(`android-device-debug`·`android-build-triage`), `devoks-ios`(`ios-simulator-debug`·`ios-build-triage`). build-triage는 대용량 빌드 로그 격리를 위해 skill→agent 승격 구조. `setup-mcp`에 mobile-mcp 선택 단계, 공식 `kotlin-lsp`/`swift-lsp` 플러그인 안내.
+  - **P2 — 실동작 검증**: `verify-acceptance-test` Phase 0에 **검증 드라이버 슬롯**(browser | mobile) 추가 + 모바일 runner agent 신설(agent `tools` frontmatter가 정적이라 `acceptance-test-runner`와 분리, `model: sonnet`). 영속 상태 대조는 `adb shell run-as … sqlite3`·`simctl get_app_container`. 현재 description의 `"실기기/에뮬레이터 확인"` 트리거는 Chrome 전용 동작과 어긋나는 오트리거였다 — 2026-10-23 `devoks-sdlc` 3.9.0에서 트리거를 제거하고 "웹앱 전용"을 명시해 정리함(아래 완료 항목 참고). `devoks-sdlc-orchestration` 실동작 allowlist(`localhost`+`9269`)에 기기 감지 프로브 추가.
+  - **P3 — 출시·운영**: `android-release-check`(서명·R8·`exported`·target API), `ios-release-check`(Info.plist 사용 목적 문구·`PrivacyInfo.xcprivacy`·entitlements·ATS), Crashlytics MCP 연동(선택), Maestro 기반 스모크(재검토 결과에 따름).
+  - 관련 항목: `metro-devtools-attach` iOS 시뮬레이터 검증(품질/유지보수) — adb/simctl 캡처 로직이 네이티브 플러그인과 중복되므로 P1 착수 시 경계 정리.
+  - 우선순위: 중(P0는 스택 중립 개선이라 선행 가능, P1~ 는 mobile-mcp 실측 후).
 
 ---
 
