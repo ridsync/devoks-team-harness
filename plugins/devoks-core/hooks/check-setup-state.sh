@@ -198,9 +198,10 @@ have "serena"     || add_missing_mcp '- serena (코드 심볼탐색·리팩토�
 have "codegraph"  || add_missing_mcp '- codegraph (코드그래프, 선택): 설치: npm install -g colbymchenry/codegraph && claude mcp add codegraph --scope user -- codegraph serve --mcp (상세: /devoks-core:setup-mcp)'
 have "figma"      || add_missing_mcp '- figma (UI 구현·visual-diff 필수): 공식 Figma 플러그인 설치 → mcp__plugin_figma_figma__* 도구 제공'
 have "playwright" || add_missing_mcp '- playwright (visual-diff 폴백 캡처, 선택): Playwright 플러그인 설치 → mcp__plugin_playwright_playwright__* 도구 제공'
-# chrome-devtools-attach 는 devoks-browser 플러그인이 번들한다. 직접 등록(~/.claude.json·project)이거나
-# devoks-browser 플러그인 활성화 둘 중 하나면 "있음"으로 본다(둘 다 없을 때만 경고).
-{ have "chrome-devtools" || have "devoks-browser"; } || add_missing_mcp '- chrome-devtools (visual-diff·data-verify 필수): devoks-browser 플러그인이 chrome-devtools-attach(:9269)를 번들 → /plugin install devoks-browser@devoks-plugins (claude mcp add 금지: 중복 인스턴스·포트 충돌)'
+# chrome-devtools-attach 는 user scope 에 직접 등록한다(devoks-browser 2.0.0 부터 플러그인 번들 없음).
+# 예전엔 "devoks-browser" 문자열도 있음으로 봤지만, 번들이 사라진 뒤로는 플러그인 활성화가 서버 존재를
+# 보장하지 않아 폴백을 뺐다. 구버전(1.x)이 번들 중이면 이중 등록되므로 setup-mcp Step 6 이 점검을 안내한다.
+have "chrome-devtools" || add_missing_mcp '- chrome-devtools (visual-diff·data-verify 필수): /devoks-core:setup-mcp Step 6 실행 또는 claude mcp add chrome-devtools-attach --scope user -- npx chrome-devtools-mcp@latest --browserUrl http://127.0.0.1:9269 (devoks-browser 2.0.0 부터 플러그인 번들 없음. Node 22 이상 권장)'
 
 # metro-devtools: RN 프로젝트에서 devoks-rn 스킬 사용 시 필요.
 # Metro WebSocket device ID가 재시작마다 바뀌어 플러그인 번들·claude mcp add로 정적 등록 불가.

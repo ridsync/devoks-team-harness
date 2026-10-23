@@ -9,7 +9,7 @@ DevOKs 팀 하네스의 스킬·커맨드가 사용하는 MCP 서버와 외부 �
 DevOKs 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·CodeGraph·context7 등)를 **번들하지 않는다**. 플러그인마다 같은 서버를 중복 선언하면 user/project scope에 이미 설치된 서버와 충돌하고(서로 다른 인스턴스·포트·파일락), 사용 가능한 도구 수가 환경마다 달라지기 때문이다.
 
 - **원칙**: 공유 MCP는 **user 또는 project scope에 1회만** 설치한다. 플러그인은 그 단일 서버를 참조만 한다.
-- **예외**: `devoks-browser`의 `chrome-devtools-attach`(`:9269` 연결 전용 고유 설정)만 플러그인이 번들한다. `devoks-rn`의 `metro-devtools`는 `/devoks-core:setup-mcp` Step 5로 user scope에 설치한다 (Metro URL 자동 조회, 재시작 자동 적응).
+- **번들 예외 없음**: `chrome-devtools-attach`(`:9269` 연결 전용 고유 설정)는 `/devoks-core:setup-mcp` Step 6으로, `devoks-rn`의 `metro-devtools`는 Step 5로 각각 user scope에 설치한다 (metro는 Metro URL 자동 조회·재시작 자동 적응). `devoks-browser`는 2.0.0부터 `chrome-devtools-attach`를 번들하지 않는다 — 이전엔 `:9269` 고유 설정을 이유로 예외였으나, 같은 이름의 정의가 플러그인과 user scope에 중복되고 Node 버전·PATH 같은 로컬 설정을 한 곳에서 다룰 수 없어 원칙에 맞췄다.
 - **자동 안내**: `devoks-core`의 SessionStart 훅(`hooks/check-setup-state.sh`)이 매 세션 시작 시 권장 MCP의 설치 여부를 점검하고, **누락 항목만** 설치 명령과 함께 안내한다. 모두 설치돼 있으면 아무것도 출력하지 않는다(멱등·non-blocking).
 - **도구 네임스페이스 주의**: 설치 방식에 따라 도구 prefix가 다르다 — 플러그인 설치 → `mcp__plugin_<plugin>_<server>__*`, `claude mcp add` → `mcp__<server>__*`. 스킬이 하드코딩한 prefix(Figma=`mcp__plugin_figma_figma__*`, Playwright=`mcp__plugin_playwright_playwright__*`)와 맞추려면 해당 서버는 **플러그인으로 설치**한다.
 
@@ -41,7 +41,7 @@ DevOKs 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 | **devoks-sdlc** (verify-data-flow) | Chrome DevTools MCP | Playwright MCP |
 | **devoks-sdlc** (code review/refactor/security) | CodeGraph MCP, Serena MCP | — |
 | **devoks-sdlc** (test author/triage) | — | — |
-| **devoks-browser** (chrome-devtools) | Chrome DevTools MCP(devoks-browser 설치 시 자동 번들, 단독 사용 시 `~/.claude.json` 수동 등록) | — |
+| **devoks-browser** (chrome-devtools) | Chrome DevTools MCP(user scope — `/devoks-core:setup-mcp` Step 6, 3절 참조) | — |
 | **devoks-browser** (visual-diff) | Figma MCP, Chrome DevTools MCP (attach) | Playwright MCP (폴백) |
 | **devoks-rn** (`metro-devtools-attach`) | `devoks-rn` 플러그인, Metro 실행 중 | `metro-devtools` (user scope — `/devoks-core:setup-mcp` Step 5); `adb` / `xcrun simctl` (스크린샷) |
 
@@ -98,14 +98,29 @@ Figma 계정 연결은 최초 도구 호출 시 브라우저 OAuth 플로우로 
 
 `devoks-browser:browser-devtools` 스킬, `devoks-browser:browser-visual-diff`의 라이브 렌더 캡처(**기본 도구**), `devoks-sdlc:verify-data-flow`(browser 환경)에 필요합니다.
 
-### 3-1. devoks 사용자 — 별도 설치 불필요
+### 3-1. devoks 사용자 — `/devoks-core:setup-mcp` Step 6으로 user scope 등록
 
-`devoks-browser` 플러그인이 `chrome-devtools-attach`(`:9269` attach 전용 설정)를 `plugin.json`의
-`mcpServers`로 직접 번들한다(2026-06-17 도입). **`/plugin install devoks-browser@devoks-plugins`만
-설치하면 자동으로 사용 가능** — `~/.claude.json` 수동 등록이나 별도 `chrome-devtools-mcp` 플러그인
-설치는 필요 없다.
+`devoks-browser`는 2.0.0부터 `chrome-devtools-attach`(`:9269` attach 전용 설정)를 번들하지 않는다
+(2026-06-17~2026-10-23은 `plugin.json`의 `mcpServers`로 번들했다). `setup-mcp` Step 6이 등록을 안내하며,
+직접 하려면 다음 한 줄이다:
+
+```bash
+claude mcp add chrome-devtools-attach --scope user -- npx chrome-devtools-mcp@latest --browserUrl http://127.0.0.1:9269
+```
+
+> **구버전(1.x)에서 올라온 경우**: 1.x가 번들한 서버가 남아 있으면 `claude mcp list`에
+> `plugin:devoks-browser:chrome-devtools-attach`와 user scope 항목이 함께 보인다(같은 `:9269`에 인스턴스 2개).
+> `devoks-browser`를 2.0.0 이상으로 업데이트하면 번들 쪽이 사라진다. 번들에만 의존하던 환경은
+> 업데이트 후 서버가 없어지므로 위 명령(또는 `setup-mcp`)으로 등록해야 한다.
+>
+> **Node 22 이상 권장**: 패키지 `engines`는 `^20.19.0`을 허용하지만 Node 20.19.0에서 `get_css_styles`가
+> `longhandValues.intersection is not a function`으로 실패한다(`Set.prototype.intersection`은 Node 22+,
+> 2026-10-23 실측 — 나머지 도구는 Node 20에서도 동작). 특정 Node로 고정하려면 `-e PATH=<node22 bin>:...`을
+> 붙여 등록한다(로컬 선택 — `setup-mcp`는 nvm 경로를 대신 정하지 않는다).
 
 ### 3-2. devoks 없이 단독으로 쓰는 경우 — `~/.claude.json`에 직접 등록
+
+3-1의 `claude mcp add`와 같은 결과이며, JSON을 직접 편집하려면:
 
 ```json
 {
@@ -366,7 +381,7 @@ brew install gh && gh auth login
 /plugin install figma@claude-plugins-official
 /plugin install playwright@claude-plugins-official
 /plugin install serena@claude-plugins-official
-# chrome-devtools-attach는 devoks-browser에 이미 번들됨(3절 참조) — 별도 설치 불필요
+# chrome-devtools-attach는 플러그인이 아니라 user scope 등록 — /devoks-core:setup-mcp Step 6 (3절 참조)
 # codegraph는 공식 플러그인이 없음 — CLI 직접 설치 (5절 참조)
 # ast-grep은 MCP가 아니라 CLI — brew install ast-grep (8절 참조)
 # RN 프로젝트: /devoks-core:setup-mcp Step 5 실행 — metro-devtools user scope 등록 (7절 참조)

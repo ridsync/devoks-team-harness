@@ -25,7 +25,8 @@ DevOKs 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
 문제는 아니지만, bare `claude mcp add`가 쓰는 PyPI 패키지명 `serena`가 이 도구(`oraios/serena`)와
 무관한 별개 프로젝트(AMQP 클라이언트)와 이름이 충돌해 `uvx serena@latest`가 잘못된 패키지를 설치한다
 (2026-08-10 확인, `pypi.org/project/serena`). context7·codegraph는 `claude mcp add`로 설치한다
-(codegraph는 공식 플러그인이 없어 CLI 직접 설치가 유일한 경로).
+(codegraph는 공식 플러그인이 없어 CLI 직접 설치가 유일한 경로). **chrome-devtools-attach도 `claude mcp add`로
+설치한다** — 스킬·에이전트 `tools:` 화이트리스트가 `mcp__chrome-devtools-attach__*` prefix를 전제하기 때문이다(Step 6).
 
 ## Steps
 
@@ -103,17 +104,27 @@ DevOKs 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
 
    ⚠ `devoks-rn` 플러그인 업데이트 후에는 `/devoks-core:setup-preset-manage`로 스크립트를 갱신한다(SessionStart 훅이 차이를 감지하면 안내한다). MCP 등록(3단계)은 경로가 같으므로 다시 할 필요가 없다.
 
-6. **chrome-devtools-attach (visual-diff·data-verify 필수 — figma·playwright와 동일하게 플러그인 경로)**
-   - 이 서버는 `devoks-browser` 플러그인이 번들한다(`:9269` attach 고유 설정, prefix `mcp__chrome-devtools-attach__*`).
-   - **`claude mcp add`로 깔지 않는다.** 같은 서버가 플러그인 번들 + user scope에 이중 등록되면
-     동일한 `:9269` 디버그 포트에 두 인스턴스가 동시에 attach를 시도해 충돌한다.
-   - 감지 결과(`claude mcp list`에 `chrome-devtools-attach` 부재, 또는 SessionStart 훅 경고)로 **누락이면**
-     다음을 안내한다: `/plugin install devoks-browser@devoks-plugins`. 이미 devoks-browser가 설치돼 있으면 별도 작업 불필요.
+6. **chrome-devtools-attach (visual-diff·data-verify 필수 — `claude mcp add`로 user scope 등록)**
+   - `:9269` attach 고유 설정이다. **`devoks-browser`는 이 서버를 번들하지 않는다**(2.0.0부터) — 정의가 한 곳
+     (user scope)에만 있어야 Node 버전·PATH 같은 로컬 설정을 그 자리에서 다룰 수 있다.
+   - prefix는 `mcp__chrome-devtools-attach__*` — 스킬·에이전트 `tools:` 화이트리스트가 전제하는 값이다.
+   - 누락이면(`claude mcp list`에 `chrome-devtools-attach` 부재, 또는 SessionStart 훅 경고) Step 2 확인을 거쳐 등록한다:
+     ```bash
+     claude mcp add chrome-devtools-attach --scope user -- npx chrome-devtools-mcp@latest --browserUrl http://127.0.0.1:9269
+     ```
+   - **이중 등록 점검:** `claude mcp list`에 `plugin:devoks-browser:chrome-devtools-attach`가 함께 보이면 구버전
+     (1.x) devoks-browser가 번들한 것이다. 같은 `:9269`에 두 인스턴스가 붙으므로 `devoks-browser`를 2.0.0 이상으로
+     업데이트하도록 안내한다(이 커맨드가 플러그인 서버를 직접 끄지 않는다).
+   - **Node 22 이상을 권장한다.** `chrome-devtools-mcp`의 `engines`는 `^20.19.0`을 허용하지만, Node 20.19.0에서
+     `get_css_styles`가 `longhandValues.intersection is not a function`으로 실패했다(`Set.prototype.intersection`은
+     Node 22+, 2026-10-23 실측 — Node 22.22.2에서는 `typeof new Set().intersection === 'function'`). 나머지 도구는
+     Node 20에서도 동작했다. 강제하지 않고 안내만 한다. `claude mcp add`에 `-e PATH=...`로 특정 Node를 고정하는 것은
+     사용자 로컬 선택이다 — 이 커맨드가 nvm 절대경로를 대신 정하지 않는다.
 
    **런처 스크립트 생성** (Step 5가 `metro-mcp.js`를 `~/.devoks/mcp/`에 두는 것과 동일한 관리 경로 패턴)
 
    매번 긴 명령을 안내하는 대신 런처를 한 번 만들어 둔다. 포트(`9269`)와 `--user-data-dir`은
-   `devoks-browser` 번들이 attach 대상으로 기대하는 값이라 **고정값**이고, 시작 URL만 인자로 받는다
+   `devoks-browser` 스킬이 attach 대상으로 기대하는 값이라 **고정값**이고, 시작 URL만 인자로 받는다
    (프로젝트마다 dev server 포트가 다르다).
 
    1. 시작 URL의 기본값을 사용자에게 **확인받는다** — 추정하지 않는다(현재 실행 중인 dev server 주소).
@@ -170,7 +181,7 @@ DevOKs 플러그인은 공유 MCP(context7·figma·serena·codegraph·playwright
    | playwright | 플러그인 (Step 4) | `mcp__plugin_playwright_playwright__*` |
    | serena | 플러그인 (Step 4) | `mcp__plugin_serena_serena__*` |
    | metro-devtools | `claude mcp add` (Step 5) | `mcp__metro-devtools__*` |
-   | chrome-devtools-attach | devoks-browser 번들 (Step 6) | `mcp__chrome-devtools-attach__*` |
+   | chrome-devtools-attach | `claude mcp add` (Step 6) | `mcp__chrome-devtools-attach__*` |
 
    - 표는 **이 커맨드가 안내한 경로**를 기준으로 한다. 사용자가 다른 방식으로 깔았다면 prefix가 달라지므로
      `claude mcp list` / `/mcp` 실제 출력으로 대조한 뒤 항목을 만든다. 추정 금지.

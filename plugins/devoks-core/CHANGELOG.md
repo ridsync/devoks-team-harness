@@ -13,6 +13,17 @@
 
 ---
 
+## 2.3.0 — 2026-10-23
+
+복사 산출물 변경 없음(`assets/chrome-debug.sh` 주석의 "번들" 표현은 의도적으로 두었다 — 주석만 고쳐도 `setup-preset-manage`가 갱신 대상으로 판정한다).
+
+### 스킬·커맨드·훅
+- `setup-mcp` › Step 6: 변경 — chrome-devtools-attach를 플러그인 번들 안내(`/plugin install devoks-browser`)에서 `claude mcp add --scope user` 등록으로 전환. `devoks-browser` 2.0.0이 번들을 제거한 것과 짝이다. 구버전 번들과의 이중 등록 점검, Node 22 이상 권장(`get_css_styles`가 Node 20에서 `Set.prototype.intersection` 부재로 실패 — 2026-10-23 실측)을 추가
+- `setup-mcp` › Overview·Step 8 대조표: 변경 — chrome-devtools-attach 설치 방식을 `claude mcp add`로 정정(prefix `mcp__chrome-devtools-attach__*`는 불변)
+- `check-setup-state.sh` › chrome-devtools 감지: 변경 — `have "devoks-browser"` 폴백 제거. 번들이 사라져 플러그인 활성화가 서버 존재를 보장하지 않는다. 경고 문구도 `setup-mcp` Step 6·`claude mcp add` 안내로 교체
+
+---
+
 ## 2.2.0 — 2026-10-21
 
 ### 복사 산출물

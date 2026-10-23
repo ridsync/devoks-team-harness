@@ -30,8 +30,8 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 - [ ] `**browser-visual-diff` → `devoks-sdlc:verify-visual-diff` 이전**
   - 시각 diff는 본질적으로 "검증"이므로 devoks-sdlc의 verify 계열로 모으는 것이 도메인상 자연스럽다.
   - 동반 이동 필요: `browser-visual-diff-capture` 에이전트, `references/` 일체.
-  - 결합 비용(이번에 보류한 이유): Chrome DevTools MCP 선언이 `devoks-browser/plugin.json`에 있고 Figma MCP·`browser-devtools` 형제 스킬과 묶여 있음 → 이전 시 MCP 의존 선언 이전 또는 cross-plugin 의존 정리가 선행되어야 함.
-  - 영향 범위: README/README.ko 카탈로그, `docs/mcp-setup-guide.md`, `devoks-core/hooks/check-setup-state.sh`(chrome-devtools 감지가 "devoks-browser" 문자열도 grep함 — 이전 시 감지 로직 점검).
+  - 결합 비용(이번에 보류한 이유): Figma MCP·`browser-devtools` 형제 스킬과 묶여 있음 → 이전 시 cross-plugin 의존 정리가 선행되어야 함. (Chrome DevTools MCP 선언은 2026-10-23 `devoks-browser` 2.0.0에서 `plugin.json` 번들을 제거하고 user scope 등록으로 옮겨 이 결합은 해소됨 — 완료 섹션 참고.)
+  - 영향 범위: README/README.ko 카탈로그, `docs/mcp-setup-guide.md`. (`check-setup-state.sh`의 chrome-devtools 감지는 2.3.0에서 `devoks-browser` 문자열 grep 폴백을 제거해 이전 시 점검할 항목이 없어짐.)
   - 우선순위: 중.
 
 ---
@@ -174,6 +174,12 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 ---
 
 ## 완료 / 최근 반영
+
+- [x] **`chrome-devtools-attach` 플러그인 번들 제거 → user scope 등록으로 통일** (2026-10-23, `devoks-browser` `1.2.6 → 2.0.0`, `devoks-core` `2.2.0 → 2.3.0`)
+  - 배경: 같은 이름의 서버가 `devoks-browser/plugin.json`과 user scope에 이중 정의돼 있었다(동작 이슈는 없고 유지보수성 문제). 또 Node 20.19에서 `chrome-devtools-mcp`의 `get_css_styles`가 `Set.prototype.intersection` 부재로 실패해(`engines`는 `^20.19.0` 허용 — 2026-10-23 실측, Node 22.22.2에서는 통과) Node·PATH를 정할 자리가 필요했는데, 플러그인 캐시 `plugin.json`은 업데이트 때 덮어써져 로컬 설정이 유지되지 않는다. 로드맵 폐기 ④가 정한 "공유 MCP는 `setup-mcp`가 user scope에 1회 설치" 모델에서 chrome-devtools만 예외였다.
+  - 반영(사용자 결정): `devoks-browser`에서 `mcpServers` 제거(`settings.permissions.allow`는 유지 — `devoks-rn`·`metro-devtools`와 같은 형태). `setup-mcp` Step 6을 `claude mcp add --scope user` 등록으로 전환하고 구버전 이중 등록 점검·Node 22 권장 안내 추가. `check-setup-state.sh`의 `have "devoks-browser"` 폴백 제거. `browser-devtools` SKILL 환경 셋업 절, `mcp-setup-guide.md` 설치 정책·3절, README/README.ko 정리.
+  - 의도적 미반영: `assets/chrome-debug.sh` 주석의 "devoks-browser 번들" 표현(복사 산출물이라 주석만 고쳐도 `setup-preset-manage`가 갱신 대상으로 판정함). `devoks-sdlc`의 "devoks-browser 플러그인 설치 전제" 문구(`verify-acceptance-test` 등 — 정확한 전제는 이제 "chrome-devtools-attach 등록"이라 후속 정리 대상).
+  - 영향: `devoks-browser` 번들에만 의존하던 설치자는 업데이트 후 서버가 사라져 `setup-mcp` Step 6(또는 `claude mcp add`)이 필요하다 — 그래서 major bump.
 
 - [x] **Define 앞단 재구성 — 두 스킬을 `feature-interview`로 통합하고 frd-author Phase 0 게이트로 연결** (2026-10-21, `devoks-sdlc` `3.6.0 → 3.7.0`)
   - 배경: 바로 아래 항목(3.5.0)에서 만든 `feature-intent-interview`·`feature-idea-refine`이 실제로는 많이 겹쳤다. idea-refine의 첫 질문이 사실상 인터뷰였고, 둘 다 같은 `FRD.draft.md`를 거쳐 frd-author로 넘어갔다. 결과적으로 요구 정의 진입점이 3개가 되어, Build 단계에서 피하려던 "사용 시기가 혼동되는 분리"를 Define 단계에서 다시 만든 셈이었다(사용자 지적). 실제로 갈려야 할 차이는 **질문 단위** 하나였다 — 의도 공백은 1개씩, 슬롯·정책은 모아서.

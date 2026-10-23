@@ -6,10 +6,15 @@ description: "이미 실행 중인 Chrome 브라우저(--remote-debugging-port=9
 
 ### 환경 셋업
 
-`devoks-browser` 플러그인 자체가 `chrome-devtools-attach`(`:9269` attach 전용 설정)를 `plugin.json`의
-`mcpServers`로 번들한다 — **`devoks-browser`를 설치하면 별도 MCP 등록 없이 자동으로 사용 가능**하다.
-`~/.claude.json` 수동 추가나 별도 `chrome-devtools-mcp` 플러그인 설치는 **불필요**하다(과거엔 수동
-설정이 필요했으나, plugin.json에 직접 번들되도록 바뀐 뒤로 무효화됐다).
+`chrome-devtools-attach`(`:9269` attach 전용 설정)는 `devoks-browser`가 번들하지 않는다(2.0.0부터) —
+`/devoks-core:setup-mcp` Step 6으로 **user scope에 1회 등록**한다. 직접 등록하려면:
+```bash
+claude mcp add chrome-devtools-attach --scope user -- npx chrome-devtools-mcp@latest --browserUrl http://127.0.0.1:9269
+```
+`claude mcp list`에 `chrome-devtools-attach`가 없으면 위 명령(또는 `setup-mcp`)을 안내한다. 별도
+`chrome-devtools-mcp` 플러그인 설치는 **불필요**하다. 구버전(1.x) `devoks-browser`는 번들했으므로,
+`claude mcp list`에 `plugin:devoks-browser:chrome-devtools-attach`가 보이면 플러그인을 업데이트한다
+(이중 등록 시 같은 `:9269`에 두 인스턴스가 붙는다).
 
 ### 런타임 전제
 

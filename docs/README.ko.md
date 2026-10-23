@@ -213,7 +213,7 @@ flowchart TD
 
 ## 의존성 요약
 
-> DevOKs 플러그인은 범용 MCP 서버(Figma·Playwright·Serena·CodeGraph·context7)를 **번들하지 않습니다.** 중복 인스턴스와 로컬 MCP 충돌을 막기 위해 **user/project scope에 1회만** 설치하세요. `devoks-core`의 SessionStart 훅(`hooks/check-setup-state.sh`)이 세션마다 미설치 항목을 감지해 설치를 안내합니다. **예외:** `devoks-browser`는 `chrome-devtools-attach`(`:9269` 연결 전용 설정)만 번들합니다. `devoks-rn`의 `metro-devtools`는 `/devoks-core:setup-mcp` Step 5로 user scope에 설치합니다 — 번들된 `metro-mcp.js`를 `~/.devoks/mcp/`에 복사해 등록하며, Metro URL을 자동 조회하므로 Metro 재시작마다 수동 갱신이 불필요합니다. 자세한 내용 → [`mcp-setup-guide.md`](mcp-setup-guide.md) → "설치 정책".
+> DevOKs 플러그인은 범용 MCP 서버(Figma·Playwright·Serena·CodeGraph·context7)를 **번들하지 않습니다.** 중복 인스턴스와 로컬 MCP 충돌을 막기 위해 **user/project scope에 1회만** 설치하세요. `devoks-core`의 SessionStart 훅(`hooks/check-setup-state.sh`)이 세션마다 미설치 항목을 감지해 설치를 안내합니다. **번들 예외 없음:** `chrome-devtools-attach`(`:9269` 연결 전용 설정)는 `/devoks-core:setup-mcp` Step 6으로 user scope에 등록합니다 — `devoks-browser`는 2.0.0부터 번들하지 않습니다(Node 22 이상 권장). `devoks-rn`의 `metro-devtools`는 `/devoks-core:setup-mcp` Step 5로 user scope에 설치합니다 — 번들된 `metro-mcp.js`를 `~/.devoks/mcp/`에 복사해 등록하며, Metro URL을 자동 조회하므로 Metro 재시작마다 수동 갱신이 불필요합니다. 자세한 내용 → [`mcp-setup-guide.md`](mcp-setup-guide.md) → "설치 정책".
 
 | 플러그인 | 필수 | 선택 |
 |---------|------|------|
