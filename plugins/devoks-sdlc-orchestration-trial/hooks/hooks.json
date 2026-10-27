@@ -1,0 +1,18 @@
+{
+  "description": "HOTL RUN 활성 시(DEVOKS_HOTL_RUN=1 또는 .hotl/ACTIVE) 금지 액션(force push·기본 브랜치 push·머지·게이트 라벨 위조·시크릿)을 차단한다. RUN이 아니면 즉시 통과.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/hotl-guard.sh",
+            "args": [],
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

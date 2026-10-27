@@ -1,0 +1,33 @@
+{
+  "$comment": "HOTL trial 프로젝트 설정 — hotl-setup이 생성. RUN은 이 파일을 수정할 수 없다(hotl-guard.sh가 차단). 키 의미는 플러그인 references/policy.md §4·pipeline.md 참고.",
+  "policyVersion": "trial-0.1.0",
+  "adapter": "github",
+  "base": "main",
+  "gates": {
+    "spec": true
+  },
+  "deliverOnBlock": false,
+  "verify": {
+    "commands": [],
+    "acceptance": {
+      "enabled": false,
+      "devServer": {
+        "command": "",
+        "host": "127.0.0.1",
+        "portRange": [5300, 5399],
+        "readyPath": "/",
+        "readyTimeoutSec": 90,
+        "lockTimeoutSec": 300
+      },
+      "persistenceCheckMethod": "",
+      "auditMarker": "ACCEPT-TEMP"
+    }
+  },
+  "limits": {
+    "taskRetries": 2,
+    "fixLoops": 2,
+    "parallel": 1,
+    "maxTurns": 120,
+    "budgetUsd": 15
+  }
+}

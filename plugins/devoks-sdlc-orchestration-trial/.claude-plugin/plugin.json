@@ -1,0 +1,7 @@
+{
+  "name": "devoks-sdlc-orchestration-trial",
+  "version": "0.3.0",
+  "description": "[실험·미배포] DevOKs HOTL(human-on-the-loop) SDLC 오케스트레이션 trial — 이슈 어댑터(GitHub/local) 기반 spec→게이트1(스펙 승인)→build→검증→draft PR, 되돌리기 어려운 작업·예외는 승인 게이트로 정지·재개. devoks-sdlc 에이전트를 이름으로 재사용하고 deny-list를 PreToolUse 훅(RUN 활성 시에만)으로 강제. 헤드리스(claude -p) 래퍼와 GitHub Actions 템플릿 포함. marketplace 미등록 — --plugin-dir로만 로드.",
+  "author": { "name": "ridsync" },
+  "dependencies": ["devoks-sdlc"]
+}

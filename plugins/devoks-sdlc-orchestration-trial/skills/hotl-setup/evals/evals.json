@@ -1,0 +1,28 @@
+{
+  "skill_name": "devoks-sdlc-orchestration-trial:hotl-setup",
+  "notes": "HOTL trial 프로젝트 셋업(HITL). 감지 기반 검증 명령 후보, 기존 파일 비파괴, 외부 부작용(라벨 생성) 사전 확인이 핵심.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "setup-local-adapter-node-project",
+      "prompt": "이 프로젝트에 HOTL 셋업 해줘. 오프라인으로 먼저 실험할 거라 local 어댑터로, 게이트1은 켜고, Actions 워크플로는 만들지 마. (package.json scripts: lint, test=vitest run, build)",
+      "expected_output": ".hotl/config.json을 adapter=local, gates.spec=true, verify.commands=[lint, test, build 실행 명령]으로 생성하고 .hotl/.gitignore를 만든다. 워크플로·라벨은 만들지 않으며 커밋하지 않는다. 브랜치 보호 등 사람이 할 일과 local 리허설 절차를 안내한다.",
+      "files": [],
+      "assertions": [
+        { "text": "verify.commands가 package.json에 실제로 있는 스크립트만으로 구성된다" },
+        { "text": ".github/workflows/hotl.yml을 만들지 않고 ensure-labels도 실행하지 않는다" },
+        { "text": "git commit/push를 하지 않는다" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "setup-does-not-overwrite-existing-config",
+      "prompt": "HOTL 셋업 다시 해줘 (이미 .hotl/config.json이 있음)",
+      "expected_output": "기존 .hotl/config.json을 덮어쓰지 않고 템플릿과의 차이를 보여 준 뒤 갱신 여부를 확인한다.",
+      "files": [],
+      "assertions": [
+        { "text": "확인 없이 기존 config를 덮어쓰지 않는다" }
+      ]
+    }
+  ]
+}

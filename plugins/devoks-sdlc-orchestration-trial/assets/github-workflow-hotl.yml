@@ -1,0 +1,63 @@
+# HOTL trial — 이슈 라벨 이벤트로 hotl-run을 무인 실행한다 (hotl-setup이 생성, 프로젝트 소유)
+#
+# ⚠️ trial 템플릿: 실제 Actions 실행은 trial 범위에서 검증하지 않았다. 처음 적용할 때 사람이 한 번 지켜보며 돌릴 것.
+#   - 사람 라벨(hotl:run / hotl:spec-approved / hotl:approved / hotl:rejected)만 이 워크플로를 깨운다.
+#     봇이 GITHUB_TOKEN으로 붙이는 라벨은 새 워크플로를 트리거하지 않으므로 자기 루프가 생기지 않는다.
+#   - claude-code-action은 write 권한이 있는 사용자만 트리거할 수 있다(공식 docs/security.md).
+#   - trial 플러그인은 marketplace에 등록돼 있지 않아 harness 저장소를 체크아웃해 --plugin-dir로 로드한다.
+#   - 실제 경계는 이 워크플로의 permissions와 브랜치 보호다. 기본 브랜치 보호(직접 push 금지·리뷰 필수)를 반드시 켠다.
+name: hotl
+
+on:
+  issues:
+    types: [labeled]
+
+concurrency:
+  group: hotl-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    if: >-
+      contains(fromJSON('["hotl:run","hotl:spec-approved","hotl:approved","hotl:rejected"]'), github.event.label.name)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write        # 작업 브랜치 push
+      issues: write          # 게이트 라벨·코멘트
+      pull-requests: write   # draft PR 생성
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout devoks harness (trial plugin)
+        uses: actions/checkout@v4
+        with:
+          repository: {{HARNESS_REPO}}
+          path: .hotl/harness
+
+      - name: Resolve stage
+        id: stage
+        run: |
+          case "${{ github.event.label.name }}" in
+            hotl:run) echo "stage=spec" >> "$GITHUB_OUTPUT" ;;
+            hotl:spec-approved) echo "stage=build" >> "$GITHUB_OUTPUT" ;;
+            *) echo "stage=resume" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - uses: anthropics/claude-code-action@v1
+        env:
+          DEVOKS_HOTL_RUN: "1"
+          HOTL_ADAPTER: github
+          GH_TOKEN: ${{ github.token }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          plugin_marketplaces: "https://github.com/{{HARNESS_REPO}}.git"
+          # trial의 실제 의존은 devoks-sdlc 에이전트뿐이다(devoks-core는 devoks-sdlc 자신의 의존)
+          plugins: "devoks-sdlc@devoks-plugins"
+          prompt: "/devoks-sdlc-orchestration-trial:hotl-run issue=${{ github.event.issue.html_url }} stage=${{ steps.stage.outputs.stage }}"
+          claude_args: |
+            --plugin-dir .hotl/harness/plugins/devoks-sdlc-orchestration-trial
+            --max-turns {{MAX_TURNS}}
+            --allowedTools Bash,Read,Edit,Write,Glob,Grep,Agent,Skill,ToolSearch,TodoWrite

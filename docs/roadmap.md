@@ -3,7 +3,7 @@
 DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 단일 SSOT 문서.
 양 언어 README는 이 문서를 링크만 한다(이중 관리 drift 방지).
 
-> 최종 갱신: 2026-10-23
+> 최종 갱신: 2026-10-27
 
 ---
 
@@ -134,6 +134,28 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - 실행 모델: Workflow 툴 + worktree 병렬, 단 브라우저 실동작 검증은 Chrome 9269 싱글턴이라 병합 후 직렬 barrier — D3·D6.
   #### 남은 오픈 결정
   - dial 상향(out-of-the-loop/auto-merge) 시점·LLM-judge 도입, Linear↔RUN 메타 매핑·웹훅 설계, Slack/Linear 어댑터 형태, D6 환경 감지·Chrome 싱글턴 큐잉 정책.
+  #### 실험: `devoks-sdlc-orchestration-trial` (2026-10-27, 0.1.0 — 미배포)
+  - **보존 방식(2026-10-27 사용자 결정)**: 브랜치 `experiment/hotl-orchestration-trial`에만 커밋·push하고 **main에 편입하지 않는다**(참고용). 실무 적용 예정 없음 — 추후 오케스트레이션·작업 스케줄링 등 에이전트 개발 시스템 구축 솔루션(심포니 등)과 함께 도입을 검토해 확장할 때 참고 자료로 쓴다.
+  - **목적**: HOTL 설계를 실제로 돌려 보고 정식 `devoks-sdlc-orchestration`에 무엇을 승격할지 판단한다. **실무 적용 대상이 아니다** — `marketplace.json` 미등록, `claude --plugin-dir`로만 로드. README·`docs/README.ko.md`·`workflow-map`·`plugin-management.md`는 의도적으로 갱신하지 않았다(실험 단계 — 아래 승격 시 할 일).
+  - **0.2.3에서 확인한 갭 → trial의 실험 지점**:
+    1. 런타임에 읽을 수 없는 참조(정책 §4가 `plugins/devoks-sdlc/...`를 저장소 경로로 참조, EARS·traceability를 파일 없이 "규약만" 적용) → 런타임이 파일로 읽어야 하는 6개만 `references/upstream/`에 **바이트 동일 사본**으로 번들(출처·sha·drift 점검 명령은 `SOURCES.md`). 스킬·에이전트는 복사하지 않고 이름으로 호출.
+    2. 위임 계약 불일치(`code-implementer`는 `plan`·`frd` 경로가 필수인데 0.2.3은 `RUN.md`만 생성) → spec 단계가 업스트림 템플릿으로 FRD.md·PLAN.md를 만든다.
+    3. 사람 개입이 세션 안·에스컬레이션뿐 → **게이트 외부화**: 게이트1(스펙 승인) + `action` 게이트(되돌리기 어려운 작업 7종: delete·dependency·security-boundary·schema·ci-config·pii·scope-change) + `exception` 게이트를 이슈 라벨로 열고 정지, 사람 라벨로 재개. 승인 검증(게이트 개방 이후·actor≠봇·write 권한)으로 위조·재사용 차단. 정책은 허용/승인 게이트/금지 3등급(0.2.0은 금지→에스컬레이션 2갈래).
+    4. 정책이 문서로만 존재 → **PreToolUse 가드 훅**(force push·기본 브랜치 push·머지·사람 전용 라벨·시크릿·자기 정책 파일). RUN 활성 시(`DEVOKS_HOTL_RUN=1` 또는 `.hotl/ACTIVE`)에만 동작해 일반 세션 무영향. 문자열 패턴 판정의 우회 한계는 `policy.md` §6에 명시.
+    5. 헤드리스·CI 경로 없음 → `scripts/hotl-headless.sh`(worktree 격리·`--max-turns`·`--max-budget-usd`·`dontAsk`, `--bare` 금지 — 플러그인 훅이 꺼짐) + `hotl-setup`이 생성하는 Actions 템플릿(`claude-code-action@v1`, 사람 라벨 이벤트 트리거).
+  - **이슈 어댑터**: `scripts/hotl-issue.sh` 단일 지점, 백엔드 `github`(gh)·`local`(파일 — 오프라인 실험), `linear`는 슬롯만(D4 목표 트리거 유지).
+  - **검증 상태(2026-10-27)**: `validate --strict` ✔, 결정론적 셀프테스트(`tests/selftest.sh` — 가드·어댑터·RUN 시작/종료) 70/70 ✔. 스크래치 저장소(local 어댑터 + bare origin) 헤드리스 E2E:
+    - `hotl-setup` → config 생성(감지된 스크립트만, 워크플로·라벨·커밋 없음) ✔ ($0.35)
+    - 이슈1 spec → FRD(EARS)·PLAN(traces 누락 0)·게이트1 개방 후 정지 ✔ ($1.05) / 승인 없이 build → 진행 거부 ✔ / 승인 후 `stage=auto` → `devoks-sdlc:code-implementer`·`code-reviewer` 위임 실행(세션 기록에 서브에이전트 2건), 테스트 8/8, local draft PR ✔ ($1.36)
+    - **크로스-플러그인 위임의 검증 범위(한정)**: 호출자(trial)는 `--plugin-dir` 로드, 피호출자(`devoks-sdlc` 3.9.0)는 GitHub 마켓플레이스에서 user scope로 **이미 설치·활성화된** 상태였다. 입증된 것은 "활성화된 다른 플러그인의 에이전트를 `플러그인:에이전트` 이름으로 호출 가능"까지다. **미입증**: trial을 마켓플레이스로 설치할 때 `dependencies`가 자동 설치·활성화되는지, devoks 플러그인이 없는 깨끗한 환경(CI 러너 등)에서 성립하는지, `devoks-sdlc` 비활성 시 실패 처리 — 0.2.3의 post-publish 스모크 우려 중 설치·의존성 해석 부분은 그대로 유효하며 승격 시 스모크 항목으로 남긴다.
+    - 이슈2(zod 의존성 필요) → 승인 후 build가 설치 **전** `action(dependency)` 게이트 개방·checkpoint 기록 ✔ ($0.96)
+    - E2E가 드러낸 결함 → 수정 완료: 가드 오탐 3종(라벨명 단순 포함·다른 명령 조각의 동사·`2>/dev/null`의 `>`), zsh `noclobber`로 빈 코멘트 게시(어댑터 빈 본문 거부 + 본문 파일 규칙), 게이트 정지 시 `hotl:building` 잔존.
+    - **미검증**: `action` 게이트 승인 후 `resume` 경로, `exception` 게이트, `limits.parallel>1` worktree 병렬, GitHub 어댑터·Actions 템플릿(실 저장소 미실행). 관찰: 첫 커밋 트레일러가 프로젝트 커밋 규약(훅 주입)을 놓치는 경우가 반복 — push 후엔 force 금지라 수정 불가.
+  - **0.2.0 보강(2026-10-27) — 실동작 검증 시나리오 표 규칙**: 0.1.0은 `acceptance-test-runner`에 "시나리오 표 주입"이라고만 정의해, 켜면 메인 루프가 표를 즉흥 작성할 공백이 있었다. `verify-acceptance-test` Phase 0(사용자 합의)을 **spec 단계 초안(`ACCEPTANCE.md`) + 게이트1 사람 리뷰**로 대체한 적응 문서 `references/acceptance-scenarios.md` 신설(적용 조건 5종·대상 AC 선별·칸별 근거·연타 규칙·슬롯을 config에서 도출·결과 매핑·임시 패치 회수 확인). 원본이 HITL 본문이라 바이트 사본이 아닌 적응 문서로 두고 drift는 원본 git 이력으로 점검(`upstream/SOURCES.md`). 실행 절차(`scenario-execution.md`)는 러너가 sdlc 안에서 읽으므로 복사하지 않음. **동적 검증 미실행**(UI 있는 샘플·dev server·Chrome 환경 필요 — eval 4 케이스만 추가).
+  - **0.3.0(2026-10-27) — 실동작 검증 dev server를 RUN worktree에서 기동(사용자 결정 (a))**: 0.2.0까지는 설정의 고정 `devServerUrl`이 사람이 띄운 **메인 작업트리 서버**를 가리켜, worktree에 있는 RUN 코드가 아니라 다른 코드를 검증하는 결함이 있었다(병렬 RUN 검토 중 발견 — 병렬 여부와 무관). `scripts/hotl-devserver.sh` 신설: 빈 포트 선택 → `devServer.command`(`{port}`) 기동 → 준비 대기 → URL 출력, 프로세스 그룹 단위 종료. Chrome·에뮬레이터·실기기 싱글턴은 worktree 공통 git 디렉터리의 **실동작 락**(`hotl-live.lock`, 주인 프로세스 부재 시 회수)으로 기기당 1 RUN 직렬화. 정책 §1에 게이트 5 한정 예외, §3에 그 외 기동·락 보유 중 구현 금지 추가. `hotl-run-end.sh`·헤드리스 래퍼 종료 시 서버·락 정리. 셀프테스트 75/75(기동·락 대기 exit 3·run-end 정리·재획득·잔재 회수). **실제 웹앱 + Chrome으로 러너를 돌린 동적 검증은 미실행.** 웹훅 큐·워커로 RUN을 병렬화할 때 남은 과제(git 관리 락·의존성 설치 캐시·테스트 포트·큐 소유 잠금·전역 예산·웹훅 서명/권한 검증)는 이 항목의 단계 3·4 범위.
+  - **아직 HITL 대비 얇은 검증**: 요구 충실도 판정(`verify-requirements`의 diff 대비 ✅/⚠️/❌·심각도 기준 없음), 테스트 실패 분류(`test-run-triage`의 회귀·플래키·스펙불일치·환경 구분 없음), 데이터 흐름·UI 시각은 flag만 — 보강 후보 순서 3(triage) → 2(요구 충실도).
+  - **승격(`devoks-sdlc-orchestration` 반영) 시 할 일**: 검증된 요소만 0.x로 이관(게이트 프로토콜·가드 훅·어댑터·헤드리스 래퍼 후보) → `orchestration-design.md` D2·D4·D5 갱신(게이트 외부화·GitHub 어댑터 채택 여부) → `marketplace.json`·README 양본·`workflow-map`·`plugin-management.md` 문서 연동 → trial 디렉터리 삭제.
+  - **열린 질문**: 승인 게이트 대상 판정이 모델 층이라 "열어야 했는데 안 연" 누락을 어떻게 측정할지, 게이트1 승인 시 `risk_forecast` 사전 승인의 범위, CI에서 RUN 상태 SSOT를 브랜치에 두는 방식의 충돌(동시 사람 커밋) 처리.
 
 - [ ] `**devoks-release` 신설 (Deploy/Release 단계 — 현재 0% 커버)**
   - Conventional Commits → CHANGELOG 생성 + semver bump + tag (devoks-git의 자연스러운 확장).
