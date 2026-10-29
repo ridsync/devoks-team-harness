@@ -1,6 +1,6 @@
 # 수정 계획 — sync-context.sh 의 gitignore 자동 추가 제거
 
-> **주의 (2026-07-09):** 이 문서는 "SessionStart 동기화 유지 + gitignore 비관여" 시점의 결정 기록입니다. 현재 운영 모델은 explicit setup/apply 기반으로 바뀌었고, legacy `sync-context.sh` 파일도 제거되었습니다. 최신 구조는 `docs/roadmap.md`, `README.md`, `docs/README.ko.md`를 우선 참고하세요.
+> **주의 (2026-07-09):** 이 문서는 "SessionStart 동기화 유지 + gitignore 비관여" 시점의 결정 기록입니다. 현재 운영 모델은 explicit setup/apply 기반으로 바뀌었고, legacy `sync-context.sh` 파일도 제거되었습니다. 최신 구조는 `docs/ROADMAP.md`, `README.md`, `docs/README.ko.md`를 우선 참고하세요.
 
 > 상태: **역사 문서** — 당시에는 `sync-context.sh` force-sync를 유지하는 결정을 기록했지만, 현재 하네스는 explicit setup/apply 모델로 전환되었습니다.
 > 발견 출처: crema-service 프로젝트 현황 조사 세션 (2026-06-18)

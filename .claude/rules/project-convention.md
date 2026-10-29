@@ -76,7 +76,7 @@ plugins/<plugin-name>/
 
 플러그인(`plugins/devoks-*`) 변경 작업은 반드시 `.claude/skills/devoks-plugin-maintenance/SKILL.md`를 먼저 사용한다.
 이 스킬이 강제하는 순서: 변경 범위 선언 → 플러그인별 체크리스트 → 버전 bump 판단 → `claude plugin validate --strict` →
-문서/카탈로그(`README.md`, `docs/README.ko.md`, `docs/mcp-setup-guide.md`, `marketplace.json`) 정합성 → MCP prefix/permission 점검 →
+문서/카탈로그(`README.md`, `docs/README.ko.md`, `docs/mcp-setup-guide.md`, `marketplace.json`) 정합성 → `docs/CHANGELOG.md` 기록(완료한 항목은 `docs/ROADMAP.md`에서 제거) → MCP prefix/permission 점검 →
 `devoks-core`의 `refs/rules` 변경 시 core sync 점검.
 
 ---

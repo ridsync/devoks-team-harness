@@ -23,7 +23,8 @@
 | `docs/mcp-setup-guide.md` | MCP 서버 설치 방식, prefix, 정책 설명이 바뀔 때 |
 | `plugins/devoks-core/commands/setup-mcp.md` | setup 절차, 예시 명령, 서버별 설치 안내가 바뀔 때 |
 | `.claude-plugin/marketplace.json` | 신규 플러그인 추가, description/dependencies/source 관련 정보가 바뀔 때 |
-| `docs/roadmap.md` | 반복 drift 문제를 후속 개선 과제로 명시해야 할 때 |
+| `docs/ROADMAP.md` | 반복 drift 문제를 후속 개선 과제로 명시해야 할 때 (열린 항목만 — 끝낸 항목은 지운다) |
+| `docs/CHANGELOG.md` | **모든 플러그인 변경·로드맵 항목 완료·폐기 결정** — 배경·반영·검증·의도적 미반영. devoks-core는 요약만(상세는 core CHANGELOG) |
 
 ## 3. MCP / prefix / permission 점검 포인트
 
@@ -117,7 +118,7 @@ agent frontmatter의 `tools:`는 **화이트리스트**다 — 거기 없는 도
 
 ### devoks-git
 - skill 없이 command만 존재(`git-commit-msg`, `git-create-issue`, `git-pull-request`) — 변경 시 command frontmatter/문서만 대상
-- **이 구성은 확정된 정책이다**(2026-08-21, `docs/roadmap.md` 완료 §「4개 항목 폐기」 폐기 ③·④): 진입점은 **커맨드**, 실행은 **메인 루프**. 근거 — git/gh write 액션은 스킬 auto-trigger 오발동 리스크가 크고, 승인 게이트가 절차의 본질이라 `docs/plugin-management.md` §12 기준 2("승인 게이트형 작업은 의도적으로 메인 루프에서 실행")에 걸리며, 커밋 메시지·PR 본문의 "왜"는 cold diff에서 나오지 않아 서브에이전트 위임 시 품질이 떨어진다. **스킬 전환·haiku 위임 제안이 다시 나오면 그 폐기 근거부터 확인할 것**
+- **이 구성은 확정된 정책이다**(2026-08-21, `docs/CHANGELOG.md` 「[폐기] 4개 항목 폐기」(2026-08-21) 폐기 ③·④): 진입점은 **커맨드**, 실행은 **메인 루프**. 근거 — git/gh write 액션은 스킬 auto-trigger 오발동 리스크가 크고, 승인 게이트가 절차의 본질이라 `docs/plugin-management.md` §12 기준 2("승인 게이트형 작업은 의도적으로 메인 루프에서 실행")에 걸리며, 커밋 메시지·PR 본문의 "왜"는 cold diff에서 나오지 않아 서브에이전트 위임 시 품질이 떨어진다. **스킬 전환·haiku 위임 제안이 다시 나오면 그 폐기 근거부터 확인할 것**
 - `gh` CLI 의존, 별도 MCP 서버·prefix 없음
 - devoks-sdlc의 여러 커맨드/스킬이 `/devoks-git:git-commit-msg`, `/devoks-git:git-create-issue`를 텍스트로 참조함(plugin.json `dependencies`엔 미기재) — devoks-git 쪽 커맨드명·규칙을 바꾸면 devoks-sdlc 참조도 함께 확인
 
@@ -180,7 +181,7 @@ agent frontmatter의 `tools:`는 **화이트리스트**다 — 거기 없는 도
 - **단일 플러그인만 대상으로 한다.** target은 한 번에 하나(`plugins/<plugin>` 경로, 이름, 또는 `plugin@marketplace`)만 받는다 — 여러 플러그인을 한 번에 스캔하는 배치 실행은 도입하지 않는다(플러그인 수만큼 실비용이 선형으로 늘어나 "필요할 때 하나만" 원칙과 맞지 않음).
 - 케이스는 **상시 저작·커밋 대상이 아니다.** 확인이 필요할 때 `evals/<임시케이스>/prompt.md`+`graders/*.md`(또는 `init` 인터랙티브)로 즉석 작성 → `--runs 1`(최소 비용, Δ까지 보려면 `--ablation` 기본값 유지) 실행 → 확인 후 커밋 없이 지워도 된다.
 - 기존 `evals/evals.json` 포맷과는 **다른 스키마**라 자동 변환 없음 — 위 서브에이전트 방법(축 1의 필수 최소 기준)을 대체하지 않고, 그 위에 얹는 선택적 심화 확인이다.
-- 근거: `docs/roadmap.md` 「evals 하니스 확대」 폐기 항목(2026-08-21) 참고 — early-access 게이트는 풀렸으나(2026-09-11 GA), 포맷 비호환·상시 확대 YAGNI 근거는 그대로 유효해 이 좁은 용도로만 채택했다.
+- 근거: `docs/CHANGELOG.md` 「evals 하니스 확대」 폐기 항목(2026-08-21) 참고 — early-access 게이트는 풀렸으나(2026-09-11 GA), 포맷 비호환·상시 확대 YAGNI 근거는 그대로 유효해 이 좁은 용도로만 채택했다.
 
 ### 정적 체크(축 2~6) 실행 방법
 

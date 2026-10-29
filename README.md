@@ -264,7 +264,8 @@ devoks-team-harness/
 │   ├── README.ko.md                   # Korean README
 │   ├── mcp-setup-guide.md             # MCP dependency setup
 │   ├── plugin-management.md           # plugin create · validate · deploy workflow
-│   └── roadmap.md                     # future improvements (TODO)
+│   ├── CHANGELOG.md                   # completed work & decisions (all plugins)
+│   └── ROADMAP.md                     # future improvements (TODO, open items only)
 ├── setup.sh                           # fallback install script
 └── README.md
 ```
@@ -277,7 +278,7 @@ devoks-team-harness/
 
 ## Roadmap
 
-Planned plugin structure & content improvements are tracked in [`docs/roadmap.md`](docs/roadmap.md) (TODO format). Highlights: native Android/iOS expansion (`devoks-android`·`devoks-ios`), add a `devoks-release` plugin for the Deploy/Release phase, auto-generate the catalog tables to prevent README drift, and consolidate the severity rubric to a single SSOT.
+Planned plugin structure & content improvements are tracked in [`docs/ROADMAP.md`](docs/ROADMAP.md) (TODO format, open items only); completed work and dropped decisions are recorded in [`docs/CHANGELOG.md`](docs/CHANGELOG.md). Highlights: native Android/iOS expansion (`devoks-android`·`devoks-ios`), add a `devoks-release` plugin for the Deploy/Release phase, auto-generate the catalog tables to prevent README drift, and consolidate the severity rubric to a single SSOT.
 
 ---
 

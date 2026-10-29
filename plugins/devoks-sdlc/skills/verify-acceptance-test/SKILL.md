@@ -27,7 +27,7 @@ MCP는 플러그인이 번들하지 않으며(`devoks-browser` 2.0.0~), `devoks-
 이 스킬은 Chrome(9269 attach)에서 조작할 수 있는 **웹앱**만 검증한다. React Native·Android·iOS 네이티브 앱은
 기기 구동 도구가 없어 대상이 아니다 — 그런 요청이면 이 스킬을 실행하지 않고 **수동 확인이 필요하다고 안내**한 뒤
 AC·기대 동작을 수동 확인 체크리스트로 정리해 준다(추측으로 Chrome에서 흉내 내지 않는다). 모바일 검증 능력은
-`docs/roadmap.md`의 "Android·iOS 네이티브 확장" P2에서 별도로 다룬다.
+`docs/ROADMAP.md`의 "Android·iOS 네이티브 확장" P2에서 별도로 다룬다.
 
 ## 호출 방법
 

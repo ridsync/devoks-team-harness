@@ -264,7 +264,8 @@ devoks-team-harness/
 │   ├── README.ko.md                   # 한국어 README (이 문서)
 │   ├── mcp-setup-guide.md             # MCP 의존성 설치 가이드
 │   ├── plugin-management.md           # 플러그인 생성·검증·배포 워크플로우
-│   └── roadmap.md                     # 추후 개선 사항 (TODO)
+│   ├── CHANGELOG.md                   # 완료 작업·결정 이력 (전 플러그인)
+│   └── ROADMAP.md                     # 추후 개선 사항 (TODO, 열린 항목만)
 ├── setup.sh                           # 폴백 설치 스크립트
 └── README.md                          # English README
 ```
@@ -277,7 +278,7 @@ devoks-team-harness/
 
 ## 로드맵
 
-플러그인 구조·내용 개선 후보는 [`roadmap.md`](roadmap.md)에 TODO 형식으로 추적합니다. 주요 항목: Android·iOS 네이티브 확장(`devoks-android`·`devoks-ios`), Deploy/Release 단계용 `devoks-release` 신설, 카탈로그 표 자동 생성(README drift 방지), 심각도 분류 SSOT 통합.
+플러그인 구조·내용 개선 후보는 [`ROADMAP.md`](ROADMAP.md)에 TODO 형식으로 추적하고(열린 항목만), 완료된 작업과 폐기 결정은 [`CHANGELOG.md`](CHANGELOG.md)에 기록합니다. 주요 항목: Android·iOS 네이티브 확장(`devoks-android`·`devoks-ios`), Deploy/Release 단계용 `devoks-release` 신설, 카탈로그 표 자동 생성(README drift 방지), 심각도 분류 SSOT 통합.
 
 ---
 

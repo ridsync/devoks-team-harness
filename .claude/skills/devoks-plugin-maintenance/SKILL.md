@@ -33,7 +33,7 @@ metadata:
 - MCP 설치/prefix 정책: `docs/mcp-setup-guide.md`, `plugins/devoks-core/commands/setup-mcp.md`
 - 세션 시작 setup 상태 점검 규칙: `plugins/devoks-core/hooks/check-setup-state.sh`
 - legacy sync 종료 맥락: `docs/fix-plan-sync-context-ssot.md`
-- 카탈로그 drift 맥락: `docs/roadmap.md`
+- 열린 개선 항목: `docs/ROADMAP.md` / 완료 이력·폐기 결정: `docs/CHANGELOG.md`
 - 상세 체크표: `references/workflow-checklist.md`
 
 ## 실행 원칙
@@ -142,6 +142,7 @@ Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한
 - `docs/mcp-setup-guide.md`
 - `plugins/devoks-core/commands/setup-mcp.md`
 - `.claude-plugin/marketplace.json`
+- `docs/CHANGELOG.md` (**항상 기록 대상**: 배경·반영·검증·의도적 미반영, 버전 변화. 로드맵 항목을 끝냈으면 `docs/ROADMAP.md`에서 지운다)
 
 **중요:** 업데이트하지 않는 파일은 "비대상 사유"를 남긴다.  
 예: "README.md 비대상 — 내부 hook comment 정정만 포함, 사용자-facing 설명 불변"
@@ -208,6 +209,7 @@ Step 1에서 "추가 신호"에 해당한다고 표시된 경우에만 적용한
 - [ ] version bump
 - [ ] validate --strict
 - [ ] docs/catalog updates
+- [ ] docs/CHANGELOG.md entry (+ ROADMAP 완료 항목 제거)
 - [ ] MCP/prefix/permission checks
 - [ ] core sync checks
 - [ ] 스킬 품질 체크(해당 시 — 8축, 신규 skill은 동적 실행 포함)
