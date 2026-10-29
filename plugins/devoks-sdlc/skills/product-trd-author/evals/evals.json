@@ -1,0 +1,113 @@
+{
+  "skill_name": "devoks-sdlc:product-trd-author",
+  "notes": "제품 단위 TRD 작성/갱신의 객관 품질. 케이스 1 greenfield(비-HITL), 2 brownfield(비-HITL — 현행 스택 사실 기록·변경 결정만), 3 양식 요청, 4 HITL 첫 턴(사실 질문+판단 제안을 한 메시지로). 2026-10-29 신설.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "greenfield-trd-from-prd",
+      "prompt": "evals/files/pilates-prd/ 에 PRD랑 FEATURES 있어. 이걸로 TRD 써줘.",
+      "expected_output": "TRD.md를 템플릿 12섹션으로 작성한다(greenfield). §2 각 선택에 대안·이유(NFR-n·제약 연결)가 있고 iOS/Android 요구에 맞는 preset(react-native 등)이 매핑된다. 버전은 출처와 함께이거나 적지 않는다. NFR-1(정원·중복 0건)·NFR-2(회원권 잔여 정합)가 §6에서 DB 제약·서버 트랜잭션 수준으로 보장되고 검증 레벨이 있다. 계측 FR이 §7 이벤트로 있다. 엔드포인트 목록·EARS AC가 없다. FEATURES.md 기반 구역에 B-n이 FRD 시드로 추가된다. 호스팅·팀 역량 같은 사실은 미확정으로 §11에.",
+      "files": [
+        "evals/files/pilates-prd/PRD.md",
+        "evals/files/pilates-prd/FEATURES.md"
+      ],
+      "assertions": [
+        {
+          "text": "TRD.md가 템플릿 12개 섹션 헤더로 생성된다"
+        },
+        {
+          "text": "§2 모든 선택에 대안과 NFR-n·제약 연결 이유가 있다"
+        },
+        {
+          "text": "stack preset이 매핑되고 setup-project-convention 안내가 있다"
+        },
+        {
+          "text": "NFR-1·NFR-2가 §6에서 DB 제약 또는 서버 트랜잭션으로 보장되고 검증 레벨이 있다"
+        },
+        {
+          "text": "PRD 계측 FR이 §7에 이벤트로 있다"
+        },
+        {
+          "text": "엔드포인트 목록·EARS AC가 없다"
+        },
+        {
+          "text": "FEATURES.md 기반 구역에 B-n이 FRD 시드 형식으로 있다"
+        },
+        {
+          "text": "호스팅·팀 역량 등 입력에 없는 사실이 미확정으로 §11에 있다(지어낸 사실 없음)"
+        },
+        {
+          "text": "버전 표기가 있으면 출처가 있다(없으면 통과)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "brownfield-existing-stack-as-fact",
+      "prompt": "evals/files/brownfield-app 이 우리 저장소야. docs/product 에 PRD 있으니까 TRD 만들어줘.",
+      "expected_output": "brownfield로 판별한다. React·Vite·Supabase·TanStack Query·Vercel·Google SSO를 package.json·README 근거로 '현행'으로 기록하고 재선정하지 않는다. 예약 기능을 위한 변경(예약 테이블·이중 예약 방지 제약 등)만 ADR로 남긴다. 이중 예약 방지 불변식이 Postgres 배타/유니크 제약 또는 트랜잭션으로 §6에 있다. rooms 엔티티는 현행으로, 예약 엔티티는 신규로 §4에 표시. preset은 react-web.",
+      "files": [
+        "evals/files/brownfield-app/package.json",
+        "evals/files/brownfield-app/README.md"
+      ],
+      "assertions": [
+        {
+          "text": "mode가 brownfield로 기록된다"
+        },
+        {
+          "text": "React·Vite·Supabase가 근거 경로와 함께 현행 스택으로 기록되고 재선정되지 않는다"
+        },
+        {
+          "text": "변경 결정(예약 저장·이중 예약 방지 등)만 ADR로 남는다"
+        },
+        {
+          "text": "이중 예약 방지가 §6에서 DB 제약 또는 트랜잭션으로 보장된다"
+        },
+        {
+          "text": "§4에서 rooms는 현행, 예약 엔티티는 신규로 구분된다"
+        },
+        {
+          "text": "preset이 react-web으로 매핑된다"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "intake-template-request",
+      "prompt": "TRD 입력 양식 줘. docs/product/bookstore 에 저장해줘.",
+      "expected_output": "assets/TRD.intake.md를 docs/product/bookstore/TRD.intake.md로 복사하고 채운 뒤 넘기는 명령을 안내하고 멈춘다. TRD.md는 만들지 않는다.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "TRD.intake.md가 지정 경로에 생성된다"
+        },
+        {
+          "text": "TRD.md를 만들지 않는다"
+        },
+        {
+          "text": "채운 뒤 product-trd-author src=<파일> 안내가 있다"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "hitl-first-turn-single-confirmation",
+      "prompt": "(HITL) evals/files/pilates-prd/ PRD로 TRD 작업 시작하자.",
+      "expected_output": "인터뷰 질문을 하나씩 하지 않는다. 사실 질문(호스팅·조직 표준·팀 역량 등)과 판단 제안(레이어별 스택·인증·저장소 — 대안·이유 포함)을 한 메시지에 담아 확인을 요청한다. 확인 전에는 TRD.md를 쓰지 않는다.",
+      "files": [
+        "evals/files/pilates-prd/PRD.md"
+      ],
+      "assertions": [
+        {
+          "text": "사실 질문과 판단 제안이 한 메시지에 묶여 있다"
+        },
+        {
+          "text": "판단 제안마다 대안과 이유가 있다"
+        },
+        {
+          "text": "확인 전 TRD.md를 쓰지 않는다"
+        }
+      ]
+    }
+  ]
+}

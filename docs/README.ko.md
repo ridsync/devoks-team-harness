@@ -17,7 +17,7 @@ DevOKs 팀 Claude Code 하네스 — 코드리뷰·기능개발·Git 워크플�
 |---------|------|----------|
 | `devoks-core` | 기본 원칙, 컨벤션 preset, 명시적 setup 흐름 — MCP 점검 + 프로젝트 convention setup/management 제공 | **필수** |
 | `devoks-git` | Git 커밋·이슈·PR 워크플로우 커맨드 | 권장 |
-| `devoks-sdlc` | SDLC 워크플로우 통합 — 제품 PRD·기능 백로그, 기능개발(FRD·PLAN·실행·UI), 테스트 작성·triage, 코드리뷰·리팩토링·모듈분석·보안검증, 요구사항·데이터흐름 검증 | 권장 |
+| `devoks-sdlc` | SDLC 워크플로우 통합 — 제품 기획 인터뷰·PRD·TRD·기능 백로그, 기능개발(FRD·PLAN·실행·UI), 테스트 작성·triage, 코드리뷰·리팩토링·모듈분석·보안검증, 요구사항·데이터흐름 검증 | 권장 |
 | `devoks-browser` | Chrome DevTools MCP 연결 + Visual Diff 검증 | 선택 |
 | `devoks-rn` | React Native 디버깅 — Metro DevTools CDP 연결, 에뮬레이터 스크린샷, JS 콘솔/상태 조회 | 선택 (RN 프로젝트) |
 
@@ -111,6 +111,8 @@ flowchart TD
 
     PRD["0b · 제품 정의 (선택, 장기 프로젝트)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD 시드)"]
 
+    TRD["0c · 기술 설계 (선택)<br/>product-trd-author<br/>→ TRD.md + 기반 작업 B-n"]
+
     D["1a · 인터뷰 (선택)<br/>feature-interview<br/>→ 승인된 요약이 1로 이어짐"]
 
     subgraph BUILD["1–3 · feature-workflow-runner (통합 진입점)"]
@@ -136,6 +138,8 @@ flowchart TD
 
     S --> BUILD
     S -.-> PRD
+    PRD -.-> TRD
+    TRD -.-> F
     PRD -.-> F
     S -.-> D
     D -.-> F
@@ -158,6 +162,7 @@ flowchart TD
 | `workflow-map` | `/devoks-sdlc:workflow-map` | devoks-sdlc |
 | `product-interview` | `/devoks-sdlc:product-interview` | devoks-sdlc |
 | `product-prd-author` | `/devoks-sdlc:product-prd-author` | devoks-sdlc |
+| `product-trd-author` | `/devoks-sdlc:product-trd-author` | devoks-sdlc |
 | `feature-interview` | `/devoks-sdlc:feature-interview` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
 | `feature-plan-author` | `/devoks-sdlc:feature-plan-author` | devoks-sdlc |

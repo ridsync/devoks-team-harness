@@ -1,7 +1,7 @@
 {
   "name": "devoks-sdlc",
-  "version": "3.11.0",
-  "description": "DevOKs SDLC 워크플로우 — 제품 기획 인터뷰·PRD·기능 백로그, 요구탐색(인터뷰·아이디어 구체화), 기능개발(FRD·PLAN·실행·UI), 테스트 작성·triage, 코드리뷰·리팩토링·모듈분석·보안검증, 요구사항·데이터흐름·실동작 인수 검증을 한 사이클로 통합",
+  "version": "3.12.0",
+  "description": "DevOKs SDLC 워크플로우 — 제품 기획 인터뷰·PRD·TRD·기능 백로그, 요구탐색(인터뷰·아이디어 구체화), 기능개발(FRD·PLAN·실행·UI), 테스트 작성·triage, 코드리뷰·리팩토링·모듈분석·보안검증, 요구사항·데이터흐름·실동작 인수 검증을 한 사이클로 통합",
   "author": { "name": "ridsync" },
   "dependencies": ["devoks-core"]
 }
