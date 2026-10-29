@@ -3,7 +3,7 @@ description: "기능 요청·아이디어가 아직 FRD로 옮기기엔 이를 �
 argument-hint: "[ask=<요청·아이디어 본문> (default: 대화 맥락)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # feature-interview — 기능 의도·방향 정련 (FRD 앞단)
@@ -81,9 +81,9 @@ Q: <초점이 하나인 질문>
 
 ### 4. 정련 요약 — 사용자의 말로
 
-논의에서 모인 답·결정을 **FRD 입력 양식** `../feature-frd-author/assets/FRD.intake.md`의 구조 그대로 채워 보여준다(주석 블록은 빼고, 해당 없는 `방향`·`관련 문서`는 생략). 사용자가 양식을 직접 채워 오는 경로와 같은 형식이어야 frd-author가 두 입력을 똑같이 받는다. 대화에서 나오지 않은 값은 지어내지 않는다(비면 "미정"). 원래 요청 원문을 첫 줄에 남긴다 — 이 요약이 frd-author의 `FRD.draft.md`로 보존되므로 인터뷰 전 원문도 함께 남는다. 끝에 "이대로 FRD 정련으로 넘어갈까요? 고칠 부분이 있으면 말씀해 주세요."를 붙인다.
+논의에서 모인 답·결정을 **FRD 입력 양식** `../feature-frd-author/assets/FRD.intake.md`의 구조 그대로 채워 보여준다(주석 블록은 빼고, 해당 없는 `방향`·`관련 문서`는 생략). 사용자가 양식을 직접 채워 오는 경로와 같은 형식이어야 frd-author가 두 입력을 똑같이 받는다. 대화에서 나오지 않은 값은 지어내지 않는다(비면 "미확정"). 원래 요청 원문을 첫 줄에 남긴다 — 이 요약이 frd-author의 `FRD.draft.md`로 보존되므로 인터뷰 전 원문도 함께 남는다. 끝에 "이대로 FRD 정련으로 넘어갈까요? 고칠 부분이 있으면 말씀해 주세요."를 붙인다.
 
-**★ 칸(Outcome·User·Success·Out of scope)은 생략 불가** — 특히 어긋남의 절반은 "만들지 않을 것"에 대한 말 없는 불일치다.
+**★ 칸(Outcome·User·Success·Out of scope)은 생략 불가** — 특히 어긋남의 절반은 "만들지 않을 것"에 대한 말 없는 불일치다. 인터뷰에서 Success·Out of scope까지 답이 나오지 않았으면 `미확정`으로 두고 넘겨도 된다 — frd-author가 절차 7에서 제안값으로 한 번 더 확인한다(Outcome·User는 이 스킬에서 확정해야 한다).
 
 ### 5. 명시 승인 → frd-author로 바로 이어서
 

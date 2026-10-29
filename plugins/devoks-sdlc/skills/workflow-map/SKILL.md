@@ -3,7 +3,7 @@ name: workflow-map
 description: DevOKs SDLC 작업의 전체 흐름(단계 순서)과 각 단계의 진입 스킬·커맨드를 한 장의 표로 보여준다. 파이프라인(준비→요구정의→작업분해→구현→검증체인→커밋/PR)과 순서 없는 단발 작업을 구분해 제시한다. "워크플로우 맵", "SDLC 흐름 보여줘", "스킬 표", "어떤 스킬 써야 해", "다음 단계 뭐야", "작업 순서 알려줘", "스킬 목록 정리해줘" 같은 조회성 요청에서 사용한다. 표를 출력할 뿐 어떤 단계도 실행하지 않는다 — 실제 실행은 표에 적힌 각 스킬을 직접 호출한다.
 metadata:
   author: ridsync
-  version: 1.5.0
+  version: 1.5.1
 ---
 # workflow-map — SDLC 워크플로우 흐름 맵
 
@@ -71,7 +71,7 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 | 0c 기술 설계 | "TRD 입력 양식 줘" → `product-trd-author`가 `docs/product/TRD.intake.md` 생성 (사실 6칸) | `/devoks-sdlc:product-trd-author src=<파일>` |
 | 1 요구 정의 | "FRD 입력 양식 줘" → `feature-frd-author`가 양식 제공 | `/devoks-sdlc:feature-frd-author frd=<파일>` |
 
-★ 표시 칸이 비어 있으면 그 칸만 인터뷰(`product-interview` / `feature-interview`)로 채운다.
+★ 칸 중 **의도 칸**(PRD 1번, FRD Outcome·User)이 비면 그 칸만 인터뷰(`product-interview` / `feature-interview`)로 채우고, 나머지 ★(PRD 7번, FRD Success·Out of scope)는 스킬이 제안을 보여 주고 한 번에 확인한다. ★가 아닌 칸은 비어 있어도 `미확정`으로 진행한다.
 
 ## 표 A-1 — 4단계 검증 체인
 

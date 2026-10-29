@@ -4,7 +4,7 @@ description: "제품 PRD(PRD.md·FEATURES.md)를 받아 여러 기능이 함께 
 argument-hint: "[src=<PRD 경로|TRD 입력 양식 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # product-trd-author — 제품 TRD · 기술 구조 작성/갱신
@@ -48,7 +48,7 @@ PRD.md + FEATURES.md ─▶ [이 스킬] TRD.md + FEATURES.md 기반 구역(B-n)
 
 ### 0. 입력 수집 · 모드 판별
 
-- PRD(`<out>/PRD.md`, `FEATURES.md`)를 읽는다. 없으면 TRD를 쓰지 않고 PRD부터 만들 것을 안내하고 멈춘다 — 기준 요구 없이 정한 스택은 취향이다.
+- PRD를 읽는다 — 입력 양식의 "기준 PRD" 경로가 있으면 그것을, 없으면 `<out>/PRD.md`와 같은 디렉터리의 `FEATURES.md`. 없으면 TRD를 쓰지 않고 PRD부터 만들 것을 안내하고 멈춘다 — 기준 요구 없이 정한 스택은 취향이다.
 - `src`가 `## 기술 입력 요약`(채운 `TRD.intake.md`)이면 그 사실은 다시 묻지 않는다.
 - 저장소에 애플리케이션 코드가 있으면 **brownfield**, 없으면 **greenfield**(`references/trd-guide.md` §4). brownfield는 매니페스트·설정·디렉터리 구조를 읽어 현행 스택을 사실로 확보한다.
 - `<out>/TRD.md` 존재 → 갱신 모드로.

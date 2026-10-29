@@ -2,7 +2,7 @@
 <!--
 FRD 입력 양식 (SSOT). 이 양식을 채워 `/devoks-sdlc:feature-frd-author frd=<이 파일>`로 넘기면 의도 인터뷰 없이 FRD 정련을 시작한다.
 - feature-interview가 인터뷰 끝에 내는 정련 요약도, product-prd-author FEATURES.md의 FRD 시드도 같은 양식이다.
-- ★ 칸은 FRD에 반드시 들어가지만, 비어 있어도 괜찮다: Outcome·User가 비면 그 칸만 인터뷰(feature-interview)로 채우고, Success·Out of scope만 비면 스킬이 요청에서 추론한 제안을 보여 주고 한 번에 확인한다. 나머지는 모르면 "미정".
+- ★ 칸은 FRD에 반드시 들어가지만, 비어 있어도 괜찮다: Outcome·User가 비면 그 칸만 인터뷰(feature-interview)로 채우고, Success·Out of scope만 비면 스킬이 요청에서 추론한 제안을 보여 주고 한 번에 확인한다. 나머지는 모르면 "미확정".
 - 쓰는 요령: 해결책 말고 니즈로(✕ "모달로 띄운다" ○ "작업을 끊지 않고 확인한다") · 형용사 말고 숫자로(✕ "빠르게" ○ "2클릭 이내") · 근거 없는 주장은 '가정'으로.
 이 주석은 지워도 된다.
 -->

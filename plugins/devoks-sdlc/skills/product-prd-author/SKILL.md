@@ -4,7 +4,7 @@ description: "아이디어·요구사항 메모·기획 문서를 받아 장기 
 argument-hint: "[src=<아이디어 본문|요구 문서 경로> (default: 대화 맥락)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # product-prd-author — 제품 PRD · 기능 백로그 작성/갱신
@@ -81,7 +81,7 @@ metadata:
 ### 3. FEATURES.md 작성 (기능 백로그)
 
 `assets/FEATURES.template.md`를 따른다. FRD 시드는 FRD 입력 양식(`../feature-frd-author/assets/FRD.intake.md`)과 같은 칸을 쓴다. `FR`을 사용자가 체감하는 기능 단위 `F-n`으로 묶고, 릴리스(MVP/Next/Later)·의존·상태를 매긴다.
-각 항목에 **FRD 시드**를 붙인다 — ★ 칸(Outcome·User·Success·Out of scope)이 `feature-frd-author`의 의도 게이트 슬롯과 같아서, 시드를 초안으로 넘기면 인터뷰 없이 FRD 정련으로 바로 들어갈 수 있다.
+각 항목에 **FRD 시드**를 붙인다 — 칸이 FRD 입력 양식의 ★(Outcome·User·Success·Out of scope)와 같아서, 시드를 초안으로 넘기면 인터뷰 없이 FRD 정련으로 바로 들어갈 수 있다. 시드에 남은 `미확정`·`제안` 값은 frd-author가 한 번 더 확인한다.
 
 ### 4. 자체 점검 → 보고
 
@@ -102,7 +102,7 @@ PRD는 결정이 바뀔 때마다 고쳐야 신뢰가 유지되는 살아있는 
 
 ## 완료 기준
 
-- 7문항 판정표를 보여줬고(승인된 정련 요약 입력이면 생략), ★ 1·7번은 확정 또는 인터뷰로 채워졌으며, 미확정 칸은 PRD에 "미확정"으로 명시되어 §11에 모였다.
+- 7문항 판정표를 보여줬고(승인된 정련 요약 입력이면 생략), ★ 1번은 확정(필요 시 인터뷰)·7번은 확정(필요 시 제안 확인)됐으며(비-HITL은 blocker 보고), 미확정 칸은 PRD에 "미확정"으로 명시되어 §11에 모였다.
 - §1 문제 진술, §4 목표(≤3)·핵심 KPI(지표 이름 + 계측 FR/NFR 연결), §8 Out of Scope(이유+행선지 최소 1개)가 있다.
 - 모든 `FR`이 `G`/`S`로 역추적되고, 모든 MVP 목표에 그것을 이루는 `FR`이 있다.
 - PRD에 EARS AC·화면 상태·컴포넌트·기술 설계가 없다.

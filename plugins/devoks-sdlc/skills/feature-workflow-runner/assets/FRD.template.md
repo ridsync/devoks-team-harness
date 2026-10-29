@@ -3,7 +3,6 @@ doc_type: frd
 id: FRD-<feature-slug>
 title: <기능 이름>
 status: draft        # draft | review | approved
-owner: <이름>
 updated: <YYYY-MM-DD>
 plan: ./PLAN.md
 issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으면 생략)
@@ -143,9 +142,9 @@ issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으�
 
 ## 10. Assumptions & Open Questions
 > 검증되지 않은 채 참이라고 두는 것과, 착수 전/중에 답이 필요한 질문. 없으면 "없음"으로 남긴다.
-> 초안이 `feature-interview`의 정련 요약이면 그 "가정"·"남은 질문"을 이어받는다.
+> 초안이 `## 기능 정련 요약` 형식(인터뷰 요약·입력 양식·FEATURES 시드)이면 그 "가정"·"남은 질문"과 확인되지 않은 `미확정`·`제안` 값을 이어받는다.
 
-| 구분 | 내용 | 확인 방법 / 담당 |
+| 구분 | 내용 | 확인 방법 |
 |------|------|-----------------|
 | 가정 | <예: 기존 필터 키는 스키마 버전과 함께 저장돼 있다> | <실데이터 조회로 확인 — EDGE로 연결 시 ID 기재> |
 | 질문 | <예: 공유 뷰는 팀 단위인가 조직 단위인가> | <사용자 확인> |
