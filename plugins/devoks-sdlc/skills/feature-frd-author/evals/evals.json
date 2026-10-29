@@ -43,6 +43,42 @@
           "text": "추측으로 REQ/AC를 채운 FRD.md를 만들지 않는다"
         }
       ]
+    },
+    {
+      "id": 3,
+      "name": "intake-template-request",
+      "prompt": "FRD 입력 양식 줘. 기능 요청은 이 양식으로 정리해서 넘길게.",
+      "expected_output": "out이 없으므로 assets/FRD.intake.md 양식을 대화에 그대로 보여 주고(★ 칸 표시 포함), 채운 뒤 feature-frd-author frd=<파일> 로 넘기라는 안내를 하고 멈춘다. FRD.md·워크스페이스를 만들지 않는다.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "FRD.intake 양식(★ Outcome·User·Success·Out of scope 포함)이 응답에 있다"
+        },
+        {
+          "text": "FRD.md나 워크스페이스 디렉터리를 만들지 않는다"
+        },
+        {
+          "text": "채운 뒤 넘기는 명령 안내가 있다"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "small-feature-judgment-slots-proposed",
+      "prompt": "로그인 화면 비밀번호 입력칸에 비밀번호 보기/숨기기 토글 추가해줘. FRD로 정리해줘. 워크스페이스는 .claude/workspace/password-toggle-20261029/",
+      "expected_output": "Outcome(비밀번호 표시 전환)·User(로그인하는 사용자)는 분명하므로 feature-interview로 진입하지 않는다. Success·Non-goals는 '제안: …'으로 추론해 다른 슬롯 확인과 한 번에 묶어 묻는다(예: 토글 1회로 전환 / 다른 입력 필드 미적용). 의도 질문을 하나씩 던지지 않는다.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "feature-interview로 진입하지 않는다(의도 인터뷰 없음)"
+        },
+        {
+          "text": "Success와 Non-goals가 '제안' 형태로 제시된다"
+        },
+        {
+          "text": "확인 질문이 한 번에 묶여 제시된다(질문 하나씩 반복 아님)"
+        }
+      ]
     }
   ]
 }

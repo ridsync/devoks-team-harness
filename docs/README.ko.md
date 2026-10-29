@@ -109,7 +109,7 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 flowchart TD
     S["0 · 준비 (최초 1회)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
 
-    PRD["0b · 제품 정의 (선택, 장기 프로젝트)<br/>product-prd-author<br/>→ PRD.md + FEATURES.md (FRD 시드)"]
+    PRD["0b · 제품 정의 (선택, 장기 프로젝트)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD 시드)"]
 
     D["1a · 인터뷰 (선택)<br/>feature-interview<br/>→ 승인된 요약이 1로 이어짐"]
 
@@ -156,6 +156,7 @@ flowchart TD
 | 스킬 | 호출 | 플러그인 |
 |------|------|---------|
 | `workflow-map` | `/devoks-sdlc:workflow-map` | devoks-sdlc |
+| `product-interview` | `/devoks-sdlc:product-interview` | devoks-sdlc |
 | `product-prd-author` | `/devoks-sdlc:product-prd-author` | devoks-sdlc |
 | `feature-interview` | `/devoks-sdlc:feature-interview` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |

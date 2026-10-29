@@ -41,6 +41,9 @@
         },
         {
           "text": "보고에 7문항 판정과 미확정 목록이 있다"
+        },
+        {
+          "text": "★ 7번(하지 않을 것)이 입력에 없으므로 보고 첫머리에 '★ 미확정 — FRD 착수 보류' blocker가 있다"
         }
       ]
     },
@@ -115,6 +118,70 @@
         },
         {
           "text": "파일을 수정했다면 §13 변경 이력이 추가되고 행 삭제 대신 dropped/이동 처리된다"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "intake-template-request",
+      "prompt": "PRD 입력 양식 하나 줘. 내가 먼저 채워볼게. 저장은 docs/product/bookstore 에.",
+      "expected_output": "assets/PRD.intake.md를 docs/product/bookstore/PRD.intake.md로 복사하고 채운 뒤 넘기는 명령 한 줄을 안내하고 멈춘다. PRD.md·FEATURES.md는 만들지 않는다.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "PRD.intake.md가 지정 경로에 양식 그대로 생성된다"
+        },
+        {
+          "text": "PRD.md·FEATURES.md를 만들지 않는다"
+        },
+        {
+          "text": "채운 뒤 product-prd-author src=<파일> 로 넘기라는 안내가 있다"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "filled-intake-missing-star7-non-hitl",
+      "prompt": "evals/files/intake-missing-7.md 채워 놨어. 이걸로 PRD 만들어줘. docs/product/bookstore 에 저장.",
+      "expected_output": "제품 정련 요약 형식이므로 확정 칸은 다시 묻지 않는다. ★ 7번이 비었지만 비-HITL이라 인터뷰로 진입하지 않고 PRD·FEATURES를 작성하되, 보고 첫머리에 ★ 미확정 blocker를 남긴다. '원하는 기능'의 해결책 표현(지도 표시 등)은 니즈로 환원된다. '재고 정보가 실제와 다르게 보이는 일'은 NFR 불변식 또는 가드레일로 간다.",
+      "files": [
+        "evals/files/intake-missing-7.md"
+      ],
+      "assertions": [
+        {
+          "text": "PRD.md·FEATURES.md가 생성된다"
+        },
+        {
+          "text": "보고 첫머리에 ★ 7번 미확정 blocker가 있다"
+        },
+        {
+          "text": "intake에 확정된 값(대상 사용자·문제·지표 이름)이 PRD에 그대로 반영된다"
+        },
+        {
+          "text": "'재고 정보 불일치 방지'가 §7 NFR(불변식)이나 §4 가드레일로 들어간다"
+        },
+        {
+          "text": "FR에 '지도 표시' 같은 해결책 지정이 그대로 없다"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "hitl-star7-missing-proposed-not-interviewed",
+      "prompt": "(HITL) evals/files/intake-missing-7.md 채워 놨어. 이걸로 PRD 만들어줘.",
+      "expected_output": "1번이 확정이므로 product-interview로 진입하지 않는다. 7번만 비었으므로 입력에서 추론한 제외 후보를 '제안: 항목 — 이유 — 행선지'로 만들어 다른 부분·미확정 항목과 한 번에 묶어 확인을 요청한다. 확인 전에는 PRD를 확정하지 않는다.",
+      "files": [
+        "evals/files/intake-missing-7.md"
+      ],
+      "assertions": [
+        {
+          "text": "product-interview로 진입하지 않는다"
+        },
+        {
+          "text": "7번 제외 후보가 '제안' 형태(항목·이유·행선지)로 제시된다"
+        },
+        {
+          "text": "확인 질문이 한 메시지에 묶여 있다"
         }
       ]
     }

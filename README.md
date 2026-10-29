@@ -109,7 +109,7 @@ The HITL flow, from setup to PR. Run `/devoks-sdlc:workflow-map` in any session 
 flowchart TD
     S["0 · Setup (once)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
 
-    PRD["0b · Product definition (optional, long-term)<br/>product-prd-author<br/>→ PRD.md + FEATURES.md (FRD seeds)"]
+    PRD["0b · Product definition (optional, long-term)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD seeds)"]
 
     D["1a · Interview (optional)<br/>feature-interview<br/>→ approved summary flows into 1"]
 
@@ -156,6 +156,7 @@ flowchart TD
 | Skill | Invoke | Plugin |
 |-------|--------|--------|
 | `workflow-map` | `/devoks-sdlc:workflow-map` | devoks-sdlc |
+| `product-interview` | `/devoks-sdlc:product-interview` | devoks-sdlc |
 | `product-prd-author` | `/devoks-sdlc:product-prd-author` | devoks-sdlc |
 | `feature-interview` | `/devoks-sdlc:feature-interview` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
