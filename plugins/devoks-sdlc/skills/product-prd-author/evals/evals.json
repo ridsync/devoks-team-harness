@@ -1,0 +1,122 @@
+{
+  "skill_name": "devoks-sdlc:product-prd-author",
+  "notes": "제품 단위 PRD+기능 백로그 작성/갱신의 객관 품질을 검증한다. 서브에이전트 실행은 비-HITL 경로이므로 질문 대신 '미확정' 명시로 진행하는지(케이스 1·2), 갱신 모드에서 확인 전 쓰지 않고 변경 목록·버전 bump 제안·FRD 재검토 보고를 내는지(케이스 3)를 본다. 2차 반복(2026-10-27): 사실/판단 구분 제안값 규칙 검증(케이스 1)과 확인 전 미기록 판별 assertion(케이스 3) 추가. 3차 반복(2026-10-29): 에이전트 구현 기준 경량화 — 담당·기한·시점 칸 제거, KPI는 지표+계측만(목표치는 출시 후), 빌드 검증 가능한 가드레일은 NFR 승격.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "vague-idea-to-prd-with-undetermined",
+      "prompt": "사내 직원들이 남는 회의실을 쉽게 찾고 바로 예약할 수 있는 서비스를 장기적으로 만들어 보려고 해. 지금은 다들 사내 메신저에 '3층 회의실 비었나요?' 묻고 다녀. 이걸로 PRD 문서 만들어줘. 저장 위치는 docs/product/meeting-room 으로.",
+      "expected_output": "docs/product/meeting-room/PRD.md와 FEATURES.md를 템플릿 구조로 작성한다. 사실(KPI 기준값·일정·인력·경쟁 제품)은 '미확정', 빌드에 영향을 주는 판단 값(NFR 수치·정책·OOS 후보)은 '미확정 (제안: 값 — 근거)'. §4는 지표 이름과 계측 FR/NFR 연결만 있고 목표치·기한·중단 기준 칸이 없다. 이중 예약 0건 같은 불변식은 NFR로 올라간다. §11은 ID·질문·막는 것만. FR은 능력 단위(EARS 없음). FEATURES 각 F에 FRD 시드(열린 질문은 Q-n 참조). 보고에 7문항 판정과 미확정 목록.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "PRD.md와 FEATURES.md가 모두 생성된다"
+        },
+        {
+          "text": "PRD.md에 템플릿 13개 섹션 헤더(문제 정의~변경 이력)가 순서대로 있다"
+        },
+        {
+          "text": "KPI 기준값·일정·인력 같은 사실 칸에 제안값·지어낸 수치가 없고 '미확정'이다"
+        },
+        {
+          "text": "NFR 수치·정책 등 빌드 판단 칸 중 최소 1곳이 '미확정 (제안: 값 — 근거)' 형태다"
+        },
+        {
+          "text": "§4에 목표치·기한·중단 기준 칸이 없고, 핵심 KPI가 계측 FR/NFR과 연결된다"
+        },
+        {
+          "text": "§11 오픈 이슈와 §10 마일스톤에 담당·기한·시점 칸이 없다"
+        },
+        {
+          "text": "본문의 미확정 항목이 §11 오픈 이슈에 모인다"
+        },
+        {
+          "text": "FR에 EARS AC(WHEN/THE SYSTEM SHALL)나 화면 상태 정의가 없다"
+        },
+        {
+          "text": "Out of Scope가 최소 1개, 이유와 행선지가 있다"
+        },
+        {
+          "text": "FEATURES.md의 각 F에 FRD 시드(대상 사용자·Why·Success·Non-goals)가 있다"
+        },
+        {
+          "text": "보고에 7문항 판정과 미확정 목록이 있다"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "requirements-memo-solutions-to-needs",
+      "prompt": "evals/files/pilates-requirements.md 에 대표 미팅 메모가 있어. 이걸 바탕으로 장기 프로젝트용 PRD랑 기능 목록 정리해줘. docs/product/pilates/ 에 저장.",
+      "expected_output": "메모의 솔루션 문장(하단 탭 3개, Firebase 푸시, 관리자 대시보드)이 FR에 그대로 들어가지 않고 사용자 니즈로 환원된다(기술은 TRD 몫 또는 제약). '빠르고 간편하게'가 숫자 또는 미확정으로 바뀐다. '알림 보내면 노쇼가 줄 것'이 §9 가정으로 들어가고 검증 방법이 붙는다. 온라인 결제가 Out of Scope(다음 버전)로 이유와 함께 들어간다. 개인정보(건강 특이사항)가 공통 NFR 또는 제약에 반영된다. 일정·인력(3개월, 개발 1명)이 §7 제약에 있다. 핵심 KPI 후보(더블부킹 월 4~5건, 문의 30건/일)가 기준값으로 쓰인다.",
+      "files": [
+        "evals/files/pilates-requirements.md"
+      ],
+      "assertions": [
+        {
+          "text": "FR에 '하단 탭'·'Firebase'·'대시보드' 같은 솔루션 지정 문구가 그대로 없다"
+        },
+        {
+          "text": "'빠르고 간편하게'가 숫자 기준 또는 미확정으로 처리된다"
+        },
+        {
+          "text": "'알림 보내면 노쇼가 줄 것'이 §9 가정으로 검증 방법과 함께 들어간다"
+        },
+        {
+          "text": "온라인 결제가 Out of Scope에 이유·행선지(다음 버전)와 함께 있다"
+        },
+        {
+          "text": "건강 특이사항 등 개인정보 보호가 NFR 또는 제약에 반영된다"
+        },
+        {
+          "text": "3개월·개발자 1명·디자이너 0.5명 제약이 §7에 있다"
+        },
+        {
+          "text": "더블부킹 월 4~5건 또는 문의 30건/일이 KPI 기준값으로 쓰인다"
+        },
+        {
+          "text": "FEATURES.md의 각 F에 FRD 시드가 있다"
+        },
+        {
+          "text": "더블부킹 0건(이중 예약 방지)이 §7 NFR 불변식으로 올라가 있다"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "update-mode-change-request",
+      "prompt": "evals/files/existing-prd/ 에 있는 팀 회고 보드 PRD 업데이트해줘. 리드들 피드백 결과 Jira 연동이 없으면 액션 추적을 안 쓰겠다고 해서 Jira 연동을 MVP에 넣기로 했어. 대신 익명 카드는 다음 버전으로 미루자.",
+      "expected_output": "기존 PRD·FEATURES를 먼저 읽고 덮어쓰지 않는다. 변경 목록(Jira 연동 Out of Scope→MVP FR 추가, FR-2 익명 카드 MVP→Next, 연쇄 영향: F-1 포함 FR·NFR-1·A-1·MVP 정의·마일스톤)을 정리한다. minor bump(0.3.0)를 제안한다. status가 approved이므로 review 전환 여부를 짚는다. F-1이 이미 FRD 상태라 해당 FRD 재검토 필요를 보고한다. 비-HITL이므로 확인 없이 파일을 쓰지 않거나, 썼다면 §13 이력·dropped 처리 없이 행을 지우지 않는다. 확인 없이 파일을 수정하지 않는다.",
+      "files": [
+        "evals/files/existing-prd/PRD.md",
+        "evals/files/existing-prd/FEATURES.md"
+      ],
+      "assertions": [
+        {
+          "text": "비-HITL 실행에서 사용자 확인 없이 PRD.md·FEATURES.md를 수정하지 않는다"
+        },
+        {
+          "text": "기존 PRD 내용을 지우고 새로 쓰지 않는다(덮어쓰기 없음)"
+        },
+        {
+          "text": "변경 목록에 Jira 연동 MVP 편입과 익명 카드(FR-2) Next 이동이 모두 있다"
+        },
+        {
+          "text": "연쇄 영향(F-1 구성, NFR-1 또는 A-1, MVP 정의·마일스톤 중 2개 이상)을 짚는다"
+        },
+        {
+          "text": "버전 bump로 minor(0.3.0)를 제안한다"
+        },
+        {
+          "text": "approved 상태에서의 review 전환 여부를 언급한다"
+        },
+        {
+          "text": "F-1에 연결된 FRD(retro-session) 재검토 필요를 보고한다"
+        },
+        {
+          "text": "파일을 수정했다면 §13 변경 이력이 추가되고 행 삭제 대신 dropped/이동 처리된다"
+        }
+      ]
+    }
+  ]
+}

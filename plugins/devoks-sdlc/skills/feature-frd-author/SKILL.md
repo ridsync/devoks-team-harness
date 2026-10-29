@@ -3,13 +3,15 @@ description: 거친 기능 아이디어나 FRD 초안을 받아, EARS Acceptance
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.4.0
+  version: 1.4.1
 ---
 
 # frd-author — FRD 정련 (Phase 1)
 
 거친 초안을 검증 가능한 FRD로 만든다. `devoks-sdlc:feature-workflow-runner` 의 **Phase 1만** 단독 실행하는 얇은 스킬이다.
 공유 자산/레퍼런스는 통합 스킬 디렉터리를 그대로 참조한다(중복 정의 금지, SSOT).
+
+> 범위: 기능 하나의 요구서다. 제품·장기 프로젝트 전체의 문제·목표·범위·기능 백로그는 `devoks-sdlc:product-prd-author`가 소유한다 — 그 백로그(`FEATURES.md`)의 **FRD 시드** 블록을 `frd` 초안으로 받으면 §1 의도 슬롯이 채워진 상태라 Phase 0 게이트를 건너뛸 수 있고, PRD의 공통 NFR(`NFR-n`)·제약은 §7에서 재정의하지 않고 참조한다.
 
 ## 호출 방법
 

@@ -3,7 +3,7 @@ description: "기능 요청·아이디어가 아직 FRD로 옮기기엔 이를 �
 argument-hint: "[ask=<요청·아이디어 본문> (default: 대화 맥락)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # feature-interview — 기능 의도·방향 정련 (FRD 앞단)
@@ -20,6 +20,7 @@ metadata:
 |---|---|
 | 원하는 것이 불명확하거나 방향이 여러 갈래 | **이 스킬** → 승인 후 frd-author 자동 연결 |
 | 방향이 정해졌고 초안이 있음 | `devoks-sdlc:feature-frd-author` (의도 공백을 발견하면 Phase 0에서 이 스킬로 진입) |
+| 기능 하나가 아니라 제품·장기 프로젝트 전체 | `devoks-sdlc:product-prd-author` (PRD + 기능 백로그 — 백로그 항목의 FRD 시드로 내려온다) |
 
 - 이름 바꾸기·오타·명확한 버그 수정처럼 의도가 자명한 요청, 정보 질문에는 쓰지 않는다.
 - **HITL 전용** — 질문이 사용자에게 전달되지 않는 맥락(위임받은 서브에이전트, `/loop`, 스케줄 실행, 자동

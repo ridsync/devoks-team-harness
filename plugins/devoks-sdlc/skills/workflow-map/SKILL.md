@@ -3,7 +3,7 @@ name: workflow-map
 description: DevOKs SDLC 작업의 전체 흐름(단계 순서)과 각 단계의 진입 스킬·커맨드를 한 장의 표로 보여준다. 파이프라인(준비→요구정의→작업분해→구현→검증체인→커밋/PR)과 순서 없는 단발 작업을 구분해 제시한다. "워크플로우 맵", "SDLC 흐름 보여줘", "스킬 표", "어떤 스킬 써야 해", "다음 단계 뭐야", "작업 순서 알려줘", "스킬 목록 정리해줘" 같은 조회성 요청에서 사용한다. 표를 출력할 뿐 어떤 단계도 실행하지 않는다 — 실제 실행은 표에 적힌 각 스킬을 직접 호출한다.
 metadata:
   author: ridsync
-  version: 1.2.1
+  version: 1.3.0
 ---
 # workflow-map — SDLC 워크플로우 흐름 맵
 
@@ -49,6 +49,7 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 | #   | 단계         | 진입점                                                                | 산출물                                     |
 | --- | ---------- | ------------------------------------------------------------------ | --------------------------------------- |
 | 0   | 준비 (최초 1회) | `/devoks-core:setup-mcp` · `/devoks-core:setup-project-convention` | MCP 서버, `.claude/rules`                 |
+| 0b  | 제품 정의 (선택, 장기 프로젝트) | `/devoks-sdlc:product-prd-author` | `PRD.md` · `FEATURES.md` (항목별 FRD 시드 → 1) |
 | 1a  | 요구 탐색 (선택) | `/devoks-sdlc:feature-interview` → 승인 시 1로 자동 연결 | 정련 요약 (대화)                        |
 | 1   | 요구 정의      | `/devoks-sdlc:feature-frd-author`                                  | `FRD.md`                                |
 | 2   | 작업 분해      | `/devoks-sdlc:feature-plan-author`                                 | `PLAN.md`                               |
@@ -107,6 +108,7 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 
 ## 참고 (표와 함께 출력)
 
+- **제품 정의는 기능 정의보다 한 단계 위다.** 여러 기능으로 이뤄진 장기 프로젝트는 `product-prd-author`로 PRD·기능 백로그를 먼저 만들고, 백로그 항목의 FRD 시드를 `feature-frd-author`에 넘긴다. 기능 하나만 만들 때는 건너뛴다.
 - **요구 단계 진입점은 사실상 하나다.** 초안이 있으면 `feature-frd-author`(또는 `feature-workflow-runner`)를 바로 쓴다 — 의도가 비었거나 방향이 여러 갈래면 그 스킬이 Phase 0에서 `feature-interview`로 먼저 정련한다. 아이디어만 있을 때 `feature-interview`를 직접 불러도 되고, 정련 요약이 승인되면 FRD 정련으로 자동으로 이어진다.
 - **기능 구현 진입점이 둘이다.** 추적 가능한 산출물(`FRD.md`/`PLAN.md`)과 태스크 단위 진행 추적이 필요하면 **표 A**(`feature-workflow-runner`)를, 산출물 없이 바로 구현하는 가벼운 작업이면 **표 B**의 `new-feature-by-github-issue`(GitHub 이슈 본문을 SSOT로 삼는 간이 구현)를 쓴다.
 - **타 플러그인 항목**(`/devoks-core:*`, `/devoks-git:*`, `/devoks-browser:*`)은 해당 플러그인이 설치돼 있어야 호출된다. 미설치 환경에서는 그 행을 건너뛴다.
