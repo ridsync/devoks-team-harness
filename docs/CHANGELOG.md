@@ -9,6 +9,12 @@
 
 ---
 
+## **react-web preset을 TypeScript 기본으로 전환** (2026-11-02, `devoks-core` `2.3.0 → 2.4.0`)
+- 배경: react-web preset만 `JavaScript + JSDoc (TypeScript 미사용)`로 남아 있었다(초기 구성 이후 미검토). react-native preset은 이미 TS였다.
+- 반영: Language를 `TypeScript (strict)`로 바꾸고 TypeScript 규칙 절 신설, 전체 코드 예시·파일 확장자·Pitfalls·Project Decisions를 TS 기준으로 전환. 파일 단위 상세는 `plugins/devoks-core/CHANGELOG.md` 2.4.0.
+- 검증: zustand `create<T>()(...)`·`zodResolver` 제네릭 규칙은 Context7 공식 문서로 확인. `validate --strict`, 잔여 `.js/.jsx`·`javascript` 코드펜스 grep.
+- 의도적 미반영: react-native preset의 `create<CartState>((set, get) => …)`(curried 아님)는 이번 범위 밖 — 후속 정정 대상. README 2종·marketplace는 preset 언어를 기술하지 않아 비대상.
+
 ## **완료 이력을 `docs/CHANGELOG.md`로 분리 + `docs/ROADMAP.md`로 개명** (2026-10-29, `devoks-sdlc` `3.12.1 → 3.12.2`)
 - 배경: `docs/roadmap.md`(현 `docs/ROADMAP.md`)는 "할 일" SSOT인데 577줄 중 약 390줄이 완료 이력이라 열린 항목이 묻혔다. 기존 `plugins/devoks-core/CHANGELOG.md`는 core 전용 기계용 기록(`setup-preset-manage`가 소비)이라 harness 전체 이력을 담을 자리가 아니었다.
 - 반영(사용자 결정): `docs/CHANGELOG.md` 신설(루트에 둘 이유 — GitHub 특수 취급·릴리스 도구 — 가 없어 `docs/`에 둠), `docs/roadmap.md` → `docs/ROADMAP.md` 개명 — roadmap "완료 / 최근 반영" 45항목을 원문 그대로 이관하고 폐기·기각 중심 항목에 `[폐기]` 태그. roadmap에는 열린 항목과 "재제안 전 확인할 결정" 포인터만 남김. roadmap의 완료 이력을 가리키던 참조 4곳(`devoks-plugin-maintenance` checklist 2곳, `orchestration-design.md`의 줄 번호 참조, `test-quality-bar.md`)을 CHANGELOG로 갱신. `devoks-plugin-maintenance`·`project-convention.md`의 변경 절차에 "`docs/CHANGELOG.md` 기록 + 끝낸 항목은 ROADMAP에서 제거"를 추가. README 2종 디렉터리 트리·로드맵 안내 갱신.

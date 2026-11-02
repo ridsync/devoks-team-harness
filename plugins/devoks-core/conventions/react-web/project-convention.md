@@ -7,7 +7,7 @@
 
 ## Stack
 
-- **Language:** JavaScript + JSDoc (TypeScript 미사용)
+- **Language:** TypeScript (`strict: true`) — 규칙은 아래 "TypeScript" 절
 - **Build Tool (CSR):** Vite + React 19
 - **Framework (SSR):** Next.js 16 (App Router) — CSR/SSR 중 하나를 프로젝트 결정으로 선택 (아래 "SSR Variant" 참고)
 - **Routing (CSR):** React Router v7 (Data Router)
@@ -35,14 +35,17 @@
 
 | 대상 | 규칙 | 예시 |
 |------|------|------|
-| 컴포넌트 파일 | PascalCase.jsx | `AppHeader.jsx`, `SafeModal.jsx` |
-| 유틸/훅 파일 | camelCase.js | `debug.util.js`, `useBootSplash.js` |
-| store 파일 | camelCase + `.store.js` | `cart.store.js`, `auth.store.js` |
-| 상수 파일 | PascalCase.js | `SchemaNames.js`, `ItemStatus.js` |
+| 컴포넌트 파일 | PascalCase.tsx | `AppHeader.tsx`, `SafeModal.tsx` |
+| 유틸/훅 파일 | camelCase.ts | `debug.util.ts`, `useBootSplash.ts` |
+| store 파일 | camelCase + `.store.ts` | `cart.store.ts`, `auth.store.ts` |
+| 상수 파일 | PascalCase.ts | `SchemaNames.ts`, `ItemStatus.ts` |
+| 공유 타입 파일 | camelCase + `.types.ts` | `product.types.ts` |
+| 타입 / 인터페이스 | PascalCase, `I`·`T` 접두어 금지 | `ProductDto`, `CartState` |
+| Props 타입 | 컴포넌트명 + `Props` | `ProductActionBarProps` |
 | 컴포넌트 | PascalCase | `export default AppHeader` |
 | 커스텀 훅 | use + PascalCase | `useBootSplash`, `useInViewport` |
 | Context 훅 | useXxxOrThrow | `useToolbarOrThrow()` |
-| shadcn/ui 컴포넌트 | CLI 생성 그대로 `components/ui/` 하위 유지 | `components/ui/button.jsx` |
+| shadcn/ui 컴포넌트 | CLI 생성 그대로 `components/ui/` 하위 유지 | `components/ui/button.tsx` |
 | Private 헬퍼 | # + prefix | `#requireBooleanOrThrow` |
 | 상수 | UPPER_SNAKE_CASE | `ZINDEX.HEADER`, `ITEM_STATUS.CREATE` |
 | 변수/함수 | camelCase | `showTimeText`, `loadConfig` |
@@ -57,9 +60,10 @@
 
 ### Import Order
 
-```javascript
+```typescript
 // 1. React / 외부 라이브러리
 import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -81,18 +85,37 @@ import UserCard from "./components/UserCard";
 
 - 매직 넘버/문자열 금지 → named constant 추출
 - 파일 상단 (import 직후, 함수 전)
-- `Object.freeze()` 적용
+- `Object.freeze()` 적용 (런타임 불변) + `as const` (리터럴 타입 보존)
 - 도메인별 그룹화
+- `enum` 대신 `as const` 객체 + 파생 유니온 타입을 쓴다 — `enum`은 런타임 코드를 생성하고 `erasableSyntaxOnly`·타입 제거 기반 트랜스파일러와 충돌한다
 
-```javascript
+```typescript
 export const ITEM_QUANTITY_RULE = Object.freeze({
     key: "itemQuantity",
     min: 0,
     max: 999,
     precision: 0,
     defaultValue: 1,
-});
+} as const);
+
+export const ITEM_STATUS = Object.freeze({
+    CREATE: "create",
+    UPDATE: "update",
+} as const);
+export type ItemStatus = (typeof ITEM_STATUS)[keyof typeof ITEM_STATUS]; // "create" | "update"
 ```
+
+### TypeScript
+
+- `tsconfig`는 `strict: true`를 끄지 않는다. 신규 프로젝트는 `noUncheckedIndexedAccess`도 켠다(인덱스 접근 결과에 `undefined` 포함).
+- **`any` 금지** — 형태를 모르는 외부 값은 `unknown`으로 받고 zod 파싱 또는 타입 가드로 좁힌다. 불가피한 `any`는 `// [WHY]` 주석과 함께 그 줄에만 둔다.
+- **타입 단언(`as`)·non-null 단언(`!`)은 계약 경계 밖에서 쓰지 않는다** — 컴파일러를 침묵시킬 뿐 런타임 보장이 없다. 대신 `*OrThrow` 헬퍼나 zod 파싱으로 좁힌다. 예외: `as const`, 테스트 fixture.
+- **API 응답은 신뢰 경계다** — 서버 응답 타입은 제네릭(`apiClient.get<ProductDto>`)만으로 보장되지 않는다. 형태가 틀리면 치명적인 응답(결제·권한 등)은 zod 스키마로 파싱하고 `z.infer`로 타입을 얻는다(스키마가 SSOT, 타입 중복 선언 금지).
+- Props·state 형태는 `type`으로 선언한다. `interface`는 선언 병합·`extends` 확장이 실제로 필요할 때만 쓴다.
+- 컴포넌트는 `React.FC` 대신 함수 시그니처에 Props 타입을 직접 붙인다. `children`은 `ReactNode`로 명시한다.
+- 타입 전용 import는 `import type`으로 분리한다(`verbatimModuleSyntax` 대응).
+- 함수 반환 타입은 추론에 맡기되, **공개 API(모듈 export되는 api/query/유틸 함수)는 반환 타입을 명시**해 계약을 고정한다.
+- **타입체크는 빌드와 별개다** — Vite는 `.ts`를 트랜스파일만 하고 타입 검사를 하지 않는다. `tsc --noEmit`(또는 `tsc -b`)을 `build`·CI 게이트에 포함한다. Next.js는 `next build`가 타입체크를 수행한다.
 
 ---
 
@@ -110,39 +133,51 @@ export const ITEM_QUANTITY_RULE = Object.freeze({
 
 ### Context / Provider (cross-cutting 값 전용)
 
-```javascript
-// Context 파일 (XxxContext.js)
-export const ToolbarContext = createContext(null);
-export function useToolbarOrThrow() {
+```tsx
+// Context 파일 (XxxContext.ts)
+export type ToolbarContextValue = {
+    items: ToolbarItem[];
+    setActive: (id: string) => void;
+};
+
+export const ToolbarContext = createContext<ToolbarContextValue | null>(null);
+export function useToolbarOrThrow(): ToolbarContextValue {
     const ctx = useContext(ToolbarContext);
     if (!ctx) throw new Error("useToolbar must be used within a ToolbarProvider");
     return ctx;
 }
 
-// Provider 파일 (XxxProvider.jsx)
-export const ToolbarProvider = ({ children }) => {
-    const value = useMemo(() => ({ ... }), [deps]);
+// Provider 파일 (XxxProvider.tsx)
+export const ToolbarProvider = ({ children }: { children: ReactNode }) => {
+    const value = useMemo<ToolbarContextValue>(() => ({ ... }), [deps]);
     return <ToolbarContext.Provider value={value}>{children}</ToolbarContext.Provider>;
 };
 export const useToolbar = () => useToolbarOrThrow();
 ```
 
 - Context는 Auth/Theme처럼 provider 경계가 실제로 필요한 cross-cutting 값에만 사용한다. 화면/도메인 상태를 Context로 끌어올리지 않는다.
-- `createContext(null)` + `useXxxOrThrow()` 패턴 (Contract: missing provider → throw)
+- `createContext<T | null>(null)` + `useXxxOrThrow()` 패턴 (Contract: missing provider → throw). `null` 체크가 타입을 `T`로 좁혀 주므로 사용부에 `!` 단언이 필요 없다.
 - `useMemo`로 context value 감싸기 (불필요한 re-render 방지)
 
 ### Store (Zustand)
 
-```javascript
-// cart.store.js
-export const useCartStore = create((set) => ({
+```typescript
+// cart.store.ts
+type CartState = {
+    items: CartItem[];
+    addItem: (item: CartItem) => void;
+    removeItem: (id: string) => void;
+};
+
+export const useCartStore = create<CartState>()((set) => ({
     items: [],
     addItem: (item) => set((state) => ({ items: [...state.items, item] })),
     removeItem: (id) => set((state) => ({ items: state.items.filter((i) => i.id !== id) })),
 }));
 ```
 
-- store는 도메인별로 분리한다 (`cart.store.js`, `ui.store.js`).
+- TypeScript에서는 `create<T>()(...)` curried 형태로 쓴다(빈 괄호 `()` 필수 — middleware 타입 추론용).
+- store는 도메인별로 분리한다 (`cart.store.ts`, `ui.store.ts`).
 - selector 단위로 구독해 불필요한 re-render를 막는다: `useCartStore((state) => state.items)`.
 - 서버에서 가져온 데이터를 store에 복제해 보관하지 않는다 — 서버 상태는 TanStack Query 캐시가 SSOT.
 
@@ -153,13 +188,18 @@ export const useCartStore = create((set) => ({
 - Tailwind CSS v4 유틸리티 클래스가 기본 스타일링 수단이다. v4는 CSS-first 설정(`@theme` 디렉티브)이므로 `tailwind.config.js`에 디자인 토큰을 재정의하지 않는다 — 토큰 SSOT는 CSS의 `@theme` 블록.
 - shadcn/ui 컴포넌트를 CLI로 생성해 `components/ui/`에 두고, `cva`(class-variance-authority)로 variant를 관리한다. Ant Design류 런타임 테마 토큰 API는 사용하지 않는다.
 - 동적 클래스 조합은 `cn()`(clsx + tailwind-merge) 헬퍼로 처리하고, 인라인 스타일 객체는 Tailwind로 표현 불가능한 값(motion 애니메이션 중간값 등)에만 예외적으로 사용한다.
-- z-index는 Tailwind 임의값 대신 `ZINDEX` 상수를 CSS 변수/`@theme` 토큰으로 노출해 사용한다 (SSOT: `constants/ZIndexHelper.js`).
+- z-index는 Tailwind 임의값 대신 `ZINDEX` 상수를 CSS 변수/`@theme` 토큰으로 노출해 사용한다 (SSOT: `constants/ZIndexHelper.ts`).
 
-```javascript
+```tsx
 import { cn } from "../../lib/cn";
 import { Button } from "../../components/ui/button";
 
-function ProductActionBar({ isPending, className }) {
+type ProductActionBarProps = {
+    isPending: boolean;
+    className?: string;
+};
+
+function ProductActionBar({ isPending, className }: ProductActionBarProps) {
     return (
         <div className={cn("flex items-center gap-2", className)}>
             <Button variant="default" disabled={isPending}>
@@ -175,7 +215,7 @@ function ProductActionBar({ isPending, className }) {
 - 화면 전환/등장 애니메이션은 `motion/react`의 `motion.div` 등으로 선언형으로 작성한다. 커스텀 CSS keyframe은 motion으로 표현 불가능한 경우에만 예외적으로 둔다.
 - 레이아웃 애니메이션에는 `layout` prop을, 목록 추가/삭제에는 `AnimatePresence`를 사용한다.
 
-```javascript
+```tsx
 import { motion, AnimatePresence } from "motion/react";
 
 <AnimatePresence>
@@ -193,20 +233,23 @@ import { motion, AnimatePresence } from "motion/react";
 
 ### Model Class
 
-```javascript
+```typescript
+type ProductInit = { name: string; sku: string; price: number };
+
 export default class Product {
-    #name; // private field
-    constructor({ name, sku, price } = {}) {
-        this.name = Product.#validateText(name, "name");
+    readonly #name: string; // private field
+    constructor({ name, sku, price }: ProductInit) {
+        this.#name = Product.#validateText(name, "name");
         this.validate();
     }
-    static #validateText(value, field) { /* ... */ }
-    static from(obj) { return new Product(obj); }
-    toJSON() { this.validate(); return { ... }; }
+    static #validateText(value: unknown, field: string): string { /* ... */ }
+    static from(obj: unknown): Product { return new Product(parseProductInitOrThrow(obj)); }
+    toJSON(): ProductInit { this.validate(); return { ... }; }
 }
 ```
 
-- ES6 class + `#private` fields
+- ES class + `#private` fields (TS `private` 키워드는 컴파일 타임만 막으므로 런타임 은닉이 필요하면 `#`)
+- `from()`의 입력은 `unknown`으로 받고 계약 경계에서 좁힌다 — 생성자 타입만 믿고 외부 값을 그대로 넘기지 않는다
 - `from()` static factory method
 - `toJSON()` for serialization
 - `validate()` on construction
@@ -223,7 +266,7 @@ export default class Product {
 ### State Management
 
 - **Zustand** — 도메인/앱 로컬 상태의 기본 저장소. 도메인별 store 분리, selector 구독.
-- **Context API** — Auth/Theme/Notification처럼 provider 순서가 의미를 갖는 cross-cutting 값만. `App.jsx`가 Provider 순서 SSOT.
+- **Context API** — Auth/Theme/Notification처럼 provider 순서가 의미를 갖는 cross-cutting 값만. `App.tsx`가 Provider 순서 SSOT.
 - **Provider 순서 = 의존관계 순서** → 변경 금지 (변경 시 하위 훅 undefined)
 
 ### Data Fetching (TanStack Query + axios)
@@ -231,23 +274,25 @@ export default class Product {
 - API 호출은 `src/api/` 아래 axios 인스턴스(`apiClient`) + 도메인별 모듈로만 수행 — 컴포넌트에서 직접 `fetch`/`axios` 호출 금지.
 - 서버 상태는 TanStack Query의 `useQuery`/`useMutation`으로만 다루고, 그 결과를 Zustand store에 복제하지 않는다.
 - 인증 토큰 갱신, 공통 에러 변환은 axios interceptor에서 처리한다.
+- `import.meta.env` 키는 `src/vite-env.d.ts`의 `ImportMetaEnv`에 선언해 오타를 컴파일 타임에 잡는다.
+- 응답 파싱 수준(전 응답 zod 파싱 / 치명 응답만 / 제네릭 타입만)은 프로젝트 결정이다 — 아래 Project Decisions에 기록한다.
 
-```javascript
-// src/api/apiClient.js
+```typescript
+// src/api/apiClient.ts
 export const apiClient = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL });
 apiClient.interceptors.response.use(
     (response) => response,
-    (error) => Promise.reject(new Error(`API error: ${error.response?.status}`)),
+    (error: AxiosError) => Promise.reject(new Error(`API error: ${error.response?.status}`)),
 );
 
-// src/api/productApi.js
-export async function fetchProduct(id) {
-    const { data } = await apiClient.get(`/products/${id}`);
-    return data;
+// src/api/productApi.ts
+export async function fetchProduct(id: string): Promise<ProductDto> {
+    const { data } = await apiClient.get<unknown>(`/products/${id}`);
+    return productDtoSchema.parse(data); // 응답은 신뢰 경계 — 제네릭 단언 대신 파싱
 }
 
-// src/queries/useProductQuery.js
-export function useProductQuery(id) {
+// src/queries/useProductQuery.ts
+export function useProductQuery(id: string) {
     return useQuery({ queryKey: ["product", id], queryFn: () => fetchProduct(id) });
 }
 
@@ -260,25 +305,28 @@ const { data, status, error } = useProductQuery(id);
 - 폼 상태는 `useForm` + `zodResolver`로 관리하고, 검증 스키마는 zod로 정의해 `*OrThrow` 계약과 동일하게 실패 시 명시적 에러 메시지를 노출한다.
 - 폼 스키마는 컴포넌트 파일이 아닌 별도 모듈(`schemas/`)에 SSOT로 둔다.
 
-```javascript
-// schemas/productFormSchema.js
+```typescript
+// schemas/productFormSchema.ts
 export const productFormSchema = z.object({
     name: z.string().min(1, "name is required"),
     price: z.number().min(0),
 });
+export type ProductFormValues = z.infer<typeof productFormSchema>; // 폼 타입 SSOT = 스키마
 
-// 사용부
+// 사용부 — 제네릭 생략, resolver에서 입력/출력 타입을 추론
 const form = useForm({ resolver: zodResolver(productFormSchema), defaultValues: { name: "", price: 0 } });
 ```
 
+- `useForm<T>`에 단일 제네릭을 넘기지 않는다 — 스키마에 `.default()`·transform이 있으면 입력/출력 타입이 달라 `zodResolver`와 충돌한다. 생략해 추론시키거나 `useForm<z.input<typeof s>, unknown, z.output<typeof s>>`로 셋 다 명시한다.
+
 ### Routing
 
-- CSR: React Router v7 Data Router 라우트 정의는 단일 파일(`src/routes.jsx`)에서 SSOT로 관리 — 화면 컴포넌트에 라우트 문자열 하드코딩 금지.
-- SSR: Next.js App Router의 파일 기반 라우팅이 SSOT — `src/routes.jsx` 없이 `app/` 디렉토리 구조 자체가 라우트 정의다.
+- CSR: React Router v7 Data Router 라우트 정의는 단일 파일(`src/routes.tsx`)에서 SSOT로 관리 — 화면 컴포넌트에 라우트 문자열 하드코딩 금지.
+- SSR: Next.js App Router의 파일 기반 라우팅이 SSOT — `src/routes.tsx` 없이 `app/` 디렉토리 구조 자체가 라우트 정의다.
 - 대형 페이지는 `lazy` + `Suspense`(CSR) 또는 Next.js의 자동 코드 스플리팅(SSR)으로 지연 로딩한다.
 - 테스트/디버그 전용 라우트는 프로덕션 빌드에서 제외 (Pitfalls 참고)
 
-```javascript
+```tsx
 const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 ```
 
@@ -317,7 +365,8 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 ## Testing
 
 - **Framework:** Vitest + @testing-library/react + happy-dom
-- **위치:** 소스 파일과 같은 디렉토리 (colocated, `*.test.js`)
+- **위치:** 소스 파일과 같은 디렉토리 (colocated, `*.test.ts` / 컴포넌트는 `*.test.tsx`)
+- **타입체크:** 테스트 실행(Vitest)은 타입 오류를 잡지 않는다 — 검증 단계에서 `tsc --noEmit`을 테스트와 별도로 돌린다
 - **구조:** `describe(단위)` → `it(동작)` → `expect(결과)`
 - Provider 의존 컴포넌트 테스트 시: 최소 mock, 실 Provider 우선
 - shadcn/ui(Radix 기반) 컴포넌트 테스트 시 `ResizeObserver`/`matchMedia` 등 happy-dom 미구현 API를 test setup에서 mock 처리 (Pitfalls 참고)
@@ -377,7 +426,7 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 
 ```bash
 # 조회
-ast-grep run -p '<Menu $$$PROPS>$$$CHILDREN</Menu>' --lang jsx src/
+ast-grep run -p '<Menu $$$PROPS>$$$CHILDREN</Menu>' --lang tsx src/
 # (deprecated 컴포넌트 API를 쓰는 지점 전수 조회)
 
 # 치환 (-r 추가, --dry-run 으로 먼저 확인)
@@ -447,18 +496,17 @@ monorepo면 저장소 루트가 아니라 실제 소스 패키지 루트에 두�
 - 사이드이펙트가 있는 훅/유틸 (구독·타이머·이벤트 리스너 등록 등)
 - 특정 조합·범위만 허용되는 상수/설정 객체
 - Description은 필수, `@param`/`@returns`/`@throws`는 의미가 자명하지 않을 때만 추가
+- TSDoc 문법을 쓴다 — 타입은 시그니처가 SSOT이므로 `@param {number}`처럼 주석에 타입을 다시 적지 않는다(중복은 drift가 된다)
 
-**태그 정의 (구체적 문법은 JSDoc/TSDoc 등 프로젝트 언어 컨벤션을 따르며 강제하지 않음):**
-
-```javascript
+```typescript
 /**
  * 재고 수량이 재주문 임계값 이하인지 판단한다.
- * @param {number} remainingQty - 현재 재고 수량
- * @param {number} thresholdQty - 재주문 트리거 임계값
- * @returns {boolean} 임계값 이하면 true
- * @throws {Error} remainingQty가 음수일 때
+ * @param remainingQty - 현재 재고 수량
+ * @param thresholdQty - 재주문 트리거 임계값
+ * @returns 임계값 이하면 true
+ * @throws remainingQty가 음수일 때
  */
-function shouldReorderStock(remainingQty, thresholdQty) {
+function shouldReorderStock(remainingQty: number, thresholdQty: number): boolean {
     if (remainingQty < 0) throw new Error("remainingQty는 음수일 수 없습니다");
     return remainingQty <= thresholdQty;
 }
@@ -474,7 +522,7 @@ function shouldReorderStock(remainingQty, thresholdQty) {
 - **Non-obvious Trade-off** — 가독성보다 성능·보안을 택한 경우 (비트 연산, 복잡한 정규식, 캐싱 레이어 등)
 - `[WHY]`(필수)/`[CONTEXT]`/`[TRADE-OFF]` 태그로 1~2줄만, 무거운 템플릿 금지
 
-```javascript
+```typescript
 // [WHY] 외부 결제 SDK가 iOS Safari에서 blur 이벤트를 중복 발생시키는 버그 우회
 // [CONTEXT] 오프라인 매장은 재고 음수를 허용하는 정책(온라인과 다른 룰)
 // [TRADE-OFF] O(1) 조회를 위해 메모리 캐시 사용, 최대 10MB 제한
@@ -482,16 +530,16 @@ function shouldReorderStock(remainingQty, thresholdQty) {
 
 ### Provider Header
 
-- 적용 대상: Context/Provider 파일(`XxxContext.js`/`XxxProvider.jsx`), Zustand store 파일(`*.store.js`) 최상단, 항상 붙인다
+- 적용 대상: Context/Provider 파일(`XxxContext.ts`/`XxxProvider.tsx`), Zustand store 파일(`*.store.ts`) 최상단, 항상 붙인다
 - `Domain` — 이 컨텍스트/store가 담당하는 책임 경계 (SSOT 여부 등). 코드만으로는 알 수 없는
   아키텍처 정보가 있으면 그것을 적고, 없으면 책임 범위를 한 줄로 요약한다 (필수)
 - `Contract` — Provider 배치 순서 등 코드로 드러나지 않는 전제조건 (선택)
 
-```javascript
+```typescript
 // Domain: Toolbar context SSOT boundary
 // Contract: AuthProvider보다 하위에 위치해야 함 — 로그인 상태로 노출 항목을 계산하므로 순서가 바뀌면 툴바가 항상 비어 보임
-export const ToolbarContext = createContext(null);
-export function useToolbarOrThrow() {
+export const ToolbarContext = createContext<ToolbarContextValue | null>(null);
+export function useToolbarOrThrow(): ToolbarContextValue {
     const ctx = useContext(ToolbarContext);
     if (!ctx) throw new Error("useToolbar must be used within a ToolbarProvider");
     return ctx;
@@ -504,7 +552,11 @@ export function useToolbarOrThrow() {
 
 | 실수 | 결과 | 방지 |
 |------|------|------|
-| Provider 순서 변경 | 하위 훅 undefined | `App.jsx` 순서 = 의존관계 SSOT |
+| Provider 순서 변경 | 하위 훅 undefined | `App.tsx` 순서 = 의존관계 SSOT |
+| Vite `build`만 통과하면 타입도 맞다고 간주 | Vite는 타입 검사 없이 트랜스파일만 해 타입 오류가 배포됨 | `tsc --noEmit`을 `build` 스크립트·CI 게이트에 포함 |
+| `apiClient.get<Dto>()` 제네릭을 런타임 보장으로 오해 | 서버 응답 형태가 바뀌어도 컴파일은 통과, 런타임에 `undefined` 접근 | 치명 응답은 zod로 파싱, 타입은 `z.infer`로 얻음 |
+| `as`·`!`로 타입 오류 침묵 | 컴파일러가 잡던 버그가 런타임으로 이동 | `*OrThrow`·타입 가드·zod로 좁힘 |
+| `useForm<T>` 단일 제네릭 + `.default()` 스키마 | `zodResolver` 입력/출력 타입 충돌 | 제네릭 생략 또는 input/context/output 3개 명시 |
 | 파생 가능한 값을 state로 중복 보관 | 동기화 drift, stale UI | 계산으로 유지하거나 `useMemo` 사용 |
 | 서버 응답을 Zustand store에 그대로 복제 | TanStack Query 캐시와 store가 따로 놀아 stale drift | 서버 상태는 TanStack Query만 SSOT로 사용 |
 | shadcn/ui(Radix) 컴포넌트를 happy-dom에서 그대로 테스트 | `ResizeObserver is not defined` 등으로 실패 | test setup에서 `ResizeObserver`/`matchMedia` mock 등록 |
@@ -522,8 +574,10 @@ export function useToolbarOrThrow() {
 
 - **Rendering Mode:** [CSR(Vite) / SSR(Next.js) 중 택1 — 결정 후 반대쪽 예시 코드 제거]
 - **Directory Policy:** [feature-first / layer-first / route-first]
-- **State SSOT:** [예: Zustand store는 `src/store/`, Context Provider 순서는 `src/App.jsx` 순서를 따름]
-- **API Layer SSOT:** [예: `src/api/`, axios 인스턴스는 `src/api/apiClient.js`]
+- **State SSOT:** [예: Zustand store는 `src/store/`, Context Provider 순서는 `src/App.tsx` 순서를 따름]
+- **API Layer SSOT:** [예: `src/api/`, axios 인스턴스는 `src/api/apiClient.ts`]
+- **API 응답 검증 수준:** [예: 결제·권한 응답만 zod 파싱, 나머지는 DTO 타입만]
+- **tsconfig 추가 엄격도:** [예: `strict` + `noUncheckedIndexedAccess` / `exactOptionalPropertyTypes` 여부]
 - **Design System SSOT:** [예: `components/ui/`(shadcn/ui) + `@theme` 토큰]
-- **Routing SSOT:** [예: `src/routes.jsx`(CSR) 또는 `app/`(SSR)]
+- **Routing SSOT:** [예: `src/routes.tsx`(CSR) 또는 `app/`(SSR)]
 - **Sensitive Files:** [예: `.env*`, `*.pem`]

@@ -13,6 +13,23 @@
 
 ---
 
+## 2.4.0 — 2026-11-02
+
+### 복사 산출물
+- `conventions/react-web/project-convention.md` › Stack: 변경 — Language를 `JavaScript + JSDoc`에서 `TypeScript (strict: true)`로 전환. 신규 웹 프로젝트의 기본 선택이 TS이고, 에이전트 구현에서 타입체커가 계약 위반을 컴파일 타임에 잡아 주는 이득이 커서다(react-native preset은 이미 TS)
+- `conventions/react-web/project-convention.md` › Coding Style › Naming: 변경 — 확장자 `.jsx/.js` → `.tsx/.ts`, 공유 타입 파일(`*.types.ts`)·타입/Props 네이밍 행 추가
+- `conventions/react-web/project-convention.md` › Coding Style › Constants: 변경 — `Object.freeze({...} as const)` + 파생 유니온 타입, `enum` 금지와 사유
+- `conventions/react-web/project-convention.md` › Coding Style › TypeScript: 추가 — strict·`any` 금지(`unknown`+좁히기)·`as`/`!` 제한·API 응답은 신뢰 경계(zod 파싱+`z.infer`)·`type` 우선·`import type`·공개 API 반환 타입 명시·타입체크는 빌드와 별개(Vite는 타입 검사 안 함)
+- `conventions/react-web/project-convention.md` › Component Pattern·UI and Styling·Design Pattern·Data & Platform Integration: 변경 — 모든 코드 예시를 TS로 전환(Context `createContext<T | null>`, Zustand `create<T>()(...)` curried, Props 타입, Model class 타입, axios 응답 zod 파싱, `useForm` 제네릭 규칙), `ImportMetaEnv` 선언 안내
+- `conventions/react-web/project-convention.md` › Testing: 변경 — `*.test.ts(x)`, `tsc --noEmit`을 테스트와 별도로 실행
+- `conventions/react-web/project-convention.md` › Comment Rules: 변경 — TSDoc 기준, 주석에 타입 재기재 금지
+- `conventions/react-web/project-convention.md` › Pitfalls: 추가 — Vite 빌드≠타입체크, 응답 제네릭 오해, `as`/`!` 침묵, `useForm` 단일 제네릭 충돌
+- `conventions/react-web/project-convention.md` › Project Decisions: 추가 — API 응답 검증 수준, tsconfig 추가 엄격도. 경로 예시를 `.tsx/.ts`로 변경
+
+> 이미 JS로 setup한 프로젝트는 `devoks-core:setup-preset-manage`의 diff에서 이 변경을 **선택적으로** 반영한다 — JS 코드베이스에 그대로 적용하면 규칙과 코드가 어긋난다.
+
+---
+
 ## 2.3.0 — 2026-10-23
 
 복사 산출물 변경 없음(`assets/chrome-debug.sh` 주석의 "번들" 표현은 의도적으로 두었다 — 주석만 고쳐도 `setup-preset-manage`가 갱신 대상으로 판정한다).
