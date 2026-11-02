@@ -33,6 +33,14 @@
 | 7 | 커밋 | `devoks-git:git-commit-msg` | 항상(사용자 확인 후) | Conventional Commits 규칙 적용 |
 | 8 | PR 생성 | `devoks-git:git-pull-request` | 항상(사용자 확인 후, 커밋 이후) | PR 그룹 경계는 PLAN §3에 이미 기록됨 |
 
+## 제품 첫 구현 완료 안내 (조건부 — 메뉴 항목 아님)
+
+`docs/product/FEATURES.md`가 있고 이번 기능으로 **MVP 항목이 모두 구현된 것으로 보이면**(상태 열이 전부 `done`이거나 이번 F-n이 마지막 남은 MVP — 판단이 불확실하면 생략) 다음 단계 메뉴 아래에 한 블록으로 다음 방향을 안내한다. 실행하지 않고 안내만 한다 — 이후 작업은 로드맵에 따라 사용자가 고른다.
+
+- 버그 수정·테스트 보강: `devoks-sdlc:test-run-triage`(전체 스위트) · `devoks-sdlc:test-author`
+- UI/UX 개선: `devoks-sdlc:product-design-author` 갱신 모드(현행 화면 기준선 → 변경 화면은 FRD 재검토 대상) 또는 시안 기반 `devoks-sdlc:new-ui-draft`
+- 남은 작업·개선: FEATURES Next/Later 항목, PRD·TRD·WIREFRAMES·VISUAL의 오픈 이슈와 미반영 영향, 보류된 인터랙티브 요소(VISUAL §4 확장 지점)
+
 ## 환경별 적용 (3·4·5번)
 
 활성 convention preset(대상 프로젝트 `.claude/project-convention.json`의 `preset`)으로 환경을 판별한다.

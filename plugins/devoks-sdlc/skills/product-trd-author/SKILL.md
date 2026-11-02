@@ -4,7 +4,7 @@ description: "제품 PRD(PRD.md·FEATURES.md)를 받아 여러 기능이 함께 
 argument-hint: "[src=<PRD 경로|TRD 입력 양식 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.1.1
+  version: 1.1.2
 ---
 
 # product-trd-author — 제품 TRD · 기술 구조 작성/갱신
@@ -80,7 +80,7 @@ PRD.md + FEATURES.md ─▶ [이 스킬] TRD.md + FEATURES.md 기반 구역(B-n)
 
 ### 4. 자체 점검 → 보고
 
-`references/trd-guide.md` §7 체크리스트를 돌려 고친 뒤 보고한다: 산출물 경로, 모드, 섹션별 확정/제안/미확정, 확인 목록(착수를 막는 것 먼저), 다음 단계 — stack preset이 정해졌으면 `/devoks-core:setup-project-convention` 안내, 사용자 화면이 있으면 `/devoks-sdlc:product-design-author`(와이어프레임 — 화면과 무관한 B-n과 병렬 가능), 그다음 B-n(디자인 시스템 B-n은 와이어프레임 뒤) → MVP F-n 순으로 `/devoks-sdlc:feature-frd-author frd=<시드>`.
+`references/trd-guide.md` §7 체크리스트를 돌려 고친 뒤 보고한다: 산출물 경로, 모드, 섹션별 확정/제안/미확정, 확인 목록(착수를 막는 것 먼저), 다음 단계 — stack preset이 정해졌으면 `/devoks-core:setup-project-convention` 안내, 사용자 화면이 있으면 `/devoks-sdlc:product-design-author`(와이어프레임 → 강조 화면 비주얼 — 그린필드 첫 프로젝트는 구현 착수 전 **권장**으로 강조, 화면과 무관한 B-n과 병렬 가능), 그다음 B-n(디자인 시스템 B-n은 와이어프레임 뒤) → MVP F-n 순으로 `/devoks-sdlc:feature-frd-author frd=<시드>`.
 `TRD.md`는 `version: 0.1.0`, `status: draft`로 시작한다.
 
 ## 갱신 모드

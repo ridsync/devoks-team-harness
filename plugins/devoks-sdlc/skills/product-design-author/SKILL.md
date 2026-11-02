@@ -4,7 +4,7 @@ description: "제품 PRD(+TRD)를 받아 기능 FRD 착수 전에 화면 설계�
 argument-hint: "[phase=<wireframe|visual> (default: wireframe)] [src=<PRD 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)] [tool=<pencil|none> (default: pencil)]"
 metadata:
   author: ridsync
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # product-design-author — 제품 화면 설계 (와이어프레임 → 비주얼)

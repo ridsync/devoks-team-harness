@@ -4,7 +4,7 @@ description: "아이디어·요구사항 메모·기획 문서를 받아 장기 
 argument-hint: "[src=<아이디어 본문|요구 문서 경로> (default: 대화 맥락)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.1.2
+  version: 1.1.3
 ---
 
 # product-prd-author — 제품 PRD · 기능 백로그 작성/갱신
@@ -87,14 +87,14 @@ metadata:
 
 `references/prd-guide.md` §3 체크리스트를 돌린다(역추적·모호어·Out of Scope 이유·미확정 수집·분량). 실패 항목은 고친 뒤 보고한다.
 
-보고에는 다음만 담는다: 산출물 경로, 섹션별 확정/미확정 요약, 미확정·오픈 이슈 목록(디자인·개발 착수를 막는 것 먼저), 다음 단계(신규 개발이거나 여러 기능이 공유할 기술 구조가 필요하면 `/devoks-sdlc:product-trd-author` → 사용자 화면이 있으면 `/devoks-sdlc:product-design-author`(와이어프레임) → 그다음 MVP 백로그 항목 → `/devoks-sdlc:feature-frd-author frd=<FRD 시드 본문>`).
+보고에는 다음만 담는다: 산출물 경로, (그린필드 신규 제품이면) **권장 경로 강조** — TRD → 와이어프레임 → 강조 화면 비주얼을 거쳐 디자인 컨셉·화면·기술 구조를 굳힌 뒤 구현에 들어가는 것이 권장이며 기능 FRD를 바로 시작하면 이 결정들이 기능마다 흩어진다는 한 줄, 섹션별 확정/미확정 요약, 미확정·오픈 이슈 목록(디자인·개발 착수를 막는 것 먼저), 다음 단계(신규 개발이거나 여러 기능이 공유할 기술 구조가 필요하면 `/devoks-sdlc:product-trd-author` → 사용자 화면이 있으면 `/devoks-sdlc:product-design-author`(와이어프레임) → 그다음 MVP 백로그 항목 → `/devoks-sdlc:feature-frd-author frd=<FRD 시드 본문>`).
 `PRD.md` frontmatter는 `version: 0.1.0`, `status: draft`로 시작한다. `review`·`approved` 전환은 사용자가 명시할 때만 한다.
 
 ## 갱신 모드
 
 PRD는 결정이 바뀔 때마다 고쳐야 신뢰가 유지되는 살아있는 문서다. 상세 규칙은 `references/prd-guide.md` §4.
 
-1. 기존 `PRD.md`·`FEATURES.md`를 먼저 읽고, 변경 요청을 섹션 단위 **변경 목록**(추가/수정/삭제 + 영향받는 ID)으로 정리한다.
+1. 기존 `PRD.md`·`FEATURES.md`를 먼저 읽고, 변경 요청을 섹션 단위 **변경 목록**(추가/수정/삭제 + 영향받는 ID)으로 정리한다. 같은 디렉터리에 `WIREFRAMES.md` §6·`VISUAL.md` §8의 PRD 영향(FR 후보·가정 갱신)이 있으면 반영 후보로 함께 올리고, 반영한 항목은 §13 사유에 **출처 ID**(V-n·IX-n·VD-n)를 적는다 — 디자인 단계가 반영 여부를 이 이력으로 판정한다.
 2. 연쇄 영향을 찾는다 — 목표가 바뀌면 그 목표를 근거로 한 `FR`·KPI, `FR`이 빠지면 그것을 담은 `F-n`.
 3. 버전 bump 수준(major/minor/patch)을 제안하고 변경 목록과 함께 **확인을 받은 뒤** 쓴다(비-HITL이면 변경 목록을 보고만 하고 쓰지 않는다). 문제·타깃·핵심 KPI가 바뀌는 major 변경은 사실상 제품 재정의이므로 특히 분명히 짚는다.
 4. 반영 후 §13 변경 이력에 `버전 | 날짜 | 변경 요약 | 사유·결정`을 추가한다. 삭제한 FR·F는 지우지 않고 `dropped`로 남기고 사유를 적는다 — 이미 FRD로 넘어간 항목의 추적이 끊기지 않게 하기 위해서다. `FEATURES.md`의 "기반" 구역(B-n)은 `product-trd-author` 소유라 고치지 않는다 — 범위 변경이 기반에 영향을 주면 "TRD 갱신 필요"로 보고한다.
