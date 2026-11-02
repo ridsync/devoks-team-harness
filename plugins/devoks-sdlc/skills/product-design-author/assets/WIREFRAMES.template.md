@@ -10,7 +10,7 @@ prd_version: <PRD 버전>
 trd: <./TRD.md / 없음>
 trd_version: <TRD 버전 / 없음>
 tool: pencil         # pencil | none (추후 figma)
-design_file: <./design/wireframes.pen / 없음>   # 미작도여도 목표 경로를 적는다 — 작도 여부는 §6·보고가 말한다
+design_file: <./design/wireframes.pen>   # tool=none·미작도여도 목표 경로를 적는다 — 작도 여부는 §6·보고가 말한다
 ---
 
 # <제품 이름> — Wireframes
@@ -21,7 +21,7 @@ design_file: <./design/wireframes.pen / 없음>   # 미작도여도 목표 경�
 
 ## 1. 범위·입력
 - 기준 문서: PRD <버전> · TRD <버전 / 없음 — UI 기반은 PRD §7 제약으로 가정>
-- 대상 플랫폼·기준 뷰포트: <TRD §2.1 — 예: 모바일 우선 360×800>
+- 플랫폼 전제: <주 타깃 플랫폼 — 예: 네이티브 앱(iOS·Android)> · 역할별 기기 <예: 회원 폰 / 원장 PC> · 기준 뷰포트 <360×800> · 보조 <1280 / 없음> — 출처 <TRD §2.1 확정 / TRD 제안 → 확인됨 / PRD §7 가정 → 확인됨 / TRD 제안·PRD §7 가정 → 미확인(비-HITL)>
 - 다루는 시나리오·기능: <S-n 목록> · <F-n 목록 (MVP 우선)>
 - 다루지 않는 것: <예: 관리자 설정 화면 — Next 릴리스>
 
@@ -62,9 +62,9 @@ flowchart LR
 | V-1 | | <충족 / 불충족 / 판단 불가 — 이유 / 결정 필요> | <예: PRD Q-8 잠금 범위 결정 필요 / 없음> |
 
 ## 7. 오픈 이슈
-| ID | 질문 | 막는 것 |
-|---|---|---|
-| WQ-1 | | <디자인 시스템 B-n / F-n FRD / 없음> |
+| ID | 질문 | 관련 W-n | 막는 것 |
+|---|---|---|---|
+| WQ-1 | | W-n | <디자인 시스템 B-n / F-n FRD / 없음> |
 
 ## 8. 변경 이력
 | 버전 | 날짜 | 변경 | 사유 |

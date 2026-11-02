@@ -1,6 +1,6 @@
 {
   "skill_name": "devoks-sdlc:product-design-author",
-  "notes": "제품 와이어프레임·화면 설계의 객관 품질. 케이스 1 문서만(tool=none, 비-HITL, TRD 없음), 2 tool=pencil인데 열린 .pen 없음(비-HITL — 문서 완성·그리기 보류 보고, .pen 직접 읽기 금지), 3 HITL 첫 턴(범위 제안 한 메시지), 4 PRD 없음(중단). 2026-11-02 신설.",
+  "notes": "제품 와이어프레임·화면 설계의 객관 품질. 케이스 1 문서만(tool=none, 비-HITL, TRD 없음), 2 tool=pencil인데 열린 .pen 없음(비-HITL — 문서 완성·그리기 보류 보고, .pen 직접 읽기 금지), 3 HITL 첫 턴(범위 제안 한 메시지), 4 PRD 없음(중단). 2026-11-02 신설. 2026-11-02 케이스 3에 플랫폼 전제 선행 확인 기대 추가.",
   "evals": [
     {
       "id": 1,
@@ -12,15 +12,33 @@
         "evals/files/pilates-prd/FEATURES.md"
       ],
       "assertions": [
-        { "text": "WIREFRAMES.md가 템플릿 8개 섹션 헤더로 생성된다" },
-        { "text": "모든 W-n에 관련 F-n 또는 FR-n과 S-n이 있고, 화면이 있는 MVP F-n이 모두 W-n을 가진다" },
-        { "text": "회원 화면과 원장 화면이 모두 있다" },
-        { "text": "S-1~S-4가 §3 흐름에 있다" },
-        { "text": "모든 W-n에 우선순위 블록·주요 동작·상태(기본/로딩/빈/오류 검토)가 있다" },
-        { "text": "§5 컴포넌트 후보가 역할 이름으로 있다" },
-        { "text": "색 hex·토큰 값·EARS AC(WHEN/SHALL)·엔드포인트가 없다" },
-        { "text": "TRD 부재가 §7 오픈 이슈에 있고 §6 결과가 미작도로 표시된다(충족이라고 쓰지 않음)" },
-        { "text": "PRD.md·FEATURES.md가 수정되지 않았고, 보고에 디자인 시스템 B-n 부재로 TRD 갱신 필요가 있다" }
+        {
+          "text": "WIREFRAMES.md가 템플릿 8개 섹션 헤더로 생성된다"
+        },
+        {
+          "text": "모든 W-n에 관련 F-n 또는 FR-n과 S-n이 있고, 화면이 있는 MVP F-n이 모두 W-n을 가진다"
+        },
+        {
+          "text": "회원 화면과 원장 화면이 모두 있다"
+        },
+        {
+          "text": "S-1~S-4가 §3 흐름에 있다"
+        },
+        {
+          "text": "모든 W-n에 우선순위 블록·주요 동작·상태(기본/로딩/빈/오류 검토)가 있다"
+        },
+        {
+          "text": "§5 컴포넌트 후보가 역할 이름으로 있다"
+        },
+        {
+          "text": "색 hex·토큰 값·EARS AC(WHEN/SHALL)·엔드포인트가 없다"
+        },
+        {
+          "text": "TRD 부재가 §7 오픈 이슈에 있고 §6 결과가 미작도로 표시된다(충족이라고 쓰지 않음)"
+        },
+        {
+          "text": "PRD.md·FEATURES.md가 수정되지 않았고, 보고에 디자인 시스템 B-n 부재로 TRD 갱신 필요가 있다"
+        }
       ]
     },
     {
@@ -33,27 +51,48 @@
         "evals/files/pilates-prd/FEATURES.md"
       ],
       "assertions": [
-        { "text": "사용자에게 질문하거나 대기하지 않고 끝까지 진행한다" },
-        { "text": "WIREFRAMES.md가 완성되고 frontmatter tool이 pencil이다" },
-        { "text": ".pen 파일을 Read·Grep·Edit로 다루지 않는다" },
-        { "text": "그리지 못한 이유와 재실행 방법이 보고에 있다" },
-        { "text": "§6 결과가 미작도로 표시된다" },
-        { "text": "보고에 범위 확인 목록이 있다" }
+        {
+          "text": "사용자에게 질문하거나 대기하지 않고 끝까지 진행한다"
+        },
+        {
+          "text": "WIREFRAMES.md가 완성되고 frontmatter tool이 pencil이다"
+        },
+        {
+          "text": ".pen 파일을 Read·Grep·Edit로 다루지 않는다"
+        },
+        {
+          "text": "그리지 못한 이유와 재실행 방법이 보고에 있다"
+        },
+        {
+          "text": "§6 결과가 미작도로 표시된다"
+        },
+        {
+          "text": "보고에 범위 확인 목록이 있다"
+        }
       ]
     },
     {
       "id": 3,
       "name": "hitl-first-turn-scope-proposal",
       "prompt": "(HITL) evals/files/pilates-prd/ PRD로 와이어프레임 작업 시작하자. Pencil 쓸 거야.",
-      "expected_output": "인터뷰 질문을 하나씩 하지 않는다. 첫 응답 한 메시지에 ① 화면 인벤토리 초안(W-n·목적·F-n), ② 그릴 핵심 흐름(S-n), ③ 충실도·기준 뷰포트(lo-fi 회색조, TRD 없으므로 PRD 기반 가정), ④ Pencil 사전 조건(에디터에서 열 .pen 경로), ⑤ 제외 화면과 이유를 담아 확인을 요청하고 멈춘다. 아직 WIREFRAMES.md를 쓰거나 그리지 않는다.",
+      "expected_output": "인터뷰 질문을 하나씩 하지 않는다. 첫 응답 한 메시지에 ① 플랫폼 전제(주 타깃 플랫폼·역할별 기기 — 원장 PC 여부 포함·기준/보조 뷰포트, TRD가 없으므로 PRD §7 가정을 첫 확인 항목으로), ② 화면 인벤토리 초안(W-n·목적·F-n — 플랫폼 가정 위의 초안), ③ 그릴 핵심 흐름(S-n), ④ 충실도(lo-fi 회색조), ⑤ Pencil 사전 조건(에디터에서 열 .pen 경로), ⑥ 제외 화면과 이유를 담아 확인을 요청하고 멈춘다. 아직 WIREFRAMES.md를 쓰거나 그리지 않는다.",
       "files": [
         "evals/files/pilates-prd/PRD.md",
         "evals/files/pilates-prd/FEATURES.md"
       ],
       "assertions": [
-        { "text": "첫 응답이 한 메시지에 화면 인벤토리 초안·핵심 흐름·충실도/뷰포트·Pencil 사전 조건·제외 화면을 담는다" },
-        { "text": "질문을 하나씩 나눠 묻는 인터뷰 형식이 아니다" },
-        { "text": "확인 전에 WIREFRAMES.md를 쓰거나 그리기를 시작하지 않는다" }
+        {
+          "text": "플랫폼 전제(주 타깃 플랫폼·역할별 기기·뷰포트)가 첫 확인 항목으로 있고, 인벤토리는 그 가정 위의 초안으로 제시된다"
+        },
+        {
+          "text": "첫 응답이 한 메시지에 플랫폼 전제·화면 인벤토리 초안·핵심 흐름·충실도·Pencil 사전 조건·제외 화면을 담는다"
+        },
+        {
+          "text": "질문을 하나씩 나눠 묻는 인터뷰 형식이 아니다"
+        },
+        {
+          "text": "확인 전에 WIREFRAMES.md를 쓰거나 그리기를 시작하지 않는다"
+        }
       ]
     },
     {
@@ -63,8 +102,12 @@
       "expected_output": "PRD가 없으므로 WIREFRAMES.md를 쓰지 않고 멈춘다. product-interview 또는 product-prd-author로 PRD부터 만들 것을 안내한다. 화면을 지어내지 않는다.",
       "files": [],
       "assertions": [
-        { "text": "WIREFRAMES.md를 생성하지 않는다" },
-        { "text": "PRD부터 만들도록 product-interview 또는 product-prd-author를 안내한다" }
+        {
+          "text": "WIREFRAMES.md를 생성하지 않는다"
+        },
+        {
+          "text": "PRD부터 만들도록 product-interview 또는 product-prd-author를 안내한다"
+        }
       ]
     }
   ]

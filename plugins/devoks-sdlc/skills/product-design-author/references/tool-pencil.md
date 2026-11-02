@@ -12,7 +12,7 @@
 ## 2. 사전 조건 확인 (그리기 전 1회)
 
 1. `mcp__pencil__*` 도구가 세션에 없으면 → 그리지 않는다. 보고에 "Pencil MCP 미등록 — Pencil 앱/에디터 확장 설치 후 재실행"을 남긴다.
-2. `get_app_state` 호출. "file needs to be open" 오류면 → HITL: 파일 열기 요청은 범위 확인 메시지(SKILL §1)에 이미 들어 있다. 그래도 열려 있지 않으면 `<out>/design/wireframes.pen`을 열어 달라고 **한 번만** 다시 알리고 기다린다 — 그 뒤에도 안 되면 문서만 완성하고 미작도로 보고한다. 비-HITL: 그리지 않고 보고에 남긴다.
+2. `get_app_state` 호출. "file needs to be open" 오류면 → HITL: 파일을 새로 만들거나 열어 두라는 요청은 범위 확인 메시지(SKILL §1)에 이미 들어 있다(첫 메시지 시점에는 `get_app_state`를 부르지 않는다). 그래도 열려 있지 않으면 `<out>/design/wireframes.pen`을 열어 달라고 **한 번만** 다시 알리고 기다린다 — 그 뒤에도 안 되면 문서만 완성하고 미작도로 보고한다. 비-HITL: 그리지 않고 보고에 남긴다.
 3. 열린 파일 경로가 frontmatter `design_file`과 다르면 어느 파일에 그릴지 확인한다(HITL) — 다른 문서의 `.pen`에 덮어쓰는 사고를 막는다.
 
 ## 3. 그리기

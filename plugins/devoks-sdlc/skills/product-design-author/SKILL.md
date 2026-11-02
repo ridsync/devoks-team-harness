@@ -4,7 +4,7 @@ description: "제품 PRD(+TRD)를 받아 기능 FRD 착수 전에 화면 설계�
 argument-hint: "[src=<PRD 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)] [tool=<pencil|none> (default: pencil)]"
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # product-design-author — 제품 와이어프레임 · 화면 설계
@@ -57,8 +57,9 @@ PRD + TRD(§2.1 UI 기반) ─▶ [이 스킬] WIREFRAMES.md (SSOT) + design/wir
 
 ### 1. 범위 제안 — 한 메시지로
 
-`references/design-guide.md` §2를 따른다. 화면 인벤토리 초안·그릴 핵심 흐름·충실도와 뷰포트·도구 사전 조건·제외 화면을 **한 메시지에** 담아 확인받는다. 사용자는 "좋아"나 고칠 줄만 답하면 된다.
-- **비-HITL**(서브에이전트 위임, `/loop`, 자동 파이프라인, 사용자가 묻지 말라고 한 경우): 묻지 않는다. 제안 범위로 진행하고 보고에 확인 목록을 남긴다.
+`references/design-guide.md` §2를 따른다. **플랫폼 전제**(주 타깃 플랫폼·역할별 기기·기준/보조 뷰포트)를 맨 앞에 두고, 화면 인벤토리 초안·그릴 핵심 흐름·충실도·도구 사전 조건·제외 화면을 **한 메시지에** 담아 확인받는다. 사용자는 "좋아"나 고칠 줄만 답하면 된다.
+- 플랫폼 전제는 TRD §2.1이 확정이면 인용만 하고, `제안`이거나 TRD가 없으면 첫 확인 항목으로 묻는다 — 확인 전에는 인벤토리를 확정하지 않는다. 논의 결과가 TRD와 다르면 보고에 "TRD §2.1 갱신 필요"를 남긴다(TRD는 고치지 않는다).
+- **비-HITL**(서브에이전트 위임, `/loop`, 자동 파이프라인, 사용자가 묻지 말라고 한 경우): 묻지 않는다. 제안 범위로 진행하고 보고에 확인 목록을 남긴다. 플랫폼 전제가 확정되지 않았으면 보고 첫머리에 blocker로 남긴다.
 - 화면 구성을 바꾸는 PRD 미결 질문(Q-n)이 있어도 멈추지 않는다 — 제안값으로 가정해 같은 메시지에서 확인한다(가이드 §2).
 
 ### 2. WIREFRAMES.md 작성
@@ -76,7 +77,7 @@ PRD + TRD(§2.1 UI 기반) ─▶ [이 스킬] WIREFRAMES.md (SSOT) + design/wir
 ### 4. 검증 → 보고
 
 §4 "검증할 제약"을 판정해 §6에 남기고(미작도면 "판단 불가 — 미작도"), 가이드 §7 체크리스트를 돌려 고친 뒤 보고한다.
-보고: 산출물 경로, 모드, 화면 수·프레임 대조 결과, §6 결과 중 PRD·TRD 영향(갱신 필요 항목), 확인 목록(착수를 막는 것 먼저), 다음 단계 — 디자인 시스템 B-n(`FEATURES.md` 기반 구역의 시드로 `/devoks-sdlc:feature-frd-author frd=<시드>`, 시드가 없으면 "TRD 갱신 필요") → MVP 화면 F-n FRD(이 문서의 W-n을 관련 문서로).
+보고: 산출물 경로, 모드, 화면 수·프레임 대조 결과, §6 결과 중 PRD·TRD 영향(갱신 필요 항목), 확인 목록(착수를 막는 것 먼저), 다음 단계 — TRD가 없으면 먼저 `/devoks-sdlc:product-trd-author`(§2.1 확정·디자인 시스템 B-n 생성), 그다음 디자인 시스템 B-n(`FEATURES.md` 기반 구역의 시드로 `/devoks-sdlc:feature-frd-author frd=<시드>`, 시드가 없으면 "TRD 갱신 필요") → MVP 화면 F-n FRD(이 문서의 W-n을 관련 문서로).
 `WIREFRAMES.md`는 `version: 0.1.0`, `status: draft`로 시작한다.
 
 ## 갱신 모드
@@ -89,6 +90,7 @@ PRD·TRD 버전이 frontmatter보다 높거나 화면 변경 요청이 오면, �
 - 모든 핵심 시나리오가 §3 흐름에 있고, 모든 W-n에 우선순위 블록·주요 동작·상태·검증할 제약이 있다.
 - §5 컴포넌트 후보가 있고, 색·토큰 값·EARS AC·엔드포인트가 없다.
 - `tool=pencil`로 그렸으면 프레임과 §2가 1:1로 대조됐다 / 그리지 못했으면 이유와 재실행 방법이 보고에 있다.
+- 플랫폼 전제(주 타깃·역할별 기기·뷰포트)가 확인됐거나 TRD 확정값을 인용했다 / 미확정이면 blocker로 보고했다.
 - 범위 확인은 한 메시지로 묶였다(HITL) / 확인 목록이 보고에 있다(비-HITL).
 
 > 경계·규칙·체크리스트: `references/design-guide.md` · Pencil 절차: `references/tool-pencil.md`
