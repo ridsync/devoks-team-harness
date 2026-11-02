@@ -65,7 +65,7 @@
 
 - 기준: 사용자 기능이 아니지만 **둘 이상의 F-n이 의존**하는 것 — 프로젝트 골격, 인증 기반, 공유 데이터 모델·마이그레이션, CI·환경, 계측 파이프라인.
 - greenfield는 보통 "골격 + 최소 CI"(walking skeleton)가 B-1이다. brownfield는 PRD 요구를 위해 새로 필요한 기반만.
-- **사용자 화면이 있는 제품은 "디자인 시스템 기반" B-n을 낸다**(이미 디자인 시스템이 있는 brownfield는 생략하고 근거 경로를 §2.1에 적는다). 시드 규칙: Outcome = "이후 화면 기능이 공통 토큰·컴포넌트로 만들어진다", 산출물에 `DESIGN.md`(토큰·컴포넌트 계약 — `new-ui-draft`·`browser-visual-diff`가 읽는 UI 계약)를 포함, Constraint = TRD §2.1 + 접근성 NFR-n, **관련 문서 = `WIREFRAMES.md` §5 컴포넌트 후보**(범위의 출처). 선행 조건으로 "와이어프레임(`/devoks-sdlc:product-design-author`) 완료"를 적는다 — 컴포넌트 범위는 화면에서 나오기 때문이다. 화면과 무관한 B-n(골격·CI·인증)은 와이어프레임과 병렬로 진행할 수 있다.
+- **사용자 화면이 있는 제품은 "디자인 시스템 기반" B-n을 낸다**(이미 디자인 시스템이 있는 brownfield는 생략하고 근거 경로를 §2.1에 적는다). 시드 규칙: Outcome = "이후 화면 기능이 공통 토큰·컴포넌트로 만들어진다", 산출물에 `DESIGN.md`(토큰·컴포넌트 계약 — `new-ui-draft`·`browser-visual-diff`가 읽는 UI 계약)를 포함, Constraint = TRD §2.1 + 접근성 NFR-n, **관련 문서 = `WIREFRAMES.md` §5 컴포넌트 후보 + (비주얼 단계를 하면) `VISUAL.md` §7 기준값**(범위·값의 출처). 선행 조건으로 "와이어프레임(`/devoks-sdlc:product-design-author`) 완료, 강조 화면이 있으면 비주얼 단계(`phase=visual`) 완료"를 적는다 — 컴포넌트 범위는 화면에서 나오기 때문이다. 화면과 무관한 B-n(골격·CI·인증)은 와이어프레임과 병렬로 진행할 수 있다.
 - **FRD 시드는 `FEATURES.md`의 "기반" 구역이 SSOT** — FRD 입력 양식(`../feature-frd-author/assets/FRD.intake.md`)을 **`## 기능 정련 요약 — <B-n 이름>` 헤더까지 그대로** 쓴다(코드 블록 안에). 기존 FEATURES.md의 F-n 시드가 구형식이어도 B-n은 이 형식을 따른다 — frd-author는 이 헤더로 입력 양식을 알아보고 의도 게이트를 건너뛴다. Outcome은 "이후 기능이 무엇을 할 수 있게 되는가", User는 "개발자(에이전트) / 이후 기능 F-n"으로 쓴다.
 - TRD §10에는 ID·이름·선행 대상만 둔다. 이 구역은 이 스킬이 소유하고, `product-prd-author`는 갱신 모드에서 건드리지 않는다.
 

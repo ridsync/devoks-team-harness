@@ -113,7 +113,7 @@ flowchart TD
 
     TRD["2 · Technical design (optional)<br/>product-trd-author<br/>→ TRD.md + foundation items B-n"]
 
-    WF["3 · Screen design (optional, UI products)<br/>product-design-author<br/>→ WIREFRAMES.md + wireframes.pen"]
+    WF["3 · Screen design (optional, UI products)<br/>product-design-author<br/>→ WIREFRAMES.md (+ VISUAL.md for key screens)"]
 
     D["Interview (optional, before 4)<br/>feature-interview<br/>→ approved summary flows into 4"]
 

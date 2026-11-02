@@ -113,7 +113,7 @@ flowchart TD
 
     TRD["2 · 기술 설계 (선택)<br/>product-trd-author<br/>→ TRD.md + 기반 작업 B-n"]
 
-    WF["3 · 화면 설계 (선택, 화면 있는 제품)<br/>product-design-author<br/>→ WIREFRAMES.md + wireframes.pen"]
+    WF["3 · 화면 설계 (선택, 화면 있는 제품)<br/>product-design-author<br/>→ WIREFRAMES.md (+ 강조 화면 VISUAL.md)"]
 
     D["인터뷰 (선택, 4 앞)<br/>feature-interview<br/>→ 승인된 요약이 4로 이어짐"]
 
