@@ -43,7 +43,8 @@
 2. **대안을 최소 1개 비교한다.** "아무것도 추가하지 않음"(기존 것 재사용)도 대안이다.
 3. **팀 역량과 조직 표준이 기술적 우위보다 먼저다.** 에이전트가 구현해도 운영·리뷰는 사람이 한다.
 4. **버전·지원 여부·가격 같은 시점 의존 정보는 확인하고 출처를 적는다.** Context7 MCP가 있으면 우선, 없으면 공식 문서 웹 검색. 확인하지 못했으면 버전을 적지 않고 "§11 확인 필요"로 둔다 — 기억으로 쓴 버전은 틀리기 쉽다.
-5. **stack preset을 매핑한다.** devoks-core preset: `react-web` · `react-native` · `android` · `ios` · `python-fastapi`. 맞는 것이 있으면 §2에 적고 `/devoks-core:setup-project-convention` 실행을 안내한다(자동 실행 금지). 없으면 "해당 없음".
+5. **UI 기반(§2.1)은 방식만 정한다.** 사용자 화면이 있으면 컴포넌트 기반·토큰 SSOT·테마·접근성 보장·디자인 도구를 다른 스택 선택과 같은 규칙(대안·이유·출처)으로 고른다. 화면 목록·컴포넌트 목록·토큰 값은 쓰지 않는다 — 화면은 `product-design-author`의 `WIREFRAMES.md`, 토큰·컴포넌트 계약은 디자인 시스템 B-n이 만드는 `DESIGN.md` 몫이다. stack preset에 기본값이 있으면(react-web: shadcn/ui + Tailwind `@theme`) greenfield에서는 그것을 첫 제안으로 쓴다. brownfield는 현행 UI 방식이 있으면 그것이 사실이고(§4), 없을 때만 preset 기본값을 제안하되 **현행 프레임워크 버전과의 호환**을 공식 문서로 확인한다 — 맞지 않으면 대안(호환 버전·다른 기반)을 함께 비교하고 §9 스파이크로 남긴다. 접근성·글자 크기 같은 PRD NFR은 §6에도 보장 위치와 함께 남긴다. PRD에 접근성 NFR이 없으면 `미확정 (제안: <수준>)`으로 두고 §11에 올리며 보고에 "PRD 갱신 필요"를 남긴다 — TRD가 NFR을 새로 만들지 않는다.
+6. **stack preset을 매핑한다.** devoks-core preset: `react-web` · `react-native` · `android` · `ios` · `python-fastapi`. 맞는 것이 있으면 §2에 적고 `/devoks-core:setup-project-convention` 실행을 안내한다(자동 실행 금지). 없으면 "해당 없음".
 
 ## 4. brownfield 모드
 
@@ -64,6 +65,7 @@
 
 - 기준: 사용자 기능이 아니지만 **둘 이상의 F-n이 의존**하는 것 — 프로젝트 골격, 인증 기반, 공유 데이터 모델·마이그레이션, CI·환경, 계측 파이프라인.
 - greenfield는 보통 "골격 + 최소 CI"(walking skeleton)가 B-1이다. brownfield는 PRD 요구를 위해 새로 필요한 기반만.
+- **사용자 화면이 있는 제품은 "디자인 시스템 기반" B-n을 낸다**(이미 디자인 시스템이 있는 brownfield는 생략하고 근거 경로를 §2.1에 적는다). 시드 규칙: Outcome = "이후 화면 기능이 공통 토큰·컴포넌트로 만들어진다", 산출물에 `DESIGN.md`(토큰·컴포넌트 계약 — `new-ui-draft`·`browser-visual-diff`가 읽는 UI 계약)를 포함, Constraint = TRD §2.1 + 접근성 NFR-n, **관련 문서 = `WIREFRAMES.md` §5 컴포넌트 후보**(범위의 출처). 선행 조건으로 "와이어프레임(`/devoks-sdlc:product-design-author`) 완료"를 적는다 — 컴포넌트 범위는 화면에서 나오기 때문이다. 화면과 무관한 B-n(골격·CI·인증)은 와이어프레임과 병렬로 진행할 수 있다.
 - **FRD 시드는 `FEATURES.md`의 "기반" 구역이 SSOT** — FRD 입력 양식(`../feature-frd-author/assets/FRD.intake.md`)을 **`## 기능 정련 요약 — <B-n 이름>` 헤더까지 그대로** 쓴다(코드 블록 안에). 기존 FEATURES.md의 F-n 시드가 구형식이어도 B-n은 이 형식을 따른다 — frd-author는 이 헤더로 입력 양식을 알아보고 의도 게이트를 건너뛴다. Outcome은 "이후 기능이 무엇을 할 수 있게 되는가", User는 "개발자(에이전트) / 이후 기능 F-n"으로 쓴다.
 - TRD §10에는 ID·이름·선행 대상만 둔다. 이 구역은 이 스킬이 소유하고, `product-prd-author`는 갱신 모드에서 건드리지 않는다.
 
@@ -71,6 +73,7 @@
 
 - [ ] §2 모든 선택에 대안 ≥1과 이유(NFR-n·제약·팀 역량 연결)가 있다. 시점 의존 정보에 출처가 있거나 §11로 갔다.
 - [ ] brownfield면 기존 스택이 근거 경로와 함께 "현행"으로 적혔고 재선정되지 않았다.
+- [ ] 사용자 화면이 있으면 §2.1 UI 기반이 채워졌고(화면·컴포넌트 목록·토큰 값은 없음), 디자인 시스템 B-n이 `WIREFRAMES.md` 선행 조건과 함께 있다. 화면이 없으면 §2.1이 "해당 없음"이다.
 - [ ] PRD의 모든 NFR(불변식 포함)이 §6에 보장 위치·검증 레벨과 함께 있다.
 - [ ] PRD §4의 모든 계측 FR이 §7에 이벤트로 있다.
 - [ ] §4에는 둘 이상의 F-n이 쓰는 엔티티만 있다.

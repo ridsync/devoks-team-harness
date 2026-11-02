@@ -36,6 +36,7 @@ DevOKs 플러그인은 범용·공유 MCP 서버(Figma·Playwright·Serena·Code
 | **devoks-git** | `gh` CLI | — |
 | **devoks-sdlc** (feature commands) | `gh` CLI | — |
 | **devoks-sdlc** (`new-ui-draft` skill) | Figma MCP + `figma:figma-design-to-code` 스킬 | — |
+| **devoks-sdlc** (`product-design-author` skill) | — (`tool=none`이면 문서만) | Pencil MCP `mcp__pencil__*` — Pencil 앱/에디터 확장이 등록, `setup-mcp` 비대상. 에디터에 `.pen` 파일이 열려 있어야 동작 |
 | **devoks-sdlc** (feature skills: frd/plan) | — | CodeGraph MCP, Serena MCP |
 | **devoks-sdlc** (feature-workflow-runner) | Figma MCP | CodeGraph MCP, Serena MCP |
 | **devoks-sdlc** (verify-data-flow) | Chrome DevTools MCP | Playwright MCP |

@@ -9,6 +9,15 @@
 
 ---
 
+## **화면 설계 단계 신설 — `product-design-author`(와이어프레임) + TRD UI 기반(디자인 시스템 방식)** (2026-11-02, `devoks-sdlc` `3.12.2 → 3.13.0`)
+- 배경: 제품 체인(인터뷰 → PRD → TRD)이 "무엇을"·"어떤 구조로"는 고정했지만 디자인 시스템을 결정하는 곳과 "화면에 무엇을 어떤 순서로"를 정하는 곳이 없었다. `new-ui-draft`·`browser-visual-diff`는 `DESIGN.md`를 UI 계약으로 읽지만 이를 만드는 단계가 없었다. 다른 에이전트의 실제 제품 작업에서 와이어프레임이 킬러 흐름 검증·NFR(글자 크기 등) 확인·디자인 시스템 범위 결정·FRD 화면 상태 정확도에 기여한다는 조사가 나왔다.
+- 반영(사용자 결정 — 구조: TRD 확장 + 신규 스킬, 명칭 `product-design-author`, 도구 독립 SSOT + Pencil 어댑터):
+  - `product-trd-author` 1.1.0: TRD §2.1 "UI 기반(디자인 시스템 방식)" — 플랫폼·뷰포트·컴포넌트 기반·토큰 SSOT·테마·접근성 보장·아이콘/폰트·디자인 도구를 방식만 결정(화면·컴포넌트 목록·토큰 값 금지). 입력 양식 사실 7번 "디자인 자산" 추가. 화면 있는 제품은 디자인 시스템 B-n(산출물 `DESIGN.md`, 범위 출처 `WIREFRAMES.md` §5, 와이어프레임 선행)을 낸다.
+  - `product-design-author` 1.0.0 신설(0d): `WIREFRAMES.md`(화면 인벤토리 W-n·핵심 흐름·화면별 우선순위 블록/주요 동작/상태/검증할 제약·컴포넌트 후보·검증 결과)를 SSOT로, Pencil `.pen`을 뷰로 작성. 범위는 인터뷰 없이 한 메시지 제안·확인. Pencil은 에디터에 `.pen`이 열려 있어야 동작해 HITL 전용 — 비-HITL은 문서만 완성하고 미작도 보고. Pencil API는 어댑터에 옮기지 않고 `read_skill`로 공식 가이드를 선행 로드. Figma는 `tool-figma.md` 어댑터 추가로 확장하는 구조.
+  - 연결: `feature-frd-author`는 W-n 상태를 AC·EDGE 후보로 참조, `new-ui-draft`는 W-n을 누락 점검 기준으로 참조(양방향 라우팅), `product-prd-author` 다음 단계·경계, `workflow-map` 파이프라인 번호를 0~8로 재정렬(0 준비 · 1 제품 정의 · 2 기술 설계 · 3 화면 설계 · 4 요구 정의 · 5 작업 분해 · 6 구현 · 7 검증 · 8 마무리 — 끼워 넣을 때마다 붙던 `0b·0c·0d·1a` 접미사 제거, 요구 탐색은 4의 선택 선행으로 흡수, 통합 진입점은 4~6), README 2종 다이어그램·카탈로그, `marketplace.json`·`plugin.json` 설명, `mcp-setup-guide.md` 의존성 매트릭스(Pencil MCP — `setup-mcp` 비대상).
+- 검증: `validate --strict`, frontmatter YAML·argument-hint == usage, references 존재·`../` 미사용, evals 4케이스 동적 실행(문서만·비-HITL Pencil 미오픈·HITL 첫 턴·PRD 없음) 전부 기대 충족 — 실행에서 드러난 모호점(차수 vs 커버리지, PRD 미결 Q-n 처리, 파일 열기 요청 횟수, 역할별 화면·OS 권한 요청 위치, §6 `결정 필요` 값, 비-HITL 정의)을 가이드·어댑터·템플릿에 반영. 2차 검증(evals 비노출 서브에이전트): TRD greenfield·brownfield 각 1회 + 그 TRD 산출물을 입력으로 design-author 연결 실행 1회 — §2.1이 방식만으로 채워지고 디자인 시스템 B-n이 와이어프레임 선행으로 나오며, design-author가 §2.1 값을 이어받아 §5를 B-n 범위로 연결함을 확인(연결 실행에서 PRD·TRD의 실제 공백 — 계정 없는 회원 대리 예약 — 도 검출). 드러난 모호점(brownfield에서 preset 기본값 제안 시 버전 호환, PRD 접근성 NFR 부재, 제안 상태 §2.1 사용, 비-키트 컴포넌트 기반의 §5 비고, 도구 값 비교 조건) 반영. 실제 Pencil 작도는 열린 `.pen`이 필요해 미검증(HITL 라이브 확인 대기 — ROADMAP).
+- 의도적 미반영: Figma 어댑터(사용자 결정 — 추후), `setup-mcp`의 Pencil 설치 안내(앱/에디터 확장이 등록하는 서버라 devoks가 설치할 대상이 아님), `FEATURES.md` 기반 구역 수정 권한(trd-author 소유 유지 — design-author는 영향만 보고).
+
 ## **react-web preset을 TypeScript 기본으로 전환** (2026-11-02, `devoks-core` `2.3.0 → 2.4.0`)
 - 배경: react-web preset만 `JavaScript + JSDoc (TypeScript 미사용)`로 남아 있었다(초기 구성 이후 미검토). react-native preset은 이미 TS였다.
 - 반영: Language를 `TypeScript (strict)`로 바꾸고 TypeScript 규칙 절 신설, 전체 코드 예시·파일 확장자·Pitfalls·Project Decisions를 TS 기준으로 전환. 파일 단위 상세는 `plugins/devoks-core/CHANGELOG.md` 2.4.0.

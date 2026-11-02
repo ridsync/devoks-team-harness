@@ -17,7 +17,7 @@ DevOKs 팀 Claude Code 하네스 — 코드리뷰·기능개발·Git 워크플�
 |---------|------|----------|
 | `devoks-core` | 기본 원칙, 컨벤션 preset, 명시적 setup 흐름 — MCP 점검 + 프로젝트 convention setup/management 제공 | **필수** |
 | `devoks-git` | Git 커밋·이슈·PR 워크플로우 커맨드 | 권장 |
-| `devoks-sdlc` | SDLC 워크플로우 통합 — 제품 기획 인터뷰·PRD·TRD·기능 백로그, 기능개발(FRD·PLAN·실행·UI), 테스트 작성·triage, 코드리뷰·리팩토링·모듈분석·보안검증, 요구사항·데이터흐름 검증 | 권장 |
+| `devoks-sdlc` | SDLC 워크플로우 통합 — 제품 기획 인터뷰·PRD·TRD·와이어프레임·기능 백로그, 기능개발(FRD·PLAN·실행·UI), 테스트 작성·triage, 코드리뷰·리팩토링·모듈분석·보안검증, 요구사항·데이터흐름 검증 | 권장 |
 | `devoks-browser` | Chrome DevTools MCP 연결 + Visual Diff 검증 | 선택 |
 | `devoks-rn` | React Native 디버깅 — Metro DevTools CDP 연결, 에뮬레이터 스크린샷, JS 콘솔/상태 조회 | 선택 (RN 프로젝트) |
 
@@ -109,21 +109,23 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 flowchart TD
     S["0 · 준비 (최초 1회)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
 
-    PRD["0b · 제품 정의 (선택, 장기 프로젝트)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD 시드)"]
+    PRD["1 · 제품 정의 (선택, 장기 프로젝트)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD 시드)"]
 
-    TRD["0c · 기술 설계 (선택)<br/>product-trd-author<br/>→ TRD.md + 기반 작업 B-n"]
+    TRD["2 · 기술 설계 (선택)<br/>product-trd-author<br/>→ TRD.md + 기반 작업 B-n"]
 
-    D["1a · 인터뷰 (선택)<br/>feature-interview<br/>→ 승인된 요약이 1로 이어짐"]
+    WF["3 · 화면 설계 (선택, 화면 있는 제품)<br/>product-design-author<br/>→ WIREFRAMES.md + wireframes.pen"]
 
-    subgraph BUILD["1–3 · feature-workflow-runner (통합 진입점)"]
+    D["인터뷰 (선택, 4 앞)<br/>feature-interview<br/>→ 승인된 요약이 4로 이어짐"]
+
+    subgraph BUILD["4–6 · feature-workflow-runner (통합 진입점)"]
         direction LR
-        F["1 · 요구 정의<br/>feature-frd-author<br/>→ FRD.md"]
-        P["2 · 작업 분해<br/>feature-plan-author<br/>→ PLAN.md"]
-        I["3 · 구현<br/>feature-plan-executor<br/>→ code-implementer 위임"]
+        F["4 · 요구 정의<br/>feature-frd-author<br/>→ FRD.md"]
+        P["5 · 작업 분해<br/>feature-plan-author<br/>→ PLAN.md"]
+        I["6 · 구현<br/>feature-plan-executor<br/>→ code-implementer 위임"]
         F --> P --> I
     end
 
-    subgraph VERIFY["4 · 검증 체인 (정적·저비용 먼저 → 실동작 마지막)"]
+    subgraph VERIFY["7 · 검증 체인 (정적·저비용 먼저 → 실동작 마지막)"]
         direction LR
         V1["요구사항 충실도<br/>verify-requirements"]
         V2["코드 리뷰<br/>code-review (mode=diff-branch)"]
@@ -134,12 +136,14 @@ flowchart TD
         V1 --> V2 --> V3 --> V4 --> V5 --> V6
     end
 
-    C["5 · 마무리<br/>devoks-git:git-commit-msg<br/>→ devoks-git:git-pull-request"]
+    C["8 · 마무리<br/>devoks-git:git-commit-msg<br/>→ devoks-git:git-pull-request"]
 
     S --> BUILD
     S -.-> PRD
     PRD -.-> TRD
     TRD -.-> F
+    TRD -.-> WF
+    WF -.-> F
     PRD -.-> F
     S -.-> D
     D -.-> F
@@ -163,6 +167,7 @@ flowchart TD
 | `product-interview` | `/devoks-sdlc:product-interview` | devoks-sdlc |
 | `product-prd-author` | `/devoks-sdlc:product-prd-author` | devoks-sdlc |
 | `product-trd-author` | `/devoks-sdlc:product-trd-author` | devoks-sdlc |
+| `product-design-author` | `/devoks-sdlc:product-design-author` | devoks-sdlc |
 | `feature-interview` | `/devoks-sdlc:feature-interview` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
 | `feature-plan-author` | `/devoks-sdlc:feature-plan-author` | devoks-sdlc |

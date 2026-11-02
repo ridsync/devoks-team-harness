@@ -1,9 +1,9 @@
 ---
 name: workflow-map
-description: DevOKs SDLC 작업의 전체 흐름(단계 순서)과 각 단계의 진입 스킬·커맨드를 한 장의 표로 보여준다. 파이프라인(준비→요구정의→작업분해→구현→검증체인→커밋/PR)과 순서 없는 단발 작업을 구분해 제시한다. "워크플로우 맵", "SDLC 흐름 보여줘", "스킬 표", "어떤 스킬 써야 해", "다음 단계 뭐야", "작업 순서 알려줘", "스킬 목록 정리해줘" 같은 조회성 요청에서 사용한다. 표를 출력할 뿐 어떤 단계도 실행하지 않는다 — 실제 실행은 표에 적힌 각 스킬을 직접 호출한다.
+description: DevOKs SDLC 작업의 전체 흐름(단계 순서)과 각 단계의 진입 스킬·커맨드를 한 장의 표로 보여준다. 파이프라인(준비→제품·기술·화면 설계(선택)→요구정의→작업분해→구현→검증체인→커밋/PR)과 순서 없는 단발 작업을 구분해 제시한다. "워크플로우 맵", "SDLC 흐름 보여줘", "스킬 표", "어떤 스킬 써야 해", "다음 단계 뭐야", "작업 순서 알려줘", "스킬 목록 정리해줘" 같은 조회성 요청에서 사용한다. 표를 출력할 뿐 어떤 단계도 실행하지 않는다 — 실제 실행은 표에 적힌 각 스킬을 직접 호출한다.
 metadata:
   author: ridsync
-  version: 1.5.1
+  version: 1.6.0
 ---
 # workflow-map — SDLC 워크플로우 흐름 맵
 
@@ -49,31 +49,33 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 | #   | 단계         | 진입점                                                                | 산출물                                     |
 | --- | ---------- | ------------------------------------------------------------------ | --------------------------------------- |
 | 0   | 준비 (최초 1회) | `/devoks-core:setup-mcp` · `/devoks-core:setup-project-convention` | MCP 서버, `.claude/rules`                 |
-| 0b  | 제품 정의 (선택, 장기 프로젝트) | `/devoks-sdlc:product-interview` → 승인 시 `/devoks-sdlc:product-prd-author` 자동 연결 | `PRD.md` · `FEATURES.md` (항목별 FRD 시드 → 1) |
-| 0c  | 기술 설계 (선택, 0b 이후) | `/devoks-sdlc:product-trd-author` | `TRD.md` · FEATURES 기반 구역 B-n (→ 1, stack preset → 0) |
-| 1a  | 요구 탐색 (선택) | `/devoks-sdlc:feature-interview` → 승인 시 1로 자동 연결 | 정련 요약 (대화)                        |
-| 1   | 요구 정의      | `/devoks-sdlc:feature-frd-author`                                  | `FRD.md`                                |
-| 2   | 작업 분해      | `/devoks-sdlc:feature-plan-author`                                 | `PLAN.md`                               |
-| 3   | 구현         | `/devoks-sdlc:feature-plan-executor`                               | 코드 (`code-implementer` 에이전트에 태스크 단위 위임) |
-| 4   | 검증 체인      | ↓ 표 A-1                                                            | 검증 리포트                                  |
-| 5   | 마무리        | `/devoks-git:git-commit-msg` → `/devoks-git:git-pull-request`      | 커밋 · PR                                 |
+| 1   | 제품 정의 (선택, 장기 프로젝트) | `/devoks-sdlc:product-interview` → 승인 시 `/devoks-sdlc:product-prd-author` 자동 연결 | `PRD.md` · `FEATURES.md` (항목별 FRD 시드 → 4) |
+| 2   | 기술 설계 (선택, 1 이후) | `/devoks-sdlc:product-trd-author` | `TRD.md`(UI 기반 §2.1 포함) · FEATURES 기반 구역 B-n (→ 4, stack preset → 0) |
+| 3   | 화면 설계 (선택, 2 이후, 화면 있는 제품) | `/devoks-sdlc:product-design-author` | `WIREFRAMES.md` · `design/wireframes.pen` (→ 디자인 시스템 B-n → 화면 F-n의 4) |
+| 4   | 요구 정의 | (선택) `/devoks-sdlc:feature-interview` → `/devoks-sdlc:feature-frd-author` | `FRD.md` |
+| 5   | 작업 분해 | `/devoks-sdlc:feature-plan-author` | `PLAN.md` |
+| 6   | 구현 | `/devoks-sdlc:feature-plan-executor` | 코드 (`code-implementer` 에이전트에 태스크 단위 위임) |
+| 7   | 검증 체인 | ↓ 표 A-1 | 검증 리포트 |
+| 8   | 마무리 | `/devoks-git:git-commit-msg` → `/devoks-git:git-pull-request` | 커밋 · PR |
 
 
-> **통합 진입점:** `/devoks-sdlc:feature-workflow-runner` 는 1~~3을 한 흐름으로 실행하고, 마무리 시점에 4~~5를 선택 메뉴로 제시한다. 1~3을 따로 돌리고 싶을 때만 개별 스킬을 쓴다.
+> **통합 진입점:** `/devoks-sdlc:feature-workflow-runner` 는 4~6을 한 흐름으로 실행하고, 마무리 시점에 7~8을 선택 메뉴로 제시한다. 4~6을 따로 돌리고 싶을 때만 개별 스킬을 쓴다.
+>
+> **1~3은 선택이다.** 여러 기능으로 이뤄진 제품을 새로 시작할 때만 거치고, 기능 하나만 만들거나 유지보수할 때는 0 다음 바로 4로 간다.
 
 ## 표 A-0 — 입력 양식 (인터뷰 대신 직접 채우기)
 
-요구 단계(0b·1a·1)는 인터뷰로 시작하거나, 정해진 양식을 채워 바로 넘길 수 있다. 둘은 같은 형식이다 — 인터뷰가 끝나면 이 양식으로 요약이 나온다.
+요구 단계(1·4)는 인터뷰로 시작하거나, 정해진 양식을 채워 바로 넘길 수 있다. 둘은 같은 형식이다 — 인터뷰가 끝나면 이 양식으로 요약이 나온다.
 
 | 단계 | 양식 받기 (요청 예) | 채운 뒤 넘기기 |
 | --- | --- | --- |
-| 0b 제품 정의 | "PRD 입력 양식 줘" → `product-prd-author`가 `docs/product/PRD.intake.md` 생성 | `/devoks-sdlc:product-prd-author src=<파일>` |
-| 0c 기술 설계 | "TRD 입력 양식 줘" → `product-trd-author`가 `docs/product/TRD.intake.md` 생성 (사실 6칸) | `/devoks-sdlc:product-trd-author src=<파일>` |
-| 1 요구 정의 | "FRD 입력 양식 줘" → `feature-frd-author`가 양식 제공 | `/devoks-sdlc:feature-frd-author frd=<파일>` |
+| 1 제품 정의 | "PRD 입력 양식 줘" → `product-prd-author`가 `docs/product/PRD.intake.md` 생성 | `/devoks-sdlc:product-prd-author src=<파일>` |
+| 2 기술 설계 | "TRD 입력 양식 줘" → `product-trd-author`가 `docs/product/TRD.intake.md` 생성 (사실 7칸) | `/devoks-sdlc:product-trd-author src=<파일>` |
+| 4 요구 정의 | "FRD 입력 양식 줘" → `feature-frd-author`가 양식 제공 | `/devoks-sdlc:feature-frd-author frd=<파일>` |
 
 ★ 칸 중 **의도 칸**(PRD 1번, FRD Outcome·User)이 비면 그 칸만 인터뷰(`product-interview` / `feature-interview`)로 채우고, 나머지 ★(PRD 7번, FRD Success·Out of scope)는 스킬이 제안을 보여 주고 한 번에 확인한다. ★가 아닌 칸은 비어 있어도 `미확정`으로 진행한다.
 
-## 표 A-1 — 4단계 검증 체인
+## 표 A-1 — 검증 체인 (7단계)
 
 순서에 의미가 있다. **정적·저비용 검증을 앞에** 두어 구조적 문제를 먼저 걸러내고, **"지금 커밋될 코드가 실제로 동작하는가"** 를 묻는 실동작 검증을 앞선 단계의 수정이 모두 반영된 뒤 마지막에 둔다.
 
@@ -121,7 +123,7 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 
 ## 참고 (표와 함께 출력)
 
-- **제품 정의는 기능 정의보다 한 단계 위다.** 여러 기능으로 이뤄진 장기 프로젝트는 `product-interview`(또는 채운 PRD 입력 양식)로 시작해 `product-prd-author`가 PRD·기능 백로그를 만들고, 백로그 항목의 FRD 시드를 `feature-frd-author`에 넘긴다. 여러 기능이 공유할 기술 구조가 필요하면 `product-trd-author`(0c)로 TRD와 기반 작업 B-n을 정하고, B-n → F-n 순으로 FRD에 넘긴다. 기능 하나만 만들거나 유지보수할 때는 건너뛰고 1a/1에서 시작한다. 입력 양식은 표 A-0.
+- **제품 정의는 기능 정의보다 한 단계 위다.** 여러 기능으로 이뤄진 장기 프로젝트는 `product-interview`(또는 채운 PRD 입력 양식)로 시작해 `product-prd-author`가 PRD·기능 백로그를 만들고, 백로그 항목의 FRD 시드를 `feature-frd-author`에 넘긴다. 여러 기능이 공유할 기술 구조가 필요하면 `product-trd-author`(2)로 TRD와 기반 작업 B-n을 정하고, B-n → F-n 순으로 FRD에 넘긴다. 사용자 화면이 있으면 `product-design-author`(3)로 와이어프레임을 먼저 고정한다 — 디자인 시스템 B-n의 컴포넌트 범위와 화면 F-n FRD의 상태 목록이 여기서 나온다(화면과 무관한 B-n은 병렬 가능). 기능 하나만 만들거나 유지보수할 때는 1~3을 건너뛰고 4에서 시작한다. 입력 양식은 표 A-0.
 - **요구 단계 진입점은 사실상 하나다.** 초안이 있으면 `feature-frd-author`(또는 `feature-workflow-runner`)를 바로 쓴다 — 의도가 비었거나 방향이 여러 갈래면 그 스킬이 Phase 0에서 `feature-interview`로 먼저 정련한다. 아이디어만 있을 때 `feature-interview`를 직접 불러도 되고, 정련 요약이 승인되면 FRD 정련으로 자동으로 이어진다.
 - **기능 구현 진입점이 둘이다.** 추적 가능한 산출물(`FRD.md`/`PLAN.md`)과 태스크 단위 진행 추적이 필요하면 **표 A**(`feature-workflow-runner`)를, 산출물 없이 바로 구현하는 가벼운 작업이면 **표 B**의 `new-feature-by-github-issue`(GitHub 이슈 본문을 SSOT로 삼는 간이 구현)를 쓴다.
 - **타 플러그인 항목**(`/devoks-core:*`, `/devoks-git:*`, `/devoks-browser:*`)은 해당 플러그인이 설치돼 있어야 호출된다. 미설치 환경에서는 그 행을 건너뛴다.

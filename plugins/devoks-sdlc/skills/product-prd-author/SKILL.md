@@ -4,7 +4,7 @@ description: "아이디어·요구사항 메모·기획 문서를 받아 장기 
 argument-hint: "[src=<아이디어 본문|요구 문서 경로> (default: 대화 맥락)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.1.1
+  version: 1.1.2
 ---
 
 # product-prd-author — 제품 PRD · 기능 백로그 작성/갱신
@@ -29,7 +29,7 @@ metadata:
 | 기능 하나의 요구서 | `devoks-sdlc:feature-frd-author` (백로그의 FRD 시드를 초안으로) |
 | 기능 하나의 의도가 막연함 | `devoks-sdlc:feature-interview` |
 
-- 하지 않는 것: 기능별 EARS AC·Contract·Edge, 화면 설계·와이어프레임, 기술 설계(TRD·아키텍처), 작업 분해, 코드 작성.
+- 하지 않는 것: 기능별 EARS AC·Contract·Edge, 화면 설계·와이어프레임(`devoks-sdlc:product-design-author`), 기술 설계(TRD·아키텍처 — `devoks-sdlc:product-trd-author`), 작업 분해, 코드 작성.
 - 시장 규모 추정·경쟁사 심층 조사는 하지 않는다. 대안 비교는 "사용자가 지금 쓰는 것 대비 무엇이 다른가"까지만.
 
 ## 호출 방법
@@ -87,7 +87,7 @@ metadata:
 
 `references/prd-guide.md` §3 체크리스트를 돌린다(역추적·모호어·Out of Scope 이유·미확정 수집·분량). 실패 항목은 고친 뒤 보고한다.
 
-보고에는 다음만 담는다: 산출물 경로, 섹션별 확정/미확정 요약, 미확정·오픈 이슈 목록(디자인·개발 착수를 막는 것 먼저), 다음 단계(신규 개발이거나 여러 기능이 공유할 기술 구조가 필요하면 `/devoks-sdlc:product-trd-author` → 그다음 MVP 백로그 항목 → `/devoks-sdlc:feature-frd-author frd=<FRD 시드 본문>`).
+보고에는 다음만 담는다: 산출물 경로, 섹션별 확정/미확정 요약, 미확정·오픈 이슈 목록(디자인·개발 착수를 막는 것 먼저), 다음 단계(신규 개발이거나 여러 기능이 공유할 기술 구조가 필요하면 `/devoks-sdlc:product-trd-author` → 사용자 화면이 있으면 `/devoks-sdlc:product-design-author`(와이어프레임) → 그다음 MVP 백로그 항목 → `/devoks-sdlc:feature-frd-author frd=<FRD 시드 본문>`).
 `PRD.md` frontmatter는 `version: 0.1.0`, `status: draft`로 시작한다. `review`·`approved` 전환은 사용자가 명시할 때만 한다.
 
 ## 갱신 모드

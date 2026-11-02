@@ -28,6 +28,19 @@ mode: greenfield     # greenfield | brownfield
 
 - **stack preset:** <react-web / react-native / android / ios / python-fastapi / 해당 없음> → `/devoks-core:setup-project-convention`으로 적용
 
+### 2.1 UI 기반 (디자인 시스템 방식)
+> 사용자 화면이 있는 제품만. 없으면 "해당 없음" 한 줄. 여기서는 **방식**만 정한다 — 실제 화면·컴포넌트 목록은 `WIREFRAMES.md`(`product-design-author`), 토큰 값·컴포넌트 계약은 디자인 시스템 B-n이 만드는 `DESIGN.md`가 소유한다.
+
+| 항목 | 선택 | 비교한 대안 | 이유 (NFR-n · 제약 · 팀 역량) |
+|---|---|---|---|
+| 대상 플랫폼·기준 뷰포트 | <예: 모바일 우선 360px, 데스크톱 1280px> | | |
+| 컴포넌트 기반 | <예: shadcn/ui 위 래퍼 / 자체 구현 / 기존 사내 라이브러리> | | |
+| 토큰 체계·SSOT 위치 | <예: Tailwind v4 `@theme` CSS 변수 — 색·간격·타이포·반경·z-index> | | |
+| 테마 | <라이트만 / 라이트+다크 / 브랜드 다중> | | |
+| 접근성 보장 | <WCAG 수준·글자 크기 하한·터치 영역 — 연결 NFR-n과 검증 방법> | | |
+| 아이콘·폰트 | | | |
+| 디자인 도구·SSOT | <예: 와이어프레임 Pencil(.pen) / 시안 Figma / 없음 — 코드가 SSOT> | | |
+
 ## 3. 시스템 구성
 ```mermaid
 flowchart LR

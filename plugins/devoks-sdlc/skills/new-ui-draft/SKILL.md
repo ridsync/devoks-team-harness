@@ -4,7 +4,7 @@ description: Figma 디자인 링크를 받아 프로젝트 패턴에 맞게 UI�
 argument-hint: "<Figma URL> <구현 추가정보>"
 metadata:
   author: ridsync
-  version: 1.2.0
+  version: 1.2.1
 ---
 
 # UI Draft Implement (Figma → 코드 구현)
@@ -15,7 +15,7 @@ Figma 디자인 링크와 추가 정보를 받아, Figma MCP로 디자인을 조
 
 > **전제 MCP (사용자 설치):** 이 스킬은 공식 Figma 플러그인이 제공하는 `mcp__plugin_figma_figma__*` 도구(`get_design_context`·`get_screenshot`·`get_metadata`)와 **동일 플러그인이 번들한 `figma:figma-design-to-code` 스킬**에 의존한다. devoks 플러그인은 Figma MCP를 번들하지 않으므로(중복·충돌 방지) user/project scope에 1회 설치돼 있어야 한다. 미설치 시 devoks-core SessionStart 훅이 설치를 안내한다.
 
-**엔지니어링 디자인 시스템 SSOT:** 저장소 루트(또는 문서에 안내된 경로)의 `DESIGN.md`가 있으면, 그 저장소의 테마·간격·타이포·레이어(z-index)·터치/접근성·다크/라이트 등 **코드로 지켜야 할 UI 계약**을 정의한 것으로 본다. Figma는 레이아웃·비주얼 레퍼런스로, `DESIGN.md`는 구현 시 계약으로 우선한다. 문서가 없으면 동일 역할의 디자인/컨벤션 문서·기존 화면을 SSOT로 삼는다.
+**엔지니어링 디자인 시스템 SSOT:** 저장소 루트(또는 문서에 안내된 경로)의 `DESIGN.md`가 있으면, 그 저장소의 테마·간격·타이포·레이어(z-index)·터치/접근성·다크/라이트 등 **코드로 지켜야 할 UI 계약**을 정의한 것으로 본다. Figma는 레이아웃·비주얼 레퍼런스로, `DESIGN.md`는 구현 시 계약으로 우선한다. 문서가 없으면 동일 역할의 디자인/컨벤션 문서·기존 화면을 SSOT로 삼는다. `docs/product/WIREFRAMES.md`(제품 와이어프레임)가 있으면 해당 화면 W-n의 우선순위 블록·상태 목록을 누락 점검 기준으로 쓴다 — 화면 목록·흐름을 새로 정하는 일은 이 스킬이 아니라 `devoks-sdlc:product-design-author`가 맡는다.
 
 ## 입력 파라미터
 

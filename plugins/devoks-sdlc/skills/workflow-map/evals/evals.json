@@ -6,11 +6,11 @@
       "id": 1,
       "name": "full-map-pipeline-and-oneshot-split",
       "prompt": "devoks-sdlc 워크플로우 전체 흐름 좀 보여줘. 어떤 순서로 어떤 스킬을 쓰는지 한눈에 알고 싶어.",
-      "expected_output": "파이프라인(0 준비 → 1 요구정의 → 2 작업분해 → 3 구현 → 4 검증체인 → 5 커밋/PR)과 순서 없는 단발 작업을 별도 표로 구분해 출력한다. 각 단계에 실제 호출 가능한 스킬/커맨드 이름을 적는다. feature-workflow-runner가 1~3 통합 진입점임을 표기한다. 표만 출력하고 어떤 스킬도 실행하지 않는다.",
+      "expected_output": "파이프라인(0 준비 → 1 제품 정의·2 기술 설계·3 화면 설계(선택) → 4 요구정의 → 5 작업분해 → 6 구현 → 7 검증체인 → 8 커밋/PR)과 순서 없는 단발 작업을 별도 표로 구분해 출력한다. 각 단계에 실제 호출 가능한 스킬/커맨드 이름을 적는다. feature-workflow-runner가 1~3 통합 진입점임을 표기한다. 표만 출력하고 어떤 스킬도 실행하지 않는다.",
       "files": [],
       "assertions": [
         { "text": "파이프라인 표에 요구정의(feature-frd-author)→작업분해(feature-plan-author)→구현(feature-plan-executor) 순서가 나타난다" },
-        { "text": "feature-workflow-runner를 1~3 통합 진입점으로 표기한다" },
+        { "text": "feature-workflow-runner를 4~6 통합 진입점으로 표기한다" },
         { "text": "순서 없는 단발 작업(code-analyze-module·code-refactoring·code-review·code-security-review·test-author 등)을 파이프라인과 분리해 제시한다" },
         { "text": "표를 출력하는 데 그치고, FRD 작성이나 코드 분석 등 실제 단계를 실행하지 않는다" }
       ]

@@ -1,12 +1,12 @@
 {
   "skill_name": "devoks-sdlc:product-trd-author",
-  "notes": "제품 단위 TRD 작성/갱신의 객관 품질. 케이스 1 greenfield(비-HITL), 2 brownfield(비-HITL — 현행 스택 사실 기록·변경 결정만), 3 양식 요청, 4 HITL 첫 턴(사실 질문+판단 제안을 한 메시지로). 2026-10-29 신설.",
+  "notes": "제품 단위 TRD 작성/갱신의 객관 품질. 케이스 1 greenfield(비-HITL), 2 brownfield(비-HITL — 현행 스택 사실 기록·변경 결정만), 3 양식 요청, 4 HITL 첫 턴(사실 질문+판단 제안을 한 메시지로). 2026-10-29 신설. 2026-11-02 케이스 1에 §2.1 UI 기반·디자인 시스템 B-n 기대 추가.",
   "evals": [
     {
       "id": 1,
       "name": "greenfield-trd-from-prd",
       "prompt": "evals/files/pilates-prd/ 에 PRD랑 FEATURES 있어. 이걸로 TRD 써줘.",
-      "expected_output": "TRD.md를 템플릿 12섹션으로 작성한다(greenfield). §2 각 선택에 대안·이유(NFR-n·제약 연결)가 있고 iOS/Android 요구에 맞는 preset(react-native 등)이 매핑된다. 버전은 출처와 함께이거나 적지 않는다. NFR-1(정원·중복 0건)·NFR-2(회원권 잔여 정합)가 §6에서 DB 제약·서버 트랜잭션 수준으로 보장되고 검증 레벨이 있다. 계측 FR이 §7 이벤트로 있다. 엔드포인트 목록·EARS AC가 없다. FEATURES.md 기반 구역에 B-n이 FRD 시드로 추가된다. 호스팅·팀 역량 같은 사실은 미확정으로 §11에.",
+      "expected_output": "TRD.md를 템플릿 12섹션으로 작성한다(greenfield). §2 각 선택에 대안·이유(NFR-n·제약 연결)가 있고 iOS/Android 요구에 맞는 preset(react-native 등)이 매핑된다. 버전은 출처와 함께이거나 적지 않는다. NFR-1(정원·중복 0건)·NFR-2(회원권 잔여 정합)가 §6에서 DB 제약·서버 트랜잭션 수준으로 보장되고 검증 레벨이 있다. 계측 FR이 §7 이벤트로 있다. 엔드포인트 목록·EARS AC가 없다. FEATURES.md 기반 구역에 B-n이 FRD 시드로 추가된다. 호스팅·팀 역량 같은 사실은 미확정으로 §11에. 회원·원장 화면이 있으므로 §2.1 UI 기반(방식만 — 화면·컴포넌트 목록·토큰 값 없음)이 채워지고, 기반 구역에 디자인 시스템 B-n이 산출물 DESIGN.md·관련 문서 WIREFRAMES.md §5·와이어프레임 선행 조건과 함께 있다.",
       "files": [
         "evals/files/pilates-prd/PRD.md",
         "evals/files/pilates-prd/FEATURES.md"
@@ -38,6 +38,9 @@
         },
         {
           "text": "버전 표기가 있으면 출처가 있다(없으면 통과)"
+        },
+        {
+          "text": "§2.1 UI 기반이 방식만으로 채워지고(화면·컴포넌트 목록·토큰 값 없음), 디자인 시스템 B-n이 DESIGN.md 산출물·WIREFRAMES.md 선행과 함께 있다"
         }
       ]
     },

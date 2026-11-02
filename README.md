@@ -17,7 +17,7 @@ Claude Code harness for the DevOKs team — plugins for code review, feature dev
 |--------|----------|----------|
 | `devoks-core` | Core principles, convention presets, explicit setup flows — MCP checks plus project convention setup/management for `.claude/` | **Required** |
 | `devoks-git` | Git commit, issue, and PR workflow commands | Recommended |
-| `devoks-sdlc` | Unified SDLC workflow — product interview·PRD·TRD & feature backlog, feature dev (FRD/PLAN/execution/UI), test authoring & triage, code review/refactoring/module analysis/security review, requirement & data-flow verification | Recommended |
+| `devoks-sdlc` | Unified SDLC workflow — product interview·PRD·TRD·wireframes & feature backlog, feature dev (FRD/PLAN/execution/UI), test authoring & triage, code review/refactoring/module analysis/security review, requirement & data-flow verification | Recommended |
 | `devoks-browser` | Chrome DevTools MCP attach + Visual Diff verification | Optional |
 | `devoks-rn` | React Native debugging — Metro DevTools CDP attach, emulator screenshots, JS console/state inspection | Optional (RN projects) |
 
@@ -109,21 +109,23 @@ The HITL flow, from setup to PR. Run `/devoks-sdlc:workflow-map` in any session 
 flowchart TD
     S["0 · Setup (once)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
 
-    PRD["0b · Product definition (optional, long-term)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD seeds)"]
+    PRD["1 · Product definition (optional, long-term)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD seeds)"]
 
-    TRD["0c · Technical design (optional)<br/>product-trd-author<br/>→ TRD.md + foundation items B-n"]
+    TRD["2 · Technical design (optional)<br/>product-trd-author<br/>→ TRD.md + foundation items B-n"]
 
-    D["1a · Interview (optional)<br/>feature-interview<br/>→ approved summary flows into 1"]
+    WF["3 · Screen design (optional, UI products)<br/>product-design-author<br/>→ WIREFRAMES.md + wireframes.pen"]
 
-    subgraph BUILD["1–3 · feature-workflow-runner (combined entry point)"]
+    D["Interview (optional, before 4)<br/>feature-interview<br/>→ approved summary flows into 4"]
+
+    subgraph BUILD["4–6 · feature-workflow-runner (combined entry point)"]
         direction LR
-        F["1 · Define requirements<br/>feature-frd-author<br/>→ FRD.md"]
-        P["2 · Break down tasks<br/>feature-plan-author<br/>→ PLAN.md"]
-        I["3 · Implement<br/>feature-plan-executor<br/>→ delegates to code-implementer"]
+        F["4 · Define requirements<br/>feature-frd-author<br/>→ FRD.md"]
+        P["5 · Break down tasks<br/>feature-plan-author<br/>→ PLAN.md"]
+        I["6 · Implement<br/>feature-plan-executor<br/>→ delegates to code-implementer"]
         F --> P --> I
     end
 
-    subgraph VERIFY["4 · Verification chain (cheap static checks first, live run last)"]
+    subgraph VERIFY["7 · Verification chain (cheap static checks first, live run last)"]
         direction LR
         V1["Requirement fidelity<br/>verify-requirements"]
         V2["Code review<br/>code-review (mode=diff-branch)"]
@@ -134,12 +136,14 @@ flowchart TD
         V1 --> V2 --> V3 --> V4 --> V5 --> V6
     end
 
-    C["5 · Wrap up<br/>devoks-git:git-commit-msg<br/>→ devoks-git:git-pull-request"]
+    C["8 · Wrap up<br/>devoks-git:git-commit-msg<br/>→ devoks-git:git-pull-request"]
 
     S --> BUILD
     S -.-> PRD
     PRD -.-> TRD
     TRD -.-> F
+    TRD -.-> WF
+    WF -.-> F
     PRD -.-> F
     S -.-> D
     D -.-> F
@@ -163,6 +167,7 @@ flowchart TD
 | `product-interview` | `/devoks-sdlc:product-interview` | devoks-sdlc |
 | `product-prd-author` | `/devoks-sdlc:product-prd-author` | devoks-sdlc |
 | `product-trd-author` | `/devoks-sdlc:product-trd-author` | devoks-sdlc |
+| `product-design-author` | `/devoks-sdlc:product-design-author` | devoks-sdlc |
 | `feature-interview` | `/devoks-sdlc:feature-interview` | devoks-sdlc |
 | `feature-frd-author` | `/devoks-sdlc:feature-frd-author` | devoks-sdlc |
 | `feature-plan-author` | `/devoks-sdlc:feature-plan-author` | devoks-sdlc |
