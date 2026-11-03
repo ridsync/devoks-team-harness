@@ -5,7 +5,7 @@
     {
       "id": 1,
       "name": "draft-with-confirmed-intent-to-frd",
-      "prompt": "아래 승인된 정련 요약으로 FRD 정련해줘. 워크스페이스는 .claude/workspace/experiment-list-20261021/\n\n## 기능 정련 요약 — 실험 목록\n- Outcome: 진행 중인 실험 목록을 한곳에서 본다\n- User: 그로스 PM 본인\n- Why now: 분기 실험이 12개로 늘어 문서가 흩어짐\n- Success: 실험 추가·종료가 1분 안에 반영되고 주간 회의에서 이 목록만 본다\n- Constraint: 사내 SSO 뒤에서만 접근\n- Out of scope: 실험 결과 지표 시각화, 팀원 공유\n- 논의 중 결정: 종료된 실험은 숨기지 않고 상태 필터로 구분\n- 가정: 실험마다 담당자는 1명이다 — 기존 문서에서 확인\n- 남은 질문: 실험 상태값(진행/보류/종료) 외에 '준비 중'이 필요한가",
+      "prompt": "아래 승인된 정련 요약으로 FRD 정련해줘. 워크스페이스는 docs/workspace/experiment-list-20261021/\n\n## 기능 정련 요약 — 실험 목록\n- Outcome: 진행 중인 실험 목록을 한곳에서 본다\n- User: 그로스 PM 본인\n- Why now: 분기 실험이 12개로 늘어 문서가 흩어짐\n- Success: 실험 추가·종료가 1분 안에 반영되고 주간 회의에서 이 목록만 본다\n- Constraint: 사내 SSO 뒤에서만 접근\n- Out of scope: 실험 결과 지표 시각화, 팀원 공유\n- 논의 중 결정: 종료된 실험은 숨기지 않고 상태 필터로 구분\n- 가정: 실험마다 담당자는 1명이다 — 기존 문서에서 확인\n- 남은 질문: 실험 상태값(진행/보류/종료) 외에 '준비 중'이 필요한가",
       "expected_output": "요약을 <out>/FRD.draft.md로 원문 보존한다(출처 feature-interview). 요약 값(User·Why now·Success·Out of scope·논의 중 결정)을 다시 묻지 않고 §1·§3·§10 근거로 쓴다고 밝힌다. Phase 0 게이트는 열지 않는다(이미 승인된 요약). 요약에 없는 슬롯·정책(실험 항목 필드 등)이나 §4 설계 임계가 있으면 그것만 한 번에 모아 확인하고 턴을 끝낼 수 있다. FRD.md를 썼다면 §1이 요약 값으로 채워지고 AC는 EARS·예외 경로 포함. '준비 중' 질문은 확인 질문이나 §10에 남는다.",
       "files": [],
       "assertions": [
@@ -65,7 +65,7 @@
     {
       "id": 4,
       "name": "small-feature-judgment-slots-proposed",
-      "prompt": "(HITL) 로그인 화면 비밀번호 입력칸에 비밀번호 보기/숨기기 토글 추가해줘. FRD로 정리해줘. 워크스페이스는 .claude/workspace/password-toggle-20261029/",
+      "prompt": "(HITL) 로그인 화면 비밀번호 입력칸에 비밀번호 보기/숨기기 토글 추가해줘. FRD로 정리해줘. 워크스페이스는 docs/workspace/password-toggle-20261029/",
       "expected_output": "Outcome(비밀번호 표시 전환)·User(로그인하는 사용자)는 분명하므로 feature-interview로 진입하지 않는다. Success·Non-goals는 '제안: …'으로 추론해 다른 슬롯 확인과 한 번에 묶어 묻는다(예: 토글 1회로 전환 / 다른 입력 필드 미적용). 의도 질문을 하나씩 던지지 않는다.",
       "files": [],
       "assertions": [

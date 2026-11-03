@@ -38,8 +38,8 @@ Chrome DevTools MCP 와 사용자 Chrome 인스턴스가 같은 프로파일을 
 
 ### 파일명 규칙
 
-- **상대 경로** 사용 (`.claude/workspace/{feature-name}-{date}/captures/render_<screen_name>.png`) — 활성 작업공간의 `captures/`에 저장.
-- `<WorkspaceCapturesDir>`는 활성 작업공간의 상대 경로 `.claude/workspace/{feature-name}-{date}/captures`다. 작업공간이 확정되지 않았으면 캡처 전 1회 확인한다.
+- **상대 경로** 사용 (`docs/workspace/{feature-name}-{date}/captures/render_<screen_name>.png`) — 활성 작업공간의 `captures/`에 저장.
+- `<WorkspaceCapturesDir>`는 활성 작업공간의 상대 경로 `docs/workspace/{feature-name}-{date}/captures`다. 작업공간이 확정되지 않았으면 캡처 전 1회 확인한다.
 - 절대 경로(`/tmp/...` 등)는 `allowed roots` 제약으로 실패할 수 있으며, 최종 캡처 보관 경로로 사용하지 않는다.
 - 파일명 예: `render_result_pass.png`, `render_settings_modal.png`
 

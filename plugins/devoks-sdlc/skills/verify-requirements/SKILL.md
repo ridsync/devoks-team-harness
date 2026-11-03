@@ -53,7 +53,8 @@ metadata:
 
 1. **`spec` 인자 확인** — 지정된 경로를 요구사항 문서로 해석한다.
 2. **자동 탐색** — 경로가 없으면 다음 위치를 순서대로 탐색한다:
-   - `.claude/workspace/` — PRD, 워크플로우, 비즈니스 로직 SSOT
+   - `docs/workspace/` — 기능 단위 FRD·PLAN(워크플로우·비즈니스 로직 SSOT)
+   - `docs/product/` — 제품 PRD·FEATURES·TRD·WIREFRAMES
    - `.claude/plans/` — 구현 플랜 파일 (가장 최신 플랜 우선)
    - `doc/` — 기타 아키텍처/기능 문서
 3. **브랜치명 키워드 매칭** — `git branch --show-current` 결과로 관련 문서를 좁힌다.
@@ -94,11 +95,11 @@ S4에서 추출한 항목을 카테고리별로 정렬하고 아래 **체크리�
 체크리스트를 다음 경로에 파일로 저장한다:
 
 ```
-.claude/workspace/checklists/<feature-name>.md
+docs/workspace/checklists/<feature-name>.md
 ```
 
 - `<feature-name>` 은 `$ARGUMENTS`의 요구사항문서를 확인하고 적절한 {feature-name}-{date} 형식으로 작성한다.
-- `.claude/workspace/checklists/` 디렉토리가 없으면 생성한다.
+- `docs/workspace/checklists/` 디렉토리가 없으면 생성한다.
 - 파일이 이미 존재하면 덮어쓰기 전 사용자에게 한 줄 확인한다.
 
 ### C3. 구현 준비 확인
@@ -114,7 +115,7 @@ S4에서 추출한 항목을 카테고리별로 정렬하고 아래 **체크리�
 
 ### V0. 기존 체크리스트 파일 확인
 
-`.claude/workspace/checklists/<feature-name>.md` 파일이 존재하는지 확인한다.
+`docs/workspace/checklists/<feature-name>.md` 파일이 존재하는지 확인한다.
 
 - **파일이 있으면** → 해당 파일을 로드해 `[REQ-*]` ID 목록을 재사용한다. S4(요구사항 재추출)를 건너뛴다.
 - **파일이 없으면** → S4에서 요구사항 문서를 재추출해 ID를 새로 생성한다.
@@ -166,7 +167,7 @@ S4에서 추출한 각 요구사항 항목에 대해:
 - 브랜치: feat/xxx
 - 참조 요구사항 문서: (문서 경로 목록)
 - 추출 항목 수: N개 (기능 N / 비즈니스로직 N / UI N / 엣지케이스 N / 데이터계약 N)
-- 저장 위치: `.claude/workspace/checklists/feat-xxx.md`
+- 저장 위치: `docs/workspace/checklists/feat-xxx.md`
 
 ---
 
@@ -302,8 +303,8 @@ S4에서 추출한 각 요구사항 항목에 대해:
   1. 구현 전 → `/devoks-sdlc:verify-requirements mode=checklist` — 구현 목표 체크리스트 확보
   2. 구현 후 → `/devoks-sdlc:verify-requirements mode=verify` — 커버리지 갭 검증
   3. 코드 품질 → `/devoks-sdlc:code-review mode=diff-branch` — 별개로 병행 실행
-- **체크리스트 저장 위치**: `.claude/workspace/checklists/<feature-name>.md` — 브랜치명 그대로 파일명 사용
-- **요구사항 문서 기본 위치**: `doc/workspace/` (PRD, 워크플로우), `.claude/plans/` (구현 플랜)
+- **체크리스트 저장 위치**: `docs/workspace/checklists/<feature-name>.md` — 브랜치명 그대로 파일명 사용
+- **요구사항 문서 기본 위치**: `docs/workspace/` (FRD·PLAN), `docs/product/` (PRD·TRD), `.claude/plans/` (구현 플랜)
 - **프로젝트 원칙**: `.claude/refs/engineering-principles.md`, `.claude/rules/agent-principles.md`
 - **추적 ID 형식**: `[REQ-카테고리약어-번호]` — 예: `[REQ-F-01]` (기능), `[REQ-B-01]` (비즈니스로직), `[REQ-U-01]` (UI), `[REQ-E-01]` (엣지케이스), `[REQ-D-01]` (데이터계약)
 - **ID 연속성**: `mode=checklist`에서 생성된 ID가 구현 검증 모드에서 동일하게 사용됨 — 사전/사후 추적 가능

@@ -21,7 +21,7 @@ metadata:
 
 > 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
-- `out` 기본값 = `.claude/workspace/{feature-name}-{date}/`. 산출물 = `<out>/FRD.md`. → `../feature-workflow-runner/references/output-location.md`
+- `out` 기본값 = `docs/workspace/{feature-name}-{date}/`. 산출물 = `<out>/FRD.md`. → `../feature-workflow-runner/references/output-location.md`
 - 워크스페이스에는 FRD 문서와 입력 초안·리소스 사본만 모은다. 코드는 두지 않는다(이 스킬은 코드 미생성).
 - **입력 형식 SSOT** — `assets/FRD.intake.md`(★ Outcome·User·Success·Out of scope). 사용자가 채운 양식, `feature-interview`의 정련 요약, `product-prd-author` FEATURES.md의 FRD 시드가 모두 이 형식이다. 자유 형식 초안·유지보수 요청도 받는다 — 그때는 ★ 칸을 초안에서 추출한다.
 
@@ -37,7 +37,7 @@ metadata:
 
 **착수 준비 점검 (조건부 — PRD로 시작한 제품의 초기 화면 기능만, 권장)** — 입력이 `FEATURES.md`의 **F-n FRD 시드**이고 `docs/product/PRD.md`가 있으며 그 기능이 사용자 화면을 가질 때만 연다. 유지보수·버그 수정·기능 변경(시드가 아닌 입력)은 대상이 아니다 — UI 변경은 받은 시안(Figma 등)을 §6에 걸면 충분하다. 디자인 시스템 B-n·화면 없는 기능도 대상이 아니다. 확인 항목: ① `WIREFRAMES.md`에 이 기능의 W-n이 있는가, ② 플랫폼 전제가 확정됐는가(WIREFRAMES §1 출처), ③ W-n 중 비주얼 비중 "강조"가 있으면 `VISUAL.md` 방향 선택·하이파이가 끝났는가, ④ WIREFRAMES §6·VISUAL §8의 PRD·TRD 영향 중 미반영이 있는가(출처 ID가 PRD §13·TRD §12 이력에 없으면 미반영). `WIREFRAMES.md`가 없으면 ①만 "없음"으로 보이고 ②~④는 "해당 없음 — WIREFRAMES 없음"으로 묶는다(TRD가 없으면 ④는 PRD 이력만 본다). 빠진 것이 있으면 **막지 않는다** — HITL은 이 점검을 **첫 응답에 단독으로** 보여 주고(선택에 따라 이후 흐름이 갈리므로 슬롯 확인과 섞지 않는다) "디자인 먼저(`/devoks-sdlc:product-design-author`) / 이대로 진행"을 묻는다. 권장일 뿐이라 사용자가 진행을 고르면 더 묻지 않는다. 비-HITL은 진행하되 §10과 완료 보고에 남긴다. 다 갖춰졌으면 한 줄로 알리고 넘어간다.
 
-0. **워크스페이스 확정 · 초안 원문 보존** — `out` 경로 `.claude/workspace/{feature-name}-{date}/`(date=`yyyyMMdd`)를 정한다. 시안·시각 리소스 사본은 **`<out>/assets/`** 에 `RES-ASSET-NNN_<slug>` 네이밍으로 저장하고(시안 외 대용량·저장소 안 리소스는 경로만 기록), FRD §6.3 Assets 표 ID와 일치시킨다. **본문으로 받은 초안은 `<out>/FRD.draft.md` 로 원문 그대로 보존**한다: 짧은 출처 헤더 + 초안 원문 verbatim + 정련 중 사용자 확인으로 확정된 결정 누적(추측 금지). 정련 결과는 `FRD.md`. → 디렉토리·`assets/`·보존 형식 근거는 `../feature-workflow-runner/references/output-location.md`(SSOT).
+0. **워크스페이스 확정 · 초안 원문 보존** — `out` 경로 `docs/workspace/{feature-name}-{date}/`(date=`yyyyMMdd`)를 정한다. 시안·시각 리소스 사본은 **`<out>/assets/`** 에 `RES-ASSET-NNN_<slug>` 네이밍으로 저장하고(시안 외 대용량·저장소 안 리소스는 경로만 기록), FRD §6.3 Assets 표 ID와 일치시킨다. **본문으로 받은 초안은 `<out>/FRD.draft.md` 로 원문 그대로 보존**한다: 짧은 출처 헤더 + 초안 원문 verbatim + 정련 중 사용자 확인으로 확정된 결정 누적(추측 금지). 정련 결과는 `FRD.md`. → 디렉토리·`assets/`·보존 형식 근거는 `../feature-workflow-runner/references/output-location.md`(SSOT).
    - 초안이 `## 기능 정련 요약` 형식(`feature-interview`의 **승인된 정련 요약**, 사용자가 채운 `FRD.intake.md`, FEATURES.md의 FRD 시드)이면 확정된 값은 다시 묻지 않고 §1(Outcome·User·Why now·Success·Out of scope → 대상 사용자·Success·Non-goals), §2·§3(방향·논의 중 결정), §7(Constraint), §6(관련 문서), §10(가정·남은 질문)의 근거로 쓴다. 단 값이 `미확정`이거나 `제안: …`이면 확정값이 아니다 — 특히 FEATURES 시드는 prd/trd-author가 쓴 것이라 비-HITL로 만들어졌을 수 있다. 이런 값은 절차 7 일괄 확인에 올리고(비-HITL이면 §10에 남긴다) 확정값처럼 §1에 옮기지 않는다. 요약도 다른 초안과 똑같이 `FRD.draft.md`로 보존한다(요약 첫 줄의 "원래 요청"이 인터뷰 전 원문이다). 요약의 "남은 질문"은 사용자가 보류한 것이라 절차 7 슬롯 확인에 한 번 더 넣어도 되고, 다시 보류되면 §10으로 넘긴다.
    - `FRD.draft.md`가 이미 있으면 덮어쓰지 않고 먼저 읽는다.
 1. **골격 로드** — `../feature-workflow-runner/assets/FRD.template.md` 를 읽어 형식을 따른다.

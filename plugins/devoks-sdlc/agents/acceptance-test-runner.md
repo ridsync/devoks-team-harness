@@ -24,8 +24,8 @@ FRD의 AC를 실행 중인 앱에서 실제로 조작해 확인하는 **실행·
 | `<DevServerURL>` | 이미 실행 중인 dev server URL |
 | `<PersistenceCheckMethod>` | 영속 상태 조회 방법(프로젝트별) |
 | `<AuditMarker>` | 임시 패치 식별 마커 (기본 `ACCEPT-TEMP`) |
-| `<WorkspaceVerificationDir>` | 최종 검증 리포트 저장 경로 (`.claude/workspace/{feature-name}-{date}/verification/`) |
-| `<WorkspaceCapturesDir>` | 실패 시점 캡처 저장 경로 (`.claude/workspace/{feature-name}-{date}/captures/`) |
+| `<WorkspaceVerificationDir>` | 최종 검증 리포트 저장 경로 (`docs/workspace/{feature-name}-{date}/verification/`) |
+| `<WorkspaceCapturesDir>` | 실패 시점 캡처 저장 경로 (`docs/workspace/{feature-name}-{date}/captures/`) |
 
 ---
 

@@ -9,7 +9,7 @@ updated: 2026-10-01
 
 | ID | 기능 | 포함 FR | 릴리스 | MoSCoW | 의존 | 상태 | FRD |
 |---|---|---|---|---|---|---|---|
-| F-1 | 회고 세션 진행 | FR-1, FR-2, FR-3 | MVP | Must | — | frd | .claude/workspace/retro-session-20261005/FRD.md |
+| F-1 | 회고 세션 진행 | FR-1, FR-2, FR-3 | MVP | Must | — | frd | docs/workspace/retro-session-20261005/FRD.md |
 | F-2 | 액션 아이템 추적 | FR-4, FR-5 | MVP | Must | F-1 | backlog | — |
 | F-3 | 카드 자동 그룹핑 | FR-6 | Next | Should | F-1 | backlog | — |
 

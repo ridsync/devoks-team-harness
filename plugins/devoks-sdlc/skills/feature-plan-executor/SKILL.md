@@ -23,7 +23,7 @@ PLAN.md를 SSOT로 태스크를 의존성 순서대로 실행하고 진행을 �
 
 > 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
-- `plan` 없으면 가장 최근 `.claude/workspace/*/PLAN.md` 를 후보로 제시·확인한다. → `../feature-workflow-runner/references/output-location.md`
+- `plan` 없으면 가장 최근 `docs/workspace/*/PLAN.md` 를 후보로 제시·확인한다. → `../feature-workflow-runner/references/output-location.md`
 - **코드는 PLAN Task의 `file:`(프로젝트 본래 위치)에 작성**한다. 워크스페이스에는 문서(진행 보고 등)만, 코드는 두지 않는다.
 
 ## 절차

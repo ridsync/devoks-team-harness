@@ -2,12 +2,28 @@
 
 > 문서 산출물과 코드 산출물의 저장 위치를 분리한다. 이 규칙은 4개 스킬이 공유한다.
 
+## `docs/` 레이아웃 (프로젝트 문서 전체)
+
+개발 문서는 대상 프로젝트의 `docs/` 아래에 **생애 단계별 서브디렉토리**로 둔다(저장소에 커밋되는 문서 — `.claude/` 아래에 두지 않는다).
+
+```
+docs/
+├─ product/          # 제품 설계·초기 구현 기준 문서 (product-prd/trd/design-author의 out 기본값)
+│  ├─ PRD.md · FEATURES.md · TRD.md · WIREFRAMES.md · VISUAL.md
+│  └─ design/        # 디자인 원본 (wireframes.pen · visual.pen)
+├─ workspace/        # 기능 단위 구현 문서 (FRD·PLAN·검증 산출물 — 아래 "기본 워크스페이스")
+└─ <운영 디렉토리>/   # 출시 이후 운영 문서는 필요해질 때 목적별로 추가 (예: runbook/, incidents/)
+```
+
+- `product/`는 제품 단위로 갱신되는 장기 문서, `workspace/`는 기능 하나의 사고 과정 문서다. 기능 문서를 `product/`에 두거나 PRD를 `workspace/`에 두지 않는다.
+- 운영 단계 디렉토리는 미리 만들지 않는다 — 실제 문서가 생길 때 목적이 드러나는 이름으로 추가한다.
+
 ## 기본 워크스페이스
 
 문서·리소스의 기본 저장 위치와 디렉토리 레이아웃(고정):
 
 ```
-.claude/workspace/{feature-name}-{date}/
+docs/workspace/{feature-name}-{date}/
 ├─ FRD.draft.md     # 본문으로 받은 초안 원문 보존(있을 때)
 ├─ FRD.md           # 정련 FRD
 ├─ PLAN.md          # 작업 분해
@@ -20,7 +36,7 @@
 - **디렉토리명** — 항상 `{feature-name}-{date}` 형식(하이픈 구분). 임의 변형 금지.
 - `{feature-name}` — FRD의 feature-slug(**kebab-case**). 초안에서 정해지지 않았으면 Goal로부터 짧게 만들고 1회 확인한다.
 - `{date}` — 오늘 날짜 **`yyyyMMdd`** (8자리, 예 `20260609`). 실행 시 `date +%Y%m%d` 로 구한다(추측 금지).
-- 예: `.claude/workspace/saved-filter-views-20260605/`
+- 예: `docs/workspace/saved-filter-views-20260605/`
 - `out` 인자가 주어지면 그 경로가 이 기본값을 덮어쓴다(이 경우에도 위 파일/`assets/`·`captures/`·`verification/`·`results/` 레이아웃은 동일하게 유지).
 
 ## 워크스페이스에 두는 것 (문서·리소스)
@@ -51,4 +67,5 @@
 ## 재진입 / 조회
 
 - 이미 워크스페이스가 있으면(같은 feature-name) 새로 만들지 말고 그 디렉터리를 이어서 쓴다.
-- executor가 PLAN 경로를 못 받으면, 가장 최근 `.claude/workspace/*/PLAN.md` 를 후보로 제시하고 확인한다.
+- executor가 PLAN 경로를 못 받으면, 가장 최근 `docs/workspace/*/PLAN.md` 를 후보로 제시하고 확인한다.
+- **이전 기본값 호환** — `docs/workspace/`에 후보가 없고 `.claude/workspace/*/`(3.16.0 이전 기본 경로)에 같은 feature-name이나 FRD/PLAN이 있으면, 그 경로를 후보로 함께 제시하고 이어서 쓸지 `docs/workspace/`로 옮길지 확인한다(자동 이동 금지).

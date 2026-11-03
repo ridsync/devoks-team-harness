@@ -15,8 +15,8 @@ PRD는 "무엇을", TRD는 "어떤 구조로"를 정했지만 **화면에 무엇
 디자인 시스템과 FRD의 입력을 만든다.
 
 ```
-PRD + TRD(§2.1) ─▶ phase=wireframe ─▶ WIREFRAMES.md (+ design/wireframes.pen)
-                         └─(강조 화면 있음)─▶ phase=visual ─▶ VISUAL.md (+ design/visual.pen)
+PRD + TRD(§2.1) ─▶ phase=wireframe ─▶ WIREFRAMES.md (+ <out>/design/wireframes.pen)
+                         └─(강조 화면 있음)─▶ phase=visual ─▶ VISUAL.md (+ <out>/design/visual.pen)
    디자인 시스템 B-n FRD ◀── WIREFRAMES §5 컴포넌트 후보 + VISUAL §7 기준값 → DESIGN.md
    화면 F-n FRD        ◀── WIREFRAMES §4 화면 상태 (+ VISUAL 하이파이)
    PRD FR 후보          ◀── VISUAL §4 기능 분류 인터랙티브 요소 (보고만)
@@ -45,7 +45,7 @@ PRD + TRD(§2.1) ─▶ phase=wireframe ─▶ WIREFRAMES.md (+ design/wireframe
 
 > 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
-- 산출물: `phase=wireframe` → `<out>/WIREFRAMES.md`(+ `design/wireframes.pen`), `phase=visual` → `<out>/VISUAL.md`(+ `design/visual.pen`). 같은 문서가 이미 있으면 **갱신 모드**.
+- 산출물: `phase=wireframe` → `<out>/WIREFRAMES.md`(+ `<out>/design/wireframes.pen` — 기본 `docs/product/design/`), `phase=visual` → `<out>/VISUAL.md`(+ `<out>/design/visual.pen`). 같은 문서가 이미 있으면 **갱신 모드**.
 - "비주얼 디자인", "하이파이", "모티프" 같은 요청이면 `phase`가 없어도 `visual`로 본다. `phase=visual`인데 `WIREFRAMES.md`가 없으면 멈춘다 — 구조 없이 그린 비주얼은 검증할 기준이 없다. HITL이면 와이어프레임 단계를 제안하고 동의하면 `phase=wireframe`으로 바로 이어서 진행, 비-HITL이면 중단·보고.
 - `tool=none`: 문서만 쓴다(디자인 도구가 없거나 비-HITL 실행). 이후 같은 문서로 `tool=pencil` 재실행하면 그리기만 이어서 한다.
 - 도구 어댑터: `pencil` → `references/tool-pencil.md`. 문서 형식은 도구와 무관하다 — 다른 도구는 어댑터 파일만 추가한다.

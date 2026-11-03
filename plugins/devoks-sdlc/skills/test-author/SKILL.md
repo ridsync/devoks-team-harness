@@ -42,7 +42,7 @@ metadata:
 
 ```
 /devoks-sdlc:test-author target=src/lib/calibration.ts
-/devoks-sdlc:test-author target=src/lib/parser.ts frd=.claude/workspace/mark-20260722/FRD.md
+/devoks-sdlc:test-author target=src/lib/parser.ts frd=docs/workspace/mark-20260722/FRD.md
 ```
 
 인자가 없어도 동작한다. Phase 0에서 1회 확인한다.

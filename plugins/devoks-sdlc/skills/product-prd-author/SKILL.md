@@ -40,7 +40,7 @@ metadata:
 
 > 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
-- 산출물: `<out>/PRD.md`, `<out>/FEATURES.md`. 장기 문서라 일회성 워크스페이스(`.claude/workspace/`)가 아니라 저장소에 남는 경로를 쓴다.
+- 산출물: `<out>/PRD.md`, `<out>/FEATURES.md`. 제품 단위 장기 문서라 기능 단위 워크스페이스(`docs/workspace/`)가 아니라 제품 문서 경로(`docs/product`)를 쓴다 — `docs/` 레이아웃 SSOT는 `../feature-workflow-runner/references/output-location.md`.
 - `<out>/PRD.md`가 이미 있으면 **갱신 모드**로 동작한다(덮어쓰지 않는다).
 
 ### 양식만 요청받은 경우

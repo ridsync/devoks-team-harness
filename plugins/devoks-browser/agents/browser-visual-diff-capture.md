@@ -27,7 +27,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 | `<TokenSSOT>` | 컬러/타이포/spacing 토큰 정의 파일 (있다면) |
 | `<ZIndexSSOT>` | z-index 상수 SSOT 파일 (있다면) |
 | `<BaselineViewport>` | 비교 기준 viewport 크기 (기본 1280×720) |
-| `<WorkspaceCapturesDir>` | 최종 라이브 렌더 캡처 저장 경로 (`.claude/workspace/{feature-name}-{date}/captures/`) |
+| `<WorkspaceCapturesDir>` | 최종 라이브 렌더 캡처 저장 경로 (`docs/workspace/{feature-name}-{date}/captures/`) |
 
 ---
 

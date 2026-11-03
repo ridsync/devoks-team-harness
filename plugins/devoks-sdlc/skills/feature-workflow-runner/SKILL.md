@@ -28,7 +28,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 > 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
 - `frd` 없으면 현재 대화에서 초안을 받는다.
-- `out` 없으면 기본 워크스페이스 **`.claude/workspace/{feature-name}-{date}/`**. → `references/output-location.md`
+- `out` 없으면 기본 워크스페이스 **`docs/workspace/{feature-name}-{date}/`**. → `references/output-location.md`
 - 워크스페이스에는 `FRD.md`·`PLAN.md`와 입력 초안·리소스 사본을 모은다. **생성/수정 코드는 워크스페이스가 아니라 프로젝트 본래 위치**에 둔다.
 
 ## 핵심 원칙
@@ -66,7 +66,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 
 > **규칙 SSOT는 `devoks-sdlc:feature-frd-author`다.** 이 Phase는 그 스킬의 Phase 0(의도·방향 게이트)과 절차 0~7을 그대로 따른다 — 입력 양식(`../feature-frd-author/assets/FRD.intake.md`) 인식, 인터뷰 진입 조건(Outcome·User 공백·방향 갈래일 때만, Success·Non-goals만 비면 제안 후 일괄 확인), 시드의 `미확정`·`제안` 값 재확인, 제품 TRD 준수, FEATURES 미등재 안내 모두 포함. 아래는 실행 순서 요약이며, 판정 기준이 다르게 읽히면 frd-author가 이긴다 — 규칙을 여기에 다시 서술하지 않는다(2026-10-29 게이트 변경이 이 파일에 반영되지 않아 drift가 났던 재발 방지).
 
-0. **워크스페이스 확정 · 초안 원문 보존** — feature-name·date(`yyyyMMdd`)로 `out` 기본 경로 `.claude/workspace/{feature-name}-{date}/` 를 정한다(디렉토리명·날짜·`assets/` 레이아웃 SSOT는 `references/output-location.md`). 시안·시각 리소스 사본은 **`<out>/assets/`** 에 `RES-ASSET-NNN_<slug>` 네이밍으로 저장하고(시안 외 대용량·저장소 안 리소스는 경로만 기록), FRD §6.3 Assets 표 ID와 일치시킨다. **본문으로 받은 거친 초안은 `<out>/FRD.draft.md` 로 원문 그대로 보존**한다: 짧은 출처 헤더(어떤 스킬·호출에서 받았는지) + 초안 원문 verbatim, 정련 중 사용자 확인으로 확정된 결정은 같은 파일 하단에 누적(추측 금지). 정련 결과는 `FRD.md`. → 형식 근거는 `references/output-location.md`(SSOT). 초안이 `## 기능 정련 요약` 형식이면 frd-author 절차 0의 입력 처리 규칙을 따른다. `FRD.draft.md`가 이미 있으면 덮어쓰지 않고 먼저 읽는다.
+0. **워크스페이스 확정 · 초안 원문 보존** — feature-name·date(`yyyyMMdd`)로 `out` 기본 경로 `docs/workspace/{feature-name}-{date}/` 를 정한다(디렉토리명·날짜·`assets/` 레이아웃 SSOT는 `references/output-location.md`). 시안·시각 리소스 사본은 **`<out>/assets/`** 에 `RES-ASSET-NNN_<slug>` 네이밍으로 저장하고(시안 외 대용량·저장소 안 리소스는 경로만 기록), FRD §6.3 Assets 표 ID와 일치시킨다. **본문으로 받은 거친 초안은 `<out>/FRD.draft.md` 로 원문 그대로 보존**한다: 짧은 출처 헤더(어떤 스킬·호출에서 받았는지) + 초안 원문 verbatim, 정련 중 사용자 확인으로 확정된 결정은 같은 파일 하단에 누적(추측 금지). 정련 결과는 `FRD.md`. → 형식 근거는 `references/output-location.md`(SSOT). 초안이 `## 기능 정련 요약` 형식이면 frd-author 절차 0의 입력 처리 규칙을 따른다. `FRD.draft.md`가 이미 있으면 덮어쓰지 않고 먼저 읽는다.
 1. 초안에서 Goal(대상 사용자·Why now·Success·Non-goals 포함)·Context·요구사항 후보를 추출한다.
 2. 각 요구사항을 `REQ-xxx` + EARS `AC-xxx-y` 로 정형화한다(정상 경로 + 예외 경로 최소 1쌍). → `references/ears-acceptance-criteria.md`
 3. 수치·세팅·상태전이를 §5 Contract(`CTR-xxx`)로 빼고, Edge Case를 §8(`EDGE-xxx`)로 정리한다. 요구가 **기존 데이터의 특정 필드/형태**에 의존하면 실환경에 그 형태가 실제로 존재하는지 확인하는 EDGE를, **상태 확정·I/O를 유발하는 반복 트리거 조작**(`.claude/refs/interaction-integrity.md` §1 적용 대상)을 포함하면 연타 시 기대 동작 EDGE를 반드시 추가한다(판정·기재 기준은 `devoks-sdlc:feature-frd-author` 절차 4와 동일).

@@ -40,7 +40,7 @@ AC·기대 동작을 수동 확인 체크리스트로 정리해 준다(추측으
 **예시:**
 
 ```
-/devoks-sdlc:verify-acceptance-test ac="AC-003-1,AC-003-2" frd=.claude/workspace/mark-calibration-20260722/FRD.md route=/settings/extraction persistence="IndexedDB(PouchDB) evaluate_script 조회"
+/devoks-sdlc:verify-acceptance-test ac="AC-003-1,AC-003-2" frd=docs/workspace/mark-calibration-20260722/FRD.md route=/settings/extraction persistence="IndexedDB(PouchDB) evaluate_script 조회"
 ```
 
 인자가 없어도 동작한다. Phase 0에서 1회 확인한다.

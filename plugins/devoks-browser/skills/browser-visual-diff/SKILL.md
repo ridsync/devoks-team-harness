@@ -85,7 +85,7 @@ Phase 1~4는 `browser-visual-diff-capture` 에이전트가 수행하며, 에이�
 ## Phase 0 — 사전 준비 (슬롯 합의)
 
 1. `$ARGUMENTS` 에서 슬롯 값 파싱 (Figma URL → `<FigmaFileKey>` + `<FigmaNodeId>` 자동 추출).
-2. `out`이 있으면 `<WorkspaceOut>`으로 사용한다. 없으면 현재 기능의 `.claude/workspace/{feature-name}-{date}/`를 확인하고, 확정되지 않았으면 작업공간 경로를 1회 확인한다. `<WorkspaceCapturesDir>`는 `<WorkspaceOut>/captures/`로 정한다.
+2. `out`이 있으면 `<WorkspaceOut>`으로 사용한다. 없으면 현재 기능의 `docs/workspace/{feature-name}-{date}/`를 확인하고, 확정되지 않았으면 작업공간 경로를 1회 확인한다. `<WorkspaceCapturesDir>`는 `<WorkspaceOut>/captures/`로 정한다.
 3. 미충족 필수 슬롯이 있으면 **1회** 사용자에게 확인:
    - "Figma 노드 ID / 비교 대상 컴포넌트 경로 / 라이브 라우트 / 프로젝트 디자인 가이드 파일(있다면) / viewport / dev server URL / 검증 명령을 알려주세요."
 4. `<DesignGuide>` 파일이 존재하면 컬러/타이포/spacing/z-index/터치 관련 섹션을 Read.

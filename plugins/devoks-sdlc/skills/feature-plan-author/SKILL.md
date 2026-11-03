@@ -19,8 +19,8 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 
 > 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
-- `frd` 없으면 가장 최근 `.claude/workspace/*/FRD.md` 를 후보로 제시·확인한다. → `../feature-workflow-runner/references/output-location.md`
-- `out` 기본값 = FRD.md가 있는 워크스페이스(`.claude/workspace/{feature-name}-{date}/`). 산출물 = `<out>/PLAN.md`. → `../feature-workflow-runner/references/output-location.md`
+- `frd` 없으면 가장 최근 `docs/workspace/*/FRD.md` 를 후보로 제시·확인한다. → `../feature-workflow-runner/references/output-location.md`
+- `out` 기본값 = FRD.md가 있는 워크스페이스(`docs/workspace/{feature-name}-{date}/`). 산출물 = `<out>/PLAN.md`. → `../feature-workflow-runner/references/output-location.md`
 - PLAN은 워크스페이스에 저장하되, 각 Task의 `file:`은 항상 **프로젝트 본래 코드 위치**를 가리킨다(워크스페이스 아님).
 
 ## 절차

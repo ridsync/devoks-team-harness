@@ -9,6 +9,16 @@
 
 ---
 
+## **개발 문서 위치를 `docs/` 생애 단계별 레이아웃으로 정리 — 워크스페이스 `.claude/workspace` → `docs/workspace`** (2026-11-03, `devoks-sdlc` `3.15.0 → 3.16.0`, `devoks-browser` `2.0.0 → 2.0.1`, `devoks-rn` `1.1.2 → 1.1.3`)
+- 배경: FRD·PLAN·검증 산출물이 `.claude/workspace/`에 생성돼 제품 문서(`docs/product`)와 위치가 갈렸다. 사용자 결정: 제품 설계·초기 구현 기준 문서는 `docs/product/`(디자인 원본은 `docs/product/design/`), 기능 구현 문서는 `docs/workspace/`, 운영 문서는 필요할 때 목적별 디렉토리를 추가.
+- 반영:
+  - `feature-workflow-runner/references/output-location.md`에 `docs/` 레이아웃 절 신설(SSOT) — product/·workspace/·운영 디렉토리 원칙. 이전 기본 경로 `.claude/workspace/` 발견 시 후보 제시·이동 여부 확인(자동 이동 금지).
+  - 워크스페이스 기본 경로 일괄 치환: sdlc(runner·frd/plan-author·executor·verify-*·test-author·acceptance-test-runner·evals), browser(visual-diff·devtools·capture agent), rn(metro-devtools-attach 스크린샷 경로).
+  - `product-design-author`의 `.pen` 경로를 `<out>/design/…`으로 명시(기본 `docs/product/design/`) — 기존에도 `<out>` 기준이었으나 SKILL 본문 표기가 `design/…`이라 루트 `design/`으로 오해될 여지가 있었다.
+  - `verify-requirements` 자동 탐색 목록에 `docs/product/` 추가, 오기 `doc/workspace/` 정정.
+- 검증: `claude plugin validate --strict` (sdlc·browser·rn), 변경 SKILL frontmatter YAML 파싱, evals JSON 파싱, `plugins/` 내 `.claude/workspace` 잔존 0(호환 안내 1곳 제외).
+- 의도적 미반영: `README.md`·`docs/README.ko.md`·`marketplace.json` — 워크스페이스 경로·버전 표기 없음. `docs/ROADMAP.md`의 `.claude/workspace/tool-usage-audit-20260918/` — harness 저장소 자신의 과거 실측 자료 위치라 사실 그대로 둠.
+
 ## **그린필드 첫 프로젝트의 디자인 선행 경로 정비 — 착수 점검·반영 추적·첫 구현 완료 안내** (2026-11-02, `devoks-sdlc` `3.14.0 → 3.15.0`)
 - 배경: 인터뷰 → PRD → TRD → 와이어프레임 → 비주얼이 단계별 "다음 단계" 안내로만 이어져, 구현 착수 직전에 디자인 결정이 끝났는지 확인하는 곳이 없었고, 디자인 단계가 보고한 PRD·TRD 갱신이 반영됐는지 추적할 방법도 없었다. 사용자 결정: 첫 구현 전에 디자인 컨셉·와이어프레임·TRD를 견고히 하는 것이 목적이며, 1차 구현 이후 UI/UX는 로드맵에 따라 별도로 계속 개선한다.
 - 반영(사용자 결정별):
