@@ -135,7 +135,7 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   #### 남은 오픈 결정
   - dial 상향(out-of-the-loop/auto-merge) 시점·LLM-judge 도입, Linear↔RUN 메타 매핑·웹훅 설계, Slack/Linear 어댑터 형태, D6 환경 감지·Chrome 싱글턴 큐잉 정책.
   #### 실험: `devoks-sdlc-orchestration-trial` (2026-10-27, 0.1.0 — 미배포)
-  - **보존 방식(2026-10-27 사용자 결정)**: 브랜치 `experiment/hotl-orchestration-trial`에만 커밋·push하고 **main에 편입하지 않는다**(참고용). 실무 적용 예정 없음 — 추후 오케스트레이션·작업 스케줄링 등 에이전트 개발 시스템 구축 솔루션(심포니 등)과 함께 도입을 검토해 확장할 때 참고 자료로 쓴다.
+  - **보존 방식(2026-10-27 사용자 결정)**: 브랜치 `experiment/hotl-orchestration-trial`에만 커밋·push하고 **main에 편입하지 않는다**(참고용). 실무 적용 예정 없음 — 추후 오케스트레이션·작업 스케줄링 등 에이전트 개발 시스템 구축 솔루션(심포니 등)과 함께 도입을 검토해 확장할 때 참고 자료로 쓴다. 자동 트리거 방식 비교·병렬 RUN 과제·유사 솔루션 조사·Slack/Linear 연동 검토는 `docs/hotl-orchestration-research.md`(이 브랜치 전용).
   - **목적**: HOTL 설계를 실제로 돌려 보고 정식 `devoks-sdlc-orchestration`에 무엇을 승격할지 판단한다. **실무 적용 대상이 아니다** — `marketplace.json` 미등록, `claude --plugin-dir`로만 로드. README·`docs/README.ko.md`·`workflow-map`·`plugin-management.md`는 의도적으로 갱신하지 않았다(실험 단계 — 아래 승격 시 할 일).
   - **0.2.3에서 확인한 갭 → trial의 실험 지점**:
     1. 런타임에 읽을 수 없는 참조(정책 §4가 `plugins/devoks-sdlc/...`를 저장소 경로로 참조, EARS·traceability를 파일 없이 "규약만" 적용) → 런타임이 파일로 읽어야 하는 6개만 `references/upstream/`에 **바이트 동일 사본**으로 번들(출처·sha·drift 점검 명령은 `SOURCES.md`). 스킬·에이전트는 복사하지 않고 이름으로 호출.
