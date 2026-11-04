@@ -6,7 +6,7 @@
       "id": 1,
       "name": "greenfield-trd-from-prd",
       "prompt": "evals/files/pilates-prd/ 에 PRD랑 FEATURES 있어. 이걸로 TRD 써줘.",
-      "expected_output": "TRD.md를 템플릿 12섹션으로 작성한다(greenfield). §2 각 선택에 대안·이유(NFR-n·제약 연결)가 있고 iOS/Android 요구에 맞는 preset(react-native 등)이 매핑된다. 버전은 출처와 함께이거나 적지 않는다. NFR-1(정원·중복 0건)·NFR-2(회원권 잔여 정합)가 §6에서 DB 제약·서버 트랜잭션 수준으로 보장되고 검증 레벨이 있다. 계측 FR이 §7 이벤트로 있다. 엔드포인트 목록·EARS AC가 없다. FEATURES.md 기반 구역에 B-n이 FRD 시드로 추가된다. 호스팅·팀 역량 같은 사실은 미확정으로 §11에. 회원·원장 화면이 있으므로 §2.1 UI 기반(방식만 — 화면·컴포넌트 목록·토큰 값 없음)이 채워지고, 기반 구역에 디자인 시스템 B-n이 산출물 DESIGN.md·관련 문서 WIREFRAMES.md §5·와이어프레임 선행 조건과 함께 있다.",
+      "expected_output": "TRD.md를 템플릿 12섹션으로 작성한다(greenfield). §2 각 선택에 대안·이유(NFR-n·제약 연결)가 있고 iOS/Android 요구에 맞는 preset(react-native 등)이 매핑된다. 버전은 출처와 함께이거나 적지 않는다. NFR-1(정원·중복 0건)·NFR-2(회원권 잔여 정합)가 §6에서 DB 제약·서버 트랜잭션 수준으로 보장되고 검증 레벨이 있다. 계측 FR이 §7 이벤트로 있다. 엔드포인트 목록·EARS AC가 없다. FEATURES.md 기반 구역에 B-n이 FRD 시드로 추가된다. 호스팅·팀 역량 같은 사실은 미확정으로 §11에. 회원·원장 화면이 있으므로 §2.1 UI 기반(방식만 — 화면·컴포넌트 목록·토큰 값 없음)이 채워지고, 기반 구역에 디자인 시스템 B-n이 산출물 DESIGN.md·관련 문서 WIREFRAMES.md §5·와이어프레임 선행 조건과 함께 있다. §2.1 대상 플랫폼이 확정 범위(iOS·Android)·계획(없음 또는 미확정)으로 나뉘고, 컴포넌트 층 정의(primitive·domain은 디자인 시스템, feature는 밖)가 있다. RN 하나로 iOS·Android를 만들면 구현 기반이 하나이므로 공유 전략은 '해당 없음'이고 패키지를 미리 분리하지 않는다.",
       "files": [
         "evals/files/pilates-prd/PRD.md",
         "evals/files/pilates-prd/FEATURES.md"
@@ -41,6 +41,12 @@
         },
         {
           "text": "§2.1 UI 기반이 방식만으로 채워지고(화면·컴포넌트 목록·토큰 값 없음), 디자인 시스템 B-n이 DESIGN.md 산출물·WIREFRAMES.md 선행과 함께 있다"
+        },
+        {
+          "text": "§2.1에 컴포넌트 층 정의가 있고 feature 층이 디자인 시스템 밖으로 명시된다"
+        },
+        {
+          "text": "구현 기반이 하나(예: RN)면 공유 전략이 '해당 없음'이고 packages/ui 같은 패키지를 미리 분리하지 않는다"
         }
       ]
     },
@@ -109,6 +115,36 @@
         },
         {
           "text": "확인 전 TRD.md를 쓰지 않는다"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "multiplatform-shared-strategy",
+      "prompt": "evals/files/pilates-multiplatform/ 에 PRD랑 FEATURES 있어. 묻지 말고 TRD 써줘.",
+      "expected_output": "TRD.md를 작성한다(greenfield, 비-HITL). §2.1 대상 플랫폼이 확정 범위(회원 iOS·Android 앱 + 원장 PC 웹)와 계획(강사 태블릿 앱 — Next)으로 나뉜다. 구현 기반이 다른 플랫폼(웹 + 모바일)이 확정 범위에 둘이므로 공유 전략 행이 채워지고 기본 제안은 '계약은 공유, 구현은 플랫폼별'이며 대안(크로스플랫폼 공통 컴포넌트·플랫폼별 별도 디자인 시스템)이 비교된다. 패키지 경계는 플랫폼 확정 범위에서 도출된다 — 두 앱이 함께 쓰는 층(의미 토큰 등)만 패키지, 컴포넌트 구현은 앱별. 계획 플랫폼(강사 앱)을 이유로 추가 패키지를 미리 분리하지 않고 ADR 되돌리는 조건에 남긴다. §8 저장소 구조가 이와 맞는다. 디자인 시스템 B-n 시드 산출물에 DESIGN.md 컴포넌트 항목의 플랫폼 차이 칸이 있다.",
+      "files": [
+        "evals/files/pilates-multiplatform/PRD.md",
+        "evals/files/pilates-multiplatform/FEATURES.md"
+      ],
+      "assertions": [
+        {
+          "text": "§2.1 대상 플랫폼이 확정 범위와 계획(강사 앱 Next)으로 나뉜다"
+        },
+        {
+          "text": "공유 전략 행이 채워지고 '계약 공유·구현 플랫폼별' 제안과 대안 2개가 있다"
+        },
+        {
+          "text": "패키지 분리가 확정 범위의 공유 층(토큰 등)으로 한정되고, 계획 플랫폼 때문에 미리 분리하지 않으며 ADR 되돌리는 조건에 남는다"
+        },
+        {
+          "text": "§8 저장소 구조가 §2.1 패키지 경계와 모순되지 않는다"
+        },
+        {
+          "text": "디자인 시스템 B-n 시드 산출물에 DESIGN.md 플랫폼 차이 칸이 있다"
+        },
+        {
+          "text": "질문하지 않고 확인 목록을 보고에 남긴다"
         }
       ]
     }

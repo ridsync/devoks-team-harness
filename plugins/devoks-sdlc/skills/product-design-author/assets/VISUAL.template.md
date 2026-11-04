@@ -64,6 +64,9 @@ design_file: <./design/visual.pen>   # tool=none·미작도여도 목표 경로�
 > 시안이 실제로 쓴 값. 토큰 이름·계층·계약은 DESIGN.md가 정한다.
 
 - 색: <역할별 기준값 — 배경·표면·포인트·데이터 색 등>
+  | 값 | 역할 | 용도 (text / fill / surface / decorative) | 대비 배경 | 대비율 | 판정 |
+  |---|---|---|---|---|---|
+  | <#hex> | <예: 정보 채움> | <fill> | <#hex — 배경·표면> | <n.nn:1> | <충족 / 미달 → decorative 재분류 / 미달 → 대체값 #hex (n.nn:1)> |
 - 타이포: <서체 후보·크기 단계>
 - 간격·반경·그림자: <기준값>
 - 모션: <duration·easing 기준값, 사용처>

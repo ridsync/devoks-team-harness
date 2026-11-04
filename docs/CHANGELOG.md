@@ -9,6 +9,16 @@
 
 ---
 
+## **디자인 시스템 범위·경계·멀티플랫폼 공유 전략 + 비주얼 단계 비텍스트 대비 점검** (2026-11-04, `devoks-sdlc` `3.16.1 → 3.17.0`)
+- 배경: careerstack B-8 디자인 시스템 구현 회고(TRD ADR-23·24)에서 받은 제안 5건. (1) 디자인 시스템의 범위·패키지 경계, (2) 플랫폼별 변형 처리가 어떤 스킬에도 없었고, (3) Pencil 시안 색의 비텍스트 대비 미달(정보 fill 2.54:1, 테두리 1.23:1)이 B-n 구현 단계에서야 발견돼 토큰을 추가했다. 사용자 결정: 5건 모두 반영하되, "패키지 경계" 행은 따로 두지 않는다 — 대상 플랫폼 계획을 PRD 요구 단계에서 묻고 TRD에서 확정하면 패키지 분리를 그 값에서 도출할 수 있어 YAGNI가 막힌다.
+- 반영:
+  - `product-prd-author` 1.1.4 — PRD 양식 §7·입력 양식 §5 `플랫폼·기기`를 "MVP 대상 · 이후 계획 플랫폼과 릴리스"로, 착수 점검 5번의 "부분" 상태에 계획 누락 추가.
+  - `product-trd-author` 1.2.0 — §2.1 대상 플랫폼을 확정 범위·계획으로 분리, `컴포넌트 층과 경계`(primitive·domain = 디자인 시스템 / feature = 밖, 기준은 업무 로직·데이터 결합) 행과 조건부 `공유 전략` 행(구현 기반이 다른 플랫폼이 확정 범위에 2개 이상일 때만 — RN 단일 iOS·Android는 해당 없음, 기본 "계약 공유·구현 플랫폼별") 추가. 가이드 §3-6 신설(패키지 분리는 확정 범위의 소비 앱 수에서 도출, 계획 플랫폼은 ADR 되돌리는 조건), §6 디자인 시스템 B-n 시드에 DESIGN.md "플랫폼 차이" 칸, §8 저장소 구조 안내, 체크리스트·완료 기준. description에 "디자인 시스템 범위·층 정하기" 트리거 추가.
+  - `product-design-author` 1.2.0 — VISUAL §7 색을 용도(text/fill/surface/decorative)·대비 배경·대비율·판정 표로, visual-guide §7에 WCAG 1.4.3(4.5:1, 큰 글자 3:1)·1.4.11(정보 fill·조작 요소 경계 3:1) 판정과 미달 처리(decorative 재분류 / 대체값 제안), 체크리스트·완료 기준. WIREFRAMES §5에 층 태그 열(feature 제외)과 선택 열 "플랫폼별 차이 예상". description에서 "디자인 시스템 자체는 product-trd-author가 맡는다"를 라우팅 문장 앞으로(사용자가 이 스킬을 디자인 시스템 담당으로 오인한 사례).
+  - evals: trd-author 1번 케이스에 층·공유 전략 해당 없음 assertion, 다중 플랫폼 케이스 신설(`evals/files/pilates-multiplatform/` — pilates PRD의 플랫폼 줄만 회원 앱 + 원장 웹 + 강사 앱 Next로 변경). design-author 1번(층 태그)·6번(대비 판정) assertion 추가.
+- 검증: `claude plugin validate ./plugins/devoks-sdlc --strict` 통과, 변경 SKILL 3종 frontmatter `ruby -ryaml` 파싱, evals JSON 파싱, 동적 실행 2건(서브에이전트, 로컬 소스 기준) — trd 다중 플랫폼: §2.1 확정 범위(회원 RN 앱 + 원장 웹)·계획(강사 태블릿) 분리, 공유 전략 "계약 공유·구현 플랫폼별"과 대안 2개, 패키지 `design-tokens`·`domain`만 분리·태블릿 착수 시 `packages/ui` 검토를 ADR 되돌리는 조건으로, B-n 시드에 플랫폼 차이 칸 / design visual(비-HITL, tool=none): §7 후보 색마다 용도·대비율·판정, 미달 1.48:1 → 대체 테두리 3.51:1 제안·구분선 decorative 재분류(대비율 독립 재계산 일치).
+- 의도적 미반영: `README.md`·`docs/README.ko.md`·`marketplace.json` — 스킬 내부 템플릿·가이드 변경이고 카탈로그 설명·버전 표기 영향 없음. MCP/prefix/permission·devoks-core sync — 해당 없음.
+
 ## **웹 접근성 자동검사(axe) 반영 + lint 도구 택1(Biome/ESLint) — react-web·react-native preset + TRD §2.1 검증 방법** (2026-11-04, `devoks-core` `2.4.0 → 2.5.0`, `devoks-sdlc` `3.16.0 → 3.16.1`)
 - 배경: 접근성은 WCAG 기준값·수동 셀프체크·리뷰 체크리스트로만 다뤄졌고 자동검사 도구는 어느 흐름에도 없었다. react-web preset은 "Biome/Oxlint가 `jsx-a11y`를 커버하지 않는다"고 적고 있었으나 공식 문서 확인 결과 사실과 달랐다(Biome `a11y` 그룹 recommended 기본 활성, Oxlint `jsx-a11y` 플러그인 opt-in). 사용자 결정: preset(1)과 TRD(2)만 반영, 에이전트 라이브 스캔 단계(3)는 1·2가 CI에서 매 변경을 검사하므로 중복이라 보류 — greenfield·brownfield 모두 같은 결론.
 - 반영: preset — 접근성 lint SSOT를 Biome `a11y`로 정정, 테스트 스택에 Playwright + `@axe-core/playwright`, Testing·Pitfalls·Project Decisions에 axe 규칙(파일 단위 상세는 `plugins/devoks-core/CHANGELOG.md` 2.5.0). `product-trd-author` 1.1.3 — TRD §2.1 접근성 보장의 검증 방법을 자동(a11y lint + 실제 브라우저 axe CI 게이트)·수동(키보드·포커스·스크린리더)으로 나눠 적도록 템플릿·가이드 보강, brownfield 신규 도입은 "변경" 결정 + 기준선 고정 게이트.

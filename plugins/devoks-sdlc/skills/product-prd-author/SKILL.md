@@ -4,7 +4,7 @@ description: "아이디어·요구사항 메모·기획 문서를 받아 장기 
 argument-hint: "[src=<아이디어 본문|요구 문서 경로> (default: 대화 맥락)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.1.3
+  version: 1.1.4
 ---
 
 # product-prd-author — 제품 PRD · 기능 백로그 작성/갱신
