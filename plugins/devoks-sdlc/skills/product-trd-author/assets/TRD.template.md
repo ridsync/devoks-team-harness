@@ -37,7 +37,7 @@ mode: greenfield     # greenfield | brownfield
 | 컴포넌트 기반 | <예: shadcn/ui 위 래퍼 / 자체 구현 / 기존 사내 라이브러리> | | |
 | 토큰 체계·SSOT 위치 | <예: Tailwind v4 `@theme` CSS 변수 — 색·간격·타이포·반경·z-index> | | |
 | 테마 | <라이트만 / 라이트+다크 / 브랜드 다중> | | |
-| 접근성 보장 | <WCAG 수준·글자 크기 하한·터치 영역 — 연결 NFR-n과 검증 방법> | | |
+| 접근성 보장 | <WCAG 수준·글자 크기 하한·터치 영역 — 연결 NFR-n과 검증 방법(자동: 예 a11y lint + 실제 브라우저 axe 검사 CI 게이트 / 수동: 키보드·포커스·스크린리더 점검 범위)> | | |
 | 아이콘·폰트 | | | |
 | 디자인 도구·SSOT | <예: 와이어프레임 Pencil(.pen) / 시안 Figma / 없음 — 코드가 SSOT> | | |
 
