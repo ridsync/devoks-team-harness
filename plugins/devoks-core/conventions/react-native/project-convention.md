@@ -16,8 +16,24 @@
 - **Server State / Data Fetching:** TanStack Query v5
 - **Styling:** NativeWind v4 (Tailwind CSS v3.4 문법 기반) + 공용 디자인 토큰
 - **Animation:** Reanimated v4 + `react-native-worklets` (New Architecture 필수 — SDK 55 기준 항상 충족)
-- **Lint/Format:** Biome (format + 기본 lint) + Oxlint(+`oxlint-config-universe`) — 단, Biome은 아직 React Native 전용 lint 규칙 플러그인이 없으므로, 필요하면 ESLint로 대체할지 사용자 확인 필요
+- **Lint/Format:** Biome 단독(format + lint) 기본 / ESLint(`eslint-config-expo`) + Prettier 대안 — 둘 중 하나만 쓴다(아래 "Lint/Format 선택")
 - **Test:** Jest + React Native Testing Library
+
+### Lint/Format 선택 (Biome / ESLint)
+
+lint 도구는 하나만 둔다. 둘을 겹치면 같은 위반이 중복 보고되고 설정·포맷 규칙이 두 벌이 된다.
+
+| | Biome 단독 (기본) | ESLint + Prettier (대안) |
+|---|---|---|
+| 구성 | 도구 1개·설정 1파일(`biome.json`)로 format·lint·import 정렬 | `npx expo lint`가 `eslint-config-expo` 기반 설정 생성(Expo 공식 경로) + Prettier |
+| RN·스택 규칙 | `linter.domains`로 `reactNative`(`<Text>` 밖 raw text·deep import 등)·`react`·`tanstackQuery`·`test` | `eslint-config-expo`(react·react-hooks·import·`expo/*`) |
+| Expo 전용 규칙 | 없음 — env 접근은 아래 보완으로 막는다 | `expo/no-dynamic-env-var`·`expo/no-env-var-destructuring`·`expo/use-dom-exports` |
+| 타입 인식 규칙 | `types` 도메인(자체 추론, 일부 nursery) — 범위가 좁다 | typescript-eslint type-aware 규칙 추가 가능 |
+
+- **ESLint를 고르는 경우:** 기존 ESLint 설정·사내 공유 config가 있다 / Expo 문서·템플릿 흐름(`npx expo lint`)을 그대로 따른다 / 타입 인식 규칙을 CI 게이트로 쓴다.
+- **그 외 greenfield는 Biome.** 단 Biome에는 Expo env 규칙이 없으므로 `process.env.EXPO_PUBLIC_*` 동적 접근(`process.env[key]`)·구조분해를 ast-grep 영속 규칙(아래 "구조 패턴 일괄 치환")이나 코드리뷰 체크 항목으로 막는다(Pitfalls 참고).
+- Oxlint(`oxlint-config-universe` 포함)는 보조 linter로 두지 않는다 — 위 두 선택지 모두 단독으로 이 스택을 커버하고, `oxlint-config-universe`는 Expo 내부 프로젝트용 공유 config이며 `expo/*` 규칙도 없다.
+- 선택 결과는 아래 Project Decisions에 적고, 고르지 않은 쪽 서술은 프로젝트 convention에서 지운다.
 
 ---
 
@@ -341,6 +357,8 @@ export const useCartStore = create<CartState>(...);
 | 실수 | 결과 | 방지 |
 |------|------|------|
 | 플랫폼 분기를 화면 곳곳에 흩뿌림 | 유지보수 악화 | bridge/service 경계로 격리 |
+| `process.env['EXPO_PUBLIC_X']`·`const { EXPO_PUBLIC_X } = process.env`로 env 접근 | 빌드 시 인라인되지 않아 런타임에 `undefined` | `process.env.EXPO_PUBLIC_X` 점 표기로만 정적 참조. Biome이면 ast-grep 규칙·리뷰로, ESLint면 `expo/no-dynamic-env-var`·`expo/no-env-var-destructuring`로 막는다 |
+| Biome과 ESLint(또는 Oxlint)를 함께 켬 | 같은 위반 중복 보고, 포맷 규칙 충돌로 저장할 때마다 diff 발생 | lint/format 도구는 Project Decisions에서 고른 하나만 설치·실행 |
 | permission/deeplink payload를 느슨하게 처리 | 재현 어려운 런타임 오류 | `*OrThrow` 검증 |
 | `AsyncStorage`에 민감 데이터 저장 | 보안 취약점 | secure storage SSOT 준수 |
 | Zustand store에 서버 응답을 그대로 복제 저장 | TanStack Query 캐시와 이중 관리, drift | 서버 상태는 TanStack Query만 SSOT |
@@ -359,6 +377,7 @@ export const useCartStore = create<CartState>(...);
 아래는 preset 주입 후 반드시 프로젝트 실정에 맞게 채운다.
 
 - **Navigation SSOT:** [예: `app/` (Expo Router file-based routing)]
+- **Lint/Format:** [Biome 단독 / ESLint(`eslint-config-expo`) + Prettier 중 택1 — 고른 이유("Lint/Format 선택" 기준) 한 줄. Biome이면 env 접근 보완 방식(ast-grep 규칙/리뷰)도 적는다]
 - **State SSOT:** [예: `src/store/`]
 - **Data Fetching SSOT:** [예: `src/query/`]
 - **Native Modules:** [예: `android/app/...`, `ios/...`]

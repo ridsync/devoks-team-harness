@@ -17,15 +17,32 @@
 - **Server State / Data Fetching:** TanStack Query v5 + axios
 - **Forms:** react-hook-form + zod(`zodResolver`)
 - **i18n:** react-i18next
-- **Lint/Format:** Biome (format + 기본 lint) + Oxlint (고속 보조 lint) — 단, React/Next.js 전용 규칙(`jsx-a11y` 등)은 Biome/Oxlint가 아직 커버하지 않으므로, 필요하면 ESLint로 대체할지 사용자 확인 필요
-- **Test:** Vitest + @testing-library/react + happy-dom
+- **Lint/Format:** Biome 단독(format + lint) 기본 / ESLint(flat config) + Prettier 대안 — 둘 중 하나만 쓴다(아래 "Lint/Format 선택"). 접근성 lint는 Biome `a11y` 그룹(`jsx-a11y` 대응, recommended 기본 활성) 또는 ESLint `eslint-plugin-jsx-a11y`
+- **Test:** Vitest + @testing-library/react + happy-dom (단위·컴포넌트) / Playwright + `@axe-core/playwright` (E2E·접근성 자동검사)
 
 ### SSR Variant (Next.js)
 
 - Next.js 16 App Router가 라우팅 SSOT — React Router는 사용하지 않는다.
 - 데이터 패칭은 Server Component/Route Handler가 1차, 클라이언트 상호작용이 필요한 화면만 TanStack Query를 보조로 쓴다.
-- Tailwind/shadcn/motion/zustand/react-hook-form+zod/Biome+Oxlint/테스트 스택은 CSR과 동일하게 적용한다.
+- Tailwind/shadcn/motion/zustand/react-hook-form+zod/Lint·Format/테스트 스택은 CSR과 동일하게 적용한다.
 - 프로젝트가 CSR/SSR 중 하나로 결정되면, 반대쪽 코드 예시는 프로젝트 convention에서 제거한다 — 두 갈래를 동시에 bracket처럼 남기지 않는다.
+- Next.js 16부터 `next lint`가 제거되고 `next build`가 lint를 돌리지 않는다 — 어느 lint 도구든 CI에 직접 넣는다. Biome이면 `linter.domains.next`를 켠다.
+
+### Lint/Format 선택 (Biome / ESLint)
+
+lint 도구는 하나만 둔다. 둘을 겹치면 같은 위반이 중복 보고되고 설정·포맷 규칙이 두 벌이 된다.
+
+| | Biome 단독 (기본) | ESLint + Prettier (대안) |
+|---|---|---|
+| 구성 | 도구 1개·설정 1파일(`biome.json`)로 format·lint·import 정렬 | ESLint(lint) + Prettier(format) 2개, 플러그인별 의존성 |
+| 스택 규칙 | `linter.domains`로 `react`·`next`·`tanstackQuery`·`test` 규칙, `a11y` 그룹 | `eslint-plugin-react-hooks`·`eslint-config-next`·`@tanstack/eslint-plugin-query`·`eslint-plugin-jsx-a11y` 공식 플러그인 |
+| 타입 인식 규칙 | `types` 도메인(자체 추론, 일부 nursery) — 범위가 좁다 | typescript-eslint type-aware 규칙(`no-floating-promises`·`no-misused-promises` 등) |
+| 속도 | 빠름 | 상대적으로 느림(type-aware 시 더) |
+
+- **ESLint를 고르는 경우:** 기존 ESLint 설정·사내 공유 config가 있다 / 타입 인식 규칙을 CI 게이트로 쓴다 / Biome에 없는 플러그인·커스텀 규칙이 필요하다.
+- **그 외 greenfield는 Biome.**
+- Oxlint는 보조 linter로 두지 않는다 — 위 두 선택지 모두 단독으로 이 스택의 규칙을 커버해, 겹쳐 쓸 때의 중복 보고·설정 비용만 남는다.
+- 선택 결과는 아래 Project Decisions에 적고, 고르지 않은 쪽 서술은 프로젝트 convention에서 지운다.
 
 ---
 
@@ -371,6 +388,8 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 - Provider 의존 컴포넌트 테스트 시: 최소 mock, 실 Provider 우선
 - shadcn/ui(Radix 기반) 컴포넌트 테스트 시 `ResizeObserver`/`matchMedia` 등 happy-dom 미구현 API를 test setup에서 mock 처리 (Pitfalls 참고)
 - TanStack Query 사용 컴포넌트는 테스트마다 새 `QueryClient`를 주입해 캐시 격리
+- **접근성 자동검사:** axe는 실제 브라우저(Playwright)에서만 돌린다 — 주요 라우트마다 `new AxeBuilder({ page }).withTags([...]).analyze()`의 `violations`가 0건임을 단언한다. 태그는 TRD §2.1 접근성 보장의 WCAG 수준을 따른다(예: 2.1 AA → `wcag2a`·`wcag2aa`·`wcag21a`·`wcag21aa`). 모달·드롭다운처럼 열린 상태가 따로 있는 UI는 그 상태로 만든 뒤 스캔한다
+- axe 자동검사는 일부 기준만 잡는다 — 키보드 조작·포커스 순서·스크린리더 낭독은 코드리뷰 체크리스트와 UI 셀프체크로 보완한다
 
 ---
 
@@ -560,6 +579,9 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 | 파생 가능한 값을 state로 중복 보관 | 동기화 drift, stale UI | 계산으로 유지하거나 `useMemo` 사용 |
 | 서버 응답을 Zustand store에 그대로 복제 | TanStack Query 캐시와 store가 따로 놀아 stale drift | 서버 상태는 TanStack Query만 SSOT로 사용 |
 | shadcn/ui(Radix) 컴포넌트를 happy-dom에서 그대로 테스트 | `ResizeObserver is not defined` 등으로 실패 | test setup에서 `ResizeObserver`/`matchMedia` mock 등록 |
+| Vitest(happy-dom)에서 axe-core 실행 | `TypeError: Cannot set property isConnected ... which has only a getter`로 실패(happy-dom#978 미해결). jsdom으로 바꿔도 레이아웃이 없어 `color-contrast`는 판정 불가 | axe는 Playwright(실제 브라우저)에서만 실행 |
+| 기존 코드베이스에 axe 게이트를 처음부터 "위반 0건"으로 켬 | 누적 위반이 한꺼번에 터져 CI가 막히고 결국 게이트를 끄게 됨 | 기존 위반은 화면별 기준선(허용 rule id 목록)으로 고정하고 신규 위반만 실패 처리, 손대는 화면부터 기준선을 줄인다 |
+| Biome과 ESLint(또는 Oxlint)를 함께 켬 | 같은 위반 중복 보고, 포맷 규칙 충돌로 저장할 때마다 diff 발생 | lint/format 도구는 Project Decisions에서 고른 하나만 설치·실행 |
 | Tailwind v4 토큰을 `tailwind.config.js`와 `@theme` 양쪽에 중복 정의 | 토큰 drift | v4는 `@theme` CSS 블록이 SSOT, config 파일에 재정의 금지 |
 | 테스트 전용 라우트를 프로덕션 빌드에 노출 | 예기치 못한 진입점 노출 | 라우트 가드 또는 빌드 분기로 제외 |
 | Contract 위반 시 `typeof` 가드로 조용히 처리 | 에러 은폐 | `*OrThrow` 헬퍼 사용 |
@@ -573,11 +595,13 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 아래는 preset 주입 후 반드시 프로젝트 실정에 맞게 채운다.
 
 - **Rendering Mode:** [CSR(Vite) / SSR(Next.js) 중 택1 — 결정 후 반대쪽 예시 코드 제거]
+- **Lint/Format:** [Biome 단독 / ESLint + Prettier 중 택1 — 고른 이유("Lint/Format 선택" 기준) 한 줄]
 - **Directory Policy:** [feature-first / layer-first / route-first]
 - **State SSOT:** [예: Zustand store는 `src/store/`, Context Provider 순서는 `src/App.tsx` 순서를 따름]
 - **API Layer SSOT:** [예: `src/api/`, axios 인스턴스는 `src/api/apiClient.ts`]
 - **API 응답 검증 수준:** [예: 결제·권한 응답만 zod 파싱, 나머지는 DTO 타입만]
 - **tsconfig 추가 엄격도:** [예: `strict` + `noUncheckedIndexedAccess` / `exactOptionalPropertyTypes` 여부]
 - **Design System SSOT:** [예: `components/ui/`(shadcn/ui) + `@theme` 토큰]
+- **접근성 기준·게이트:** [예: WCAG 2.1 AA — 신규 화면은 axe 위반 0건 / 기존 화면은 기준선 고정 후 신규 위반만 실패. TRD §2.1 접근성 보장과 일치시킨다]
 - **Routing SSOT:** [예: `src/routes.tsx`(CSR) 또는 `app/`(SSR)]
 - **Sensitive Files:** [예: `.env*`, `*.pem`]

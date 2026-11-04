@@ -13,6 +13,24 @@
 
 ---
 
+## 2.5.0 — 2026-11-04
+
+### 복사 산출물
+- `conventions/react-web/project-convention.md` › Stack › Lint/Format: 변경 — `Biome + Oxlint` 병용을 **Biome 단독(기본) / ESLint + Prettier(대안) 택1**로 전환하고 Oxlint 제거. 병용 채택 근거가 기록된 적 없고(2026-07-10 스택 최신화 때 도입), 두 선택지 모두 단독으로 스택 규칙(react·next·tanstackQuery·a11y)을 커버해 병용은 중복 보고·설정 비용만 남는다. 함께 "Biome/Oxlint가 `jsx-a11y`를 커버하지 않는다"는 사실과 다른 서술 정정(Biome `a11y` 그룹 recommended 기본 활성)
+- `conventions/react-web/project-convention.md` › Stack › Lint/Format 선택: 추가 — Biome/ESLint 비교표(구성·스택 규칙·타입 인식 규칙·속도)와 ESLint를 고르는 조건(기존 설정·사내 config, type-aware 게이트, Biome에 없는 플러그인)
+- `conventions/react-web/project-convention.md` › Stack › SSR Variant: 추가 — Next.js 16 `next lint` 제거·`next build` lint 미실행 → CI에 직접, Biome이면 `next` 도메인
+- `conventions/react-web/project-convention.md` › Pitfalls·Project Decisions: 추가 — lint 도구 병용 금지, Lint/Format 택1 기록
+- `conventions/react-native/project-convention.md` › Stack › Lint/Format: 변경 — `Biome + Oxlint(+oxlint-config-universe)` → **Biome 단독(기본) / ESLint(`eslint-config-expo`) + Prettier(대안) 택1**, Oxlint 제거. "Biome에 RN 전용 규칙이 없다"는 서술이 사실과 달라 정정(Biome `reactNative` 도메인 존재). Expo 공식 경로는 ESLint(`npx expo lint`)지만 웹 preset과 기본값을 맞추는 사용자 결정 — Biome으로도 lint·format은 동작한다. `oxlint-config-universe`는 Expo 내부 프로젝트용이며 `expo/*` 규칙이 없다
+- `conventions/react-native/project-convention.md` › Stack › Lint/Format 선택: 추가 — Biome/ESLint 비교표, ESLint를 고르는 조건, Biome일 때 Expo env 규칙 부재 보완(ast-grep 규칙·리뷰)
+- `conventions/react-native/project-convention.md` › Pitfalls: 추가 — `EXPO_PUBLIC_*` 동적 접근·구조분해 시 인라인 안 됨(런타임 `undefined`), lint 도구 병용 금지
+- `conventions/react-native/project-convention.md` › Project Decisions: 추가 — Lint/Format 택1과 Biome일 때 env 접근 보완 방식
+- `conventions/react-web/project-convention.md` › Stack › Test: 변경 — E2E·접근성 자동검사로 Playwright + `@axe-core/playwright` 추가
+- `conventions/react-web/project-convention.md` › Testing: 추가 — 실제 브라우저에서 라우트별 axe 스캔·`violations` 0건 단언, 태그는 TRD §2.1 WCAG 수준을 따름, 자동검사의 한계(키보드·포커스·스크린리더는 수동 보완)
+- `conventions/react-web/project-convention.md` › Pitfalls: 추가 — happy-dom에서 axe-core 실행 실패(happy-dom#978)·jsdom의 `color-contrast` 판정 불가, 기존 코드베이스에 0건 게이트를 바로 켜는 문제(기준선 고정 후 신규 위반만 실패)
+- `conventions/react-web/project-convention.md` › Project Decisions: 추가 — 접근성 기준·게이트
+
+> 이미 setup한 프로젝트는 `devoks-core:setup-preset-manage`의 diff에서 선택 반영한다 — 기존 코드베이스라면 Pitfalls의 기준선 방식으로 도입한다. Biome+Oxlint를 이미 쓰는 프로젝트는 Oxlint 제거 여부를 프로젝트 결정으로 판단한다(강제 아님).
+
 ## 2.4.0 — 2026-11-02
 
 ### 복사 산출물
