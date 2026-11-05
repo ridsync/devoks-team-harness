@@ -9,6 +9,16 @@
 
 ---
 
+## **에이전트 본문의 플러그인 파일 참조를 `${CLAUDE_PLUGIN_ROOT}` 절대 형태로 고정** (2026-11-05, `devoks-sdlc` `3.17.0 → 3.17.1`, `devoks-browser` `2.0.1 → 2.0.2`)
+- 배경: 신규 프로젝트 세션에서 `devoks-sdlc:code-reviewer`가 `skills/code-review/references/` 아래 2개 파일(`review-execution.md`·`report-template.md`)을 찾지 못했다. 파일은 설치 캐시에 있었다. 원인은 에이전트 본문의 `../skills/...` 상대 경로다. 스킬과 달리 서브에이전트에는 기준 디렉토리가 주입되지 않아(공식 sub-agents 문서: "only this system prompt plus basic environment details like the working directory"), 상대 경로가 대상 프로젝트 cwd 기준으로 해석된다. 공식 plugins-reference에 따르면 `${CLAUDE_PLUGIN_ROOT}`는 "Skill, command, and agent content — Anywhere in the Markdown body"에서 치환된다.
+- 반영:
+  - devoks-sdlc 에이전트 6종(`code-reviewer`·`code-security-reviewer`·`test-writer`·`code-analyzer`·`acceptance-test-runner`·`code-implementer`)의 `../skills/...`·`skills/...`·`references/...` 참조를 `${CLAUDE_PLUGIN_ROOT}/skills/...`로 치환.
+  - devoks-browser `browser-visual-diff-capture`의 `references/...` 5종을 `${CLAUDE_PLUGIN_ROOT}/skills/browser-visual-diff/references/...`로 치환.
+  - `docs/plugin-management.md` §12에 "에이전트 본문 상대 경로 참조 금지" Pitfall 신설(스킬/에이전트 기준점 차이 표, 검사 grep, 사고 기록). maintenance 체크리스트 §7 축 5에 에이전트 규칙과 grep 기준 추가.
+  - 재발 방지(사용자 결정): maintenance 체크리스트 §3에 「에이전트 클린 환경 스모크 테스트」 신설 — 에이전트 본문이 바뀌면 빈 디렉토리에서 `claude --plugin-dir` 헤드리스로 띄워 경로 치환·Read 성공을 확인(필수). §6 최종 확인 항목과 SKILL.md Step 4에도 연결. 놓친 원인: 규칙이 "루트 밖 `../`"만 금지해 `agents/ → ../skills/`(루트 안)가 통과, 스킬 품질 체크가 스킬 한정이라 에이전트 미적용, harness 저장소 안 실행 시 cwd 아래 `plugins/` 원본을 Glob으로 찾아 정상처럼 보이는 dogfooding 마스킹, push 전 라이브 검증 수단이 없다고 여겨 클린 환경 실행을 안 함.
+- 검증: 치환된 경로 16종 전부 실제 파일 존재 확인, `plugins/*/agents/`에 미고정 경로(`../`·`skills/`·`references/`) 0건, `claude plugin validate --strict`(sdlc·browser). 라이브 확인 — 빈 git 디렉토리에서 `claude --plugin-dir <로컬 plugins/devoks-sdlc> -p`로 `code-reviewer`를 띄워 Glob·find 없이 보고하게 함: 시스템 프롬프트 1번 항목이 `/Users/.../plugins/devoks-sdlc/skills/code-review/references/review-execution.md`(로컬 소스 절대 경로)로 치환돼 있었고 Read 성공.
+- 의도적 미반영: 스킬 본문의 `../<sibling-skill>/...` 참조 — 스킬은 로드 시 기준 디렉토리가 주입되어 정상 해석되므로 유지. `README.md`·`docs/README.ko.md`·`marketplace.json` — 버전·경로 표기 없음. MCP/prefix/permission·devoks-core sync — 해당 없음. 설치본(마켓플레이스 캐시) 반영은 push → marketplace update → 재설치 후.
+
 ## **디자인 시스템 범위·경계·멀티플랫폼 공유 전략 + 비주얼 단계 비텍스트 대비 점검** (2026-11-04, `devoks-sdlc` `3.16.1 → 3.17.0`)
 - 배경: careerstack B-8 디자인 시스템 구현 회고(TRD ADR-23·24)에서 받은 제안 5건. (1) 디자인 시스템의 범위·패키지 경계, (2) 플랫폼별 변형 처리가 어떤 스킬에도 없었고, (3) Pencil 시안 색의 비텍스트 대비 미달(정보 fill 2.54:1, 테두리 1.23:1)이 B-n 구현 단계에서야 발견돼 토큰을 추가했다. 사용자 결정: 5건 모두 반영하되, "패키지 경계" 행은 따로 두지 않는다 — 대상 플랫폼 계획을 PRD 요구 단계에서 묻고 TRD에서 확정하면 패키지 분리를 그 값에서 도출할 수 있어 YAGNI가 막힌다.
 - 반영:

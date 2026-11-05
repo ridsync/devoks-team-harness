@@ -57,7 +57,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 
 ## Phase 1 — Figma reference 캡처
 
-상세 절차는 `references/figma-capture.md` (SSOT)를 따른다.
+상세 절차는 `${CLAUDE_PLUGIN_ROOT}/skills/browser-visual-diff/references/figma-capture.md` (SSOT)를 따른다.
 
 1. `mcp__plugin_figma_figma__get_screenshot(nodeId=<FigmaNodeId>, fileKey=<FigmaFileKey>)`
    → `figma_<screen>.png` 저장
@@ -72,11 +72,11 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 
 ## Phase 2 — 라이브 렌더 캡처
 
-상세 절차 및 임시 패치 패턴은 `references/live-capture.md`, `references/state-patch-pattern.md` (SSOT)를 따른다.
+상세 절차 및 임시 패치 패턴은 `${CLAUDE_PLUGIN_ROOT}/skills/browser-visual-diff/references/live-capture.md`, `${CLAUDE_PLUGIN_ROOT}/skills/browser-visual-diff/references/state-patch-pattern.md` (SSOT)를 따른다.
 
 1. Chrome 브라우저 연결 확인 (`list_pages` 호출)
    - 연결 실패 시: 리포트에 "Chrome DevTools MCP 연결 실패 — 메인 루프에서 사용자 확인 필요"를 기록하고 Playwright로 폴백 시도한다.
-2. 특정 화면 진입이 필요하면 `references/state-patch-pattern.md`의 임시 패치 적용.
+2. 특정 화면 진입이 필요하면 `${CLAUDE_PLUGIN_ROOT}/skills/browser-visual-diff/references/state-patch-pattern.md`의 임시 패치 적용.
    - **임시 패치는 캡처 완료 직후 반드시 회수한다**: `git restore <패치된 파일>`
    - 회수 실패 또는 잔존 패치가 있으면 리포트에 명시한다.
 3. **기본 도구 (Chrome DevTools MCP)**:
@@ -91,7 +91,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 
 ## Phase 3 — Multimodal 시각 diff
 
-상세 체크리스트는 `references/diff-checklist.md` (SSOT)를 따른다.
+상세 체크리스트는 `${CLAUDE_PLUGIN_ROOT}/skills/browser-visual-diff/references/diff-checklist.md` (SSOT)를 따른다.
 
 `figma_<screen>.png`와 `render_<screen>.png`를 Claude multimodal로 함께 읽어 비교한다:
 - **좌표/사이즈/spacing** — 비율 기준 비교 (Figma frame 크기 차이 보정)
@@ -103,7 +103,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 
 ## Phase 4 — 프로젝트 디자인 가이드 정합성 검증
 
-상세 매핑 규칙은 `references/design-guide-mapping.md` (SSOT)를 따른다.
+상세 매핑 규칙은 `${CLAUDE_PLUGIN_ROOT}/skills/browser-visual-diff/references/design-guide-mapping.md` (SSOT)를 따른다.
 
 1. Phase 3 발견 hex 색상을 `<DesignGuide>` / `<TokenSSOT>` 토큰 표와 매핑
    - 매핑 가능 → "토큰 사용 권장" 항목으로 기록
@@ -116,7 +116,7 @@ Figma 렌더와 라이브 렌더를 비교하는 **캡처·분석 전담 subagen
 
 ## 출력 (충실도 리포트)
 
-`references/diff-checklist.md` 템플릿 기반으로 아래 구조의 리포트를 최종 메시지로 리턴한다.
+`${CLAUDE_PLUGIN_ROOT}/skills/browser-visual-diff/references/diff-checklist.md` 템플릿 기반으로 아래 구조의 리포트를 최종 메시지로 리턴한다.
 
 ```markdown
 ## 🎨 Visual Diff 충실도 리포트

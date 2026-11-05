@@ -420,6 +420,20 @@ model: sonnet
 
 > 모델 결정 우선순위: `CLAUDE_CODE_SUBAGENT_MODEL` 환경변수 > 호출 시 `model` 파라미터 > agent frontmatter > 메인 세션(`inherit`).
 
+### ⚠️ Pitfall — 에이전트 본문에서 상대 경로로 플러그인 파일 참조 금지
+
+에이전트 본문에서 플러그인 내부 파일(스킬 `references/`·`assets/` 등)을 가리킬 때는 **항상 `${CLAUDE_PLUGIN_ROOT}/...` 절대 형태**로 쓴다.
+`../skills/<skill>/references/x.md`, `skills/<skill>/...`, `references/x.md` 같은 상대 경로는 금지다.
+
+| 구분 | 상대 경로 기준점 | 결과 |
+|------|----------------|------|
+| 스킬(`SKILL.md`) | 로드 시 "Base directory for this skill"이 함께 주입됨 | 스킬 디렉토리 기준 `references/`·`../<sibling>/` 해석 가능 |
+| 에이전트(`agents/*.md`) | 기준 디렉토리 주입 없음 — 서브에이전트는 "only this system prompt plus basic environment details like the working directory"만 받는다 | 상대 경로가 **대상 프로젝트 작업 디렉토리** 기준으로 해석되어 파일을 못 찾는다 |
+
+- `${CLAUDE_PLUGIN_ROOT}`는 "Skill, command, and agent content — Anywhere in the Markdown body"에서 설치된 버전의 절대 경로로 치환된다(공식 [Plugins reference — Where each variable resolves](https://code.claude.com/docs/en/plugins-reference#where-each-variable-resolves)).
+- `claude plugin validate --strict`는 본문 경로를 검사하지 않는다 — 에이전트 추가·수정 시 `` grep -rnE '`(\.\./|skills/|references/)' plugins/*/agents/ ``로 미고정 경로가 없는지 확인한다.
+- 실제 사고(2026-11-05): devoks-sdlc 에이전트 6종(`code-reviewer` 등)과 devoks-browser `browser-visual-diff-capture`가 `../skills/...`·`skills/...`·`references/...`로 참조하고 있었고, 신규 프로젝트 세션에서 `code-reviewer`가 `review-execution.md`·`report-template.md`를 찾지 못했다.
+
 ### `effort` 미지원 환경에서의 기대 동작
 
 `effort` frontmatter는 **있으면 보너스, 없으면 `model` 단독으로도 목표를 달성**하는 전제로 설계한다. 미지원 환경에서는 필드가 조용히 무시되고, 해당 에이전트는 `model`(예: `opus`) + 세션 기본 effort로만 동작한다.

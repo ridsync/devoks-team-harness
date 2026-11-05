@@ -110,6 +110,7 @@ claude plugin validate ./plugins/<plugin> --strict
 - 신규/수정 skill frontmatter
 - 신규/수정 command frontmatter
 - 신규/수정 agent frontmatter (`model` 필드를 의도적으로 선택했는지 — 근거는 `docs/plugin-management.md` §12 참고)
+- 신규/수정 agent 본문 — 플러그인 파일 참조는 `${CLAUDE_PLUGIN_ROOT}/...`만 허용(상대 경로 금지, `docs/plugin-management.md` §12 Pitfall). 본문이 바뀌었으면 빈 디렉토리에서 `claude --plugin-dir` 헤드리스 스모크 테스트로 경로 치환·Read 성공을 확인한다(`references/workflow-checklist.md` §3 「에이전트 클린 환경 스모크 테스트」)
 - 경로 구조 유효성
 - warning도 실패로 취급할지 여부 (`--strict` 기준)
 

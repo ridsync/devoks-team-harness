@@ -43,7 +43,7 @@ FRD의 AC를 실행 중인 앱에서 실제로 조작해 확인하는 **실행·
 
 ## Phase 1~4 — 시나리오별 실행·대조
 
-상세 절차는 `../skills/verify-acceptance-test/references/scenario-execution.md` (SSOT)를 따른다.
+상세 절차는 `${CLAUDE_PLUGIN_ROOT}/skills/verify-acceptance-test/references/scenario-execution.md` (SSOT)를 따른다.
 
 시나리오 표 각 행에 대해 반복:
 
@@ -59,7 +59,7 @@ FRD의 AC를 실행 중인 앱에서 실제로 조작해 확인하는 **실행·
 
 ## 출력 (검증 리포트)
 
-`../skills/verify-acceptance-test/references/report-template.md` 템플릿 기반으로 아래 구조의 리포트를 최종 메시지로 리턴한다.
+`${CLAUDE_PLUGIN_ROOT}/skills/verify-acceptance-test/references/report-template.md` 템플릿 기반으로 아래 구조의 리포트를 최종 메시지로 리턴한다.
 
 ```markdown
 ## 🧪 실동작 인수 검증 리포트

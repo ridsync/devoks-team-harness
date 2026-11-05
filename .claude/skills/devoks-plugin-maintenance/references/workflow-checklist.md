@@ -63,6 +63,25 @@ agent frontmatter의 `tools:`는 **화이트리스트**다 — 거기 없는 도
   `ctx_batch_execute`/`ctx_execute`를 지시하고 있었다(죽은 코드). 1차 사고 후 재발 방지를
   "reference와 frontmatter 대조"로만 적어둬서, 본문에 직접 박힌 경우가 빠져나갔다.
 
+### 에이전트 클린 환경 스모크 테스트 (에이전트 본문 변경 시 필수, 2026-11-05)
+
+정적 체크(grep·`validate --strict`)는 **설치 후 대상 프로젝트에서 어떻게 동작하는지**를 보지 못한다.
+harness 저장소 안에서 돌리면 cwd 아래에 `plugins/` 원본이 있어서, 경로가 잘못돼도 에이전트가 Glob으로
+찾아내 정상처럼 보인다(dogfooding 마스킹). 그래서 **빈 디렉토리 + 로컬 소스**로 한 번 띄워 본다.
+push 전에도 가능하다 — `--plugin-dir`로 넘긴 로컬 소스가 설치된 캐시보다 먼저 쓰인다(2026-11-05 실증).
+
+적용: 에이전트 **본문**(파일 참조·도구 호출 지시)이 바뀐 경우 필수. frontmatter `description`·`model`만 바뀌면 생략 가능.
+
+```bash
+D=<scratchpad>/agent-smoke && mkdir -p "$D" && cd "$D" && git init -q
+claude --plugin-dir <저장소>/plugins/<plugin> -p "<plugin>:<agent> 서브에이전트를 Agent 도구로 1회 호출해라. \
+본 작업은 하지 말고 다음만 보고하게 한다: (a) 시스템 프롬프트에서 읽으라고 지시된 파일 경로 문자열 원문, \
+(b) 그 경로 그대로 Read한 첫 3줄 또는 에러 원문. Glob/find로 찾지 말 것. 응답은 가공 없이 출력해라."
+```
+
+판정: (a)가 `${CLAUDE_PLUGIN_ROOT}`가 아니라 **로컬 소스 절대 경로로 치환**돼 있고, (b)의 Read가 모든 경로에서 성공해야 PASS다.
+경로가 여러 개면 전부 보고하게 한다. 실제 사고: `docs/plugin-management.md` §12 Pitfall(2026-11-05 에이전트 7종 상대 경로).
+
 ## 4. 특수 케이스
 
 ### 진입점 정책 (command vs skill) — 확정 SSOT, 2026-08-24
@@ -140,6 +159,7 @@ agent frontmatter의 `tools:`는 **화이트리스트**다 — 거기 없는 도
 - [ ] 문서 대상/비대상 판단이 파일별로 남아 있는가
 - [ ] MCP/prefix/permission 대조 지점이 확인되었는가
 - [ ] 에이전트를 추가·수정했으면 `tools:` 화이트리스트를 **에이전트 본문과 references 양쪽**의 도구 호출과 대조했는가
+- [ ] 에이전트 본문이 바뀌었으면 §3 「에이전트 클린 환경 스모크 테스트」(빈 디렉토리 + `--plugin-dir` 헤드리스)를 통과했는가
 - [ ] core sync 영향이 있으면 `.claude/` 사본과 문서까지 함께 봤는가
 - [ ] 신규/변경 skill이면 §7 스킬 품질 체크리스트(8축)를 적용했는가
 
@@ -153,7 +173,7 @@ agent frontmatter의 `tools:`는 **화이트리스트**다 — 거기 없는 도
 | 2 | `references/` 존재 | 정적 — SKILL.md 내 `references/*.md` 언급을 grep, 실제 파일과 대조 | 필수 |
 | 3 | `evals/evals.json` 보유 | 정적 — 파일 존재 확인 | 신규 skill: blocking(없으면 최소 1~2개 작성) / 기존 skill 변경: 권장 |
 | 4 | 의존 MCP/도구 명시 | 정적 — 위 "3. MCP / prefix / permission 점검 포인트" 대조 지점 재사용 | 필수 |
-| 5 | 설치 후 경로 참조 안전성 | 정적 — 플러그인 루트 밖 상대경로(`../`) grep, `${CLAUDE_PLUGIN_ROOT}` 사용 확인 | 필수 |
+| 5 | 설치 후 경로 참조 안전성 | 정적 — 플러그인 루트 밖 상대경로(`../`) grep, `${CLAUDE_PLUGIN_ROOT}` 사용 확인. **에이전트 본문은 상대 경로 자체가 금지**(기준 디렉토리가 주입되지 않아 대상 프로젝트 cwd 기준으로 해석됨) — `` grep -rnE '`(\.\./\|skills/\|references/)' plugins/*/agents/ `` 결과 0건이어야 한다(근거: `docs/plugin-management.md` §12 Pitfall) | 필수 |
 | 6 | 토큰효율성 | 정적(SKILL.md 라인수·인라인 대용량 예시·`references/` 분리 여부) + 동적(축 1 실행 시 토큰/턴수 관찰) | 신규 skill: 필수 / 기존 skill 변경: 권장 |
 | 7 | 인접 스킬 경계 명확성(중복 방지) | 정적 — 아래 "인접 스킬 경계 검사" 절차 | 신규 skill: 필수 / 기존 skill의 description·트리거·범위가 넓어지는 변경: 필수 |
 | 8 | `argument-hint` 정합성 | 정적 — 아래 "argument-hint 정합성" 절차 | 인자 슬롯 있는 스킬: 항상 필수 / 인자 슬롯 없는 스킬: 힌트가 있으면 제거 대상 |

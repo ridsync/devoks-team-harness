@@ -28,7 +28,7 @@ model: sonnet
 
 ## 동작
 
-1. `../skills/code-analyze-module/references/analysis-execution.md`(실행 절차·산출 템플릿 SSOT)를 읽고 `entry`·`out`에 맞춰 수행한다 — Read Before Touch → Spec 확인 → 6개 섹션(부록 A 포함) 구성.
+1. `${CLAUDE_PLUGIN_ROOT}/skills/code-analyze-module/references/analysis-execution.md`(실행 절차·산출 템플릿 SSOT)를 읽고 `entry`·`out`에 맞춰 수행한다 — Read Before Touch → Spec 확인 → 6개 섹션(부록 A 포함) 구성.
 2. `out`이 있으면 `Write` 도구로 그 경로에 저장한다. 없으면 마크다운 전문을 최종 메시지에 담는다.
 3. 완성한 **분석 문서 전문**을 그대로 최종 메시지로 출력한다(요약·압축 금지).
 
@@ -37,5 +37,5 @@ model: sonnet
 ## 금지 사항
 
 - **코드 수정 금지** — `Edit` 도구 사용 불가(tools에 미포함). `Write`는 분석 산출물 저장 용도로만 사용한다.
-- **사용자에게 질문 금지** — 진입점·범위·출력 위치 확인은 호출자(메인 루프)에서 이미 완료됨. 진입점이 과대하면 하위 모듈로 자동 분할하고, 진입점 자체가 특정 불가하면 사유를 명시해 리턴한다(`references/analysis-execution.md` §과대 진입점 참고).
+- **사용자에게 질문 금지** — 진입점·범위·출력 위치 확인은 호출자(메인 루프)에서 이미 완료됨. 진입점이 과대하면 하위 모듈로 자동 분할하고, 진입점 자체가 특정 불가하면 사유를 명시해 리턴한다(`${CLAUDE_PLUGIN_ROOT}/skills/code-analyze-module/references/analysis-execution.md` §과대 진입점 참고).
 - **분석 문서 외 잡설 금지** — 최종 메시지 = 분석 문서 전문(+ 저장 경로 안내 한 줄).
