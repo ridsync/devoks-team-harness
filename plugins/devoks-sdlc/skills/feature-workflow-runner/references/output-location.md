@@ -12,10 +12,12 @@ docs/
 │  ├─ PRD.md · FEATURES.md · TRD.md · WIREFRAMES.md · VISUAL.md
 │  └─ design/        # 디자인 원본 (wireframes.pen · visual.pen)
 ├─ workspace/        # 기능 단위 구현 문서 (FRD·PLAN·검증 산출물 — 아래 "기본 워크스페이스")
+├─ decisions/        # 엔지니어링 결정 기록 ADR-NNN-<slug>.md (단계 무관 — 규칙 SSOT: adr-guide.md)
 └─ <운영 디렉토리>/   # 출시 이후 운영 문서는 필요해질 때 목적별로 추가 (예: runbook/, incidents/)
 ```
 
 - `product/`는 제품 단위로 갱신되는 장기 문서, `workspace/`는 기능 하나의 사고 과정 문서다. 기능 문서를 `product/`에 두거나 PRD를 `workspace/`에 두지 않는다.
+- `decisions/`는 생애 단계와 무관하게 쌓이는 결정 이력이다. 기능 workspace 안의 결정(FRD `DSN`)이 기능 밖으로 파급되면 여기로 승격한다 — 첫 ADR을 쓸 때 만든다(미리 만들지 않는다).
 - 운영 단계 디렉토리는 미리 만들지 않는다 — 실제 문서가 생길 때 목적이 드러나는 이름으로 추가한다.
 
 ## 기본 워크스페이스

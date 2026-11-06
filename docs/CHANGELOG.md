@@ -9,6 +9,28 @@
 
 ---
 
+## **엔지니어링 결정 기록(ADR) 프로세스 도입 — `docs/decisions/` 결정당 파일 하나 + 스킬별 작성 지점 연결** (2026-11-06, `devoks-core` `2.5.0 → 2.6.0`, `devoks-sdlc` `3.17.1 → 3.18.0`)
+- 배경: 결정 기록이 TRD §12 표(TRD를 쓸 때만), PRD §13, FRD `DSN`(기능 workspace 안이라 기능이 끝나면 다시 읽히지 않음), preset `Project Decisions`(이유 없음)에 흩어져 있었다. TRD 단계 밖의 결정(구현 중 라이브러리 교체, 리팩토링 구조 방향, 기능 밖으로 파급되는 DSN)은 남지 않았다. `memory-policy.md`가 "결정의 SSOT = Claude 파일 메모리"로 규정해, 팀 결정이 개인 로컬 메모리로 갈 수도 있었다. 사용자 결정:
+  - (A) ADR 본문은 `docs/decisions/ADR-NNN-<slug>.md` 파일이 SSOT이고, TRD §12는 색인으로만 둔다.
+  - (B) 대상은 "이후 코드 작성 방식을 구속하는 엔지니어링(How) 결정"이고, 정성 신호 4개로 판정한다. 제품·도메인(What)·버그 수정은 제외한다. 회색 지대(기술 구조를 고정하는 도메인 규칙, 규약을 낳는 버그 수정)는 ADR로 올린다. 에이전트는 제안하고, 기록은 사용자 확인 후에 한다.
+- 반영:
+  - devoks-sdlc: `feature-workflow-runner` 1.9.0
+    - `references/adr-guide.md`(대상 판정·위치·형식·제안→확인→기록·비-HITL `proposed`·서브에이전트 기록 금지·불변성/supersede·스킬별 작성 지점)와 `assets/ADR.template.md`(MADR 축약형) 신설.
+    - `output-location.md` 레이아웃에 `docs/decisions/` 추가.
+    - `design-spec.md`·FRD 템플릿 §4.3에 DSN → ADR 승격 규칙 추가.
+  - devoks-sdlc: `product-trd-author` 1.3.0 — §12를 색인(ID·결정·상태·파일)으로 바꾸고, 판단마다 ADR 파일을 쓴다. 구버전 TRD의 본문 표는 보존하고 신규 결정부터 파일로 쓴다.
+  - devoks-sdlc: `code-refactoring` 1.2.0 — 구조 방향 전환이 있으면 승인 메시지에서 ADR을 제안한다.
+  - devoks-sdlc: `feature-plan-executor` 1.7.0 — 구현 중 생긴 결정을 마무리 보고에 "ADR 후보"로 올린다.
+  - devoks-core: `agent-principles` 19 범위 한정, 20 Record Engineering Decisions 신설(스킬 밖 트리거), `memory-policy` "저장소 문서" 계층 추가. 파일 단위 상세는 `plugins/devoks-core/CHANGELOG.md` 2.6.0.
+- 검증: `claude plugin validate --strict`(core·sdlc), 변경 SKILL frontmatter `ruby -ryaml` 파싱, 신규 참조 경로 존재 확인.
+- 의도적 미반영:
+  - `README.md`·`docs/README.ko.md`·`marketplace.json` — 스킬 description·카탈로그 표기 불변.
+  - 별도 ADR 스킬 — 결정은 기존 흐름 안에서 나오므로 작성 지점 연결 + base rule 트리거로 충분하다고 판단(YAGNI).
+  - `docs/decisions/` 색인 파일 — 디렉토리 목록과 frontmatter가 색인이라 drift 방지 차원에서 두지 않음.
+  - preset `Project Decisions` — 선택 결과만 적는 기존 구조 유지(이유가 필요한 선택은 ADR 대상).
+  - evals 동적 실행 — description·트리거 불변이라 생략.
+  - MCP/prefix/permission — 해당 없음.
+
 ## **에이전트 본문의 플러그인 파일 참조를 `${CLAUDE_PLUGIN_ROOT}` 절대 형태로 고정** (2026-11-05, `devoks-sdlc` `3.17.0 → 3.17.1`, `devoks-browser` `2.0.1 → 2.0.2`)
 - 배경: 신규 프로젝트 세션에서 `devoks-sdlc:code-reviewer`가 `skills/code-review/references/` 아래 2개 파일(`review-execution.md`·`report-template.md`)을 찾지 못했다. 파일은 설치 캐시에 있었다. 원인은 에이전트 본문의 `../skills/...` 상대 경로다. 스킬과 달리 서브에이전트에는 기준 디렉토리가 주입되지 않아(공식 sub-agents 문서: "only this system prompt plus basic environment details like the working directory"), 상대 경로가 대상 프로젝트 cwd 기준으로 해석된다. 공식 plugins-reference에 따르면 `${CLAUDE_PLUGIN_ROOT}`는 "Skill, command, and agent content — Anywhere in the Markdown body"에서 치환된다.
 - 반영:

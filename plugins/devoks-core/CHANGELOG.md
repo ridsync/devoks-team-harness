@@ -13,6 +13,15 @@
 
 ---
 
+## 2.6.0 — 2026-11-06
+
+### 복사 산출물
+- `rules/agent-principles.md` › [State & Context] 19 Persist Decisions: 변경 — 메모리 대상을 작업 선호·피드백·맥락으로 한정하고, 팀 엔지니어링 결정은 저장소 문서로 보낸다. 파일 메모리는 사용자 로컬에만 있어 팀원·CI가 읽지 못하는데, 기존 문구대로면 에이전트가 팀 결정을 개인 메모리에 적을 수 있었다
+- `rules/agent-principles.md` › [State & Context] 20 Record Engineering Decisions: 추가 — 이후 코드 작성 방식을 구속하는 엔지니어링 결정(라이브러리·아키텍처·모듈/디렉토리 구조·API 규약·인증·저장/캐싱·테스트 전략)이 되돌리기 비용·모듈 파급·대안 비교·"왜?" 신호 중 하나를 가지면 ADR을 제안하고 사용자 확인 후 `docs/decisions/ADR-NNN-<slug>.md`에 기록. 제품·도메인 정책·버그 수정·기존 패턴 적용은 제외. 스킬 밖 대화에서 내린 결정도 남기기 위한 트리거(형식 SSOT는 devoks-sdlc `adr-guide.md`). 기존 20 Apply Past Feedback은 21로 번호 이동
+- `rules/memory-policy.md` › 머리말·계층별 역할·규칙 1·3: 변경 — "저장소 문서"(ADR·PRD·TRD·FRD) 계층을 팀 공유 결정의 SSOT로 추가하고, 파일 메모리는 작업 선호·피드백·맥락의 SSOT로 한정. 충돌 시 팀 결정은 저장소 문서 우선
+
+> 이미 setup한 프로젝트는 `devoks-core:setup-preset-manage`로 base rules를 갱신한다. 로컬에서 규칙 번호(20)를 인용한 문서가 있으면 21로 맞춘다.
+
 ## 2.5.0 — 2026-11-04
 
 ### 복사 산출물

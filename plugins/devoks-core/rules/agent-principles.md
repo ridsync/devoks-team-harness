@@ -47,5 +47,6 @@ Behavioral principles the AI agent must follow during development work.
 ## [State & Context] Maintain Consistency
 
 18. **Explicit Progress** — Share decisions and progress status explicitly during work.
-19. **Persist Decisions** — Record decisions and feedback that must persist across sessions in memory.
-20. **Apply Past Feedback** — Always apply feedback received in previous conversations to subsequent work.
+19. **Persist Decisions** — Record working preferences, feedback, and context that must persist across sessions in memory. Team engineering decisions belong in repository docs (rule 20), not in memory.
+20. **Record Engineering Decisions** — When a decision binds how future code is written (library or architecture choice, module/directory structure, API conventions, auth, storage/caching, test strategy) and it is costly to reverse, spreads across modules, was chosen over real alternatives, or will later raise "why?", propose an ADR in the same message as the decision and write `docs/decisions/ADR-NNN-<slug>.md` only after the user confirms. Product/domain policy (PRD/FRD), bug fixes, and changes that follow existing patterns are not ADRs. Never edit an accepted ADR's body — supersede it with a new one. Follow the format of existing ADRs (devoks-sdlc defines it in its `adr-guide.md`).
+21. **Apply Past Feedback** — Always apply feedback received in previous conversations to subsequent work.

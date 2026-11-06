@@ -3,7 +3,7 @@ description: "지정된 파일/폴더/모듈을 대상으로 현황 파악 → �
 argument-hint: "target=<파일|폴더|모듈 경로> [goal=<개선 목표>] [constraints=<제외 범위·동작 불변 요구 등>]"
 metadata:
   author: ridsync
-  version: 1.1.0
+  version: 1.2.0
 ---
 
 # code-refactoring — 코드 리팩토링 (구조·책임·계약 품질 개선)
@@ -58,6 +58,8 @@ Phase 0에서 확정된 `target`·`goal`·`constraints`로 아래 절차를 **�
 
 > 사용자 승인 없이 코드를 변경하지 않는다(계획 수립 후 반드시 승인 → 실행).
 
+> 계획에 **구조 방향 전환**(계층 재편·의존 방향 변경·상태관리/패턴 교체처럼 이후 코드 작성 방식을 바꾸는 것)이 있으면 승인 메시지에서 ADR 기록을 함께 제안하고, 승인되면 `docs/decisions/`에 남긴다. 네이밍·분할·정리 같은 국소 개선은 대상이 아니다. 판정·형식: `../feature-workflow-runner/references/adr-guide.md`.
+
 ---
 
 ## Checklist
@@ -66,7 +68,7 @@ Phase 0에서 확정된 `target`·`goal`·`constraints`로 아래 절차를 **�
 - [ ] 대상 파일 및 직접 의존 모듈 탐색 완료
 - [ ] `.claude/CLAUDE.md` 및 `.claude/refs/engineering-principles.md` 기준 위반 항목 도출 (코드 크기, 네이밍, 계층, 사이드이펙트)
 - [ ] `.claude/rules/` 및 `.claude/refs/` 규칙 파일 기준 위반 항목 도출
-- [ ] 수정/생성/삭제 파일 목록 및 개선 방향 작성 후 사용자 승인
+- [ ] 수정/생성/삭제 파일 목록 및 개선 방향 작성 후 사용자 승인 (구조 방향 전환이 있으면 ADR 기록 제안 포함)
 - [ ] Critical: SSOT/Contract/Fail-Fast 위반 수정
 - [ ] High: 1000자 초과 분할, 계층 재배치, 사이드이펙트 분리
 - [ ] Medium: 네이밍 개선, 주석 3종(프로젝트 기본 주석/Rationale/Provider Header) 보완(불필요한 주석 제거 포함)

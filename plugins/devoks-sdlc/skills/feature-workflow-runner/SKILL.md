@@ -3,7 +3,7 @@ description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하�
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.8.2
+  version: 1.9.0
 ---
 
 # feature-workflow-runner
@@ -49,6 +49,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 | `assets/PLAN.template.md` | Phase 2 — PLAN 골격 |
 | `references/ears-acceptance-criteria.md` | Phase 1 — AC를 EARS로 쓸 때 |
 | `references/design-spec.md` | Phase 1 — §4 설계 스펙(컴포넌트/패턴/배치)·`DSN`·능동 제안 절차 |
+| `references/adr-guide.md` | Phase 1·3 — `DSN` ADR 승격·구현 중 결정의 ADR 후보 판정·형식(`assets/ADR.template.md`)·`docs/decisions/` 규칙 |
 | `references/traceability.md` | Phase 2·4 — `traces` 커버리지 검증(누락 0) |
 | `references/task-pr-splitting.md` | Phase 2 — Task 분해·`[P]`·`size`/`test` 부여 기준·PR 분리·의존성 그래프 |
 | `references/progress-tracking.md` | Phase 1·2·3 — FRD/PLAN 승인 전환, PLAN 체크박스/status 갱신, 재개 절차 |

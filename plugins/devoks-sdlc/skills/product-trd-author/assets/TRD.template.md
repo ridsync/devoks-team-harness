@@ -101,9 +101,11 @@ flowchart LR
 | Q-1 | | <B-n / F-n 착수 / 없음> |
 
 ## 12. 결정 기록 (ADR) & 변경 이력
-| ID | 결정 | 대안 | 이유 | 되돌리는 조건 | 상태 |
-|---|---|---|---|---|---|
-| ADR-1 | | | | | accepted |
+> 이 TRD가 의존하는 ADR의 **색인**이다. 본문(Context·Decision·Rationale·Considered Alternatives·Consequences·Revisit Conditions)은 `docs/decisions/ADR-NNN-<slug>.md`에만 쓴다.
+
+| ID | 결정 | 상태 | 파일 |
+|---|---|---|---|
+| ADR-001 | | proposed / accepted | `docs/decisions/ADR-001-<slug>.md` |
 
 | 버전 | 날짜 | 변경 | 사유 |
 |---|---|---|---|

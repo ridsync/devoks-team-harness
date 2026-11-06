@@ -4,7 +4,7 @@ description: "제품 PRD(PRD.md·FEATURES.md)를 받아 여러 기능이 함께 
 argument-hint: "[src=<PRD 경로|TRD 입력 양식 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.2.0
+  version: 1.3.0
 ---
 
 # product-trd-author — 제품 TRD · 기술 구조 작성/갱신
@@ -71,7 +71,7 @@ PRD.md + FEATURES.md ─▶ [이 스킬] TRD.md + FEATURES.md 기반 구역(B-n)
 - PRD의 **모든 NFR**(불변식 포함)을 §6에 보장 위치·검증 레벨과 함께 옮기고, **모든 계측 FR**을 §7 이벤트로 설계한다.
 - §4는 둘 이상의 F-n이 쓰는 엔티티만. 판단 기준은 "이 결정이 바뀌면 여러 기능이 같이 바뀌는가?"(가이드 §1).
 - 사용자 화면이 있으면 §2.1 UI 기반을 채운다(방식만 — 화면·컴포넌트 목록·토큰 값 금지, 가이드 §3-5). 대상 플랫폼은 확정 범위·계획으로 나누고, 컴포넌트 층·패키지 경계·공유 전략은 가이드 §3-6을 따른다.
-- 주요 판단은 §12 ADR로 남긴다(결정·대안·이유·되돌리는 조건).
+- 주요 판단은 판단마다 `docs/decisions/ADR-NNN-<slug>.md` 파일로 남기고(확인된 것은 `accepted`, 비-HITL 제안값은 `proposed`), §12에는 색인 행(ID·결정·상태·파일)만 둔다. 이미 같은 결정을 다룬 ADR이 있으면 새로 쓰지 않고 색인에 연결한다. 형식·대상 판정·번호 규칙: `../feature-workflow-runner/references/adr-guide.md`.
 - `미확정`·`제안`은 §11에 모은다(`ID | 질문 | 막는 것`).
 
 ### 3. 기반 작업 → FEATURES.md 기반 구역
@@ -85,7 +85,7 @@ PRD.md + FEATURES.md ─▶ [이 스킬] TRD.md + FEATURES.md 기반 구역(B-n)
 
 ## 갱신 모드
 
-PRD 버전이 TRD의 `prd_version`보다 높거나 기술 결정을 바꾸자는 요청이 오면, 변경 목록(섹션·ID·연쇄 영향)을 만들어 **확인 후** 쓴다(비-HITL이면 보고만). ADR은 지우지 않고 새 ADR + `superseded by` 표시. 영향받는 FRD는 "재검토 필요"로 보고한다. 상세: 가이드 §8.
+PRD 버전이 TRD의 `prd_version`보다 높거나 기술 결정을 바꾸자는 요청이 오면, 변경 목록(섹션·ID·연쇄 영향)을 만들어 **확인 후** 쓴다(비-HITL이면 보고만). ADR은 지우지 않고 새 ADR 파일 + 기존 파일 `status: superseded`·`superseded_by` 표시(adr-guide §5). 영향받는 FRD는 "재검토 필요"로 보고한다. 상세: 가이드 §8.
 
 ## 완료 기준
 
