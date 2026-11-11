@@ -3,7 +3,7 @@ description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)�
 argument-hint: "[frd=<FRD.md 경로> (default: 최근 FRD)] [out=<디렉터리> (default: FRD 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.4.0
+  version: 1.5.0
 ---
 
 # plan-author — PLAN 작성 (Phase 2)
@@ -28,7 +28,7 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태). → `../feature-workflow-runner/references/progress-tracking.md`
 1. **골격 로드** — `../feature-workflow-runner/assets/PLAN.template.md` 형식을 따른다.
 2. **Approach·Resource** — §1 구현 방식·PR 분리 방침, §2 Resource Check(FRD §6에서 가져옴).
-3. **Task 분해** — 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면)`[P]`, `size`(S/M/L — 실행 라우팅 신호, 애매하면 M), `test`(required/skip — 테스트 필요 여부, 애매하면 required), `file:`, `traces:` 부여. `L`은 분해 재검토 신호 — 원칙적으로 더 쪼개고, 못 쪼개면 §1에 사유 1줄을 **스펙 닫힘 축/판단 축 중 어느 것인지 밝혀** 남긴다(실행 라우팅이 이 기록을 읽는다). `test`는 `code-implementer`가 실행 중 스스로 재판단하지 않고 그대로 따르는 값이므로 이 단계에서 확정한다. → `../feature-workflow-runner/references/task-pr-splitting.md`
+3. **Task 분해** — 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면)`[P]`, `size`(S/M/L — 실행 라우팅 신호, 애매하면 M), `test`(required/skip — 테스트 필요 여부, 애매하면 required), `file:`, `traces:` 부여. `L`은 분해 재검토 신호 — 원칙적으로 더 쪼개고, 못 쪼개면 §1에 사유 1줄을 **스펙 닫힘 축/판단 축 중 어느 것인지 밝혀** 남긴다(실행 라우팅이 이 기록을 읽는다). `test`는 `code-implementer`가 실행 중 스스로 재판단하지 않고 그대로 따르는 값이므로 이 단계에서 확정한다. `file:`은 대상 프로젝트의 `.claude/rules/project-convention.md` Project Decisions 구조 슬롯(S1~S3)을 읽고 세그먼트 파일 단위로 정하며, 공용 자산 신설·승격은 별도 Task로 나눈다. → `../feature-workflow-runner/references/task-pr-splitting.md`
 4. **PR 그룹핑** — 기본값 PR 1개. FRD의 메모는 참고일 뿐, `task-pr-splitting.md` 기준으로 이 단계에서 직접 재판단한다(애매하면 AskUserQuestion). 분리 시 §1에 근거 1줄. → `../feature-workflow-runner/references/task-pr-splitting.md`
 5. **그래프·DoD** — §4 mermaid 의존성 그래프(사이클 금지), §5 Definition of Done.
 6. **커버리지 검증(누락 0)** — FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검. → `../feature-workflow-runner/references/traceability.md` 의 comm 스크립트.

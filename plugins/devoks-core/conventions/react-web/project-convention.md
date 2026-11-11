@@ -75,6 +75,16 @@ lint 도구는 하나만 둔다. 둘을 겹치면 같은 위반이 중복 보고
 - **Functions:** ≤50 lines (target), **100 lines max** (hard limit).
 - **Files:** ≤500 lines (target), **1000 lines max** (hard limit).
 
+### Module Structure & Shared Placement
+
+파일 묶음·하위 디렉터리·배치 단계·공개면·승격/강등의 판정 기준은 `.claude/rules/agent-principles.md`의 [Structure]와 DRY가 SSOT다. 이 절은 그 기준을 이 스택에 적용할 때의 고려사항만 적고, 실제 디렉터리·세그먼트·경로는 **Project Decisions의 구조 슬롯(S1~S8)**에 확정한다.
+
+- **프레임워크 단위는 파일당 1개:** 컴포넌트·커스텀 훅은 파일당 공개 1개(default export 규칙 유지). 그 컴포넌트만 쓰는 하위 컴포넌트는 같은 파일에 export 없이 둔다.
+- **그 밖의 코드는 세그먼트 파일로 묶는다:** 같은 데이터 소스·규칙·변경 이유를 공유하는 함수는 모듈의 세그먼트 파일 하나에 둔다(예: `product.api.ts`·`product.store.ts`·`product.schema.ts`). 함수마다 파일을 만들지 않는다. 세그먼트 표기와 목록은 S2.
+- **SSR 실행 경계(SSR 프로젝트만):** `"use client"`·`"use server"`·`import "server-only"`는 파일 단위로 걸린다. 경계가 갈리면 같은 기능이라도 파일을 나눈다 — 단일 함수 파일을 허용하는 사유다.
+- **barrel(`index.ts`):** re-export 파일은 tree-shaking·개발 서버 성능을 떨어뜨리고 순환 import의 통로가 되기 쉽다. 둘 위치는 S4에서 정하고, 모듈 안에서 자기 `index.ts`를 import하지 않는다. 순환 검출 규칙(Biome `noImportCycles` / ESLint `import/no-cycle`)은 S5에 적는다.
+- **테스트·픽스처:** 테스트는 세그먼트 파일 단위로 colocated. 테스트 전용 픽스처·헬퍼는 운영 소스 디렉터리 밖(S8)에 두고 공개 API로 내보내지 않는다.
+
 ### Import Order
 
 ```typescript
@@ -596,7 +606,6 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 
 - **Rendering Mode:** [CSR(Vite) / SSR(Next.js) 중 택1 — 결정 후 반대쪽 예시 코드 제거]
 - **Lint/Format:** [Biome 단독 / ESLint + Prettier 중 택1 — 고른 이유("Lint/Format 선택" 기준) 한 줄]
-- **Directory Policy:** [feature-first / layer-first / route-first]
 - **State SSOT:** [예: Zustand store는 `src/store/`, Context Provider 순서는 `src/App.tsx` 순서를 따름]
 - **API Layer SSOT:** [예: `src/api/`, axios 인스턴스는 `src/api/apiClient.ts`]
 - **API 응답 검증 수준:** [예: 결제·권한 응답만 zod 파싱, 나머지는 DTO 타입만]
@@ -605,3 +614,14 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 - **접근성 기준·게이트:** [예: WCAG 2.1 AA — 신규 화면은 axe 위반 0건 / 기존 화면은 기준선 고정 후 신규 위반만 실패. TRD §2.1 접근성 보장과 일치시킨다]
 - **Routing SSOT:** [예: `src/routes.tsx`(CSR) 또는 `app/`(SSR)]
 - **Sensitive Files:** [예: `.env*`, `*.pem`]
+
+**구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.
+
+- **S1 Directory Policy:** [분할 방식(feature-first / layer-first / route-first / 혼합) + 최상위 디렉터리 맵. 예: `src/app/`(라우트) · `src/features/<domain>/` · `src/shared/`]
+- **S2 Module Segment:** [역할 표기(파일 접미사 / 하위 디렉터리 / 이름만) + 세그먼트 목록 + 하위 디렉터리 임계. 예: `<domain>.api.ts`·`<domain>.store.ts`·`<domain>.schema.ts`·`<Name>.tsx`, 모듈 파일이 8개를 넘으면 하위 디렉터리]
+- **S3 Shared Placement:** [배치 단계별 실제 경로 — 이 순서가 기존 자산 탐색 순서. 예: 모듈 `src/features/<domain>/` → 앱 범용 `src/shared/ui`·`src/shared/lib` → 앱 도메인 `src/entities/<domain>/` → 워크스페이스 `packages/shared`(멀티 패키지일 때만)]
+- **S4 Public API:** [모듈 공개면. 예: 패키지 루트 `index.ts`만 / 모듈별 `index.ts` / barrel 없이 파일 직접 import]
+- **S5 Dependency Direction:** [허용 방향 + 강제 도구. 예: shared → features → app, features 간 import 금지, Biome `noImportCycles` 활성화]
+- **S6 Promotion:** [`기본`(agent-principles DRY) 또는 다르게 정한 기준과 이유]
+- **S7 Shared Catalog:** [공용 자산을 찾는 장치. 예: Storybook / 개발용 컴포넌트 확인 화면 / 없음]
+- **S8 Test-only Code:** [테스트 전용 픽스처·헬퍼 위치. 예: `src/test/`]

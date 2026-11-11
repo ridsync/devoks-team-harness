@@ -47,6 +47,7 @@ SessionStart 훅(`hooks/check-setup-state.sh`)은 위 산출물이 원본과 달
 - legacy convention이 bundled copy 잔재인지, 실제 프로젝트 커스터마이징인지 추정
 - devoks-core 업데이트 후 base rules/refs 7종 + 스택 한정 refs 갱신 (아래 "base 갱신" 절)
 - devoks-core·devoks-rn 업데이트 후 `~/.devoks` 스크립트 갱신 (아래 "~/.devoks 스크립트 갱신" 절)
+- Project Decisions 구조 슬롯(S1~S8)이 없거나 비어 있는 기존 convention의 슬롯 확정 (5단계)
 
 ---
 
@@ -138,6 +139,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - preset 전환 시 스택 한정 refs도 함께 맞춘다 — 새 preset의 스택 한정 refs는 복사하고 스냅샷(`.claude/.devoks-base/refs/`)도 기록한다. 이전 preset 전용 ref(예: `react-web` → `react-native` 전환 시 `web-security.md`)는 **자동 삭제하지 않고** 삭제 여부를 확인받는다(로컬에서 계속 참고할 수 있다). 삭제하면 스냅샷도 함께 지운다
 - preset 전환 후에는 `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files도 drift 여부를 점검
 - `Custom` 흐름은 가장 가까운 preset + 사용자 보정값으로 처리
+- 반영 결과 Project Decisions에 구조 슬롯(S1~S8)이 새로 생기거나 placeholder로 남아 있으면, `${CLAUDE_PLUGIN_ROOT}/commands/setup-project-convention.md` 7단계(구조 슬롯 확정)를 같은 절차로 이어서 수행한다 — 기존 프로젝트이므로 코드베이스 실측이 1차 입력이고, 이미 convention 다른 절(Directory Policy·SSOT 경로 등)에 적힌 프로젝트 결정은 슬롯으로 옮겨 적되 중복으로 남기지 않는다
 
 ### 6. 마무리 리포트
 
@@ -148,6 +150,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - preset이 최신 상태였는지, 업스트림 변경으로 갱신됐는지 (`presetHash` 일치 여부)
 - 유지한 로컬 커스터마이징
 - 추가로 프로젝트 실제 값으로 바꿔야 할 preset 예시 항목 (Stack, Project Decisions 등)
+- `미확정`으로 남은 구조 슬롯과 슬롯 확정 중 나온 관찰 목록(후속 리팩토링 후보)
 - 필요 시 다음 액션 (`CLAUDE.md` 보강, 테스트 스택 명시, UI guideline SSOT 연결 등)
 
 ---

@@ -43,6 +43,15 @@
 - **Functions:** ≤50 lines (target), **100 lines max** (hard limit).
 - **Files:** ≤500 lines (target), **1000 lines max** (hard limit).
 
+### Module Structure & Shared Placement
+
+파일 묶음·하위 디렉터리·배치 단계·공개면·승격/강등의 판정 기준은 `.claude/rules/agent-principles.md`의 [Structure]와 DRY가 SSOT다. 이 절은 그 기준을 이 스택에 적용할 때의 고려사항만 적고, 실제 디렉터리·세그먼트·경로는 **Project Decisions의 구조 슬롯(S1~S8)**에 확정한다. 아래 Package Structure는 제네릭 예시다.
+
+- **역할 파일 = 세그먼트:** `router.py`·`service.py`·`schemas.py`처럼 역할 파일 하나가 세그먼트다. 함수마다 모듈 파일을 만들지 않는다. 한 세그먼트가 커지면 같은 이름의 하위 패키지(`service/`)로 나눈다(임계는 S2).
+- **`__init__.py` re-export는 barrel이다:** 패키지 공개면을 `__init__.py`로 모을지는 S4에서 정한다. 같은 패키지 안에서 자기 `__init__`을 거쳐 import하지 않는다 — 순환 import는 런타임 `ImportError`로 드러난다.
+- **도메인 간 공유:** 다른 도메인의 로직은 그 도메인 service의 공개 함수로만 쓰고, 여러 도메인이 공유하는 설정·DB·보안만 `core/`(앱 범용 단계)에 둔다.
+- **테스트·픽스처:** 테스트는 `tests/<domain>/` 미러 구조, 공용 픽스처는 `conftest.py`(S8). 테스트 전용 코드를 `app/`에 두지 않는다.
+
 ### Package Structure (Domain/module-first)
 
 ```
@@ -440,3 +449,14 @@ async def get_db_session() -> AsyncIterator[AsyncSession]:
 - **Auth 전략:** [예: JWT Bearer / 세션 쿠키 중 택1]
 - **비동기 워커:** [예: Celery + Redis 사용 여부, 미사용이면 "미사용"]
 - **Sensitive Files:** [예: `.env`, `*.pem`, `alembic.ini`의 DB 접속 정보]
+
+**구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.
+
+- **S1 Directory Policy:** [분할 방식(기본 domain-first — 위 Package Structure, 다르게 가면 이유 한 줄) + 최상위 패키지 맵. 예: `app/core/` · `app/<domain>/` · `tests/`]
+- **S2 Module Segment:** [역할 파일 목록 + 하위 패키지 임계. 예: `router.py`·`schemas.py`·`models.py`·`service.py`·`dependencies.py`·`exceptions.py`, 한 파일이 500줄을 넘으면 같은 이름의 하위 패키지]
+- **S3 Shared Placement:** [배치 단계별 실제 위치 — 이 순서가 기존 자산 탐색 순서. 예: 도메인 패키지 → 앱 범용 `app/core/` → 공유 라이브러리 패키지(여러 서비스가 쓸 때만)]
+- **S4 Public API:** [패키지 공개면. 예: 도메인 간에는 `service.py`의 공개 함수만 / `__init__.py` re-export 사용 여부]
+- **S5 Dependency Direction:** [허용 방향 + 강제 수단. 예: router → service → models, `core`는 도메인을 import하지 않음]
+- **S6 Promotion:** [`기본`(agent-principles DRY) 또는 다르게 정한 기준과 이유]
+- **S7 Shared Catalog:** [공용 자산을 찾는 장치. 예: `app/core/` 모듈 docstring 목록 / 없음]
+- **S8 Test-only Code:** [테스트 전용 픽스처·헬퍼 위치. 예: `tests/conftest.py`, `tests/factories/`]

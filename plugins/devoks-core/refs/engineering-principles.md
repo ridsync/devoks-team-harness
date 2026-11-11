@@ -43,6 +43,8 @@ Shared development principles for individuals, teams, and AI agents.
 16. **Tool-First Architecture** — Prefer tool calls and structured interfaces over prompt persuasion to increase reliability and control.
 17. **Explicit Dependencies** — Declare all dependencies (libraries, services, env vars). Never hide them so the environment is reproducible.
 
+Where code lives and when to share or keep it separate (file grouping, placement levels, public surface, promotion/demotion, DRY by knowledge) are defined once in `.claude/rules/agent-principles.md` — [Structure] and DRY. The project's concrete layout is in the structure slots (S1–S8) of `.claude/rules/project-convention.md` Project Decisions.
+
 ---
 
 ## [Security] Limit Access and Blast Radius

@@ -35,6 +35,15 @@
 - **Functions:** ≤50 lines (target), **100 lines max** (hard limit).
 - **Files:** ≤500 lines (target), **1000 lines max** (hard limit).
 
+### Module Structure & Shared Placement
+
+파일 묶음·하위 디렉터리·배치 단계·공개면·승격/강등의 판정 기준은 `.claude/rules/agent-principles.md`의 [Structure]와 DRY가 SSOT다. 이 절은 그 기준을 이 스택에 적용할 때의 고려사항만 적고, 실제 디렉터리·세그먼트·경로는 **Project Decisions의 구조 슬롯(S1~S8)**에 확정한다. 아래 Package Structure는 제네릭 예시다.
+
+- **Gradle 모듈이 가장 강한 경계:** 모듈 간 공개면은 `internal` 가시성과 `implementation(project(...))` 의존 선언으로 제한한다. 단일 모듈 앱이면 feature 패키지가 모듈 경계 역할을 한다(S1·S4).
+- **파일 묶음:** Kotlin 파일은 여러 top-level 함수·작은 타입을 담을 수 있다. 같은 이유로 바뀌는 확장 함수·매퍼·작은 sealed 계층은 한 파일에 묶고, 공개 클래스(ViewModel·Repository·UseCase)는 파일당 1개로 둔다.
+- **세그먼트 = 패키지 하위 디렉터리:** 예시의 `data/`·`domain/`·`di/`·`ui/`가 세그먼트다. 실제 목록과 의존 방향(예: ui → domain ← data)은 S2·S5.
+- **테스트·픽스처:** 테스트 전용 픽스처·헬퍼는 `src/test`·`src/androidTest` 소스셋(또는 S8에서 정한 공용 테스트 모듈)에 두고 main 소스셋에 섞지 않는다.
+
 ### Package Structure
 
 ```
@@ -275,3 +284,14 @@ object ProductModule { /* ... */ }
 - **Navigation SSOT:** [예: `app/src/main/java/.../navigation/`]
 - **Storage SSOT:** [예: `app/src/main/java/.../data/`]
 - **Sensitive Files:** [예: `keystore.properties`, `*.jks`, `local.properties`]
+
+**구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.
+
+- **S1 Directory Policy:** [분할 방식(feature-first / layer-first / 혼합) + Gradle 모듈·최상위 패키지 맵. 예: `:app` · `:feature:<name>` · `:core:<name>`]
+- **S2 Module Segment:** [세그먼트 목록 + 하위 패키지 임계. 예: `data/`·`domain/`·`di/`·`ui/`]
+- **S3 Shared Placement:** [배치 단계별 실제 위치 — 이 순서가 기존 자산 탐색 순서. 예: feature 패키지 → 앱 범용 `:core:ui`·`:core:common` → 앱 도메인 `:core:domain`]
+- **S4 Public API:** [모듈 공개면. 예: Gradle 모듈 간에는 `public` API만, 모듈 내부 구현은 `internal`]
+- **S5 Dependency Direction:** [허용 방향 + 강제 수단. 예: feature → core, feature 간 의존 금지(Gradle 의존 선언으로 강제)]
+- **S6 Promotion:** [`기본`(agent-principles DRY) 또는 다르게 정한 기준과 이유]
+- **S7 Shared Catalog:** [공용 자산을 찾는 장치. 예: Compose Preview 모음 / 없음]
+- **S8 Test-only Code:** [테스트 전용 픽스처·헬퍼 위치. 예: 각 모듈 `src/test`, 공용 `:core:testing`]

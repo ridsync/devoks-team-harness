@@ -213,7 +213,7 @@ flowchart TD
 | 커맨드 | 설명 |
 |--------|------|
 | `/devoks-core:setup-mcp` | 권장 MCP 서버·의존성 설치/점검 |
-| `/devoks-core:setup-project-convention` | base rules/refs 적용 후 stack preset 기반 `project-convention.md` 구성 |
+| `/devoks-core:setup-project-convention` | base rules/refs 적용 후 stack preset 기반 `project-convention.md` 구성 + 프로젝트 구조 슬롯(디렉터리·세그먼트·공용 위치) 확정 |
 
 ### devoks-git
 

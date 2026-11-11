@@ -13,6 +13,24 @@
 
 ---
 
+## 2.7.0 — 2026-11-11
+
+### 복사 산출물
+- `rules/agent-principles.md` › [Philosophy] DRY: 변경 — "2곳 이상이면 추출"을 **지식 기준**으로 정정. 사실·규칙(도메인 값·분류·스키마·계산 규칙·문구·토큰·경로)은 첫 사용부터 1곳, 함께 바뀌어야 하는 동일 로직은 2번째에 추출, 차이를 플래그로 흡수해야 하는 유사 코드는 3번째 사례로 변하는 축이 보일 때까지 복제 유지, 호출처별 분기가 늘면 인라인으로 되돌림. 기존 문구는 비슷한 코드까지 즉시 추출하게 해 잘못된 추상화를 부를 수 있었다
+- `rules/agent-principles.md` › [Philosophy] Reuse-First Ladder (2): 변경 — 기존 자산 탐색을 project convention의 Shared Placement 슬롯 단계 순서(가까운 단계부터)로 하도록 추가. "기존 것을 써라"만 있고 어디를 찾을지가 없어 근처만 찾고 새로 만드는 일이 있었다
+- `rules/agent-principles.md` › [Structure] Module Structure & Shared Placement: 추가 — 스택·구조 무관 판정 기준 6개(파일 = 함께 바뀌는 것·단일 함수 파일 허용 사유, 응집 기준 하위 디렉터리, 사용처의 가장 가까운 공통 조상 배치, 범용 공용 계층의 업무 무지·단방향 의존, 모듈 경계당 공개면 1개·순환 0, 공용화 = 계약·강등). 구체값은 Project Decisions 구조 슬롯(S1~S8)이 갖고, 미확정이면 기준만 적용하고 구조를 지어내지 않는다. 구현·설계 경로(code-implementer·design-spec)가 읽는 곳이 `.claude/rules/`라 refs가 아닌 rules에 둔다
+- `refs/engineering-principles.md` › [Structure & Design]: 추가 — 배치·공용화 기준은 agent-principles [Structure]·DRY와 구조 슬롯을 따른다는 포인터 1줄(내용 중복 없음)
+- `refs/code-review.md` › Code Quality: 변경 — "DRY를 따르고 있는가?"를 지식 기준 DRY 판정으로 바꾸고, 성급한 공용화(사용처 1곳·호출처별 플래그)와 구조 슬롯 위치·기존 공용 자산 중복 신설 체크 2항목 추가. 기존 체크는 중복 신설 방향만 봤다
+- `conventions/{react-web,react-native,android,ios,python-fastapi}/project-convention.md` › Coding Style › Module Structure & Shared Placement: 추가 — 판정 기준 SSOT(agent-principles) 포인터 + 스택별 적용 고려사항만(web: 프레임워크 단위·세그먼트 파일·SSR 지시어 경계·barrel·테스트 픽스처 / RN: 플랫폼 파일·`app/` 라우트 / android: Gradle 모듈·`internal`·Kotlin 파일 묶음 / ios: target·access control / python: 역할 파일·`__init__.py` re-export·순환 `ImportError`). android·ios·python의 기존 구조 절은 "제네릭 예시"로 명시. 특정 프로젝트 구조를 규칙으로 고정하지 않기 위해 구체값은 슬롯으로 넘긴다
+- `conventions/{5종}/project-convention.md` › Project Decisions: 추가 — 구조 슬롯 S1~S8(Directory Policy·Module Segment·Shared Placement·Public API·Dependency Direction·Promotion·Shared Catalog·Test-only Code), 스택별 예시 placeholder. `미확정` 허용
+- `conventions/react-web/project-convention.md` › Project Decisions: 삭제 — `Directory Policy` 한 줄(S1로 대체)
+
+### 스킬·커맨드
+- `commands/setup-project-convention.md` › 7. 구조 슬롯 확정: 추가 — 파일 적용 직후 코드베이스 실측(기존)·TRD §8·ADR·preset 예시(신규)로 S1~S8 초안 + 관찰 목록을 만들어 한 메시지로 확인, 미확정 허용, 구조 결정(S1·S4·S5)은 ADR 여부 함께 질문. 기존 7단계(후속 안내)는 8로 이동. 3단계 적용 범위에 6번 항목 추가
+- `skills/setup-preset-manage` › 지원 작업·5·6단계: 추가 — 반영 결과 구조 슬롯이 새로 생기거나 비어 있으면 setup 7단계를 이어서 수행(기존 convention의 Directory Policy·SSOT 경로는 슬롯으로 옮기고 중복으로 남기지 않음), 리포트에 미확정 슬롯·관찰 목록
+
+> 이미 setup한 프로젝트: base rules는 `devoks-core:setup-preset-manage`의 "base 갱신"으로, preset 절·슬롯은 같은 스킬의 선택 반영(Coding Style·Project Decisions)으로 가져온 뒤 슬롯 확정 절차를 진행한다. 이미 프로젝트 고유 모듈 규칙을 적어 둔 convention은 그 내용을 슬롯 값으로 옮기면 되고, 새 절을 거부해도 base rule의 기준은 적용된다.
+
 ## 2.6.0 — 2026-11-06
 
 ### 복사 산출물

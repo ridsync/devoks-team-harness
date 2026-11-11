@@ -67,6 +67,7 @@ base rules/refs 와 선택한 stack preset을 프로젝트에 적용한다.
 3. `.claude/refs/` base refs 복사/갱신 + 선택한 preset의 스택 한정 refs 복사(있을 때만 — 어떤 파일인지 이름을 밝힌다)
 4. 선택한 preset을 `.claude/rules/project-convention.md`로 생성 또는 교체
 5. `.claude/project-convention.json` 생성/갱신
+6. Project Decisions 구조 슬롯(S1~S8) 확정 — 코드베이스 실측·TRD 기반 초안을 한 번에 확인 (7단계)
 
 적용 모드는 아래 중 하나로 제안한다.
 
@@ -152,7 +153,19 @@ SessionStart 훅이 판정하는 기준이다. 훅은 이 값이 설치 버전�
 이 필드를 추가하려고 기존 프로젝트를 재설정할 필요는 없다. 경고가 나오면 이 커맨드를 다시 돌리지 않고
 `devoks-core:setup-preset-manage`의 "base 갱신"으로 base 7종만 교체한다(preset 재선택 불필요).
 
-### 7. 후속 안내
+### 7. 구조 슬롯 확정
+
+파일 적용 직후 `.claude/rules/project-convention.md` Project Decisions의 **구조 슬롯(S1~S8)**을 프로젝트 구조에 맞게 채운다. 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY이고, 슬롯 값은 프로젝트가 고른다 — preset의 슬롯 예시나 다른 프로젝트의 구조를 그대로 옮겨 적지 않는다.
+
+1. **입력 수집**
+   - 기존 코드가 있으면 실측한다: 최상위 디렉터리 맵, 모듈 안 파일 표기 관례(접미사·하위 디렉터리)와 그 빈도, `index`·`__init__` re-export 유무, 공용 디렉터리 후보와 그쪽으로 향하는 import 방향, 테스트·픽스처 위치, lint 도구의 순환 import 규칙 설정 여부.
+   - TRD가 있으면 §8 개발 기반(저장소 구조)과 구조 관련 ADR(`docs/decisions/`)을 읽어 S1·S3(특히 워크스페이스 단계)의 근거로 쓴다.
+   - 신규 프로젝트면 preset 슬롯 예시를 출발점으로 쓴다.
+2. **슬롯별 초안** — 기존 코드는 현행을 사실로 적되 감지값은 제안일 뿐 SSOT로 단정하지 않는다. 기준과 어긋나는 곳(예: 도메인 규칙이 앱 범용 유틸에 있음, 함수마다 파일)은 슬롯 값에 섞지 말고 **관찰 목록**으로 따로 적는다. 이 단계에서 코드를 옮기지 않는다.
+3. **한 메시지로 확인** — S1~S8 초안 표와 관찰 목록을 보여주고 한 번에 확인받는다. 답이 없거나 아직 정할 수 없는 슬롯은 `미확정`으로 적는다. 에이전트는 미확정 슬롯에 대해 기준만 적용하고 구조를 지어내지 않으며, 첫 기능 구현 때 다시 확정을 제안한다.
+4. **반영** — 확인된 값으로 Project Decisions의 슬롯 placeholder를 교체한다. 되돌리기 비용이 큰 구조 결정(S1·S4·S5)은 `agent-principles.md` 규칙 20에 따라 ADR 기록 여부를 같은 메시지에서 묻는다. 관찰 목록은 convention에 넣지 않고 후속 리팩토링 후보로 리포트에만 남긴다.
+
+### 8. 후속 안내
 
 적용 후 아래를 짧게 안내한다.
 
@@ -160,6 +173,7 @@ SessionStart 훅이 판정하는 기준이다. 훅은 이 값이 설치 버전�
 - preset 전환 / diff / selective apply, devoks-core 업데이트 후 base rules/refs 갱신은 `devoks-core:setup-preset-manage` 흐름으로 수행
 - `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files가 비어 있으면 함께 정리 권장
 - preset은 starter이므로 placeholder와 pitfall 섹션을 프로젝트 실정에 맞게 채워야 함
+- `미확정`으로 남긴 구조 슬롯과 7단계 관찰 목록(후속 리팩토링 후보)
 
 ---
 

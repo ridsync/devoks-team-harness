@@ -213,7 +213,7 @@ flowchart TD
 | Command | Description |
 |---------|-------------|
 | `/devoks-core:setup-mcp` | Install/check recommended MCP servers and dependencies |
-| `/devoks-core:setup-project-convention` | Apply base rules/refs and choose a stack preset for `project-convention.md` |
+| `/devoks-core:setup-project-convention` | Apply base rules/refs, choose a stack preset for `project-convention.md`, and confirm the project structure slots (directories, segments, shared placement) |
 
 ### devoks-git
 

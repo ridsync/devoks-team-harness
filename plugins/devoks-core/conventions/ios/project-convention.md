@@ -34,6 +34,15 @@
 - **Functions:** ≤50 lines (target), **100 lines max** (hard limit).
 - **Files:** ≤500 lines (target), **1000 lines max** (hard limit).
 
+### Module Structure & Shared Placement
+
+파일 묶음·하위 디렉터리·배치 단계·공개면·승격/강등의 판정 기준은 `.claude/rules/agent-principles.md`의 [Structure]와 DRY가 SSOT다. 이 절은 그 기준을 이 스택에 적용할 때의 고려사항만 적고, 실제 디렉터리·세그먼트·경로는 **Project Decisions의 구조 슬롯(S1~S8)**에 확정한다. 아래 File Organization은 제네릭 예시다.
+
+- **target/module이 가장 강한 경계:** SPM target(또는 framework)이 모듈 경계이고, 공개면은 access control(`public`/`internal`)로 제한한다(S1·S4).
+- **파일 묶음:** 공개 타입은 파일당 1개. 그 타입만 쓰는 보조 타입·`private` extension은 같은 파일에 둔다. 함수마다 파일을 만들지 않는다.
+- **세그먼트:** 예시의 model·repository·view model·view가 기능 단위 세그먼트다. 실제 목록과 표기는 S2.
+- **테스트·픽스처:** 테스트 전용 픽스처·헬퍼는 테스트 target(또는 S8에서 정한 공용 테스트 target)에 두고 앱 target에 섞지 않는다.
+
 ### File Organization
 
 ```
@@ -278,3 +287,14 @@ func shouldReorderStock(remainingQty: Int, thresholdQty: Int) throws -> Bool {
 - **Persistence SSOT:** [예: `Sources/App/Data/`]
 - **Design Guideline SSOT:** [예: `docs/DESIGN.md`]
 - **Sensitive Files:** [예: `GoogleService-Info.plist`, `*.mobileprovision`, signing config]
+
+**구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.
+
+- **S1 Directory Policy:** [분할 방식(feature-first / layer-first / 혼합) + target·최상위 디렉터리 맵. 예: `Sources/App/Feature/<Name>/` · `Sources/App/Shared/`]
+- **S2 Module Segment:** [세그먼트 표기와 목록 + 하위 디렉터리 임계. 예: `<Name>.swift`(model)·`<Name>Repository.swift`·`<Name>ViewModel.swift`·`<Name>View.swift`]
+- **S3 Shared Placement:** [배치 단계별 실제 위치 — 이 순서가 기존 자산 탐색 순서. 예: feature 디렉터리 → 앱 범용 `Shared/UI`·`Shared/Util` → 앱 도메인 `Shared/Domain` → 별도 SPM package(여러 앱이 쓸 때만)]
+- **S4 Public API:** [모듈 공개면. 예: package/target 간에는 `public`만, 나머지는 `internal`]
+- **S5 Dependency Direction:** [허용 방향 + 강제 수단. 예: Shared → Feature → App, feature 간 참조 금지(target 의존으로 강제)]
+- **S6 Promotion:** [`기본`(agent-principles DRY) 또는 다르게 정한 기준과 이유]
+- **S7 Shared Catalog:** [공용 자산을 찾는 장치. 예: SwiftUI Preview 모음 / 없음]
+- **S8 Test-only Code:** [테스트 전용 픽스처·헬퍼 위치. 예: `Tests/<Target>Tests/Fixtures/`]

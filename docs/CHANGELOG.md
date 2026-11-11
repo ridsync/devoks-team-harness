@@ -9,6 +9,37 @@
 
 ---
 
+## **모듈 구조·공용 vs 분리 판정 기준(base) + preset 구조 슬롯 S1~S8 + setup 슬롯 확정 단계** (2026-11-11, `devoks-core` `2.6.0 → 2.7.0`, `devoks-sdlc` `3.18.0 → 3.19.0`)
+- 배경: careerstack(react-web preset, Next.js 모노레포)에서 모듈 내부가 "함수 1개 = 파일 1개"로 쪼개지고(예: 37줄을 파일 2개로), 도메인 규칙이 앱 범용 유틸에 놓이며, 같은 헬퍼가 4곳에 반복되는 문제가 보고됐다. 원인은 세 가지였다.
+  - (1) preset에 파일 묶음·하위 디렉터리·barrel·공용 위치 기준이 없었다(react-web은 `Directory Policy` 자리표시자 한 줄뿐).
+  - (2) PLAN `file:`이 Task마다 새 경로를 지정하고, `code-implementer`가 `file:` 밖 변경을 최소화해 위임 단계에서 쪼개짐이 증폭됐다.
+  - (3) DRY("2곳이면 추출")·재사용 사다리는 "어떻게 재사용"만 말하고 "어디에 두고, 언제 공용화하고, 어디부터 찾는지"가 없었다.
+  - `engineering-principles.md`는 리뷰·검증 스킬만 읽고, 구현·설계 경로(`code-implementer`·`design-spec`)는 `.claude/rules/`만 읽는다는 점도 확인했다.
+- 사용자 결정:
+  - (A) 특정 프로젝트 구조를 규칙으로 하드픽스하지 않는다 — 3계층으로 나눈다: L1 구조 무관 기준은 base rule, L2 스택 고려사항과 슬롯은 preset, L3 구체값은 setup에서 확정.
+  - (B) L1은 구현 경로가 읽는 `agent-principles.md`에 둔다.
+  - (C) DRY는 횟수가 아니라 지식 기준이다 — 사실은 1곳, 동일 로직은 2번째, 유사 코드만 3번째 사례로 축 확인.
+  - (D) 슬롯은 setup 때 제안·확인하고 `미확정`을 허용하며, 소비 측 fallback은 L1이다.
+  - (E) 5개 preset에 동시 반영한다.
+  - (F) placeholder 잔존 경고 훅은 보류한다.
+- 반영:
+  - devoks-core: `agent-principles` DRY 정정·사다리 탐색 순서·[Structure] 신설, `engineering-principles` 포인터, `code-review` ref 체크 3항목, preset 5종 Module Structure 절 + 구조 슬롯 S1~S8. `setup-project-convention` 7단계 "구조 슬롯 확정"(실측·TRD·ADR → 초안 + 관찰 목록 → 한 번에 확인), `setup-preset-manage` 연결. 파일 단위 상세는 `plugins/devoks-core/CHANGELOG.md` 2.7.0.
+  - devoks-sdlc:
+    - `code-implementer`: 탐색은 S3 단계 순서로 하고, 파일 배치는 [Structure]·슬롯을 따른다. `file:`과 충돌하면 규칙을 따르고 인계 노트에 남기며, 미확정 슬롯은 리포트한다.
+    - `feature-plan-author` 1.5.0: `file:`은 세그먼트 파일 단위로 쓰고, 공용 신설·승격은 별도 Task로 나눈다.
+    - `feature-workflow-runner` 1.10.0: `task-pr-splitting` `file:` 규칙과 `design-spec` 패턴 탐색 범위를 반영했다.
+    - `code-review` 2.2.0: Lean `merge`에 중복 정의된 사실을 추가하고, `inline`(성급한 공용화)을 신설했다.
+  - `README.md`·`docs/README.ko.md`: `setup-project-convention` 카탈로그 설명에 구조 슬롯 확정을 추가했다.
+- 검증: `claude plugin validate --strict`(core·sdlc), 변경 skill·agent·command frontmatter `ruby -ryaml` 파싱. 에이전트 클린 환경 스모크 테스트 — 빈 git 디렉토리에서 `claude --plugin-dir <로컬 devoks-sdlc> -p`로 `code-implementer`를 띄웠다. 플러그인 경로 2종이 로컬 소스 절대 경로로 치환되고 Read에 성공했으며, 신규 프로젝트 경로 참조(`project-convention.md` S3, `agent-principles.md` [Structure])도 인식됐다. 근거 자료: FSD(segments·public API·layers), Next.js project structure(colocation·private folders), bulletproof-react(barrel 철회·cross-feature 금지·unidirectional), Biome `noImportCycles`(v2.0.0, 기본 비활성), Rule of Three(Fowler/Roberts), Sandi Metz "The Wrong Abstraction", Kent C. Dodds AHA, *The Pragmatic Programmer*의 DRY 정의.
+- 의도적 미반영:
+  - 새 base ref 파일 — base 7종 목록(`check-setup-state.sh` `BASE_FILES`·SSOT 문서)을 바꾸는 비용 대비 이득이 없어 기존 rules·refs를 확장했다.
+  - placeholder 경고 훅 — 보류(D5).
+  - 중복 탐지 도구(jscpd 등) — 외부 도구 채택 게이트(실측 효용) 전이라 도입하지 않았다.
+  - careerstack 적용 — 대상 프로젝트에서 `setup-preset-manage`로 별도 진행한다.
+  - `marketplace.json`·`docs/plugin-management.md`·`docs/mcp-setup-guide.md` — 카탈로그 description·관리 규칙·MCP 불변.
+  - evals 동적 실행 — 스킬 description·트리거 불변(본문 규칙 보강)이라 생략.
+  - MCP/prefix/permission — 해당 없음.
+
 ## **엔지니어링 결정 기록(ADR) 프로세스 도입 — `docs/decisions/` 결정당 파일 하나 + 스킬별 작성 지점 연결** (2026-11-06, `devoks-core` `2.5.0 → 2.6.0`, `devoks-sdlc` `3.17.1 → 3.18.0`)
 - 배경: 결정 기록이 TRD §12 표(TRD를 쓸 때만), PRD §13, FRD `DSN`(기능 workspace 안이라 기능이 끝나면 다시 읽히지 않음), preset `Project Decisions`(이유 없음)에 흩어져 있었다. TRD 단계 밖의 결정(구현 중 라이브러리 교체, 리팩토링 구조 방향, 기능 밖으로 파급되는 DSN)은 남지 않았다. `memory-policy.md`가 "결정의 SSOT = Claude 파일 메모리"로 규정해, 팀 결정이 개인 로컬 메모리로 갈 수도 있었다. 사용자 결정:
   - (A) ADR 본문은 `docs/decisions/ADR-NNN-<slug>.md` 파일이 SSOT이고, TRD §12는 색인으로만 둔다.
