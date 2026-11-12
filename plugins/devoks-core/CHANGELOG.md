@@ -13,6 +13,13 @@
 
 ---
 
+## 2.7.1 — 2026-11-12
+
+### 복사 산출물
+- `refs/engineering-principles.md` › [Structure & Design] #12 Separation of Concerns: 변경 — "책임 = 변경 이유이며 파일 경계가 아니다, 같은 이유로 바뀌는 함수는 같은 파일"을 덧붙이고 [Structure]를 가리킴. "function마다 책임 하나"가 "함수 1개 = 파일 1개"로 읽혀 과분할 근거가 됐다(careerstack B-7)
+- `refs/code-review.md` › Layered Examination Level 1: 변경 — "구조가 일관적인가?"에 판정 기준([Structure]·구조 슬롯 S1~S8)과 신호(함수별 소파일 군집, S4 밖 하위 barrel, 슬롯과 다른 위치)를 연결. 기준 없는 질문이라 리뷰가 과분할을 놓쳤다
+- `conventions/react-web/project-convention.md` › Project Decisions S4 Public API: 변경 — 강제 수단 예시 추가(Biome `performance.noBarrelFile`·`performance.noReExportAll` + 공개면 경로만 `overrides`로 해제)
+
 ## 2.7.0 — 2026-11-11
 
 ### 복사 산출물

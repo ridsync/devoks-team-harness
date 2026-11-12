@@ -36,7 +36,7 @@ Shared development principles for individuals, teams, and AI agents.
 
 ## [Structure & Design] Maintainable Architecture
 
-12. **Separation of Concerns** — Each module, function, and layer owns exactly one responsibility to make changes and tests easier.
+12. **Separation of Concerns** — Each module, function, and layer owns exactly one responsibility to make changes and tests easier. A responsibility is a reason to change, not a file boundary: functions that change for the same reason belong in the same file (see [Structure] in `.claude/rules/agent-principles.md`), so "one responsibility" never means "one function per file".
 13. **Simplicity First** — Prefer the simplest solution that works. Avoid over-engineering and premature abstraction. Add complexity only when justified.
 14. **High Cohesion** — Keep related functionality together in a single module. Minimizes cross-module dependencies and clarifies ownership.
 15. **Loose Coupling** — Communicate between modules through stable interfaces or events, not direct dependencies. Changes in one module should not ripple to others.

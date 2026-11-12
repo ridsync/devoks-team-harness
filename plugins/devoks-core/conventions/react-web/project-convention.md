@@ -620,7 +620,7 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 - **S1 Directory Policy:** [분할 방식(feature-first / layer-first / route-first / 혼합) + 최상위 디렉터리 맵. 예: `src/app/`(라우트) · `src/features/<domain>/` · `src/shared/`]
 - **S2 Module Segment:** [역할 표기(파일 접미사 / 하위 디렉터리 / 이름만) + 세그먼트 목록 + 하위 디렉터리 임계. 예: `<domain>.api.ts`·`<domain>.store.ts`·`<domain>.schema.ts`·`<Name>.tsx`, 모듈 파일이 8개를 넘으면 하위 디렉터리]
 - **S3 Shared Placement:** [배치 단계별 실제 경로 — 이 순서가 기존 자산 탐색 순서. 예: 모듈 `src/features/<domain>/` → 앱 범용 `src/shared/ui`·`src/shared/lib` → 앱 도메인 `src/entities/<domain>/` → 워크스페이스 `packages/shared`(멀티 패키지일 때만)]
-- **S4 Public API:** [모듈 공개면. 예: 패키지 루트 `index.ts`만 / 모듈별 `index.ts` / barrel 없이 파일 직접 import]
+- **S4 Public API:** [모듈 공개면 + 강제 수단. 예: 패키지 루트 `index.ts`만 / 모듈별 `index.ts` / barrel 없이 파일 직접 import. 강제 예: Biome `performance.noBarrelFile`·`performance.noReExportAll`을 켜고 허용할 공개면 경로만 `overrides`로 끈다]
 - **S5 Dependency Direction:** [허용 방향 + 강제 도구. 예: shared → features → app, features 간 import 금지, Biome `noImportCycles` 활성화]
 - **S6 Promotion:** [`기본`(agent-principles DRY) 또는 다르게 정한 기준과 이유]
 - **S7 Shared Catalog:** [공용 자산을 찾는 장치. 예: Storybook / 개발용 컴포넌트 확인 화면 / 없음]

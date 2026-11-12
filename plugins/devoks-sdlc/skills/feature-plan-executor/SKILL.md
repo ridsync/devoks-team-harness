@@ -3,7 +3,7 @@ description: PLAN.md(작업 분해)를 받아 각 태스크를 의존성 순서�
 argument-hint: "[plan=<PLAN.md 경로> (default: 최근 PLAN)] [pr=<PR 그룹> (default: 전체)] [task=<TASK-ID> (default: 전체)]"
 metadata:
   author: ridsync
-  version: 1.7.0
+  version: 1.8.0
 ---
 
 # plan-executor — 태스크 단계 실행 (Phase 3)

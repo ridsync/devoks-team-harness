@@ -3,7 +3,7 @@ description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하�
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.10.0
+  version: 1.11.0
 ---
 
 # feature-workflow-runner

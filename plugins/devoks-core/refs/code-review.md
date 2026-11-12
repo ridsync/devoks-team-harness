@@ -50,7 +50,7 @@ AI(Claude Code, Cursor, Copilot 등)와 사람이 코드리뷰 시 일관되게 
 
 ### Level 1 – Structure / Architecture
 
-- 전체 디렉토리/모듈 구조가 일관적인가?
+- 전체 디렉토리/모듈 구조가 일관적인가? 판정 기준은 `.claude/rules/agent-principles.md` [Structure](함께 바뀌는 것끼리 한 파일, 응집 단위 하위 디렉토리, 배치 단계, 공개면)와 `.claude/rules/project-convention.md` 구조 슬롯(S1~S8)이다 — 함수마다 흩어진 소파일 군집, S4 밖의 하위 barrel, 슬롯과 다른 위치가 신호다
 - 모듈 경계와 책임 분리가 명확한가?
 - 이 변경이 **기존 호출자의 계약**(시그니처·반환 형태·에러 계약·이벤트/페이로드 스키마)을 깨는가?
   깬다면 호출부를 전수 확인한다 — 단순 시그니처 불일치는 §2 타입 검사가 잡으므로,

@@ -9,6 +9,34 @@
 
 ---
 
+## **형제 Task 간 지식 단절·과분할 리뷰 공백 보강 (careerstack B-7 사후 분석)** (2026-11-12, `devoks-core` `2.7.0 → 2.7.1`, `devoks-sdlc` `3.19.0 → 3.20.0`)
+- 배경: careerstack B-7(AI 생성 파이프라인)은 설치본 devoks-sdlc 3.12.2로 `feature-workflow-runner`를 돌렸고, 구현 뒤 리팩토링 비용이 63파일(+925/−1,022)에 이르렀다. 과분할(P1), 같은 PR 형제 Task 간 헬퍼 중복(P2), 공유 타입·조립 코드 중복과 시그니처 불일치(P3·P5), 테스트 픽스처 운영 src 혼입(P4), 리뷰 미탐지가 보고됐다. 3.19.0(`49fc055`)과 대조해 P1의 `file:` 세그먼트화·[Structure]와 P4(S8)는 이미 반영됐음을 확인했다. careerstack은 아직 S1~S8 슬롯이 없는 구버전 상태였다. 남은 원인은 네 가지다.
+  - (1) 순차 위임 원칙의 근거가 "파일 충돌"뿐이라, 파일이 겹치지 않는 병렬 위임을 합리화할 여지가 있었다(실제로 병렬 위임했다).
+  - (2) 여러 Task가 쓰는 모듈 내부 개념의 정의 Task를 정하는 장치가 없었다.
+  - (3) 리뷰 `reuse`는 기존 헬퍼 대비라서, diff 안에서 둘 다 새로 생긴 중복은 기준 밖이었다.
+  - (4) 과분할 판정 기준이 없었고, 구조를 리뷰 범위에서 빼면 SSOT 중복 점검도 함께 빠졌다.
+- 반영:
+  - devoks-sdlc:
+    - `task-delegation.md`: 순차 위임 근거에 지식 단절 추가, 인계 노트 `경로::심볼 — 용도` 형식과 윈도잉 후순위 보존, `context`로 파일 분할 지시 금지.
+    - `code-implementer`: `context` 지시도 [Structure]에 양보한다.
+    - `task-pr-splitting.md`: 여러 Task가 쓰는 개념의 정의 Task 지정 + 의존성 연결.
+    - `design-spec.md` §4.4: 세그먼트 단위 기술 + `개념 → 정의 위치`.
+    - `review-execution.md`: Lean `merge`에 diff 내부 새 정의끼리 대조·시그니처 불일치·과분할(소파일 군집·S4 밖 하위 barrel) 추가, `merge`·`reuse`는 제외 범위와 무관하게 항상 점검.
+    - 스킬 버전: `code-review` 2.3.0, `feature-workflow-runner` 1.11.0, `feature-plan-author` 1.6.0, `feature-plan-executor` 1.8.0.
+  - devoks-core: `engineering-principles` #12 해석 보강, `code-review` ref Level 1 판정 기준 연결, react-web preset S4 강제 수단 예시. 파일 단위 상세는 `plugins/devoks-core/CHANGELOG.md` 2.7.1.
+- 검증: `claude plugin validate --strict`(core·sdlc), 변경 SKILL·agent frontmatter `ruby -ryaml` 파싱, Biome 규칙 이름은 공식 문서(biomejs/website `no-barrel-file`·`no-re-export-all`·configuration `overrides`)로 확인.
+- 의도적 미반영(제외 근거):
+  - `code-implementer` "30줄 미만 단일 함수 파일 사유 기록" — 수치 대리지표라 과통합을 부를 수 있다. [Structure]의 정성 허용 사유 4종이 이미 있다.
+  - `owns:` 신규 PLAN 마커 — 검증 부담만 늘린다. Task 설명의 정의 위치와 기존 의존성 그래프로 대체했다.
+  - "병렬 위임 시 공유 개념은 소유 Task에만" — 순차 위임 원칙과 충돌한다. 대신 그 원칙의 근거를 보강했다.
+  - done 리포트 `new public API` 필드 신설 — 기존 인계 노트 필수 항목의 형식 강화로 흡수했다.
+  - agent-principles 재사용 사다리 ①에 "같은 PR 형제 Task 산출물" 추가 — 순차 위임이면 워킹트리에 이미 있어 ①로 탐색된다. 원인은 오케스트레이션이므로 base rules는 바꾸지 않았다.
+  - P4 테스트 픽스처 — preset S8로 이미 반영돼 있다.
+  - `devoks-sdlc-orchestration` worktree 병렬(D3) — RUN 한정 정책이라 이번 범위 밖이다. 지식 단절 리스크는 같으므로 후속 검토 대상이다.
+  - careerstack 적용 — 대상 프로젝트에서 플러그인 갱신 + `setup-preset-manage`로 별도 진행한다.
+  - `README.md`·`docs/README.ko.md`·`marketplace.json`·`docs/plugin-management.md`·`docs/mcp-setup-guide.md` — 카탈로그 description·관리 규칙·MCP 불변.
+  - evals 동적 실행 — 스킬 description·트리거 불변(본문 규칙 보강)이라 생략.
+
 ## **모듈 구조·공용 vs 분리 판정 기준(base) + preset 구조 슬롯 S1~S8 + setup 슬롯 확정 단계** (2026-11-11, `devoks-core` `2.6.0 → 2.7.0`, `devoks-sdlc` `3.18.0 → 3.19.0`)
 - 배경: careerstack(react-web preset, Next.js 모노레포)에서 모듈 내부가 "함수 1개 = 파일 1개"로 쪼개지고(예: 37줄을 파일 2개로), 도메인 규칙이 앱 범용 유틸에 놓이며, 같은 헬퍼가 4곳에 반복되는 문제가 보고됐다. 원인은 세 가지였다.
   - (1) preset에 파일 묶음·하위 디렉터리·barrel·공용 위치 기준이 없었다(react-web은 `Directory Policy` 자리표시자 한 줄뿐).

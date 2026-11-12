@@ -3,7 +3,7 @@ description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)�
 argument-hint: "[frd=<FRD.md 경로> (default: 최근 FRD)] [out=<디렉터리> (default: FRD 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.5.0
+  version: 1.6.0
 ---
 
 # plan-author — PLAN 작성 (Phase 2)
