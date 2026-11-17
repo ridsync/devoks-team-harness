@@ -5,13 +5,29 @@
 - **복사 산출물** — 플러그인 밖으로 복사되는 파일. 항목 형식: `파일 › 섹션: 추가/변경/삭제 — 사유`
   - base: `rules/agent-principles.md`, `rules/memory-policy.md`, `refs/{code-review,engineering-principles,git-convention,interaction-integrity,workflow}.md`
   - preset: `conventions/<preset>/project-convention.md`
-  - 스택 한정 refs: `refs/*.md` 중 frontmatter `scope: <preset>`이 있는 파일(active preset과 같을 때만 복사) — `refs/web-security.md`(`react-web`)
+  - 스택 한정 refs: `refs/*.md` 중 frontmatter `scope`(쉼표로 구분한 preset id 목록)가 있는 파일(active preset이 목록에 있을 때만 복사) — `refs/web-security.md`(`react-web`, `nextjs`)
   - 스크립트: `assets/chrome-debug.sh` (→ `~/.devoks/bin/`)
 - **스킬·커맨드·훅** — 플러그인과 함께 자동 갱신된다. 사용법이 바뀐 경우만 적는다.
 
 변경이 없는 구역은 생략한다. 1.1.4 이전 기록은 없다.
 
 ---
+
+## 2.8.0 — 2026-11-17
+
+### 복사 산출물
+- `conventions/nextjs/project-convention.md`: 추가 — Next.js App Router 전용 preset. react-web을 골격으로 하되 Stack(Next 16·`proxy`·next-intl), Module Structure(파일 단위 실행 경계·`app/`은 진입점만·인프라 vs 도메인), **Server Architecture**(진입점 → 서비스 → DAL → 인프라, 진입점별 데이터 접근 표, Server Action = 공개 엔드포인트, `proxy`는 낙관적 검사만, React `cache`는 render pass 한정, 오류 전파, lint import 제한), Client Data Fetching(상호작용 읽기만 TanStack Query + Route Handler), Store(요청별 `createStore` 팩토리), Routing(라우트 그룹·private folder), Testing(async Server Component는 E2E, `server-only` mock), Security·Pitfalls·Project Decisions·S1~S8 Next 예시를 새로 썼다. 근거는 Next.js 공식 가이드(`data-security`·`authentication`·`backend-for-frontend`·`project-structure`·`file-conventions/proxy`·`testing/vitest`)와 Zustand Next.js 가이드. App Router의 구조 결정이 react-web의 "SSR Variant" 몇 줄로는 담기지 않아, 프로젝트마다 로컬 커스터마이징으로 흩어지고 재사용되지 않았다(careerstack ADR-030)
+- `conventions/react-web/project-convention.md` › Stack·SSR Variant·Module Structure·TypeScript·Routing·Security·Project Decisions: 변경/삭제 — Vite CSR SPA 전용으로 좁혔다. SSR Variant 절을 "Next.js는 `nextjs` preset" 안내로 바꾸고, Framework(SSR) 줄·SSR 실행 경계 항목·Routing SSR 줄·`Rendering Mode` 슬롯·`NEXT_PUBLIC_`·`next` 도메인 언급을 지웠다. 한 문서에 CSR/SSR 두 갈래를 두면 결정 뒤 반대쪽을 지우는 수작업이 남고, SSR 쪽은 구조 결정을 담을 자리가 없었다
+- `refs/web-security.md` › frontmatter `scope`: 변경 — `react-web` → `react-web, nextjs`. 같은 웹 보안 가이드를 두 preset이 공유한다
+- `conventions/README.md` › Presets: 추가 — `nextjs/`, ast-grep 절 동일 유지 대상 6개로
+
+### 스킬·커맨드·훅
+- `hooks/check-setup-state.sh` › `scoped_ref_files()`: 변경 — refs `scope`를 쉼표 구분 preset id 목록으로 해석(단일값과 호환). base stale 판정이 nextjs 프로젝트의 `web-security.md`도 보게 한다
+- `commands/setup-project-convention.md` › 1·2단계: 추가 — Next.js 감지 시그널(`next` 의존성·`next.config.*`·`app/`, 모노레포 앱 패키지)과 추천 규칙(`next`가 있으면 React Web보다 우선). › 6단계: 스택 한정 refs를 scope 목록 기준으로 복사. › 7단계: 추가 — "현행 vs 목표 비교" 하위 단계. TRD §3.1(앱 내부 아키텍처)이 있으면 그것이 목표, 없으면 preset 구조 고려사항으로 목표 후보를 제안해 슬롯마다 현행 유지/목표로 전환/미확정을 고르게 하고, 슬롯 값은 목표 구조로 적고 다른 현행 코드는 관찰 목록(리팩토링 후보)으로 남긴다. 실측만으로 슬롯을 채우면 지금 구조가 맞는지 묻지 않은 채 규칙으로 굳었다(careerstack 2026-11-12 → ADR-030 리팩토링)
+- `commands/setup-project-convention.md` › 1·7·8단계: 추가 — 기술 설계 시그널(TRD §2 `stack preset`·§3.1)과 근거 우선순위(그린필드는 TRD가 1순위 — TRD도 없으면 TRD 먼저 권장, 브라운필드는 코드가 1순위 — TRD와 다르면 차이를 보여 주고 질문), 그린필드에서 이 커맨드의 제자리(TRD 직후·첫 FRD/PLAN 전), 그린필드 슬롯 입력 우선순위(TRD §3.1 → preset 예시는 제안만, §3.1이 없으면 S1·S3·S5는 TRD 먼저 권장 또는 미확정), 골격 B-n 구현 직후 실제 디렉터리와 S1~S3 대조 안내. 코드가 없는 그린필드에서는 코드 시그널이 비어 preset이 근거 없이 질문으로만 골라졌고, 커맨드가 0단계(최초 1회)에만 묶여 스택이 정해지기 전에 돌거나 첫 PLAN 뒤로 밀렸다
+- `skills/setup-preset-manage`: 변경 — 전환 대상에 Next.js·Python FastAPI 추가, react-web(SSR Variant) → nextjs 전환 안내(슬롯 값 보존), 두 preset이 공유하는 scoped ref는 전환 시 삭제 확인 대상에서 제외, 슬롯 확정 시 "현행 vs 목표" 비교를 거치도록 연결
+
+> 이미 setup한 Next.js 프로젝트(react-web SSR Variant 기반): `devoks-core:setup-preset-manage`로 `nextjs` 전환을 진행한다. 구조 슬롯 값과 로컬 SSR 커스터마이징은 유지·이관 대상으로 먼저 보여 준다. 슬롯을 현행 실측으로만 채웠다면 같은 흐름에서 "현행 vs 목표" 비교를 다시 돌린다.
 
 ## 2.7.1 — 2026-11-12
 

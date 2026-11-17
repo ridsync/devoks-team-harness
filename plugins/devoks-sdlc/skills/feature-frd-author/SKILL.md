@@ -3,7 +3,7 @@ description: 거친 기능 아이디어나 FRD 초안을 받아, EARS Acceptance
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.8.0
+  version: 1.8.1
 ---
 
 # frd-author — FRD 정련 (Phase 1)

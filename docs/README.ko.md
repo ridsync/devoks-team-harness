@@ -92,7 +92,7 @@ cd /path/to/your-project
 
 | 유형 | 소스 | 프로젝트 적용 방식 |
 |------|------|--------------------|
-| **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | explicit setup 시 복사 — 공통 refs는 항상, 스택 한정 refs(frontmatter `scope: <preset>`, 예: React Web의 `web-security.md`)는 선택한 preset과 일치할 때만 |
+| **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | explicit setup 시 복사 — 공통 refs는 항상, 스택 한정 refs(frontmatter `scope: <preset 목록>`, 예: React Web·Next.js의 `web-security.md`)는 선택한 preset이 목록에 있을 때만 |
 | **refs** | `plugins/devoks-core/refs/*.md` | explicit setup 시 복사 |
 | **stack preset** | `plugins/devoks-core/conventions/<preset>/project-convention.md` | `.claude/rules/project-convention.md`로 주입 |
 | **project active convention** | `.claude/rules/project-convention.md` | 프로젝트 소유, SessionStart overwrite 없음 |
@@ -107,7 +107,7 @@ SessionStart 훅은 이제 MCP/프로젝트 초기화 상태만 점검합니다.
 
 ```mermaid
 flowchart TD
-    S["0 · 준비 (최초 1회)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
+    S["0 · 준비<br/>devoks-core:setup-mcp (최초 1회)<br/>devoks-core:setup-project-convention<br/>(기존 코드: 지금 · 그린필드: TRD 직후, FRD 전)"]
 
     PRD["1 · 제품 정의 (선택, 장기 프로젝트)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD 시드)"]
 
@@ -141,6 +141,7 @@ flowchart TD
     S --> BUILD
     S -.-> PRD
     PRD -.-> TRD
+    TRD -.->|"preset · §3.1 (그린필드)"| S
     TRD -.-> F
     TRD -.-> WF
     WF -.-> F
@@ -213,7 +214,7 @@ flowchart TD
 | 커맨드 | 설명 |
 |--------|------|
 | `/devoks-core:setup-mcp` | 권장 MCP 서버·의존성 설치/점검 |
-| `/devoks-core:setup-project-convention` | base rules/refs 적용 후 stack preset 기반 `project-convention.md` 구성 + 프로젝트 구조 슬롯(디렉터리·세그먼트·공용 위치) 확정 |
+| `/devoks-core:setup-project-convention` | base rules/refs 적용 후 stack preset 기반 `project-convention.md` 구성 + 프로젝트 구조 슬롯(디렉터리·세그먼트·공용 위치) 확정 — 기존 코드는 목표 구조(TRD §3.1 또는 preset 고려사항)와 비교해 현행이 그대로 규칙으로 굳지 않게 한다 |
 
 ### devoks-git
 

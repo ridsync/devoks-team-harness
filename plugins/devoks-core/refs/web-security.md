@@ -1,11 +1,11 @@
 ---
 description: "React 웹 프론트엔드 보안 가이드 SSOT — 규칙·근거·리뷰 탐지 시그널"
-scope: react-web
+scope: react-web, nextjs
 ---
 
 # Web Security Guide (React Web)
 
-> **적용 대상:** React 웹 프론트엔드 (react-web preset 프로젝트). 다른 스택 프로젝트에서는 참고용.
+> **적용 대상:** React 웹 프론트엔드 (react-web·nextjs preset 프로젝트). 다른 스택 프로젝트에서는 참고용.
 > **심각도 분류:** `.claude/refs/code-review.md` §8을 따른다.
 > **역할 경계:** 이 문서는 보안 지식(규칙·왜·탐지 시그널)의 SSOT다. 리뷰 절차·리포트 형식은 `code-review.md`, 프로젝트별 실행 규약 요약은 `.claude/rules/project-convention.md`(Security)가 소유한다.
 

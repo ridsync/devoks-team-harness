@@ -3,7 +3,7 @@ name: workflow-map
 description: DevOKs SDLC 작업의 전체 흐름(단계 순서)과 각 단계의 진입 스킬·커맨드를 한 장의 표로 보여준다. 파이프라인(준비→제품·기술·화면 설계(선택)→요구정의→작업분해→구현→검증체인→커밋/PR)과 순서 없는 단발 작업을 구분해 제시한다. "워크플로우 맵", "SDLC 흐름 보여줘", "스킬 표", "어떤 스킬 써야 해", "다음 단계 뭐야", "작업 순서 알려줘", "스킬 목록 정리해줘" 같은 조회성 요청에서 사용한다. 표를 출력할 뿐 어떤 단계도 실행하지 않는다 — 실제 실행은 표에 적힌 각 스킬을 직접 호출한다.
 metadata:
   author: ridsync
-  version: 1.7.1
+  version: 1.7.2
 ---
 # workflow-map — SDLC 워크플로우 흐름 맵
 
@@ -48,9 +48,9 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 
 | #   | 단계         | 진입점                                                                | 산출물                                     |
 | --- | ---------- | ------------------------------------------------------------------ | --------------------------------------- |
-| 0   | 준비 (최초 1회) | `/devoks-core:setup-mcp` · `/devoks-core:setup-project-convention` | MCP 서버, `.claude/rules`                 |
+| 0   | 준비 | `/devoks-core:setup-mcp`(최초 1회) · `/devoks-core:setup-project-convention`(기존 코드: 지금 / 그린필드: 2 직후·4 전) | MCP 서버, `.claude/rules`(preset·구조 슬롯) |
 | 1   | 제품 정의 (선택, 장기 프로젝트) | `/devoks-sdlc:product-interview` → 승인 시 `/devoks-sdlc:product-prd-author` 자동 연결 | `PRD.md` · `FEATURES.md` (항목별 FRD 시드 → 4) |
-| 2   | 기술 설계 (선택, 1 이후) | `/devoks-sdlc:product-trd-author` | `TRD.md`(UI 기반 §2.1 포함) · FEATURES 기반 구역 B-n (→ 4, stack preset → 0) |
+| 2   | 기술 설계 (선택, 1 이후) | `/devoks-sdlc:product-trd-author` | `TRD.md`(UI 기반 §2.1·앱 내부 아키텍처 §3.1 포함) · FEATURES 기반 구역 B-n (→ 4, stack preset·§3.1 → 0의 setup-project-convention) |
 | 3   | 화면 설계 (선택, 2 이후, 화면 있는 제품) | `/devoks-sdlc:product-design-author` → 강조 화면 있으면 `phase=visual` | `WIREFRAMES.md`(+`.pen`) → `VISUAL.md`(+`.pen`) (→ 디자인 시스템 B-n → 화면 F-n의 4) |
 | 4   | 요구 정의 | (선택) `/devoks-sdlc:feature-interview` → `/devoks-sdlc:feature-frd-author` | `FRD.md` |
 | 5   | 작업 분해 | `/devoks-sdlc:feature-plan-author` | `PLAN.md` |
@@ -61,7 +61,7 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 
 > **통합 진입점:** `/devoks-sdlc:feature-workflow-runner` 는 4~6을 한 흐름으로 실행하고, 마무리 시점에 7~8을 선택 메뉴로 제시한다. 4~6을 따로 돌리고 싶을 때만 개별 스킬을 쓴다.
 >
-> **1~3은 그린필드 첫 프로젝트의 권장 경로다.** 코드가 없는 새 제품을 PRD로 시작한다면 1 → 2 → 3(와이어프레임 → 강조 화면 비주얼) → 디자인 단계가 보고한 PRD·TRD 갱신 반영 → 4 순서로 디자인 컨셉·화면·기술 구조를 먼저 굳히고 구현을 시작한다. 그 밖의 경우(기존 제품의 기능 추가·유지보수·버그 수정)는 선택이며 0 다음 바로 4로 간다 — UI 변경은 받은 시안을 FRD에 건다. 1차 구현 이후의 UI/UX 개선은 로드맵에 따라 그때그때 진행한다.
+> **1~3은 그린필드 첫 프로젝트의 권장 경로다.** 코드가 없는 새 제품을 PRD로 시작한다면 `setup-mcp` → 1 → 2 → **`setup-project-convention`**(TRD §2 preset·§3.1 아키텍처로 convention·구조 슬롯 확정) → 3(와이어프레임 → 강조 화면 비주얼) → 디자인 단계가 보고한 PRD·TRD 갱신 반영 → 4 순서로 디자인 컨셉·화면·기술 구조를 먼저 굳히고 구현을 시작한다. convention은 스택이 정해진 뒤(2 이후)여야 고를 preset이 있고, 첫 FRD/PLAN(4·5) 전이어야 PLAN `file:`과 구현이 구조 슬롯을 읽는다 — 슬롯 없이 골격을 깔면 그 구조가 나중에 "현행"으로 굳는다. 골격 B-n 구현 직후 실제 디렉터리와 슬롯을 한 번 대조한다. 그 밖의 경우(기존 제품의 기능 추가·유지보수·버그 수정)는 선택이며 0 다음 바로 4로 간다 — 기존 코드에 TRD를 새로 쓰면 그 뒤 `setup-preset-manage`로 슬롯을 다시 맞춘다 — UI 변경은 받은 시안을 FRD에 건다. 1차 구현 이후의 UI/UX 개선은 로드맵에 따라 그때그때 진행한다.
 
 ## 표 A-0 — 입력 양식 (인터뷰 대신 직접 채우기)
 
@@ -85,8 +85,8 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 | 1   | 요구사항 구현 충실도          | `/devoks-sdlc:verify-requirements`                                                                                                                                             | 항상                                          |
 | 2   | 코드 리뷰                | `/devoks-sdlc:code-review mode=diff-branch`                                                                                                                                    | 항상                                          |
 | 3   | 데이터 흐름 정합성           | `/devoks-sdlc:verify-data-flow`                                                                                                                                                | 입력→계산→저장→재로드 흐름이 있을 때                       |
-| 4   | UI 시각 품질             | `/devoks-browser:browser-visual-diff`                                                                                                                                          | UI 컴포넌트/스타일링 변경이 있을 때 — react-web 한정(RN·네이티브는 육안) |
-| 5   | 브라우저 실동작             | `/devoks-sdlc:verify-acceptance-test`                                                                                                                                          | AC에 UI 조작+상태 영속이 걸려 있을 때(react-web 한정, RN·네이티브는 수동 확인) — **커밋 직전 최종 게이트** |
+| 4   | UI 시각 품질             | `/devoks-browser:browser-visual-diff`                                                                                                                                          | UI 컴포넌트/스타일링 변경이 있을 때 — react-web·nextjs 한정(RN·네이티브는 육안) |
+| 5   | 브라우저 실동작             | `/devoks-sdlc:verify-acceptance-test`                                                                                                                                          | AC에 UI 조작+상태 영속이 걸려 있을 때(react-web·nextjs 한정, RN·네이티브는 수동 확인) — **커밋 직전 최종 게이트** |
 | 옵션  | 테스트 스위트 회귀           | `/devoks-sdlc:test-run-triage`                                                                                                                                                 | 전체 스위트 회귀를 따로 확인할 때                         |
 | 옵션  | 프로젝트 전용 스모크 테스트 (참고) | 프로젝트별 상이 — 예: `aware-react-app`의 `verify-app-smoke-test`(`.claude/skills/verify-app-smoke-test/SKILL.md`). 아직 없다면 `/devoks-sdlc:new-smoke-test-draft`로 화면 목록을 스캔해 초안을 생성할 수 있다 | 해당 프로젝트가 배포 전 스모크 테스트 스킬을 자체 보유(또는 생성)할 때만  |
 

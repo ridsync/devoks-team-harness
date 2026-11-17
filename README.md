@@ -92,7 +92,7 @@ Instead, it uses an **explicit setup/apply model**:
 
 | Type | Source | Applied to project |
 |------|--------|--------------------|
-| **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | copied during explicit setup — common refs always, stack-scoped refs (frontmatter `scope: <preset>`, e.g. `web-security.md` for React Web) only when matching the chosen preset |
+| **base rules** | `plugins/devoks-core/rules/agent-principles.md`, `memory-policy.md` | copied during explicit setup — common refs always, stack-scoped refs (frontmatter `scope: <preset list>`, e.g. `web-security.md` for React Web·Next.js) only when the chosen preset is listed |
 | **refs** | `plugins/devoks-core/refs/*.md` | copied during explicit setup |
 | **stack preset** | `plugins/devoks-core/conventions/<preset>/project-convention.md` | copied to `.claude/rules/project-convention.md` |
 | **project active convention** | `.claude/rules/project-convention.md` | project-owned; no SessionStart overwrite |
@@ -107,7 +107,7 @@ The HITL flow, from setup to PR. Run `/devoks-sdlc:workflow-map` in any session 
 
 ```mermaid
 flowchart TD
-    S["0 · Setup (once)<br/>devoks-core:setup-mcp<br/>devoks-core:setup-project-convention"]
+    S["0 · Setup<br/>devoks-core:setup-mcp (once)<br/>devoks-core:setup-project-convention<br/>(existing code: now · greenfield: after TRD, before FRD)"]
 
     PRD["1 · Product definition (optional, long-term)<br/>product-interview → product-prd-author<br/>→ PRD.md + FEATURES.md (FRD seeds)"]
 
@@ -141,6 +141,7 @@ flowchart TD
     S --> BUILD
     S -.-> PRD
     PRD -.-> TRD
+    TRD -.->|"preset · §3.1 (greenfield)"| S
     TRD -.-> F
     TRD -.-> WF
     WF -.-> F
@@ -213,7 +214,7 @@ flowchart TD
 | Command | Description |
 |---------|-------------|
 | `/devoks-core:setup-mcp` | Install/check recommended MCP servers and dependencies |
-| `/devoks-core:setup-project-convention` | Apply base rules/refs, choose a stack preset for `project-convention.md`, and confirm the project structure slots (directories, segments, shared placement) |
+| `/devoks-core:setup-project-convention` | Apply base rules/refs, choose a stack preset for `project-convention.md`, and confirm the project structure slots (directories, segments, shared placement) — existing code is compared against the target structure (TRD §3.1 or preset guidance) instead of being frozen as-is |
 
 ### devoks-git
 

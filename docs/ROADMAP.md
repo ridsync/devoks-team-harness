@@ -24,7 +24,8 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 - [ ] **컨벤션 preset 확장 (신규 stack)**
   - management 고도화(provenance hash 기반 stale 감지, 플러그인 번들링 버그 수정)는 2026-07-14 완료 — 완료 섹션 참고.
   - `python-fastapi` preset 추가는 2026-09-15 완료 — 완료 섹션 참고.
-  - 남은 범위: `react-web`·`react-native`·`android`·`ios`·`python-fastapi` 5개 외 `nextjs`, `node-backend`, `spring`, `swiftui-only`, `compose-only` 등 세분 preset 추가.
+  - `nextjs` preset 추가는 2026-11-17 완료 — CHANGELOG 참고.
+  - 남은 범위: `react-web`·`nextjs`·`react-native`·`android`·`ios`·`python-fastapi` 6개 외 `node-backend`, `spring`, `swiftui-only`, `compose-only` 등 세분 preset 추가.
   - 우선순위: 낮음(management 인프라는 갖춰졌으니 실제 수요가 생길 때 진행 — blocking 이슈 없음).
 
 - [ ] **Android·iOS 네이티브 확장 — `devoks-android`·`devoks-ios` 신설 + 스택 중립 계층 보강**
@@ -32,7 +33,7 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - **확정 결정**: ① 플러그인은 `devoks-android`/`devoks-ios` **분리**(툴체인·MCP가 서로 겹치지 않고 iOS는 macOS 전제) ② 모바일 acceptance runner는 **`devoks-sdlc`에 위치**(스킬 계약 SSOT가 sdlc) ③ 기기 UI 구동 드라이버는 **mobile-mcp(`@mobilenext/mobile-mcp`)를 우선 후보로 선정**하되 외부 도구 채택 게이트(실측 효용성)를 통과한 뒤 최종 결정 — XcodeBuildMCP·Xcode 내장 MCP(`xcrun mcpbridge`, 26.3+)·Maestro(`maestro mcp`)는 재검토 대상으로 보류. MCP는 번들하지 않고 `setup-mcp`에서 user scope 등록(`devoks-browser` 2.0.0과 동일 원칙).
   - **P0 — 스택 중립 보강(저비용)**:
     - `setup-project-convention` 감지: RN 프로젝트에도 `android/`·`ios/`가 있어 네이티브로 오추천될 수 있음 → `package.json`에 `react-native`가 있으면 RN 우선 규칙 추가.
-    - refs `scope` 다중값 지원(현재 `scope: react-web` 단일) → `refs/mobile-security.md`(OWASP MASVS/MASTG 기반)를 `android`·`ios`·`react-native`가 공유. `check-setup-state.sh`·`setup-preset-manage` 판정 동반 수정.
+    - refs `scope` 다중값 지원은 2026-11-17 완료(쉼표 구분 목록 — `web-security.md`를 `react-web`·`nextjs`가 공유). 남은 일: `refs/mobile-security.md`(OWASP MASVS/MASTG 기반)를 `scope: android, ios, react-native`로 추가.
     - `refs/code-review.md` 파일 패턴 표(`*.jsx`/`*.tsx`만 존재)에 `*.kt`·`*.swift`·`AndroidManifest.xml`·`Info.plist`/`*.entitlements` 행 추가. lint/type 선행검증에 Android Lint·detekt·ktlint·SwiftLint·컴파일 검사.
     - `test-author`/`test-run-triage`: Gradle(JUnit5, `test/` vs `androidTest/`)·`xcodebuild test`/`swift test` 감지, JUnit XML·`.xcresult` 파싱, 플래키 "기기·에뮬레이터" 범주.
     - `code-security-review`: Gradle·SwiftPM 의존성 audit(도구 실측 후 선정).

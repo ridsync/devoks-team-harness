@@ -14,7 +14,7 @@ description: devoks setup(setup-project-convention·setup-mcp)이 플러그인 �
 |---|---|---|---|---|
 | active convention | `.claude/rules/project-convention.md` | `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/` | preset에서 출발해 **프로젝트가 커스터마이징** | Steps 1~6 (섹션 단위) |
 | base rules/refs 7종 | `.claude/rules/`·`.claude/refs/` | `${CLAUDE_PLUGIN_ROOT}/rules·refs/` | 원본 사본 | "base 갱신" (파일 단위) |
-| 스택 한정 refs | `.claude/refs/` | `${CLAUDE_PLUGIN_ROOT}/refs/` 중 frontmatter `scope`가 active preset과 같은 파일(예: `react-web` → `web-security.md`) | 원본 사본 | "base 갱신" (파일 단위), 전환 시 추가·제거는 5단계 |
+| 스택 한정 refs | `.claude/refs/` | `${CLAUDE_PLUGIN_ROOT}/refs/` 중 frontmatter `scope`(쉼표 구분 preset id 목록)에 active preset이 들어 있는 파일(예: `react-web`·`nextjs` → `web-security.md`) | 원본 사본 | "base 갱신" (파일 단위), 전환 시 추가·제거는 5단계 |
 | `chrome-debug.sh` | `~/.devoks/bin/` | `${CLAUDE_PLUGIN_ROOT}/assets/chrome-debug.sh` | 원본 사본 (기본 URL은 `~/.devoks/chrome-debug.url`에 별도) | "~/.devoks 스크립트 갱신" |
 | `metro-mcp.js` | `~/.devoks/mcp/` | devoks-rn 플러그인 `scripts/metro-mcp.js` | 원본 사본 | "~/.devoks 스크립트 갱신" |
 
@@ -29,7 +29,7 @@ SessionStart 훅(`hooks/check-setup-state.sh`)은 위 산출물이 원본과 달
 - preset provenance metadata: `.claude/project-convention.json` (`presetHash` = preset 기준, `devoksCoreVersion` = base 기준)
 - preset 원본: `${CLAUDE_PLUGIN_ROOT}/conventions/<preset>/project-convention.md`
 - base rules/refs 원본(7종, 목록 SSOT는 `hooks/check-setup-state.sh`의 `BASE_FILES`): `${CLAUDE_PLUGIN_ROOT}/rules/{agent-principles,memory-policy}.md`, `${CLAUDE_PLUGIN_ROOT}/refs/{code-review,engineering-principles,git-convention,interaction-integrity,workflow}.md` → 프로젝트 `.claude/rules/`·`.claude/refs/` 같은 이름
-- 스택 한정 refs 원본: `${CLAUDE_PLUGIN_ROOT}/refs/*.md` 중 frontmatter `scope: <preset>`이 provenance의 `preset`과 같은 파일 → 프로젝트 `.claude/refs/` 같은 이름. `scope`가 없는 refs가 base다. 대상 목록은 매번 **새 원본의 frontmatter에서** 다시 구한다(업데이트로 새로 생긴 스택 한정 ref도 `신규`로 잡히게)
+- 스택 한정 refs 원본: `${CLAUDE_PLUGIN_ROOT}/refs/*.md` 중 frontmatter `scope`(쉼표로 구분한 preset id 목록, 예: `scope: react-web, nextjs`)에 provenance의 `preset`이 들어 있는 파일 → 프로젝트 `.claude/refs/` 같은 이름. `scope`가 없는 refs가 base다. 대상 목록은 매번 **새 원본의 frontmatter에서** 다시 구한다(업데이트로 새로 생긴 스택 한정 ref도 `신규`로 잡히게)
 - 적용 당시 원본 스냅샷(3-way merge base): `.claude/.devoks-base/` — `rules/`·`refs/`(base 7종 + 스택 한정 refs)와 `preset/project-convention.md`. setup·이 스킬이 원본을 반영할 때마다 함께 갱신한다. `.claude/rules/`와 같은 git 추적 정책을 따른다(팀이 rules를 커밋하면 스냅샷도 커밋)
 - 버전별 변경 사유: `${CLAUDE_PLUGIN_ROOT}/CHANGELOG.md`
 - 프로젝트 사실 SSOT: `.claude/CLAUDE.md`
@@ -42,7 +42,7 @@ SessionStart 훅(`hooks/check-setup-state.sh`)은 위 산출물이 원본과 달
 - current vs preset 차이 요약
 - upstream preset 재적용
 - selective apply (일부 섹션만 반영)
-- React Web / React Native / Android / iOS / Custom 간 전환
+- React Web / Next.js / React Native / Android / iOS / Python FastAPI / Custom 간 전환
 - `.claude/CLAUDE.md`와 convention 사이의 stack drift 점검
 - legacy convention이 bundled copy 잔재인지, 실제 프로젝트 커스터마이징인지 추정
 - devoks-core 업데이트 후 base rules/refs 7종 + 스택 한정 refs 갱신 (아래 "base 갱신" 절)
@@ -136,10 +136,11 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 - `.claude/rules/project-convention.md`를 직접 덮어쓸 수 있는 작업은 반드시 사용자 확인 후에만 수행
 - provenance metadata를 함께 갱신 — `presetHash`도 현재 preset 원본의 최신 해시로 갱신
 - preset 스냅샷(`.claude/.devoks-base/preset/project-convention.md`)을 반영한 preset 원본으로 갱신(`command cp -f`) — 일부 섹션만 반영했어도 거부한 섹션이 다시 제안되지 않도록 갱신한다
-- preset 전환 시 스택 한정 refs도 함께 맞춘다 — 새 preset의 스택 한정 refs는 복사하고 스냅샷(`.claude/.devoks-base/refs/`)도 기록한다. 이전 preset 전용 ref(예: `react-web` → `react-native` 전환 시 `web-security.md`)는 **자동 삭제하지 않고** 삭제 여부를 확인받는다(로컬에서 계속 참고할 수 있다). 삭제하면 스냅샷도 함께 지운다
+- preset 전환 시 스택 한정 refs도 함께 맞춘다 — 새 preset의 스택 한정 refs는 복사하고 스냅샷(`.claude/.devoks-base/refs/`)도 기록한다. 이전 preset 전용 ref(예: `react-web` → `react-native` 전환 시 `web-security.md`)는 **자동 삭제하지 않고** 삭제 여부를 확인받는다(로컬에서 계속 참고할 수 있다). 삭제하면 스냅샷도 함께 지운다. 두 preset이 같은 ref의 `scope`에 함께 들어 있으면(예: `react-web` → `nextjs`의 `web-security.md`) 전용 ref가 아니므로 그대로 둔다
+- **react-web → nextjs 전환**: Next.js 프로젝트가 react-web preset(SSR Variant)으로 설정돼 있으면 전환을 제안한다. 구조 슬롯(S1~S8)과 로컬 SSR 커스터마이징은 nextjs preset의 같은 절과 대조해 유지·이관할 항목을 먼저 보여 주고, 슬롯 값은 그대로 옮긴다(preset 예시로 덮어쓰지 않는다)
 - preset 전환 후에는 `.claude/CLAUDE.md`의 Tech Stack / Commands / Architecture / Sensitive Files도 drift 여부를 점검
 - `Custom` 흐름은 가장 가까운 preset + 사용자 보정값으로 처리
-- 반영 결과 Project Decisions에 구조 슬롯(S1~S8)이 새로 생기거나 placeholder로 남아 있으면, `${CLAUDE_PLUGIN_ROOT}/commands/setup-project-convention.md` 7단계(구조 슬롯 확정)를 같은 절차로 이어서 수행한다 — 기존 프로젝트이므로 코드베이스 실측이 1차 입력이고, 이미 convention 다른 절(Directory Policy·SSOT 경로 등)에 적힌 프로젝트 결정은 슬롯으로 옮겨 적되 중복으로 남기지 않는다
+- 반영 결과 Project Decisions에 구조 슬롯(S1~S8)이 새로 생기거나 placeholder로 남아 있으면, `${CLAUDE_PLUGIN_ROOT}/commands/setup-project-convention.md` 7단계(구조 슬롯 확정)를 같은 절차로 이어서 수행한다 — 기존 프로젝트이므로 코드베이스 실측이 1차 입력이지만 그대로 확정하지 않고 같은 단계의 "현행 vs 목표" 비교(TRD §3.1 또는 preset 구조 고려사항 대비)를 거치며, 이미 convention 다른 절(Directory Policy·SSOT 경로 등)에 적힌 프로젝트 결정은 슬롯으로 옮겨 적되 중복으로 남기지 않는다
 
 ### 6. 마무리 리포트
 

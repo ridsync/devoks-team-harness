@@ -28,7 +28,7 @@
 
 요구 누락의 "묻기만"과 구분되는, 설계 전용 흐름이다.
 
-1. **패턴 탐색** — 코드베이스에서 유사 기능의 기존 상태관리·훅·유틸·모델 패턴을 먼저 찾는다(재사용 우선, 새 구조 창작 최소화). 탐색 범위와 새로 둘 위치는 `.claude/rules/project-convention.md` Project Decisions 구조 슬롯(S3 Shared Placement)의 단계 순서를 따르고, 공용화 여부는 `.claude/rules/agent-principles.md` DRY로 판정한다.
+1. **패턴 탐색** — 코드베이스에서 유사 기능의 기존 상태관리·훅·유틸·모델 패턴을 먼저 찾는다(재사용 우선, 새 구조 창작 최소화). 탐색 범위와 새로 둘 위치는 `.claude/rules/project-convention.md` Project Decisions 구조 슬롯(S3 Shared Placement)의 단계 순서를 따르고, 공용화 여부는 `.claude/rules/agent-principles.md` DRY로 판정한다. `.claude/rules/project-convention.md`가 없는데 TRD(`docs/product/TRD.md`)에 `stack preset`이 있으면(그린필드에서 convention 적용 전) §4를 쓰기 전에 `/devoks-core:setup-project-convention` 실행을 먼저 권한다 — 슬롯 없이 정한 위치가 골격 구조를 목표와 다르게 깔 수 있다. 사용자가 그대로 진행하길 원하거나 비-HITL이면 TRD §3.1과 [Structure] 기준으로 정하고 §4에 "convention 미적용" 1줄을 남긴다.
 2. **후보안 도출** — 탐색 결과를 근거로 **설계안 1개**(트레이드오프가 크면 대안 1개 동봉)를 만든다.
 3. **제안 → 확인** — "이렇게 설계하려는데 맞는지" 한 번에 모아 사용자에게 확인한다. 빈칸을 그냥 "채워달라"고 떠넘기지 않는다.
 4. **확정 → §4 작성** — 확인된 안으로 4.2~4.5와 DSN 표를 채운다.

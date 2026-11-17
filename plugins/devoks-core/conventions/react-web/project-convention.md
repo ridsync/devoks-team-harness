@@ -1,6 +1,6 @@
 # Project Convention — React Web Preset
 
-이 문서는 **React Web 프로젝트용 preset**입니다. bracket 선택형 메뉴가 아니라, 한 가지로 결정된 예시 스택과 실제 코드/테이블로 구성되어 있습니다.
+이 문서는 **React Web(Vite CSR SPA) 프로젝트용 preset**입니다. bracket 선택형 메뉴가 아니라, 한 가지로 결정된 예시 스택과 실제 코드/테이블로 구성되어 있습니다.
 최초 주입 후에는 아래 예시 스택·코드를 프로젝트의 실제 선택으로 즉시 교체하세요.
 
 ---
@@ -8,9 +8,8 @@
 ## Stack
 
 - **Language:** TypeScript (`strict: true`) — 규칙은 아래 "TypeScript" 절
-- **Build Tool (CSR):** Vite + React 19
-- **Framework (SSR):** Next.js 16 (App Router) — CSR/SSR 중 하나를 프로젝트 결정으로 선택 (아래 "SSR Variant" 참고)
-- **Routing (CSR):** React Router v7 (Data Router)
+- **Build Tool:** Vite + React 19
+- **Routing:** React Router v7 (Data Router)
 - **Styling:** Tailwind CSS v4 + shadcn/ui
 - **Animation:** motion (구 `framer-motion`, import는 `motion/react`)
 - **State:** Zustand v5 (도메인/앱 상태) + Context API (Auth/Theme 등 provider 경계가 필요한 cross-cutting 값만)
@@ -20,13 +19,9 @@
 - **Lint/Format:** Biome 단독(format + lint) 기본 / ESLint(flat config) + Prettier 대안 — 둘 중 하나만 쓴다(아래 "Lint/Format 선택"). 접근성 lint는 Biome `a11y` 그룹(`jsx-a11y` 대응, recommended 기본 활성) 또는 ESLint `eslint-plugin-jsx-a11y`
 - **Test:** Vitest + @testing-library/react + happy-dom (단위·컴포넌트) / Playwright + `@axe-core/playwright` (E2E·접근성 자동검사)
 
-### SSR Variant (Next.js)
+### Next.js 프로젝트
 
-- Next.js 16 App Router가 라우팅 SSOT — React Router는 사용하지 않는다.
-- 데이터 패칭은 Server Component/Route Handler가 1차, 클라이언트 상호작용이 필요한 화면만 TanStack Query를 보조로 쓴다.
-- Tailwind/shadcn/motion/zustand/react-hook-form+zod/Lint·Format/테스트 스택은 CSR과 동일하게 적용한다.
-- 프로젝트가 CSR/SSR 중 하나로 결정되면, 반대쪽 코드 예시는 프로젝트 convention에서 제거한다 — 두 갈래를 동시에 bracket처럼 남기지 않는다.
-- Next.js 16부터 `next lint`가 제거되고 `next build`가 lint를 돌리지 않는다 — 어느 lint 도구든 CI에 직접 넣는다. Biome이면 `linter.domains.next`를 켠다.
+Next.js App Router 프로젝트는 이 preset이 아니라 **`nextjs` preset**을 쓴다 — 서버 진입점(Server Component·Server Action·Route Handler)·DAL·실행 환경 경계 같은 구조 결정이 SPA와 크게 달라 한 문서에 두 갈래로 두지 않는다. 예전에 이 preset의 "SSR Variant"로 설정한 프로젝트는 `devoks-core:setup-preset-manage`로 `nextjs`로 전환한다.
 
 ### Lint/Format 선택 (Biome / ESLint)
 
@@ -35,7 +30,7 @@ lint 도구는 하나만 둔다. 둘을 겹치면 같은 위반이 중복 보고
 | | Biome 단독 (기본) | ESLint + Prettier (대안) |
 |---|---|---|
 | 구성 | 도구 1개·설정 1파일(`biome.json`)로 format·lint·import 정렬 | ESLint(lint) + Prettier(format) 2개, 플러그인별 의존성 |
-| 스택 규칙 | `linter.domains`로 `react`·`next`·`tanstackQuery`·`test` 규칙, `a11y` 그룹 | `eslint-plugin-react-hooks`·`eslint-config-next`·`@tanstack/eslint-plugin-query`·`eslint-plugin-jsx-a11y` 공식 플러그인 |
+| 스택 규칙 | `linter.domains`로 `react`·`tanstackQuery`·`test` 규칙, `a11y` 그룹 | `eslint-plugin-react-hooks`·`@tanstack/eslint-plugin-query`·`eslint-plugin-jsx-a11y` 공식 플러그인 |
 | 타입 인식 규칙 | `types` 도메인(자체 추론, 일부 nursery) — 범위가 좁다 | typescript-eslint type-aware 규칙(`no-floating-promises`·`no-misused-promises` 등) |
 | 속도 | 빠름 | 상대적으로 느림(type-aware 시 더) |
 
@@ -81,7 +76,6 @@ lint 도구는 하나만 둔다. 둘을 겹치면 같은 위반이 중복 보고
 
 - **프레임워크 단위는 파일당 1개:** 컴포넌트·커스텀 훅은 파일당 공개 1개(default export 규칙 유지). 그 컴포넌트만 쓰는 하위 컴포넌트는 같은 파일에 export 없이 둔다.
 - **그 밖의 코드는 세그먼트 파일로 묶는다:** 같은 데이터 소스·규칙·변경 이유를 공유하는 함수는 모듈의 세그먼트 파일 하나에 둔다(예: `product.api.ts`·`product.store.ts`·`product.schema.ts`). 함수마다 파일을 만들지 않는다. 세그먼트 표기와 목록은 S2.
-- **SSR 실행 경계(SSR 프로젝트만):** `"use client"`·`"use server"`·`import "server-only"`는 파일 단위로 걸린다. 경계가 갈리면 같은 기능이라도 파일을 나눈다 — 단일 함수 파일을 허용하는 사유다.
 - **barrel(`index.ts`):** re-export 파일은 tree-shaking·개발 서버 성능을 떨어뜨리고 순환 import의 통로가 되기 쉽다. 둘 위치는 S4에서 정하고, 모듈 안에서 자기 `index.ts`를 import하지 않는다. 순환 검출 규칙(Biome `noImportCycles` / ESLint `import/no-cycle`)은 S5에 적는다.
 - **테스트·픽스처:** 테스트는 세그먼트 파일 단위로 colocated. 테스트 전용 픽스처·헬퍼는 운영 소스 디렉터리 밖(S8)에 두고 공개 API로 내보내지 않는다.
 
@@ -142,7 +136,7 @@ export type ItemStatus = (typeof ITEM_STATUS)[keyof typeof ITEM_STATUS]; // "cre
 - 컴포넌트는 `React.FC` 대신 함수 시그니처에 Props 타입을 직접 붙인다. `children`은 `ReactNode`로 명시한다.
 - 타입 전용 import는 `import type`으로 분리한다(`verbatimModuleSyntax` 대응).
 - 함수 반환 타입은 추론에 맡기되, **공개 API(모듈 export되는 api/query/유틸 함수)는 반환 타입을 명시**해 계약을 고정한다.
-- **타입체크는 빌드와 별개다** — Vite는 `.ts`를 트랜스파일만 하고 타입 검사를 하지 않는다. `tsc --noEmit`(또는 `tsc -b`)을 `build`·CI 게이트에 포함한다. Next.js는 `next build`가 타입체크를 수행한다.
+- **타입체크는 빌드와 별개다** — Vite는 `.ts`를 트랜스파일만 하고 타입 검사를 하지 않는다. `tsc --noEmit`(또는 `tsc -b`)을 `build`·CI 게이트에 포함한다.
 
 ---
 
@@ -348,9 +342,8 @@ const form = useForm({ resolver: zodResolver(productFormSchema), defaultValues: 
 
 ### Routing
 
-- CSR: React Router v7 Data Router 라우트 정의는 단일 파일(`src/routes.tsx`)에서 SSOT로 관리 — 화면 컴포넌트에 라우트 문자열 하드코딩 금지.
-- SSR: Next.js App Router의 파일 기반 라우팅이 SSOT — `src/routes.tsx` 없이 `app/` 디렉토리 구조 자체가 라우트 정의다.
-- 대형 페이지는 `lazy` + `Suspense`(CSR) 또는 Next.js의 자동 코드 스플리팅(SSR)으로 지연 로딩한다.
+- React Router v7 Data Router 라우트 정의는 단일 파일(`src/routes.tsx`)에서 SSOT로 관리 — 화면 컴포넌트에 라우트 문자열 하드코딩 금지.
+- 대형 페이지는 `lazy` + `Suspense`로 지연 로딩한다.
 - 테스트/디버그 전용 라우트는 프로덕션 빌드에서 제외 (Pitfalls 참고)
 
 ```tsx
@@ -437,7 +430,7 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 - `dangerouslySetInnerHTML`은 sanitize(DOMPurify 등) 없이 금지, React 밖 DOM 직접 조작(innerHTML 대입 등)으로 이스케이프 우회 금지
 - 사용자 입력이 `href`/`src`로 흐르면 URL 스킴 검증 (`javascript:`/`data:` 차단)
 - 인증 토큰은 `localStorage`/`sessionStorage` 저장 금지 → HttpOnly+Secure+SameSite 쿠키
-- 공개 prefix env(`VITE_`/`NEXT_PUBLIC_`)에 시크릿 배치 금지, 프로덕션 소스맵 비공개
+- 공개 prefix env(`VITE_`)에 시크릿 배치 금지, 프로덕션 소스맵 비공개
 - lockfile 커밋 필수, 의존성 audit 정기 실행 (Critical/High 미해결 금지)
 - `postMessage`는 targetOrigin 명시(`'*'` 금지) + 수신 origin 검증
 - 업로드 파일(SVG·HTML 포함)은 앱 origin에서 인라인 렌더 금지, LLM 응답은 사용자 입력과 같은 등급으로 sanitize·스킴 검증
@@ -604,7 +597,6 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 
 아래는 preset 주입 후 반드시 프로젝트 실정에 맞게 채운다.
 
-- **Rendering Mode:** [CSR(Vite) / SSR(Next.js) 중 택1 — 결정 후 반대쪽 예시 코드 제거]
 - **Lint/Format:** [Biome 단독 / ESLint + Prettier 중 택1 — 고른 이유("Lint/Format 선택" 기준) 한 줄]
 - **State SSOT:** [예: Zustand store는 `src/store/`, Context Provider 순서는 `src/App.tsx` 순서를 따름]
 - **API Layer SSOT:** [예: `src/api/`, axios 인스턴스는 `src/api/apiClient.ts`]
@@ -612,7 +604,7 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 - **tsconfig 추가 엄격도:** [예: `strict` + `noUncheckedIndexedAccess` / `exactOptionalPropertyTypes` 여부]
 - **Design System SSOT:** [예: `components/ui/`(shadcn/ui) + `@theme` 토큰]
 - **접근성 기준·게이트:** [예: WCAG 2.1 AA — 신규 화면은 axe 위반 0건 / 기존 화면은 기준선 고정 후 신규 위반만 실패. TRD §2.1 접근성 보장과 일치시킨다]
-- **Routing SSOT:** [예: `src/routes.tsx`(CSR) 또는 `app/`(SSR)]
+- **Routing SSOT:** [예: `src/routes.tsx`]
 - **Sensitive Files:** [예: `.env*`, `*.pem`]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

@@ -146,18 +146,27 @@ provenance_core_version() {
   return 1
 }
 
-# 스택 한정 refs — frontmatter `scope: <preset>`이 active preset과 같을 때만 복사되는 refs
-# (예: web-security.md → react-web). BASE_FILES에 고정하지 않고 번들 frontmatter에서 매번
+# 스택 한정 refs — frontmatter `scope`에 active preset이 들어 있을 때만 복사되는 refs
+# (예: web-security.md → react-web, nextjs). BASE_FILES에 고정하지 않고 번들 frontmatter에서 매번
 # 구한다: 업데이트로 새 스택 한정 ref가 생기면 사본이 없어 "다름"으로 잡혀야 base 갱신 안내가 뜬다.
+# scope는 쉼표로 구분한 preset id 목록이다 — 같은 보안 가이드를 여러 스택이 공유하기 때문.
 scoped_ref_files() {
-  local root="$1" preset f scope
+  local root="$1" preset f scope item items
   preset="$(sed -n 's/.*"preset"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$CLAUDE_DIR/project-convention.json" 2>/dev/null | head -1)"
   [[ -n "$preset" ]] || return 0
   for f in "$root"/refs/*.md; do
     [[ -f "$f" ]] || continue
     # 첫 frontmatter 블록 안의 scope만 본다(본문의 우연한 "scope:" 줄 무시).
     scope="$(awk 'NR==1 && $0!="---" {exit} NR>1 && $0=="---" {exit} /^scope:/ {sub(/^scope:[[:space:]]*/, ""); print; exit}' "$f")"
-    [[ "$scope" == "$preset" ]] && printf 'refs/%s\n' "${f##*/}"
+    [[ -n "$scope" ]] || continue
+    IFS=',' read -r -a items <<< "$scope"
+    for item in "${items[@]}"; do
+      item="${item//[[:space:]]/}"
+      if [[ "$item" == "$preset" ]]; then
+        printf 'refs/%s\n' "${f##*/}"
+        break
+      fi
+    done
   done
   return 0
 }

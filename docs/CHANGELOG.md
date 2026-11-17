@@ -9,6 +9,29 @@
 
 ---
 
+## **프레임워크 확정 시 앱 내부 아키텍처 단계(TRD §3.1) + setup "현행 vs 목표" 비교 + `nextjs` preset** (2026-11-17, `devoks-core` `2.7.1 → 2.8.0`, `devoks-sdlc` `3.20.0 → 3.21.0`)
+- 배경: careerstack(career-guide-init 세션)의 제안이다. 2026-11-12 `setup-preset-manage`로 S1~S8을 채울 때 7단계가 코드베이스 실측을 1차 입력으로 삼아, 당시 구조가 그대로 규칙이 됐다. 그 구조에는 `src/server/`에 인프라와 도메인이 섞인 문제, 진입점 5곳이 DB에 직접 붙어 리소스 인가가 흩어진 문제(IDOR 위험)가 있었다. 이 문제는 Next.js 공식 권장(DAL·BFF·인증)을 검토하고 나서야 드러났고, ADR-030으로 리팩토링했다. 원인은 두 가지다. ① 프레임워크를 확정한 직후 앱 내부 구조(디렉터리 맵·계층·진입점별 데이터 접근)를 정하는 단계가 없었다. ② App Router 구조 결정이 react-web의 "SSR Variant" 몇 줄뿐이라 로컬 커스터마이징으로만 존재했다.
+- 결정(사용자, 2026-11-17): A는 새 스킬 없이 TRD 확장 + setup 비교 단계로, B는 별도 `nextjs` preset으로 간다. 후속 검토에서 그린필드 순서도 정했다. setup-project-convention은 TRD 직후·첫 FRD/PLAN 전에 둔다 — 스택이 정해져야 고를 preset이 있고, PLAN `file:`과 구현이 구조 슬롯을 읽기 때문이다. "base만 먼저 적용" 모드 신설은 기각했다(PRD·TRD 단계는 base rules에 의존하지 않고, 커맨드·훅 판정 변경 비용만 든다). careerstack 이름(`services/`·`defineApiRoute` 등)은 규칙으로 쓰지 않는다 — 공식 권장만 원칙으로 두고 구체값은 슬롯이 정한다.
+- 반영:
+  - devoks-sdlc:
+    - `product-trd-author` 1.4.0: TRD 템플릿 §3.1 "앱 내부 아키텍처"(근거 문서·디렉터리 맵과 두지 않는 것·계층·진입점별 데이터 접근과 인가 위치·배치 규칙·오류 전파·강제 수단·brownfield "현행 vs 목표" 표) 추가. 가이드 §3-8(공식 권장 먼저, 이름은 프로젝트가 고름, 슬롯 매핑 S1·S3·S4·S5), §4 brownfield(현행을 목표로 옮기지 않음), §7 체크리스트, preset 목록에 `nextjs`. description·절차·완료 기준·evals 케이스 1·2 기대값을 갱신했다.
+    - `post-implementation-checklist.md`·`workflow-map`: 웹 전용 도구(visual-diff·acceptance) 분기에 `nextjs` 추가.
+    - 그린필드 순서 보정(같은 날 후속 검토): `workflow-map` 1.7.2 표 A 0단계를 "setup-mcp(최초 1회) · setup-project-convention(기존 코드: 지금 / 그린필드: 2 직후·4 전)"으로 나누고, 그린필드 권장 경로를 `setup-mcp` → 1 → 2 → **convention** → 3 → 4로 바꿨다. `product-trd-author` 보고 다음 단계에 "첫 FRD 착수 전" 명시. `design-spec.md`(`feature-frd-author` 1.8.1·`feature-workflow-runner` 1.11.1)와 `feature-plan-author` 1.6.1에 "convention이 없는데 TRD에 `stack preset`이 있으면 setup 먼저 권장, 진행 시 TRD §3.1 + [Structure] + '미적용' 1줄"을 추가했다. `task-pr-splitting.md`는 convention이 없으면 TRD §3.1을 따른다. README 두 곳의 흐름도 0단계 라벨을 나누고 `TRD -.-> setup` 화살표를 넣었다.
+  - devoks-core: `conventions/nextjs` 신설, react-web을 Vite CSR 전용으로 정리, refs `scope` 다중값(`web-security.md` 공유), setup 감지·추천·7단계 "현행 vs 목표" 비교, preset-manage 전환 안내. 파일 단위 상세는 `plugins/devoks-core/CHANGELOG.md` 2.8.0.
+- 검증:
+  - `claude plugin validate --strict`(core·sdlc) 통과.
+  - 변경 SKILL·command·ref frontmatter를 `ruby -ryaml`로 파싱했다(`scope: "react-web, nextjs"` 문자열 확인). evals.json JSON 파싱 통과.
+  - `scoped_ref_files()`를 macOS `/bin/bash` 3.2에서 스모크 테스트했다(react-web·nextjs → `web-security.md`, ios·react-native → 없음). 훅 `bash -n` 통과, nextjs provenance 스크래치 프로젝트에서 훅 전체 실행 exit 0.
+  - nextjs·react-web preset의 ast-grep 절이 동일함을 diff로 확인했다.
+  - Next.js 사실은 공식 문서로 확인했다: DAL 권장·Server Action 공개 POST·Origin/Host 비교·`allowedOrigins`, proxy 낙관적 검사·16.0.0 rename·Node 기본 런타임, React `cache` render pass 한정, SC → 자기 Route Handler fetch 금지, Vitest async SC 미지원, private folder·route group. `server-only` 패키지 exports(`react-server` → empty, default → throw)는 unpkg로 확인했다. Biome `noImportCycles`·`noBarrelFile`·`noReExportAll`·`noRestrictedImports`(patterns `group`)는 공식 문서로 확인했다.
+- 의도적 미반영(제외 근거):
+  - 별도 아키텍처 스킬 신설 — TRD가 이미 "여러 기능이 같이 바뀌는 결정"의 SSOT다. 경계 관리 비용만 는다.
+  - 구조 슬롯 S9(진입점별 데이터 접근) 신설 — 스택마다 의미가 달라 base 슬롯으로 일반화하기 이르다. nextjs preset의 "Server Architecture" 결정 행과 TRD §3.1로 받는다.
+  - Biome `noRestrictedImports` JSON 예시 — `patterns` 지원·그룹 위치가 버전마다 달라 규칙 이름과 의도만 적었다.
+  - evals 동적 실행 — 트리거 문구는 한 개("디렉터리 구조·계층 정하기")만 늘었고 본문 절차가 보강된 것이라 권장 단계로 두고 생략했다. 기대값·assertion은 갱신했다.
+  - careerstack 반영 — 대상 프로젝트 세션이 플러그인 갱신 후 `setup-preset-manage`로 진행한다. 미확정 슬롯 S2·S4·S5·S8 추천은 그 세션에 회신했다.
+  - `marketplace.json`·`docs/plugin-management.md`·`docs/mcp-setup-guide.md` — 카탈로그 description·관리 규칙·MCP 불변.
+
 ## **형제 Task 간 지식 단절·과분할 리뷰 공백 보강 (careerstack B-7 사후 분석)** (2026-11-12, `devoks-core` `2.7.0 → 2.7.1`, `devoks-sdlc` `3.19.0 → 3.20.0`)
 - 배경: careerstack B-7(AI 생성 파이프라인)은 설치본 devoks-sdlc 3.12.2로 `feature-workflow-runner`를 돌렸고, 구현 뒤 리팩토링 비용이 63파일(+925/−1,022)에 이르렀다. 과분할(P1), 같은 PR 형제 Task 간 헬퍼 중복(P2), 공유 타입·조립 코드 중복과 시그니처 불일치(P3·P5), 테스트 픽스처 운영 src 혼입(P4), 리뷰 미탐지가 보고됐다. 3.19.0(`49fc055`)과 대조해 P1의 `file:` 세그먼트화·[Structure]와 P4(S8)는 이미 반영됐음을 확인했다. careerstack은 아직 S1~S8 슬롯이 없는 구버전 상태였다. 남은 원인은 네 가지다.
   - (1) 순차 위임 원칙의 근거가 "파일 충돌"뿐이라, 파일이 겹치지 않는 병렬 위임을 합리화할 여지가 있었다(실제로 병렬 위임했다).
