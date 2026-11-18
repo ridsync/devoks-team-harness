@@ -4,7 +4,7 @@ description: 거친 기능 아이디어나 FRD 초안을 받아, EARS Acceptance
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.9.0
+  version: 1.10.0
 ---
 
 # frd-author — FRD 정련 (Phase 1)
@@ -61,6 +61,7 @@ metadata:
 - 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨.
 - ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능.
 - `FRD.md` 작성 완료 시 frontmatter `status: draft → review`. → `../feature-workflow-runner/references/progress-tracking.md`
+- 입력이 FEATURES.md의 FRD 시드(F-n·B-n)면 FRD frontmatter `feature: <FEATURES.md 경로>#<ID>`를 채우고(ID는 시드의 "관련 문서" 줄 또는 시드가 놓인 항목 제목, 경로는 그 FEATURES.md), 그 백로그 행을 `📝 frd`로 바꾸며 FRD 열에 FRD 경로를 적는다 — 뒤 단계(plan·실행)가 이 키로 상태를 이어서 갱신한다. 규칙: `progress-tracking.md` "제품 백로그 상태 동기화".
 - 저장소에 제품 PRD(`product-prd-author` 산출물, 기본 `docs/product/PRD.md`)가 있는데 이 기능이 그 `FEATURES.md`에 없는 **새 능력**이면, 완료 보고에 "`product-prd-author` 갱신 모드로 FEATURES 등재 필요"를 안내한다(직접 고치지 않는다) — 유지보수로 추가된 기능이 제품 백로그에서 빠지면 PRD가 실제 제품과 어긋난다.
 
 > 막히면 `../feature-workflow-runner/references/example-walkthrough.md` 의 완성 예시를 참고한다.

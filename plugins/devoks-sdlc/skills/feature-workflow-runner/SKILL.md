@@ -4,7 +4,7 @@ description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하�
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.11.1
+  version: 1.12.0
 ---
 
 # feature-workflow-runner
@@ -76,7 +76,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 5. **§4 설계 스펙** — 제품 TRD가 있으면 그 구조 안에서(frd-author 절차 6). 복잡도 임계 초과 시 코드 패턴을 먼저 탐색(기존 상태관리·훅·유틸·모델)하고 **설계안을 제안·확인**한 뒤 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. 단순 기능은 §4.1만 간결히. → `references/design-spec.md`
 6. **누락 슬롯은 한 번에 모아 사용자에게 확인**한다(추측 금지 — 요구는 묻고, 설계는 제안 후 확인). 검증되지 않은 가정·보류 질문은 §10에 남긴다. 여기서 모아 묻는 것은 슬롯·정책과 Success·Non-goals 제안값이고, 의도 수준 공백(Outcome·User·방향)은 frd-author Phase 0 게이트가 맡는다. 확정되면 `<out>/FRD.md` 작성.
 
-완료 기준: §1에 대상 사용자·Success·Non-goals(최소 1개)가 있고 §10이 채워짐(없으면 "없음"). 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 기존 데이터 의존 요구·반복 트리거 조작 요구는 각각 해당 EDGE가 최소 1개 있음. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능. `FRD.md` 작성 시 frontmatter `status: draft → review`. → `references/progress-tracking.md`
+완료 기준: §1에 대상 사용자·Success·Non-goals(최소 1개)가 있고 §10이 채워짐(없으면 "없음"). 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 기존 데이터 의존 요구·반복 트리거 조작 요구는 각각 해당 EDGE가 최소 1개 있음. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능. `FRD.md` 작성 시 frontmatter `status: draft → review`, FEATURES 시드 입력이면 FRD `feature:` 기입 + 백로그 행 `📝 frd`. → `references/progress-tracking.md`
 
 ## Phase 2 — PLAN 작성
 
@@ -90,7 +90,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 5. **커버리지 검증**: FRD의 모든 `AC/CTR/EDGE`가 어떤 Task `traces`에 등장하는지 점검(누락 0). → `references/traceability.md` 의 comm 스크립트.
 6. 확정되면 `<out>/PLAN.md` 작성. 누락이 있으면 담당 Task를 추가한 뒤에만 다음 단계로. 기존 PLAN.md가 `in-progress`이거나 미체크 Task가 남아 있으면 덮어쓰지 않는다(처리: `devoks-sdlc:feature-plan-author` 절차 7 "진행 중 PLAN 보호"와 동일).
 
-완료 기준: 모든 Task가 `size:`·`test:`·`file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `size`/`test` 분포 자기점검 통과(기준: `devoks-sdlc:feature-plan-author` 완료 기준, 부여 기준 SSOT는 `references/task-pr-splitting.md`), `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(기본 1개, 2개 이상이면 §1에 분리 근거 명시·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재. `PLAN.md` 작성 시 frontmatter `status: draft → approved`. → `references/progress-tracking.md`
+완료 기준: 모든 Task가 `size:`·`test:`·`file:`·`traces:`를 가지고 ID 규칙(`TASK-\d+`)을 지킴, `size`/`test` 분포 자기점검 통과(기준: `devoks-sdlc:feature-plan-author` 완료 기준, 부여 기준 SSOT는 `references/task-pr-splitting.md`), `[P]`가 의존성 그래프와 모순 없음(병렬 Task는 서로를 가리키지 않음), 1개 이상 PR(기본 1개, 2개 이상이면 §1에 분리 근거 명시·PR 간 의존 단방향), 커버리지 점검 출력 공백(누락 0) + DoD 섹션 존재. `PLAN.md` 작성 시 frontmatter `status: draft → approved`, FRD에 `feature:`가 있으면 백로그 행 `🗂️ plan`. → `references/progress-tracking.md`
 
 ## Phase 3 — 태스크 단계 실행
 
@@ -109,7 +109,7 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
    - 커버리지 재점검(누락 0) — `references/traceability.md` comm 스크립트 재실행.
    - 핵심 로직 테스트 통과를 실제 실행 출력으로 확인.
    - Edge case 처리 확인.
-2. 모든 Task `[x]` + DoD 충족 시 frontmatter `status: done`.
+2. 모든 Task `[x]` + DoD 충족 시 frontmatter `status: done`. FRD에 `feature:`가 있으면 FEATURES 행도 `✅ done`(첫 착수 때는 `🚧 in-progress`) — `references/progress-tracking.md` "제품 백로그 상태 동기화".
 3. 미완 Task·임시 코드·추후 작업(예: 커밋/PR, 추가 테스트)을 명시적으로 보고한다(은폐 금지). 각 done 리포트의 **미확인·리스크** 항목("없음" 제외)도 Task별로 모아 함께 보고한다(`references/task-delegation.md`).
 4. **다음 단계 (AskUserQuestion 다중선택 → 선택 항목 위임 실행)** — (제품 첫 구현 완료로 보이면 같은 문서의 "제품 첫 구현 완료 안내"를 함께 출력) `references/post-implementation-checklist.md`의 표준 메뉴에서 해당 항목만 골라 검증/마무리 2개 질문의 `multiSelect`로 제시하고, **고른 항목을 메뉴 순서대로 위임 실행**한다(HITL 선택 실행). 읽기전용 검증/리뷰/테스트는 즉시 실행, 커밋·PR은 각 git 커맨드 자체 확인 플로를 최종 게이트로 위임한다. **앞선 검증에서 Critical/High가 나오면 커밋·PR 전에 멈추고 확인**한다. → `references/post-implementation-checklist.md`
 

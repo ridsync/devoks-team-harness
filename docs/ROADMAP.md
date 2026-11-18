@@ -155,7 +155,6 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
   - `product-design-author` Pencil 실작도 라이브 검증 — 에디터에 `.pen`을 연 HITL 세션에서 `read_skill` → 프레임 작성 → §2 대조까지. `execute`의 `filePath`로 열린 파일 없이 작성 가능한지도 확인(가능하면 비-HITL 작도 경로가 생긴다).
   - Figma 어댑터 `references/tool-figma.md` — 사용자 결정으로 보류(Pencil 우선). 추가 시 `tool` 슬롯 값만 늘리고 SSOT 형식은 유지.
   - TRD 오픈 이슈 ID가 PRD `Q-n`과 겹침(실행마다 `Q-T`n 등 임의 접두어) — TRD·WIREFRAMES ID 접두어 규칙 통일.
-  - `FEATURES.md` "기반" 구역의 위치·형식이 PRD 산출물에 따라 달라짐(구역 없는 FEATURES에 trd-author가 임의 위치로 추가) — 템플릿 기준 위치 고정.
   - `react-native` preset: Zustand 예시가 TS curried 형태(`create<T>()(...)`)가 아님, Expo SDK 표기(55)가 공식 최신과 어긋날 수 있음(2026-11-02 Context7 기준 58) — 재확인 후 갱신.
   - 우선순위: 중(라이브 검증) · 낮음(나머지).
 

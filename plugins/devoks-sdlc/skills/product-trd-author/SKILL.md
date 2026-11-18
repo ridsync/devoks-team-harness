@@ -4,7 +4,7 @@ description: "제품 PRD(PRD.md·FEATURES.md)를 받아 여러 기능이 함께 
 argument-hint: "[src=<PRD 경로|TRD 입력 양식 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.4.0
+  version: 1.5.0
 ---
 
 # product-trd-author — 제품 TRD · 기술 구조 작성/갱신
@@ -77,7 +77,7 @@ PRD.md + FEATURES.md ─▶ [이 스킬] TRD.md + FEATURES.md 기반 구역(B-n)
 
 ### 3. 기반 작업 → FEATURES.md 기반 구역
 
-둘 이상의 기능이 의존하는 공통 기반(골격·인증·공유 모델·CI·계측 파이프라인, 화면이 있으면 디자인 시스템)을 `B-n`으로 뽑아 `FEATURES.md`의 "기반" 구역에 FRD 시드(FRD 입력 양식과 같은 칸)로 쓴다(가이드 §6). 이 구역은 이 스킬이 소유한다. TRD §10에는 목록만 둔다.
+둘 이상의 기능이 의존하는 공통 기반(골격·인증·공유 모델·CI·계측 파이프라인, 화면이 있으면 디자인 시스템)을 `B-n`으로 뽑아 `FEATURES.md`의 "기반" 구역 — §2 표(상태 `📋 backlog`)와 §4의 `### B-n` 시드(FRD 입력 양식과 같은 칸) — 에 쓴다(가이드 §6). 이 구역은 이 스킬이 소유한다. B-n이 앞서야 하는 F-n의 의존 열에 B-n을 넣고, §3 작업 순서를 다시 계산한다(F-n의 다른 열은 고치지 않는다). TRD §10에는 목록만 둔다.
 
 ### 4. 자체 점검 → 보고
 
@@ -96,7 +96,7 @@ PRD 버전이 TRD의 `prd_version`보다 높거나 기술 결정을 바꾸자는
 - 화면이 있는 제품이면 §2.1 UI 기반(플랫폼 확정 범위·계획, 컴포넌트 층, 해당 시 공유 전략)과 디자인 시스템 B-n(와이어프레임 선행)이 있다.
 - PRD의 모든 NFR이 §6에, 모든 계측 FR이 §7에 있다.
 - 엔드포인트 목록·EARS AC·기능 내부 설계가 없다.
-- B-n이 FEATURES.md 기반 구역에 FRD 시드로 있다.
+- B-n이 FEATURES.md 기반 구역(§2 표 + §4 시드)에 있고, §3 작업 순서에 반영됐다.
 - 확인은 한 메시지로 묶였다(HITL) / 확인 목록이 보고에 있다(비-HITL).
 
 > 경계·규칙·체크리스트: `references/trd-guide.md`

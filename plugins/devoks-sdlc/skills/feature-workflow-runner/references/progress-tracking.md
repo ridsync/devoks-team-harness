@@ -27,6 +27,22 @@ Phase 경계에서 FRD·PLAN frontmatter `status`를 **자동**으로 갱신한�
 - Phase 3(실행) 시작 시 PLAN `status`가 아직 `draft`이면 먼저 `approved`로 올린 뒤, 첫 Task 착수 시 `in-progress`로 전환한다.
 - FRD `status`는 `approved`가 최종이다(`done` 사용 안 함).
 
+## 제품 백로그(FEATURES.md) 상태 동기화
+
+FRD frontmatter `feature:`(`<FEATURES.md 경로>#F-n` 또는 `#B-n`)가 있으면, 위 전환과 **같은 시점에** 그 백로그 행의 상태도 바꾼다. 상태 범례·칸 소유의 SSOT는 `../../product-prd-author/assets/FEATURES.template.md` "상태 범례"다.
+
+| 시점 | FEATURES 행 상태 | 함께 바꾸는 칸 |
+|------|------------------|----------------|
+| `FRD.md` 작성 (Phase 1 완료) | `📝 frd` | FRD 열 = FRD.md 경로(저장소 루트 기준) |
+| `PLAN.md` 작성 (Phase 2 완료) | `🗂️ plan` | — |
+| 첫 Task 착수 (PLAN `in-progress`) | `🚧 in-progress` | — |
+| PLAN `done` 전환 | `✅ done` | — |
+
+- 고치는 것은 **그 행의 상태·FRD 칸과 frontmatter `updated`뿐**이다. 다른 열·행·§3 작업 순서·시드는 건드리지 않는다(소유 스킬 몫).
+- **앞으로만 간다** — 이미 더 뒤 상태면 그대로 둔다(예: 진행 중 PLAN을 재계획해도 `in-progress` 유지). 행이 `🚫 dropped`면 고치지 않고 보고에 "dropped 항목에 대한 작업"을 남긴다.
+- `feature:`가 없거나 경로·행을 찾지 못하면 건너뛰고 완료 보고에 한 줄 남긴다(추측해서 다른 행을 고치지 않는다).
+- 구형식 FEATURES(이모지 없는 `frd` 등)는 구조를 바꾸지 않고 상태 칸만 고친다 — 표기도 그 파일의 기존 형식(키워드만)을 따른다. 새 구조로의 이전은 `product-prd-author` 갱신 모드에서 사용자가 요청할 때만 한다.
+
 ## PLAN.md 갱신 규칙
 
 - Task **착수 시**: 세션 도구에서 해당 항목을 in_progress로. PLAN 체크박스는 아직 `[ ]`.

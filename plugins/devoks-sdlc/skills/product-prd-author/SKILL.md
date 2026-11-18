@@ -4,7 +4,7 @@ description: "아이디어·요구사항 메모·기획 문서를 받아 장기 
 argument-hint: "[src=<아이디어 본문|요구 문서 경로> (default: 대화 맥락)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.1.4
+  version: 1.2.0
 ---
 
 # product-prd-author — 제품 PRD · 기능 백로그 작성/갱신
@@ -80,8 +80,8 @@ metadata:
 
 ### 3. FEATURES.md 작성 (기능 백로그)
 
-`assets/FEATURES.template.md`를 따른다. FRD 시드는 FRD 입력 양식(`../feature-frd-author/assets/FRD.intake.md`)과 같은 칸을 쓴다. `FR`을 사용자가 체감하는 기능 단위 `F-n`으로 묶고, 릴리스(MVP/Next/Later)·의존·상태를 매긴다.
-각 항목에 **FRD 시드**를 붙인다 — 칸이 FRD 입력 양식의 ★(Outcome·User·Success·Out of scope)와 같아서, 시드를 초안으로 넘기면 인터뷰 없이 FRD 정련으로 바로 들어갈 수 있다. 시드에 남은 `미확정`·`제안` 값은 frd-author가 한 번 더 확인한다.
+`assets/FEATURES.template.md`를 따른다. FRD 시드는 FRD 입력 양식(`../feature-frd-author/assets/FRD.intake.md`)과 같은 칸을 쓴다. `FR`을 사용자가 체감하는 기능 단위 `F-n`으로 묶어 §1 표에 쓰고, 릴리스(MVP/Next/Later)·의존을 매기며 상태는 `📋 backlog`로 시작한다. §2(공통 기반 B-n)는 비워 두고(`product-trd-author` 몫), §3 작업 순서를 의존 열에서 계산해 쓴다 — 같은 단계는 동시 진행 가능, 다음 단계는 시작 조건 항목이 모두 `done`일 때(계산 규칙은 템플릿 §3). 상태는 이후 feature 스킬들이 범례대로 바꾼다.
+§4에 항목마다 **FRD 시드**를 붙인다 — 칸이 FRD 입력 양식의 ★(Outcome·User·Success·Out of scope)와 같아서, 시드를 초안으로 넘기면 인터뷰 없이 FRD 정련으로 바로 들어갈 수 있다. 시드에 남은 `미확정`·`제안` 값은 frd-author가 한 번 더 확인한다.
 
 ### 4. 자체 점검 → 보고
 
@@ -97,7 +97,7 @@ PRD는 결정이 바뀔 때마다 고쳐야 신뢰가 유지되는 살아있는 
 1. 기존 `PRD.md`·`FEATURES.md`를 먼저 읽고, 변경 요청을 섹션 단위 **변경 목록**(추가/수정/삭제 + 영향받는 ID)으로 정리한다. 같은 디렉터리에 `WIREFRAMES.md` §6·`VISUAL.md` §8의 PRD 영향(FR 후보·가정 갱신)이 있으면 반영 후보로 함께 올리고, 반영한 항목은 §13 사유에 **출처 ID**(V-n·IX-n·VD-n)를 적는다 — 디자인 단계가 반영 여부를 이 이력으로 판정한다.
 2. 연쇄 영향을 찾는다 — 목표가 바뀌면 그 목표를 근거로 한 `FR`·KPI, `FR`이 빠지면 그것을 담은 `F-n`.
 3. 버전 bump 수준(major/minor/patch)을 제안하고 변경 목록과 함께 **확인을 받은 뒤** 쓴다(비-HITL이면 변경 목록을 보고만 하고 쓰지 않는다). 문제·타깃·핵심 KPI가 바뀌는 major 변경은 사실상 제품 재정의이므로 특히 분명히 짚는다.
-4. 반영 후 §13 변경 이력에 `버전 | 날짜 | 변경 요약 | 사유·결정`을 추가한다. 삭제한 FR·F는 지우지 않고 `dropped`로 남기고 사유를 적는다 — 이미 FRD로 넘어간 항목의 추적이 끊기지 않게 하기 위해서다. `FEATURES.md`의 "기반" 구역(B-n)은 `product-trd-author` 소유라 고치지 않는다 — 범위 변경이 기반에 영향을 주면 "TRD 갱신 필요"로 보고한다.
+4. 반영 후 §13 변경 이력에 `버전 | 날짜 | 변경 요약 | 사유·결정`을 추가한다. 삭제한 FR·F는 지우지 않고 `dropped`로 남기고 사유를 적는다 — 이미 FRD로 넘어간 항목의 추적이 끊기지 않게 하기 위해서다. `FEATURES.md`의 "기반" 구역(§2 표·§4 B-n 시드)은 `product-trd-author` 소유라 고치지 않는다 — 범위 변경이 기반에 영향을 주면 "TRD 갱신 필요"로 보고한다. F-n의 의존·릴리스가 바뀌면 §3 작업 순서를 B-n 의존까지 읽어 다시 계산한다. 상태 열은 feature 스킬이 진행에 맞춰 바꾼 값이므로 `dropped` 외에는 되돌리지 않는다. 구형식 FEATURES(번호 구역·상태 범례·§3 없음)는 사용자가 요청할 때만 새 구조로 옮긴다 — 옮길 때도 ID·상태·FRD 경로·시드 본문은 그대로 두고 배치만 바꾼다.
 5. 이미 FRD가 연결된(`FEATURES.md` 상태 `frd` 이후) 항목이 영향을 받으면 해당 FRD 경로를 "재검토 필요"로 보고한다(FRD를 직접 고치지 않는다).
 
 ## 완료 기준
@@ -106,7 +106,7 @@ PRD는 결정이 바뀔 때마다 고쳐야 신뢰가 유지되는 살아있는 
 - §1 문제 진술, §4 목표(≤3)·핵심 KPI(지표 이름 + 계측 FR/NFR 연결), §8 Out of Scope(이유+행선지 최소 1개)가 있다.
 - 모든 `FR`이 `G`/`S`로 역추적되고, 모든 MVP 목표에 그것을 이루는 `FR`이 있다.
 - PRD에 EARS AC·화면 상태·컴포넌트·기술 설계가 없다.
-- `FEATURES.md`의 모든 `FR`이 정확히 하나의 `F`에 속하고, 각 `F`에 FRD 시드가 있다.
+- `FEATURES.md`의 모든 `FR`이 정확히 하나의 `F`에 속하고, 각 `F`에 FRD 시드가 있으며, §3 작업 순서가 의존 열과 일치한다.
 - 갱신 모드: 사용자 확인 후 반영, 버전 bump, §13 이력 추가, 영향받은 FRD 보고.
 
 > 판정 기준·작성 규칙·예시: `references/prd-guide.md`

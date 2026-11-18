@@ -4,7 +4,7 @@ description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)�
 argument-hint: "[frd=<FRD.md 경로> (default: 최근 FRD)] [out=<디렉터리> (default: FRD 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.6.1
+  version: 1.7.0
 ---
 
 # plan-author — PLAN 작성 (Phase 2)
@@ -46,5 +46,6 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 - 1개 이상 PR 생성(기본 1개). 2개 이상이면 §1에 분리 근거(기능/위험/리뷰 부담 중 하나) 명시 + PR 간 의존 단방향 준수.
 - 커버리지 점검 출력 공백(누락 0), DoD 섹션 존재.
 - `PLAN.md` 작성 완료 시 frontmatter `status: draft → approved`. → `../feature-workflow-runner/references/progress-tracking.md`
+- FRD frontmatter에 `feature:`가 있으면 그 FEATURES.md 행을 `🗂️ plan`으로 바꾼다(앞으로만 — 이미 `in-progress` 이후면 유지). 규칙: `progress-tracking.md` "제품 백로그 상태 동기화".
 
 > 형식이 헷갈리면 `../feature-workflow-runner/references/example-walkthrough.md` 참고.

@@ -9,6 +9,17 @@
 
 ---
 
+## **FEATURES.md 구역 레이블·작업 순서·상태 이모지 + feature 스킬의 백로그 상태 동기화** (2026-11-18, `devoks-sdlc` `3.22.0 → 3.23.0`)
+- 배경: FEATURES 템플릿은 `backlog → frd → plan → in-progress → done` 상태를 정의했지만, FEATURES.md를 쓰는 스킬은 `product-prd-author`(F-n 생성·dropped)와 `product-trd-author`(B-n)뿐이었다. 그래서 FRD·PLAN을 쓰거나 구현을 시작·완료해도 상태 열이 `backlog`에 머물렀다. `post-implementation-checklist`의 "MVP 전부 done" 판정과 prd/trd/design 갱신 모드의 "상태 `frd` 이후 = 재검토 필요" 판정이 이 열을 읽는데, 그 값이 갱신되지 않고 있었다. 템플릿에서도 상태 설명이 표 위 인용 한 줄뿐이었고, F-n 표·기반 표·시드에 구역 레이블이 없었으며, 순차·병렬 작업 순서를 볼 곳이 없었다. 기반 구역 위치가 산출물마다 달라지던 ROADMAP 항목도 같은 원인이었다.
+- 반영:
+  - `FEATURES.template.md`: 상태 범례 표를 추가했다(이모지 📋📝🗂️🚧✅🚫, 의미, 바꾸는 스킬·시점, 칸 소유). 구역은 §1 사용자 기능 단위(F-n) / §2 공통 기반 작업 단위(B-n, `의존` 열 추가) / §3 작업 순서 / §4 기능 단위 상세(FRD 시드, `### F-n`·`### B-n`)로 나눴다. §3은 의존 열에서 계산한 보기로, 같은 단계는 `∥` 동시 진행, 다음 단계는 시작 조건 항목이 모두 done일 때 시작한다. 같은 공유 엔티티를 고치는 항목에는 `충돌 주의`를 단다. 시드의 "관련 문서"는 `FEATURES.md F-n`이다.
+  - 동기화 키: FRD frontmatter에 `feature: <FEATURES.md 경로>#F-n|B-n`을 추가했다. `progress-tracking.md`에 "제품 백로그 상태 동기화" 절을 추가했다(시점별 전환, 그 행의 상태·FRD 칸만 수정, 앞으로만 진행, dropped는 수정하지 않고 보고, 키가 없으면 건너뛰고 보고, 구형식은 표기 유지).
+  - `feature-frd-author` 1.10.0(시드 입력 시 `feature:` 기입 + `📝 frd` + FRD 경로), `feature-plan-author` 1.7.0(`🗂️ plan`), `feature-plan-executor` 1.9.0·`feature-workflow-runner` 1.12.0(`🚧 in-progress`·`✅ done`).
+  - `product-prd-author` 1.2.0: §1/§3/§4 작성, 의존 변경 시 §3 재계산, 상태 열은 되돌리지 않음, 구형식은 요청 시에만 새 구조로 이전. `product-trd-author` 1.5.0: 기반 구역 = §2 표 + §4 B-n 시드, B-n을 기다리는 F-n의 의존 열에 B-n 기입(칸 소유 예외로 명시), §3 재계산.
+- 결정: 사용자 예시의 `FR`/`MR` 접두어는 채택하지 않고 `F-n`/`B-n` ID를 유지했다. 레이블만 바꿨다. `FR-n`은 PRD 기능 요구 ID와 겹치고, `B-n`은 TRD §10·design·frd 스킬 전반에서 쓰이기 때문이다.
+- 검증: `claude plugin validate ./plugins/devoks-sdlc --strict` 통과. 변경 SKILL 6개 frontmatter를 `ruby -ryaml`로 파싱했다(`argument-hint` String 유지).
+- 의도적 미반영: README·README.ko·marketplace는 바꾸지 않았다(스킬 이름·description·카탈로그 불변). evals 고정 입력(`evals/files/*/FEATURES.md`)은 구형식 그대로 두었다 — 구형식 호환 경로를 검증하는 입력이기 때문이다. 동적 eval 실행은 하지 않았다(트리거 조건 불변).
+
 ## **스킬 frontmatter `name` 전수 명시 (= 디렉토리명)** (2026-11-18, `devoks-browser` `2.0.2 → 2.0.3`, `devoks-rn` `1.1.3 → 1.1.4`, `devoks-sdlc` `3.22.0`(같은 미배포 버전에 포함))
 - 배경: 스킬 18개(browser 2·rn 1·sdlc 15)에 `name`이 없었다. 컨벤션은 "`name` 필수"인데 `validate --strict`는 SKILL frontmatter를 보지 않아 잡지 못했다. Claude Code는 `name`을 생략하면 디렉토리명을 쓰므로 동작에는 문제가 없었다(공식 문서 Skills › Frontmatter reference: "Defaults to the directory name").
 - 결정(사용자, 2026-11-18): 커맨드는 `/<plugin>:<skill-dir>` 형식을 유지한다. 자동완성으로 접근하기 쉽고 다른 스킬과 구분되기 때문이다. 그래서 `name`은 디렉토리명과 같게 명시한다. command는 `name`을 지원하지 않아(공식 문서) 파일명이 커맨드 이름인 기존 관행을 유지한다.

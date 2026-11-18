@@ -5,6 +5,7 @@ title: <기능 이름>
 status: draft        # draft | review | approved
 updated: <YYYY-MM-DD>
 plan: ./PLAN.md
+feature:            # 선택 — 제품 백로그 항목. `<FEATURES.md 경로>#F-n`(또는 #B-n). FEATURES 시드로 시작했으면 채운다 — 백로그 상태 동기화 키
 issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으면 생략)
 ---
 
