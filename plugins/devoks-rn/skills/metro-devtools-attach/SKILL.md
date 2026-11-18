@@ -1,4 +1,5 @@
 ---
+name: metro-devtools-attach
 description: "React Native 앱 디버깅 — 에뮬레이터/시뮬레이터 스크린샷 자동 캡처, Metro CDP로 JS 콘솔 확인, Zustand·TanStack Query 상태 조회, 네트워크 API 모니터링. RN 디버깅, 화면 확인, 스크린샷, console.log 확인, 에뮬레이터, 시뮬레이터, Metro, Hermes, 앱 상태 조회 키워드에 반드시 사용한다."
 ---
 

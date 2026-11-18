@@ -1,4 +1,5 @@
 ---
+name: new-feature-by-github-issue
 description: "GitHub에 이미 등록된 태스크 이슈 본문을 SSOT로 삼아, 프로젝트 패턴에 맞게 기능을 설계·구현한다(요구 정리 → 설계·승인 → 브랜치 사전체크 → 구현 → 마무리). FRD/PLAN 산출물 없이 이슈 하나로 바로 구현하는 간이 경로다. \"이 이슈로 기능 구현해줘\", \"깃헙 이슈 기반으로 개발\", \"이슈 #42 구현\", \"issue driven development\" 같은 요청에서 사용한다. 이슈 자체를 새로 등록하려면 devoks-git:git-create-issue, 추적 가능한 FRD/PLAN 산출물과 태스크 단위 진행이 필요하면 devoks-sdlc:feature-workflow-runner 를 쓴다."
 argument-hint: "issue=<이슈 URL|owner/repo#번호|본문 전체>"
 metadata:

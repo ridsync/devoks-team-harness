@@ -1,4 +1,5 @@
 ---
+name: code-refactoring
 description: "지정된 파일/폴더/모듈을 대상으로 현황 파악 → 계획 수립 → 승인 → 실행 → 검증 순서로 리팩토링한다. UI 개선이 아닌 구조·책임·계약·도메인 품질(SSOT, Fail-Fast, 계층 분리, 네이밍, 사이드이펙트) 개선에 집중하며 외부 동작 변경은 원칙적으로 하지 않는다. \"리팩토링해줘\", \"이 파일 구조 정리\", \"코드 품질 개선\", \"SSOT 위반 고쳐줘\", \"Fail-Fast 적용\" 같은 요청에서 사용한다. 새 기능 구현은 devoks-sdlc:feature-plan-executor 또는 devoks-sdlc:new-feature-by-github-issue, 코드 문제 발견(수정 아님)은 devoks-sdlc:code-review 를 쓴다."
 argument-hint: "target=<파일|폴더|모듈 경로> [goal=<개선 목표>] [constraints=<제외 범위·동작 불변 요구 등>]"
 metadata:

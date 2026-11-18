@@ -1,4 +1,5 @@
 ---
+name: verify-acceptance-test
 description: FRD의 AC(Acceptance Criteria) 중 UI 조작과 상태 영속이 걸린 항목을, 이미 실행 중인 앱에서 실제로 조작해 검증한다. 단위/통합/E2E 자동화 테스트 스위트와 달리 테스트 코드를 남기지 않는 1회성 실동작 확인이다 — 진입 경로(라우트) → 사전 상태 세팅 → 조작(클릭/입력) → 기대 UI 상태 → 기대 영속 상태(DB 필드 대조) 순으로 실행하고 시나리오별 PASS/FAIL 리포트를 낸다. Chrome DevTools MCP(`chrome-devtools-attach`, 9269 attach)가 user scope에 등록돼 있어야 한다. 웹앱(Chrome attach) 전용이며 React Native·Android·iOS 네이티브 앱은 대상이 아니다. "실동작 검증", "브라우저로 실제 확인", "AC가 실제로 동작하는지", "기능이 실제 앱에서 되는지", "acceptance test" 키워드에서 호출한다. 레이어별 계측·3중 대조가 필요한 데이터 정합성 심층 검증은 devoks-sdlc:verify-data-flow를 쓴다.
 argument-hint: "ac=<AC-ID 목록> [frd=<FRD.md 경로>] route=<진입 라우트> persistence=<영속 조회 방법>"
 metadata:

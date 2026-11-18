@@ -126,6 +126,16 @@ argument-hint: "[mode=general|diff-branch] [scope=<파일/폴더 경로>]"
 ...
 ```
 
+### name — 스킬 디렉토리명과 동일
+
+`name`은 플러그인 스킬 커맨드의 마지막 세그먼트를 정한다(플러그인 prefix는 유지). 생략하면 디렉토리명을 쓰지만,
+이 저장소는 `name`을 **항상 명시하고 디렉토리명과 같게** 둔다 — 커맨드가 `/<plugin>:<skill-dir>` 형식으로 고정된다.
+command `.md`는 `name`을 지원하지 않으므로 파일명이 커맨드 이름이다. 전수 확인:
+
+```bash
+for f in plugins/*/skills/*/SKILL.md; do d=$(basename $(dirname $f)); ruby -ryaml -e 's=File.read(ARGV[0]); y=YAML.load(s[/\A---\n(.*?)\n---/m,1]); puts "BAD #{ARGV[0]}" unless y["name"]==ARGV[1]' $f $d; done
+```
+
 ### argument-hint — 인자를 받는 스킬의 필수 항목
 
 `argument-hint`는 `/skill-name` 입력 시 autocomplete에 표시되는 **기대 인자 힌트**다.

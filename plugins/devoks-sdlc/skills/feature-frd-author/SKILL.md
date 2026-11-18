@@ -1,4 +1,5 @@
 ---
+name: feature-frd-author
 description: 거친 기능 아이디어나 FRD 초안을 받아, EARS Acceptance Criteria·Contract(파라미터/상태전이)·Resource 체크리스트·Edge Case·Testing Strategy를 갖춘 정련된 FRD.md로 완성한다. "FRD 초안 정리해줘", "FRD 입력 양식 줘", "기능 요청 양식", "기능 요구서 다듬기", "요구사항을 EARS로 정형화", "AC/Contract 정리", "스펙 문서 작성" 같은 요청에서 사용한다. 초안의 의도(무엇이 달라지는지·누구를 위한 것인지)가 비었거나 방향이 여러 갈래면 Phase 0에서 devoks-sdlc:feature-interview 로 먼저 정련한 뒤 이어서 진행한다. FRD→PLAN→실행 전체를 한 번에 돌리려면 devoks-sdlc:feature-workflow-runner, 작성 후 작업 분해는 devoks-sdlc:feature-plan-author 를 쓴다. 입력은 FRD 입력 양식(FRD.intake.md)이 SSOT이며 양식만 요청하면 빈 양식을 준다.
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:

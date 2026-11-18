@@ -1,4 +1,5 @@
 ---
+name: browser-visual-diff
 description: Figma 디자인과 라이브 렌더를 비교해 UI 충실도를 끌어올린다. Phase 0(슬롯 합의·Chrome 연결 확인) → Phase 1~4를 browser-visual-diff-capture 에이전트에 위임(캡처·시각diff·디자인가이드 정합성 검증 결과를 충실도 리포트로 수령) → Phase 5(미세조정) → Phase 6(회수+검증). Figma 비교 / 시각 diff / 픽셀 퍼펙트 / UI 충실도 / Figma vs 실제 렌더 키워드에서 호출.
 argument-hint: "figma-url=<URL> component=<경로> route=<라이브 라우트> [design-guide=<경로>] [out=<디렉터리> (default: 활성 워크스페이스)]"
 metadata:

@@ -9,6 +9,12 @@
 
 ---
 
+## **스킬 frontmatter `name` 전수 명시 (= 디렉토리명)** (2026-11-18, `devoks-browser` `2.0.2 → 2.0.3`, `devoks-rn` `1.1.3 → 1.1.4`, `devoks-sdlc` `3.22.0`(같은 미배포 버전에 포함))
+- 배경: 스킬 18개(browser 2·rn 1·sdlc 15)에 `name`이 없었다. 컨벤션은 "`name` 필수"인데 `validate --strict`는 SKILL frontmatter를 보지 않아 잡지 못했다. Claude Code는 `name`을 생략하면 디렉토리명을 쓰므로 동작에는 문제가 없었다(공식 문서 Skills › Frontmatter reference: "Defaults to the directory name").
+- 결정(사용자, 2026-11-18): 커맨드는 `/<plugin>:<skill-dir>` 형식을 유지한다. 자동완성으로 접근하기 쉽고 다른 스킬과 구분되기 때문이다. 그래서 `name`은 디렉토리명과 같게 명시한다. command는 `name`을 지원하지 않아(공식 문서) 파일명이 커맨드 이름인 기존 관행을 유지한다.
+- 반영: 18개 SKILL.md에 `name: <디렉토리명>`을 추가했다. 컨벤션 Frontmatter 규칙에 "디렉토리명과 동일" 규칙과 command의 `name` 미지원을 적었다. `docs/plugin-management.md` §4에 `name` 절과 전수 확인 스크립트를 넣었다.
+- 검증: 전체 스킬 `name == 디렉토리명` 전수 파싱 통과(기존 `name`이 있던 스킬도 불일치 0). `validate --strict`(browser·rn·sdlc) 통과.
+
 ## **기존 디자인 역문서화 모드 + 디자인 파일 경로 규칙 + 착수 점검 분기 + 제품 문서 이관 안내** (2026-11-17, `devoks-sdlc` `3.21.0 → 3.22.0`, `devoks-core` `2.8.0 → 2.9.0`)
 - 배경: careerstack(career-guide-init 세션) 사후 분석이다. F-4 FRD의 착수 점검에서 WIREFRAMES.md가 없다고 나왔다. 화면은 2026-11-02에 Pencil(`docs/design/wireframes.pen`)로 먼저 그렸고, 같은 날 도입된 `product-design-author`를 한 번도 거치지 않았다. `.pen`은 Pencil MCP·HITL 전용이라 에이전트·CI가 화면 근거를 못 읽고, FRD가 W-n을 인용할 수 없으며, 디자인 이후 결정을 기록할 곳이 없었다. 하네스 쪽 원인은 네 가지다. ① 디자인 → 문서 방향 절차가 없었다(`tool-pencil.md` §6은 역방향 수정을 금지만 함). ② 착수 점검이 "디자인 먼저"만 안내해 처음부터 다시 그리는 것처럼 읽혔다. ③ 새 제품 문서 단계를 진행 중 프로젝트에 알릴 경로가 없었다. ④ `<out>/design/` 고정이라 `out=docs/design`이면 경로가 이중으로 생기고, 기존 경로를 따를 규칙이 없었다.
 - 결정(사용자, 2026-11-17): 제안 1·2·4는 반영한다. 3은 SessionStart 훅 대신 `setup-preset-manage` 일괄 점검의 1줄 안내로 줄인다 — "화면이 있는 제품인가"를 훅이 Bash로 판정하면 오탐 위험이 있다.

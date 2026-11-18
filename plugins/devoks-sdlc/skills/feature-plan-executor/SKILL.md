@@ -1,4 +1,5 @@
 ---
+name: feature-plan-executor
 description: PLAN.md(작업 분해)를 받아 각 태스크를 의존성 순서대로 단계 실행하고 진행 상태를 추적한다. 선행이 끝난 Task부터 `size` 마커로 라우팅해(S 직접·M 위임·L 분해 재검토) code-implementer 에이전트에 구현·검증을 위임(기본 경로) → done 리포트의 검증 근거·인계 노트 확인 → PLAN 체크박스 `[x]`·frontmatter status 갱신. PLAN.md를 진행 SSOT로 삼아 세션이 끊겨도 재개 가능. "PLAN대로 진행해줘", "태스크 단계 실행", "작업 계획 따라 구현", "PLAN 체크리스트 진행", "다음 태스크 이어서" 같은 요청에서 사용한다. 구현 착수 전 브랜치·이슈 사전체크(제안→확인→적용)를 수행한다. 커밋·푸시·PR 생성은 하지 않는다(별도 도구·사용자 명시 요청). 전체 흐름은 devoks-sdlc:feature-workflow-runner.
 argument-hint: "[plan=<PLAN.md 경로> (default: 최근 PLAN)] [pr=<PR 그룹> (default: 전체)] [task=<TASK-ID> (default: 전체)]"
 metadata:

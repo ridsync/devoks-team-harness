@@ -56,10 +56,10 @@ plugins/<plugin-name>/
 ## Frontmatter 규칙
 
 - `description`(또는 다른 YAML 값)에 `: `(콜론+공백)이 포함되면 YAML 파싱 실패 → **쌍따옴표로 감싼다.**
-- SKILL.md: `name`, `description` 필수.
+- SKILL.md: `name`, `description` 필수. `name` 값은 **스킬 디렉토리명과 동일**하게 둔다 — 플러그인 스킬은 `name`이 커맨드의 마지막 세그먼트가 되므로, 같아야 `/<plugin>:<skill-dir>` 형식(자동완성·다른 플러그인 스킬과의 구분)이 유지된다. Claude Code 자체는 `name` 생략 시 디렉토리명을 쓰지만, 명시해 두면 디렉토리 이름이 바뀌어도 커맨드 이름이 소리 없이 바뀌지 않는다.
 - SKILL.md `argument-hint`: 본문에 `## 호출 방법`(또는 `## 호출`) 슬롯이 정의된 스킬은 **필수**, 인자 슬롯이 없는 스킬은 **금지**(없는 인자를 오인시킴). **값은 항상 쌍따옴표** — `[`로 시작하면 YAML flow sequence로 해석된다.
 - `argument-hint` 값은 본문 usage 라인의 **인자부와 완전히 동일한 문자열**로 유지한다(본문이 SSOT). 표기는 usage string 관례 — `key=<값>` 필수 / `[key=<값>]` 선택 / `[key=<값> (default: X)]` 선택+기본값. 기본값 키워드는 `default:` 고정(usage 표기 전용 — 산문에서는 한국어 `기본` 유지), 값은 본문에 서술된 것만 쓰고 추정하지 않는다. 힌트만 고치면 필수/선택이 본문과 모순되므로 **항상 같이 고친다**. 판정 기준·검증 스크립트는 `docs/plugin-management.md` §4 및 `.claude/skills/devoks-plugin-maintenance/references/workflow-checklist.md` §7.
-- command `.md`: `description` 필수, frontmatter 없으면 `--strict` 검증 실패.
+- command `.md`: `description` 필수, frontmatter 없으면 `--strict` 검증 실패. `name` 필드는 command에서 지원되지 않는다(공식 문서) — 커맨드 이름은 항상 파일명이고 `/<plugin>:<file>` 형식이 된다.
 - agent `.md`: `name`, `description` 필수. `model`/`effort`는 생략 시 세션 상속(`inherit`) — 신규 agent는 반드시 의도적으로 결정하고, `inherit`로 두기로 했어도 명시한다. 모델 선택 기준은 `docs/plugin-management.md` §12.
 
 ---
