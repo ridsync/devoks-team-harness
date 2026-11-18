@@ -9,6 +9,17 @@
 
 ---
 
+## **기존 디자인 역문서화 모드 + 디자인 파일 경로 규칙 + 착수 점검 분기 + 제품 문서 이관 안내** (2026-11-17, `devoks-sdlc` `3.21.0 → 3.22.0`, `devoks-core` `2.8.0 → 2.9.0`)
+- 배경: careerstack(career-guide-init 세션) 사후 분석이다. F-4 FRD의 착수 점검에서 WIREFRAMES.md가 없다고 나왔다. 화면은 2026-11-02에 Pencil(`docs/design/wireframes.pen`)로 먼저 그렸고, 같은 날 도입된 `product-design-author`를 한 번도 거치지 않았다. `.pen`은 Pencil MCP·HITL 전용이라 에이전트·CI가 화면 근거를 못 읽고, FRD가 W-n을 인용할 수 없으며, 디자인 이후 결정을 기록할 곳이 없었다. 하네스 쪽 원인은 네 가지다. ① 디자인 → 문서 방향 절차가 없었다(`tool-pencil.md` §6은 역방향 수정을 금지만 함). ② 착수 점검이 "디자인 먼저"만 안내해 처음부터 다시 그리는 것처럼 읽혔다. ③ 새 제품 문서 단계를 진행 중 프로젝트에 알릴 경로가 없었다. ④ `<out>/design/` 고정이라 `out=docs/design`이면 경로가 이중으로 생기고, 기존 경로를 따를 규칙이 없었다.
+- 결정(사용자, 2026-11-17): 제안 1·2·4는 반영한다. 3은 SessionStart 훅 대신 `setup-preset-manage` 일괄 점검의 1줄 안내로 줄인다 — "화면이 있는 제품인가"를 훅이 Bash로 판정하면 오탐 위험이 있다.
+- 반영:
+  - devoks-sdlc:
+    - `product-design-author` 1.3.0: 역문서화 모드를 추가했다(문서 없음 + 디자인 파일에 프레임 있음). 캔버스를 1회 읽어 프레임 → W-n 매핑 초안을 만들고 한 메시지로 확인받는다. 이름 변경은 선택이고 기본은 매핑만 한다. 끝나면 문서가 SSOT다. visual 역문서화도 넣었다. 가이드 §9에 매핑·추적성(PRD 근거 없음은 `미확정`)·차수(그린 화면과 미작도 화면을 한 문서에서 한 실행으로)·디자인 이후 결정·금지 사항, `tool-pencil.md` §7에 읽기 절차와 §6 예외를 적었다. 디자인 파일 경로 규칙을 추가했다(기존 `design_file` → 저장소에 이미 있는 파일 → 기본값, `<out>` 이름이 `design`이면 한 번 더 붙이지 않음, 문서 기준 상대 경로). 템플릿 주석과 evals 8번(비-HITL 역문서화 보류·경로 유지)도 추가했다.
+    - `feature-frd-author` 1.9.0: 착수 점검에서 WIREFRAMES.md가 없으면 디자인 파일(`*.pen`·Figma 링크)도 확인한다. 있으면 "디자인 먼저" 대신 "기존 디자인 역문서화"를 안내한다.
+  - devoks-core: `setup-preset-manage` 제품 문서 이관 안내. 상세는 `plugins/devoks-core/CHANGELOG.md` 2.9.0.
+- 검증: `claude plugin validate --strict`(core·sdlc) 통과. 변경 SKILL frontmatter를 `ruby -ryaml`로 파싱했고(`argument-hint` 문자열 유지) evals.json 파싱도 통과했다. evals 8번은 빈 스크래치 저장소에서 `claude --plugin-dir` 헤드리스로 실행해 assertion 4개를 모두 충족했다(역문서화로 판별 → 비-HITL이라 캔버스를 읽지 않고 멈춤 → WIREFRAMES.md 미생성 → `.pen` 미열람, 기존 `docs/design/` 경로 유지). 역문서화의 HITL 경로(Pencil로 실제 프레임 읽기)는 라이브로 검증하지 않았다 — 같은 날 careerstack이 수동으로 역문서화한 결과(b278a97, W-1~W-18 대조 불일치 0)가 절차의 근거다.
+- 의도적 미반영: SessionStart 훅 감지(제안 3 원문)는 오탐 위험 때문에 넣지 않았다. README·README.ko·marketplace는 바꾸지 않았다(스킬 이름·description 범위·카탈로그 불변, 모드 추가만).
+
 ## **프레임워크 확정 시 앱 내부 아키텍처 단계(TRD §3.1) + setup "현행 vs 목표" 비교 + `nextjs` preset** (2026-11-17, `devoks-core` `2.7.1 → 2.8.0`, `devoks-sdlc` `3.20.0 → 3.21.0`)
 - 배경: careerstack(career-guide-init 세션)의 제안이다. 2026-11-12 `setup-preset-manage`로 S1~S8을 채울 때 7단계가 코드베이스 실측을 1차 입력으로 삼아, 당시 구조가 그대로 규칙이 됐다. 그 구조에는 `src/server/`에 인프라와 도메인이 섞인 문제, 진입점 5곳이 DB에 직접 붙어 리소스 인가가 흩어진 문제(IDOR 위험)가 있었다. 이 문제는 Next.js 공식 권장(DAL·BFF·인증)을 검토하고 나서야 드러났고, ADR-030으로 리팩토링했다. 원인은 두 가지다. ① 프레임워크를 확정한 직후 앱 내부 구조(디렉터리 맵·계층·진입점별 데이터 접근)를 정하는 단계가 없었다. ② App Router 구조 결정이 react-web의 "SSR Variant" 몇 줄뿐이라 로컬 커스터마이징으로만 존재했다.
 - 결정(사용자, 2026-11-17): A는 새 스킬 없이 TRD 확장 + setup 비교 단계로, B는 별도 `nextjs` preset으로 간다. 후속 검토에서 그린필드 순서도 정했다. setup-project-convention은 TRD 직후·첫 FRD/PLAN 전에 둔다 — 스택이 정해져야 고를 preset이 있고, PLAN `file:`과 구현이 구조 슬롯을 읽기 때문이다. "base만 먼저 적용" 모드 신설은 기각했다(PRD·TRD 단계는 base rules에 의존하지 않고, 커맨드·훅 판정 변경 비용만 든다). careerstack 이름(`services/`·`defineApiRoute` 등)은 규칙으로 쓰지 않는다 — 공식 권장만 원칙으로 두고 구체값은 슬롯이 정한다.

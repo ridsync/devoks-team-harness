@@ -1,10 +1,10 @@
 ---
 name: product-design-author
-description: "제품 PRD(+TRD)를 받아 기능 FRD 착수 전에 화면 설계를 두 단계로 고정한다 — (1) 와이어프레임: 플랫폼 전제·화면 인벤토리·핵심 흐름·화면별 우선순위 블록과 상태·비주얼 비중·컴포넌트 후보를 담은 도구 독립 SSOT WIREFRAMES.md를 쓰고 저해상도로 그린다, (2) 비주얼(선택): 강조 화면(랜딩·전환·공유)을 대상으로 브랜드 모티프·이미지 에셋 출처·인터랙티브 요소(기능/디자인 분류와 채택·보류·기각)·모션 원칙을 정하고 방향 시안 2~3개 비교 → 선택 → 하이파이로 VISUAL.md를 쓴다. 그리기는 디자인 도구(현재 Pencil .pen)로 하고 문서와 1:1 대조한다. 결과는 디자인 시스템 기반 작업(B-n)과 기능 FRD의 입력이 되며, 기능에 해당하는 인터랙티브 요소는 PRD FR 후보로 보고한다. \"와이어프레임 그려줘\", \"화면 설계\", \"화면 목록 정리\", \"화면 흐름 잡아줘\", \"UX 흐름\", \"디자인 시작 전 화면 구성\", \"Pencil로 와이어프레임\", \"비주얼 디자인\", \"하이파이 시안\", \"브랜드 모티프 정하기\", \"랜딩 디자인 고도화\", \"WIREFRAMES 업데이트\" 요청에서 사용한다. 디자인 시스템 자체(방식·범위·컴포넌트 층·패키지 경계·멀티플랫폼 공유 전략·토큰 SSOT·테마·도구)를 정하는 일은 이 스킬이 아니라 devoks-sdlc:product-trd-author(TRD §2.1)가 맡는다. 화면 하나의 동작 규칙은 devoks-sdlc:feature-frd-author, Figma 시안을 코드로 옮기는 일은 devoks-sdlc:new-ui-draft 가 맡는다."
+description: "제품 PRD(+TRD)를 받아 기능 FRD 착수 전에 화면 설계를 두 단계로 고정한다 — (1) 와이어프레임: 플랫폼 전제·화면 인벤토리·핵심 흐름·화면별 우선순위 블록과 상태·비주얼 비중·컴포넌트 후보를 담은 도구 독립 SSOT WIREFRAMES.md를 쓰고 저해상도로 그린다, (2) 비주얼(선택): 강조 화면(랜딩·전환·공유)을 대상으로 브랜드 모티프·이미지 에셋 출처·인터랙티브 요소(기능/디자인 분류와 채택·보류·기각)·모션 원칙을 정하고 방향 시안 2~3개 비교 → 선택 → 하이파이로 VISUAL.md를 쓴다. 그리기는 디자인 도구(현재 Pencil .pen)로 하고 문서와 1:1 대조한다. 결과는 디자인 시스템 기반 작업(B-n)과 기능 FRD의 입력이 되며, 기능에 해당하는 인터랙티브 요소는 PRD FR 후보로 보고한다. \"와이어프레임 그려줘\", \"화면 설계\", \"화면 목록 정리\", \"화면 흐름 잡아줘\", \"UX 흐름\", \"디자인 시작 전 화면 구성\", \"Pencil로 와이어프레임\", \"비주얼 디자인\", \"하이파이 시안\", \"브랜드 모티프 정하기\", \"랜딩 디자인 고도화\", \"WIREFRAMES 업데이트\", \"기존 디자인을 WIREFRAMES로 역문서화\" 요청에서 사용한다. 디자인 파일만 있고 문서가 없으면 역문서화 모드로 문서를 먼저 만든다. 디자인 시스템 자체(방식·범위·컴포넌트 층·패키지 경계·멀티플랫폼 공유 전략·토큰 SSOT·테마·도구)를 정하는 일은 이 스킬이 아니라 devoks-sdlc:product-trd-author(TRD §2.1)가 맡는다. 화면 하나의 동작 규칙은 devoks-sdlc:feature-frd-author, Figma 시안을 코드로 옮기는 일은 devoks-sdlc:new-ui-draft 가 맡는다."
 argument-hint: "[phase=<wireframe|visual> (default: wireframe)] [src=<PRD 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)] [tool=<pencil|none> (default: pencil)]"
 metadata:
   author: ridsync
-  version: 1.2.0
+  version: 1.3.0
 ---
 
 # product-design-author — 제품 화면 설계 (와이어프레임 → 비주얼)
@@ -45,7 +45,8 @@ PRD + TRD(§2.1) ─▶ phase=wireframe ─▶ WIREFRAMES.md (+ <out>/design/wir
 
 > 표기: `key=값` 필수 · `[key=값]` 선택 · `(default: X)` 미지정 시 X로 진행.
 
-- 산출물: `phase=wireframe` → `<out>/WIREFRAMES.md`(+ `<out>/design/wireframes.pen` — 기본 `docs/product/design/`), `phase=visual` → `<out>/VISUAL.md`(+ `<out>/design/visual.pen`). 같은 문서가 이미 있으면 **갱신 모드**.
+- 산출물: `phase=wireframe` → `<out>/WIREFRAMES.md`(+ 디자인 파일), `phase=visual` → `<out>/VISUAL.md`(+ 디자인 파일). 같은 문서가 이미 있으면 **갱신 모드**, 문서는 없고 디자인 파일만 있으면 **역문서화 모드**.
+- 디자인 파일 경로 — 위에서부터 처음 해당하는 것을 쓴다: ① 기존 문서 frontmatter `design_file`, ② 저장소에 이미 있는 디자인 파일(예: `docs/design/wireframes.pen` — 기존 경로를 옮기지 않는다), ③ 기본값 `<out>/design/wireframes.pen`·`<out>/design/visual.pen`(`<out>` 이름이 이미 `design`이면 `design/`을 한 번 더 붙이지 않고 `<out>/` 바로 아래). `design_file`은 문서 위치 기준 상대 경로로 적는다(예: 같은 디렉터리면 `./wireframes.pen`).
 - "비주얼 디자인", "하이파이", "모티프" 같은 요청이면 `phase`가 없어도 `visual`로 본다. `phase=visual`인데 `WIREFRAMES.md`가 없으면 멈춘다 — 구조 없이 그린 비주얼은 검증할 기준이 없다. HITL이면 와이어프레임 단계를 제안하고 동의하면 `phase=wireframe`으로 바로 이어서 진행, 비-HITL이면 중단·보고.
 - `tool=none`: 문서만 쓴다(디자인 도구가 없거나 비-HITL 실행). 이후 같은 문서로 `tool=pencil` 재실행하면 그리기만 이어서 한다.
 - 도구 어댑터: `pencil` → `references/tool-pencil.md`. 문서 형식은 도구와 무관하다 — 다른 도구는 어댑터 파일만 추가한다.
@@ -58,7 +59,7 @@ PRD + TRD(§2.1) ─▶ phase=wireframe ─▶ WIREFRAMES.md (+ <out>/design/wir
 - `<out>/TRD.md`가 있으면 §2.1 UI 기반(플랫폼·뷰포트·컴포넌트 기반·디자인 도구)을 따른다. §2.1 값이 `제안` 상태면 제안값으로 쓰고 §1에 "(TRD 제안)"으로 표시한다. 없거나 §2.1이 비었으면 PRD §7 제약에서 플랫폼을 가정하고 §7 오픈 이슈에 "TRD §2.1 미정"을 남긴다. TRD §2.1의 디자인 도구가 `tool` 값(`pencil`·`none`)으로 대응되고 서로 다를 때만 HITL에서 확인한다 — 대응되지 않는 서술(예: "디자이너 도구 미정")이면 `tool`을 따른다.
 - 사용자 화면이 없는 제품(API·배치 전용)이면 쓰지 않고 그 판단을 보고한다.
 - 저장소에 기존 화면 코드가 있으면(brownfield) 라우트·페이지 목록을 가볍게 훑어 현행 화면을 W-n에 "현행"으로 표시한다 — 재설계 대상은 PRD 요구와 닿는 화면만.
-- `<out>/WIREFRAMES.md` 존재 → 갱신 모드로.
+- `<out>/WIREFRAMES.md` 존재 → 갱신 모드로. 없고 디자인 파일(위 경로 ②, 또는 사용자가 알려 준 `.pen`·Figma)에 화면 프레임이 이미 있으면 → 역문서화 모드로.
 
 ### 1. 범위 제안 — 한 메시지로
 
@@ -97,6 +98,15 @@ PRD + TRD(§2.1) ─▶ phase=wireframe ─▶ WIREFRAMES.md (+ <out>/design/wir
 6. **보고**: 결정 요약, 방향 선택 결과, 하이파이 프레임 대조, PRD·TRD 갱신 필요 항목, 보류 요소와 확장 지점, 다음 단계 — TRD가 없으면 먼저 `/devoks-sdlc:product-trd-author`, 기능 요소를 채택·보류했으면 `/devoks-sdlc:product-prd-author`(갱신 모드)로 FR 반영 → 디자인 시스템 B-n(입력: WIREFRAMES §5 + VISUAL §7) → 화면 F-n FRD.
 - **비-HITL**: 결정은 `proposed`로 쓰고, 그릴 수 있으면 방향 시안까지만 그린다. 방향 선택·하이파이는 하지 않고 보고 첫머리에 "방향 선택 필요 — 하이파이·디자인 시스템 B-n 보류"를 blocker로 남긴다.
 - 화면 구조를 바꾸고 싶어지면 VISUAL에서 바꾸지 않는다 — "WIREFRAMES 갱신 필요"로 보고한다.
+
+## 역문서화 모드 (기존 디자인 → 문서)
+
+문서 체인보다 디자인을 먼저 그린 프로젝트(이 스킬 도입 전 착수, 디자이너가 먼저 작업 등)를 SSOT 순서로 되돌린다. 캔버스를 **한 번** 읽어 문서 초안을 만들고, 확인이 끝나면 그 뒤로는 문서가 SSOT다(`tool-pencil.md` §6 금지 사항의 유일한 예외 — 1회 이관이지 상시 동기화가 아니다). 규칙: 가이드 §9.
+1. **읽기**: 어댑터(`tool-pencil.md` §7)로 프레임 목록·블록 순서·문구를 읽는다. 디자인 파일을 읽을 수 없으면(Pencil MCP 없음·파일 미오픈·비-HITL) 문서를 추측으로 쓰지 않고 멈춰 보고한다 — 재실행 방법(파일을 열고 HITL로 실행)을 남긴다.
+2. **초안 + 범위 제안 — 한 메시지로**(SKILL §1과 같은 형식): 프레임 → W-n 매핑 표(기존 프레임 이름·추적한 F-n/S-n·판정 `반영`/`dropped 후보`/`PRD 근거 없음`), PRD에는 있는데 프레임이 없는 화면(신규 W-n 후보), 프레임 이름 변경 여부(선택 — 기본은 유지하고 매핑만), 디자인 이후 생긴 결정 중 문서에 넣을 것을 묻는다.
+3. **작성**: 확인된 매핑으로 WIREFRAMES.md를 쓴다(§2 템플릿). 이미 그린 화면은 캔버스 내용을 옮기고, 새 W-n은 문서부터 쓴다. `tool≠none`이면 새 W-n만 그린 뒤 전체 프레임을 §2와 1:1 대조한다.
+4. **보고**: wireframe 보고 항목 + 매핑 결과(반영·dropped·PRD 근거 없음 수)·이름 변경 여부·"이후 SSOT는 WIREFRAMES.md". 하이파이 프레임도 있으면 `phase=visual` 역문서화(선택된 방향을 기존 결정으로 기록)를 다음 단계로 안내한다.
+- `phase=visual` 역문서화: `WIREFRAMES.md`가 있어야 한다(없으면 wireframe 역문서화부터). 결정 라운드·방향 시안 라운드는 건너뛰고, 이미 그린 하이파이의 방향을 `VD-n accepted (역문서화)`로, 모티프·에셋·인터랙티브 요소는 캔버스에서 보이는 것만 기록하고 대안·이유가 없는 항목은 `미확정`으로 둔다. §7 기준값은 시안 값을 읽어 채우고 대비율 판정은 그대로 한다.
 
 ## 갱신 모드
 

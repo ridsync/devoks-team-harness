@@ -10,7 +10,7 @@ prd_version: <PRD 버전>
 trd: <./TRD.md / 없음>
 trd_version: <TRD 버전 / 없음>
 tool: pencil         # pencil | none (추후 figma)
-design_file: <./design/wireframes.pen>   # tool=none·미작도여도 목표 경로를 적는다 — 작도 여부는 §6·보고가 말한다
+design_file: <./design/wireframes.pen>   # 이 문서 기준 상대 경로. 기존 디자인 파일이 있으면 그 경로(예: ./wireframes.pen). tool=none·미작도여도 목표 경로를 적는다 — 작도 여부는 §6·보고가 말한다
 ---
 
 # <제품 이름> — Wireframes
