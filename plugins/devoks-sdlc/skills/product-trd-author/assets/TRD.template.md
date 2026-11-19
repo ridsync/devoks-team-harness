@@ -132,6 +132,7 @@ flowchart LR
 
 ## 12. 결정 기록 (ADR) & 변경 이력
 > 이 TRD가 의존하는 ADR의 **색인**이다. 본문(Context·Decision·Rationale·Considered Alternatives·Consequences·Revisit Conditions)은 `docs/decisions/ADR-NNN-<slug>.md`에만 쓴다.
+> §2~§6의 판단마다 ADR을 쓰지 않는다 — 판단은 각 절 표가 기록하고, 세 관문(아키텍처 범위·되돌리기 비용·이유가 코드에 없음)을 모두 통과한 것만 여기에 오른다(`adr-guide.md` §1). 행이 스택 행 수만큼 늘었다면 판정을 다시 본다.
 
 | ID | 결정 | 상태 | 파일 |
 |---|---|---|---|

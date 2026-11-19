@@ -4,7 +4,7 @@ description: "제품 PRD(PRD.md·FEATURES.md)를 받아 여러 기능이 함께 
 argument-hint: "[src=<PRD 경로|TRD 입력 양식 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)]"
 metadata:
   author: ridsync
-  version: 1.5.0
+  version: 1.6.0
 ---
 
 # product-trd-author — 제품 TRD · 기술 구조 작성/갱신
@@ -72,7 +72,7 @@ PRD.md + FEATURES.md ─▶ [이 스킬] TRD.md + FEATURES.md 기반 구역(B-n)
 - PRD의 **모든 NFR**(불변식 포함)을 §6에 보장 위치·검증 레벨과 함께 옮기고, **모든 계측 FR**을 §7 이벤트로 설계한다.
 - §4는 둘 이상의 F-n이 쓰는 엔티티만. 판단 기준은 "이 결정이 바뀌면 여러 기능이 같이 바뀌는가?"(가이드 §1).
 - 사용자 화면이 있으면 §2.1 UI 기반을 채운다(방식만 — 화면·컴포넌트 목록·토큰 값 금지, 가이드 §3-5). 대상 플랫폼은 확정 범위·계획으로 나누고, 컴포넌트 층·패키지 경계·공유 전략은 가이드 §3-6을 따른다.
-- 주요 판단은 판단마다 `docs/decisions/ADR-NNN-<slug>.md` 파일로 남기고(확인된 것은 `accepted`, 비-HITL 제안값은 `proposed`), §12에는 색인 행(ID·결정·상태·파일)만 둔다. 이미 같은 결정을 다룬 ADR이 있으면 새로 쓰지 않고 색인에 연결한다. 형식·대상 판정·번호 규칙: `../feature-workflow-runner/references/adr-guide.md`.
+- 모든 판단은 해당 절 표(§2·§2.1 등)에 선택·대안·이유로 남긴다 — 이것이 기본 기록이다. 그중 adr-guide §1 **세 관문(아키텍처 범위·되돌리기 비용·이유가 코드에 없음)을 모두 통과한 판단만** `docs/decisions/ADR-NNN-<slug>.md`로 쓴다(확인된 것은 `accepted`, 비-HITL 제안값은 `proposed`). 스택 행·라이브러리마다 ADR을 만들지 않고, 함께 되돌려야 하는 선택은 한 ADR로 묶는다. 브랜드·비주얼·개발 도구·작업 프로세스 결정은 ADR이 아니다. §12에는 색인 행(ID·결정·상태·파일)만 둔다. 이미 같은 결정을 다룬 ADR이 있으면 새로 쓰지 않고 색인에 연결한다. 판정·분량·형식·번호 규칙: `../feature-workflow-runner/references/adr-guide.md`.
 - `미확정`·`제안`은 §11에 모은다(`ID | 질문 | 막는 것`).
 
 ### 3. 기반 작업 → FEATURES.md 기반 구역

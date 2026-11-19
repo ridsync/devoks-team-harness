@@ -4,7 +4,7 @@ description: "제품 PRD(+TRD)를 받아 기능 FRD 착수 전에 화면 설계�
 argument-hint: "[phase=<wireframe|visual> (default: wireframe)] [src=<PRD 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)] [tool=<pencil|none> (default: pencil)]"
 metadata:
   author: ridsync
-  version: 1.3.0
+  version: 1.3.1
 ---
 
 # product-design-author — 제품 화면 설계 (와이어프레임 → 비주얼)
@@ -94,7 +94,7 @@ PRD + TRD(§2.1) ─▶ phase=wireframe ─▶ WIREFRAMES.md (+ <out>/design/wir
 2. **결정 라운드 — 한 메시지**(가이드 §2·§4): 대상 화면·브랜드 모티프(적용 지점 포함)·이미지 에셋 출처(추천+되돌리는 조건)·인터랙티브 요소 후보 표(분류 + 채택 추천 — 가이드 §5)·방향 시안 2~3개 콘셉트·도구 사전 조건·브랜드 자산 사실 질문을 번호별 결정 항목으로 묻는다.
 3. **방향 시안 라운드**: 같은 대표 화면 1개를 방향마다 그려 나란히 비교하고 선택받는다(`tool-pencil.md` §5).
 4. **하이파이 라운드**: 선택한 방향으로 대상 화면을 그리고 프레임을 §6과 1:1 대조한다.
-5. **VISUAL.md 작성**: `assets/VISUAL.template.md` 골격. §7에는 시안이 쓴 기준값만(토큰 이름·API 금지) — 색은 용도(text/fill/surface/decorative)와 대비율을 계산해 함께 적고 미달 값을 처리한다(가이드 §7), §8에는 PRD FR 후보·TRD 기록 대상(비주얼 단계 ADR·에셋 정책·모션 원칙).
+5. **VISUAL.md 작성**: `assets/VISUAL.template.md` 골격. §7에는 시안이 쓴 기준값만(토큰 이름·API 금지) — 색은 용도(text/fill/surface/decorative)와 대비율을 계산해 함께 적고 미달 값을 처리한다(가이드 §7), §8에는 PRD FR 후보·TRD §2.1 반영 대상(디자인 도구·에셋 형식·모션 구현 수단 — 비주얼 결정 자체는 ADR이 아니다, 가이드 §8).
 6. **보고**: 결정 요약, 방향 선택 결과, 하이파이 프레임 대조, PRD·TRD 갱신 필요 항목, 보류 요소와 확장 지점, 다음 단계 — TRD가 없으면 먼저 `/devoks-sdlc:product-trd-author`, 기능 요소를 채택·보류했으면 `/devoks-sdlc:product-prd-author`(갱신 모드)로 FR 반영 → 디자인 시스템 B-n(입력: WIREFRAMES §5 + VISUAL §7) → 화면 F-n FRD.
 - **비-HITL**: 결정은 `proposed`로 쓰고, 그릴 수 있으면 방향 시안까지만 그린다. 방향 선택·하이파이는 하지 않고 보고 첫머리에 "방향 선택 필요 — 하이파이·디자인 시스템 B-n 보류"를 blocker로 남긴다.
 - 화면 구조를 바꾸고 싶어지면 VISUAL에서 바꾸지 않는다 — "WIREFRAMES 갱신 필요"로 보고한다.

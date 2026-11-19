@@ -9,6 +9,18 @@
 
 ---
 
+## **ADR 대상 판정을 세 관문(AND)으로 좁히고 분량·형식 가드레일 추가** (2026-11-19, `devoks-sdlc` `3.23.0 → 3.24.0`, `devoks-core` `2.9.0 → 2.10.0`)
+- 배경: careerstack `docs/decisions/`에 ADR 32개가 쌓였다. 그중 ADR-001~027은 TRD §12 결정 표를 기계적으로 옮긴 것이다. 언어(TypeScript)·Storybook 미사용 같은 항목이 하나씩 ADR이 됐고, Rationale은 "사용자 결정. 유지 비용 절감" 한 줄, 대안 표 기각 이유는 "Rationale 참고", Consequences는 "이전 기록에 별도 항목 없음"이었다. 브랜드 모티프(ADR-022)·와이어프레임 단계(ADR-020)·비주얼 단계(ADR-021)처럼 아키텍처가 아닌 결정도 들어갔다. 반대로 ADR-030은 118줄이었는데 폴더 표·import 제한·rename 범위처럼 convention과 PR이 담을 내용이 대부분이었다. 하네스 쪽 원인은 셋이다. ① `adr-guide` §1이 4개 신호 중 **하나 이상**이면 ADR로 판정했다(대안 비교 하나만으로 통과). ② `product-trd-author`가 "주요 판단은 **판단마다** ADR 파일"로 지시했다. ③ `product-design-author` 가이드가 "모티프·에셋·모션 정책은 ADR"로 라우팅했다. 템플릿은 모든 칸을 요구해 빈 칸 메우기 문구를 유도했다.
+- 반영:
+  - `adr-guide.md`(feature-workflow-runner 1.13.0) 재작성: §1 세 관문 **모두 통과**(A 아키텍처 범위 · B 되돌리기 비용 · C 이유가 코드·커밋·PR에 없음)와 판정 질문 하나. §1-1 묶음 단위(스택 기준선은 TRD §2 표, 함께 되돌려야 하는 선택만 한 ADR로 묶음). §1-2 회색 지대에 "디자인이 기술 구조를 고정할 때"를 추가. §1-3 "ADR이 아닌 것 → 기록 위치" 표. §3 분량(본문 40줄 안팎은 점검 신호)·섹션별 분량·쓰지 않는 것(구현 경위·파일 목록·실행 규칙 전문·빈 칸 메우기 문구)·"사용자 결정"만 쓰지 않기. §4 제안에 관문 판정 근거 한 줄. 관문 미통과 결정을 사용자가 명시 요청하면 따르고 알린다. §5 기존 과다 ADR 정리 절차(요청 시에만, 삭제 대신 `deprecated`+이관 위치). §6 TRD 행 "판단마다" 삭제, design-author는 ADR을 만들지 않음. §7 실사례 안티패턴 표.
+  - `ADR.template.md`: 채택안 행·"좋아지는 것" 칸을 지웠다(Rationale과 중복). 섹션별 분량 안내와 관문 확인 주석을 넣었다. 섹션 제목은 유지해 기존 ADR과 구조 호환.
+  - `product-trd-author` 1.6.0: 모든 판단은 절 표가 기본 기록이고 관문 통과분만 ADR. 템플릿 §12 안내·가이드 §4·§7·§8을 맞췄다. evals 1번에 "스택 행마다 쪼개지 않음·빈 칸 메우기 없음·비주얼/도구 ADR 없음" assertion을 추가했다.
+  - `product-design-author` 1.3.1: design-guide 문서 경계·visual-guide §8·VISUAL 템플릿 §8·SKILL 5단계에서 "비주얼 ADR"을 "TRD §2.1 행(디자인 도구·에셋 형식·모션 구현 수단)"으로 바꿨다. 비주얼 결정 자체는 VISUAL.md VD-n이 소유한다. evals 6번 기대값을 맞췄다.
+  - `design-spec.md`: DSN의 ADR 승격 조건을 세 관문으로 맞췄다.
+  - devoks-core: `agent-principles` 규칙 20. 상세는 `plugins/devoks-core/CHANGELOG.md` 2.10.0.
+- 검증: `claude plugin validate --strict`(sdlc·core) 통과. 변경 SKILL 3개 frontmatter를 `ruby -ryaml`로 파싱했고(`argument-hint` String 유지), ADR 템플릿 frontmatter와 evals.json 2개 파싱도 통과했다. 앵커링 없는 서브에이전트에게 새 adr-guide만 주고 careerstack ADR 32개를 판정시켰다. 결과는 실질 유지 9건(001·003·008·014·024·025·028·030·032), 경계선 4건, 나머지는 묶음 또는 다른 문서로 이관이었다. 사용자가 지목한 022(브랜드 모티프)·014류 쪼개기·018(Storybook)·020/021(프로세스)·016(알림 채널)이 모두 의도대로 탈락하거나 묶였다. 판정이 갈린 지점 6개와 판정할 수 없던 지점 5개를 받아 가이드에 반영했다. 반영 내용은 B 평가 시점·평가 대상(실행 후 비용, 경계 구조 자체), C의 "구체적 제약" 요건, 언어·런타임 단독 ADR 금지, 묶음 판정 기준("독립적으로 되돌릴 수 있는가"), §1-2 예시 교체(대비 테스트 → 토큰 생성 파이프라인), §1-3 행 4개 추가(테스트·데이터 보존·계측·설정값), 골자와 실행 규칙의 구분, §5 분할·형식 미달·superseded 처리다. `claude --plugin-dir` 헤드리스 TRD 생성 eval은 실행하지 않았다(트리거 조건 불변 — 권장 항목).
+- 의도적 미반영: careerstack의 기존 ADR 정리는 하지 않았다(대상 프로젝트 작업 — §5 정리 절차로 사용자 요청 시 진행). README·README.ko·marketplace는 바꾸지 않았다(스킬 이름·description·카탈로그 불변). `code-refactoring`·`feature-plan-executor`의 ADR 언급은 adr-guide를 가리키기만 해 그대로 두었다.
+
 ## **FEATURES.md 구역 레이블·작업 순서·상태 이모지 + feature 스킬의 백로그 상태 동기화** (2026-11-18, `devoks-sdlc` `3.22.0 → 3.23.0`)
 - 배경: FEATURES 템플릿은 `backlog → frd → plan → in-progress → done` 상태를 정의했지만, FEATURES.md를 쓰는 스킬은 `product-prd-author`(F-n 생성·dropped)와 `product-trd-author`(B-n)뿐이었다. 그래서 FRD·PLAN을 쓰거나 구현을 시작·완료해도 상태 열이 `backlog`에 머물렀다. `post-implementation-checklist`의 "MVP 전부 done" 판정과 prd/trd/design 갱신 모드의 "상태 `frd` 이후 = 재검토 필요" 판정이 이 열을 읽는데, 그 값이 갱신되지 않고 있었다. 템플릿에서도 상태 설명이 표 위 인용 한 줄뿐이었고, F-n 표·기반 표·시드에 구역 레이블이 없었으며, 순차·병렬 작업 순서를 볼 곳이 없었다. 기반 구역 위치가 산출물마다 달라지던 ROADMAP 항목도 같은 원인이었다.
 - 반영:

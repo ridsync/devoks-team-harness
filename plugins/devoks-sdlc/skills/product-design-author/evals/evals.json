@@ -145,7 +145,7 @@
       "id": 6,
       "name": "visual-non-hitl-blocker",
       "prompt": "evals/files/pilates-wired/ 와이어프레임 기준으로 비주얼 디자인 문서 만들어줘. tool=none. out=evals/files/pilates-wired. 나는 자리에 없으니 묻지 말고 진행해.",
-      "expected_output": "VISUAL.md를 템플릿 10섹션으로 작성한다. 결정(VD-n)은 proposed 상태이고 대안·이유·되돌리는 조건이 있다. 인터랙티브 요소마다 분류와 (제안) 채택 결정이 있고, 기능 채택·보류는 §8 PRD FR 후보로, 보류는 확장 지점과 함께 있다. 비주얼 비중이 없는 구버전 WIREFRAMES이므로 'WIREFRAMES 갱신 필요'를, TRD가 없으므로 다음 단계에 TRD 작성을 먼저 안내한다. 방향 시안은 콘셉트만 있고 선택·하이파이는 하지 않는다. §7에는 기준값(또는 미정)만 있고 토큰 이름·컴포넌트 API가 없다. 보고 첫머리에 '방향 선택 필요 — 하이파이·디자인 시스템 B-n 보류' blocker가 있고, PRD 갱신 필요(FR 후보)·TRD 갱신 필요(ADR·에셋 정책·모션 원칙)를 보고한다. WIREFRAMES.md·PRD.md·FEATURES.md를 수정하지 않는다. §7 색에 후보값을 적었다면 값마다 용도(text/fill/surface/decorative)·대비 배경·대비율·판정이 있고 '후보'로 표시되며, 미달 값은 decorative 재분류나 대체값 제안으로 처리된다(미정이면 통과).",
+      "expected_output": "VISUAL.md를 템플릿 10섹션으로 작성한다. 결정(VD-n)은 proposed 상태이고 대안·이유·되돌리는 조건이 있다. 인터랙티브 요소마다 분류와 (제안) 채택 결정이 있고, 기능 채택·보류는 §8 PRD FR 후보로, 보류는 확장 지점과 함께 있다. 비주얼 비중이 없는 구버전 WIREFRAMES이므로 'WIREFRAMES 갱신 필요'를, TRD가 없으므로 다음 단계에 TRD 작성을 먼저 안내한다. 방향 시안은 콘셉트만 있고 선택·하이파이는 하지 않는다. §7에는 기준값(또는 미정)만 있고 토큰 이름·컴포넌트 API가 없다. 보고 첫머리에 '방향 선택 필요 — 하이파이·디자인 시스템 B-n 보류' blocker가 있고, PRD 갱신 필요(FR 후보)·TRD 갱신 필요(§2.1 디자인 도구·에셋 형식·모션 구현 수단 — 비주얼 결정은 ADR로 올리지 않는다)를 보고한다. WIREFRAMES.md·PRD.md·FEATURES.md를 수정하지 않는다. §7 색에 후보값을 적었다면 값마다 용도(text/fill/surface/decorative)·대비 배경·대비율·판정이 있고 '후보'로 표시되며, 미달 값은 decorative 재분류나 대체값 제안으로 처리된다(미정이면 통과).",
       "files": [
         "evals/files/pilates-wired/PRD.md",
         "evals/files/pilates-wired/FEATURES.md",
