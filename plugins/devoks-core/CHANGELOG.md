@@ -13,6 +13,12 @@
 
 ---
 
+## 2.10.1 — 2026-11-19
+
+### 스킬·커맨드·훅
+- `commands/setup-project-convention` › 0. 대상 루트 확정·Rules: 추가 — 대상 루트를 `${CLAUDE_PROJECT_DIR:-$PWD}`로 고정하고 이후 경로를 `<루트>/.claude/...` 절대 경로로 다룬다. 루트가 `$HOME`이거나 프로젝트 시그널이 없으면 중단하고 확인받는다. `~/.claude/`에 쓰지 않는다는 규칙을 추가했다. 지금까지는 `.claude/...` 상대 경로만 적혀 있어서, 홈에서 연 세션에서 실행하면 user scope `~/.claude/rules·refs/`에 쓸 수 있었다. 레거시 `sync-context.sh`(`${CLAUDE_PROJECT_DIR:-.}/.claude`)가 실제로 `~/.claude/refs/`에 사본 4개를 남겼다
+- `skills/setup-preset-manage` › 1. 현황 파악: 추가 — 같은 대상 루트 확정 가드를 넣었다. provenance가 없을 때 타는 "스냅샷 없는 프로젝트" 경로는 사본을 갱신하고 provenance를 새로 만든다. 그래서 홈에서 실행하면 `~/.claude/refs/` 잔재를 갱신 대상으로 잡을 수 있었다
+
 ## 2.10.0 — 2026-11-19
 
 ### 복사 산출물

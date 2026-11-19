@@ -55,6 +55,8 @@ SessionStart 훅(`hooks/check-setup-state.sh`)은 위 산출물이 원본과 달
 
 ### 1. 현황 파악
 
+**대상 루트 확정** — `devoks-core:setup-project-convention` 0단계와 같은 기준이다. 루트는 `${CLAUDE_PROJECT_DIR:-$PWD}`이고, 이 문서의 `.claude/...`는 모두 `<루트>/.claude/...`다. 루트가 `$HOME`이거나 프로젝트 시그널(`.git`, 코드베이스 파일)이 없으면 중단하고 대상 경로를 확인받는다. 홈의 `~/.claude/rules·refs/`는 user scope이고, 거기 남은 사본(레거시 자동 동기화 잔재)은 갱신 대상이 아니라 정리 대상이다.
+
 먼저 아래를 읽는다.
 
 - `.claude/project-convention.json`

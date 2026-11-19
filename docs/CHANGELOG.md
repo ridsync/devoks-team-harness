@@ -9,6 +9,12 @@
 
 ---
 
+## **setup-project-convention 대상 루트 고정 + 홈 디렉토리 가드** (2026-11-19, `devoks-core` `2.10.0 → 2.10.1`)
+- 배경: 점검해 보니 `~/.claude/refs/`에 `code-review`·`engineering-principles`·`git-convention`·`workflow.md` 4개(mtime 2026-07-08)가 있었다. git 이력의 과거 refs 버전과 바이트 단위로 같았다. 원인은 레거시 `sync-context.sh`(2026-06-16 ~ 07-09, `1ac291e`에서 폐기)였다. 대상이 `${CLAUDE_PROJECT_DIR:-.}/.claude`라서 홈에서 연 세션이 user scope에 사본을 썼다. 현재 setup 커맨드·preset-manage·훅은 홈에 쓰지 않는다. 다만 커맨드가 `.claude/...` 상대 경로만 적고 루트를 정하지 않아 같은 사고가 날 수 있었다.
+- 반영: `setup-project-convention`에 0단계 "대상 루트 확정"(훅과 같은 `${CLAUDE_PROJECT_DIR:-$PWD}` 기준, `$HOME`이거나 프로젝트 시그널이 없으면 중단·확인)과 Rules "`~/.claude/`에 쓰지 않음"을 추가했다. `setup-preset-manage` 1단계에도 같은 가드를 넣었다. provenance가 없을 때 타는 "스냅샷 없는 프로젝트" 경로가 사본을 갱신하고 provenance를 만들기 때문에, 홈에서 실행하면 잔재를 갱신 대상으로 잡을 수 있었다. 로컬 잔재 4개와 빈 `~/.claude/rules/`는 삭제했다(전역 `CLAUDE.md`·`settings.json`에서 참조 없음 확인).
+- 검증: `claude plugin validate ./plugins/devoks-core --strict` 통과. preset-manage SKILL frontmatter는 바꾸지 않았다(description·트리거 불변 → 스킬 품질 8축 비대상).
+- 의도적 미반영: README·README.ko·marketplace는 바꾸지 않았다(커맨드·스킬 이름·description·카탈로그 불변). 훅 `check-setup-state.sh`는 읽기만 하므로 그대로 두었다.
+
 ## **ADR 대상 판정을 세 관문(AND)으로 좁히고 분량·형식 가드레일 추가** (2026-11-19, `devoks-sdlc` `3.23.0 → 3.24.0`, `devoks-core` `2.9.0 → 2.10.0`)
 - 배경: careerstack `docs/decisions/`에 ADR 32개가 쌓였다. 그중 ADR-001~027은 TRD §12 결정 표를 기계적으로 옮긴 것이다. 언어(TypeScript)·Storybook 미사용 같은 항목이 하나씩 ADR이 됐고, Rationale은 "사용자 결정. 유지 비용 절감" 한 줄, 대안 표 기각 이유는 "Rationale 참고", Consequences는 "이전 기록에 별도 항목 없음"이었다. 브랜드 모티프(ADR-022)·와이어프레임 단계(ADR-020)·비주얼 단계(ADR-021)처럼 아키텍처가 아닌 결정도 들어갔다. 반대로 ADR-030은 118줄이었는데 폴더 표·import 제한·rename 범위처럼 convention과 PR이 담을 내용이 대부분이었다. 하네스 쪽 원인은 셋이다. ① `adr-guide` §1이 4개 신호 중 **하나 이상**이면 ADR로 판정했다(대안 비교 하나만으로 통과). ② `product-trd-author`가 "주요 판단은 **판단마다** ADR 파일"로 지시했다. ③ `product-design-author` 가이드가 "모티프·에셋·모션 정책은 ADR"로 라우팅했다. 템플릿은 모든 칸을 요구해 빈 칸 메우기 문구를 유도했다.
 - 반영:
