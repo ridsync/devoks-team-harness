@@ -102,7 +102,7 @@ metadata가 없으면 다음 순서로 추정하되, **확정으로 단정하지
 #### 제품 문서 이관 안내 (읽기 전용)
 
 setup 산출물은 아니지만, 플러그인 업데이트로 새로 생긴 제품 문서 단계가 이미 진행 중인 프로젝트에 빠져 있으면 알려 준다. 판정·작성은 하지 않고 안내만 한다(해당 스킬이 맡는다). 지금 보는 항목은 하나다:
-- `docs/product/PRD.md`(또는 `FEATURES.md`와 같은 디렉터리의 PRD)가 있고 같은 디렉터리에 `WIREFRAMES.md`가 없으면 → 1줄 안내. 저장소에 디자인 파일(`*.pen`)이 있으면 "기존 디자인 역문서화: `/devoks-sdlc:product-design-author`", 없으면 "화면이 있는 제품이면 와이어프레임 단계: `/devoks-sdlc:product-design-author`". 화면 유무는 판정하지 않는다(그 스킬이 판정한다).
+- `docs/product/PRD.md`(또는 `FEATURES.md`와 같은 디렉터리의 PRD)가 있고 같은 디렉터리에 `WIREFRAMES.md`가 없으면 → 1줄 안내. 저장소에 디자인 파일(`*.pen`)이 있으면 "기존 디자인으로 WIREFRAMES 작성: `/devoks-sdlc:product-design-author`", 없으면 "화면이 있는 제품이면 와이어프레임 단계: `/devoks-sdlc:product-design-author`". 화면 유무는 판정하지 않는다(그 스킬이 판정한다).
 - 해당 없으면 아무것도 쓰지 않는다. 새 제품 문서 단계가 플러그인에 추가되면 이 목록에 같은 형식으로 더한다.
 
 ### 3. drift / provenance 판단

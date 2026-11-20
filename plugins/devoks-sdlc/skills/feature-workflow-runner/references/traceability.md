@@ -42,6 +42,14 @@ comm -23 /tmp/frd_ids.txt /tmp/plan_ids.txt
 
 마지막 명령 출력이 비어 있어야 "누락 0"이다. 출력이 있으면 그 ID들을 담당할 Task를 추가한다.
 
+## 미룬 일의 담당 ID (후속 표기 규칙)
+
+FRD·PLAN·WIREFRAMES·VISUAL에서 일을 이번 범위 밖으로 미룰 때(`후속`·`추후`·`다음 단계`·`별도 진행` 등)는 **그 일을 맡을 ID를 같은 줄에 적는다** — `TASK-n`(이 PLAN), `F-n`·`B-n`(FEATURES — 기존 항목의 범위 추가도 된다). 맡을 항목이 아직 없으면 "FEATURES 등재 필요: <무엇>"으로 완료 보고에 올린다(FEATURES는 `product-prd-author`·`product-trd-author`만 고친다).
+
+- 이유: 담당 없는 "후속"은 어떤 단계의 입력에도 잡히지 않아 사라진다(careerstack F-4 — 하이파이의 문서화를 "후속"으로 적은 뒤 맡은 작업이 없어, 구현이 하이파이와 다르게 나왔다).
+- 대상 밖: 기능 안의 확장 지점·출시 후 아이디어처럼 **아무도 하기로 하지 않은 것**은 "하지 않음(Non-goals)"이나 "보류 — 확장 지점"으로 쓴다. 미룬 일이 아니다.
+- 자체 점검: `grep -nE '후속|추후' <문서>`로 찾은 줄마다 담당 ID 또는 "FEATURES 등재 필요"가 있는지 본다 — 없으면 0건이 될 때까지 고친다.
+
 ## Definition of Done 연결
 
 PLAN §5 DoD의 "모든 REQ/AC/CTR/EDGE가 Task traces로 커버됨 (누락 0)" 항목은 위 점검으로 객관 판정한다.

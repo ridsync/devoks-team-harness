@@ -4,7 +4,7 @@ description: 정련된 FRD.md를 받아 실행 가능한 PLAN.md(작업 분해)�
 argument-hint: "[frd=<FRD.md 경로> (default: 최근 FRD)] [out=<디렉터리> (default: FRD 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.8.0
+  version: 1.9.0
 ---
 
 # plan-author — PLAN 작성 (Phase 2)
@@ -46,6 +46,7 @@ FRD를 추적 가능하고 PR 단위로 분리된 작업 분해로 변환한다.
 - `test` 분포 자기점검 — `skip`을 부여한 Task에 실제로 로직(비즈니스 로직·상태 전이·데이터 흐름·계약 검증·조건부 분기·반복·파싱·금액/보안·버그 수정)이 없는지 재확인. 애매해서 `skip`으로 몰아넣지 않았는지 확인 — 부여 기준: `../feature-workflow-runner/references/task-pr-splitting.md`.
 - 1개 이상 PR 생성(기본 1개). 2개 이상이면 §1에 분리 근거(기능/위험/리뷰 부담 중 하나) 명시 + PR 간 의존 단방향 준수.
 - 커버리지 점검 출력 공백(누락 0), DoD 섹션 존재.
+- 담당 ID 없는 `후속`·`추후` 표기 0건 — PLAN에서 미룬 일(디자인 대조·측정·QA 등)마다 `TASK-n`·`F-n`·`B-n` 또는 "FEATURES 등재 필요"가 있다(`../feature-workflow-runner/references/traceability.md` "미룬 일의 담당 ID"). FRD §4.1 "하이파이 구성"에서 온 AC도 위 커버리지 점검에 그대로 포함된다.
 - `PLAN.md` 작성 완료 시 frontmatter `status: draft → approved`. → `../feature-workflow-runner/references/progress-tracking.md`
 - FRD frontmatter에 `feature:`가 있으면 그 FEATURES.md 행을 `🗂️ plan`으로 바꾼다(앞으로만 — 이미 `in-progress` 이후면 유지). 규칙: `progress-tracking.md` "제품 백로그 상태 동기화".
 

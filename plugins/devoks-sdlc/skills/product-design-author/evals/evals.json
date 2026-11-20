@@ -200,14 +200,14 @@
       "id": 8,
       "name": "backfill-from-existing-pen-non-hitl",
       "prompt": "evals/files/pilates-prd/ PRD로 진행 중인 프로젝트야. 화면은 이미 docs/design/wireframes.pen에 Pencil로 다 그려 놨는데 WIREFRAMES.md가 없어. 기존 디자인을 문서로 만들어줘. out=evals/files/pilates-prd. 묻지 말고 진행해.",
-      "expected_output": "역문서화 모드로 판별한다. 비-HITL이고 .pen은 Pencil MCP·열린 파일 없이는 읽을 수 없으므로 PRD만으로 WIREFRAMES.md를 추측 작성하지 않고 멈춘다. .pen을 Read/Grep로 열지 않는다. 보고에 '디자인 파일 읽기 불가 — 역문서화 보류'와 재실행 방법(에디터에서 docs/design/wireframes.pen을 열고 HITL로 실행)이 있고, 디자인 파일 경로는 기존 docs/design/ 경로를 유지한다고 밝힌다(docs/design/design/ 같은 이중 경로를 만들지 않는다).",
+      "expected_output": "기존 디자인이 있는 일반 작성(프레임을 초안 재료로 읽는 경우)으로 판별한다. 비-HITL이고 .pen은 Pencil MCP·열린 파일 없이는 읽을 수 없으므로 PRD만으로 WIREFRAMES.md를 추측 작성하지 않고 멈춘다. .pen을 Read/Grep로 열지 않는다. 보고에 '디자인 파일 읽기 불가 — WIREFRAMES 작성 보류'와 재실행 방법(에디터에서 docs/design/wireframes.pen을 열고 HITL로 실행)이 있고, 디자인 파일 경로는 기존 docs/design/ 경로를 유지한다고 밝힌다(docs/design/design/ 같은 이중 경로를 만들지 않는다).",
       "files": [
         "evals/files/pilates-prd/PRD.md",
         "evals/files/pilates-prd/FEATURES.md"
       ],
       "assertions": [
         {
-          "text": "역문서화 모드로 판별한다"
+          "text": "기존 디자인을 초안 재료로 읽는 경우로 판별한다"
         },
         {
           "text": "캔버스를 읽지 못한 채 WIREFRAMES.md를 추측으로 쓰지 않는다"
