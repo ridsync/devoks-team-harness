@@ -56,6 +56,8 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
     - 피그마 리소스의 체계화 사전 작업이 필수, 태스크 요청시 피그마 UI시안의 링크정보의 정확도,구조등 UI작업시 필요한 리소스 정련 중요
   - 결정 필요: UI컴포넌트, 구조설계 및 기능구현작업 이후 UI CSS스타일링과 다듬기(polish)를 별도 단계로 추가할지, 아니면 기능구현시 병행 구현이 가능하도록 스킬을 고도화 할지. / 이외 추가적으로 `new-ui-draft`를 선행/후행 UI 패스로 분리할지, `feature-workflow-runner` Phase 안에 UI 다듬기(polish)를 명시할지.
   - 근거 보강(2026-07-22): `FRD.template.md` §4 Design Spec은 컴포넌트/아키텍처 구조 중심이라 i18n 키·색상 인디케이터·버튼 활성 조건 같은 UI 세부 사양을 ID로 강제 추적하지 않음(`verify-requirements`의 F/B/E/D 카테고리는 FRD §3/§5/§8에 대응되지만 U는 대응 섹션이 약함) — `post-implementation-checklist.md` 항목 1이 U를 범위 밖으로 명시하며 이 항목을 참조.
+  - 부분 반영(2026-11-20, careerstack F-4 회고): `code-implementer`가 Pencil `.pen`을 읽고(위임 입력 `design`), 구현 후 체크리스트 4번이 W-n 화면 기능에 디자인 대조를 권장 기본값으로 제시하며, 미루면 PLAN §1에 사유·담당 Task를 남긴다. Polish 단계 분리 결정 자체는 미결.
+  - 남은 하위 작업: `devoks-browser:browser-visual-diff`의 Pencil(`.pen`) 소스 지원 — 지금은 Figma 전용이라 Pencil 소스는 스크린샷을 나란히 놓고 육안으로 대조한다. Pencil MCP `execute`의 스크린샷·내보내기로 캡처하고, Pencil이 에디터에 파일이 열려 있어야 동작하는 제약(HITL 한정)을 Phase 0 사전 조건에 반영해야 한다.
   - 우선순위: 높음(UI 품질 안정화).
 
 - [ ] `**devoks-sdlc-orchestration` 신설 — 비-HITL(전체 위임) SDLC 오케스트레이션 플러그인**

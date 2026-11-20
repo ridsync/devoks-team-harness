@@ -9,6 +9,24 @@
 
 ---
 
+## **careerstack F-4 회고 8건 반영 — 앱 셸 W-0·디자인 소스 열람·디자인 대조·지연 예산·E2E 격리·code-implementer 금지 항목** (2026-11-20, `devoks-sdlc` `3.24.0 → 3.25.0`, `devoks-core` `2.10.1 → 2.10.2`)
+- 배경: careerstack 세션이 F-4(진단 → 미리보기) 설계·구현 중 드러난 하네스 허점 6건을 보내왔다. ① 전역 헤더·내비·푸터(앱 셸)가 `.pen`에는 그려져 있었는데 WIREFRAMES 역문서화·FEATURES·TRD 기반 작업 어디에도 없었다. 화면(W-n)도, 디자인 시스템 컴포넌트도, F-n도 아니어서 세 기준 모두에 걸리지 않았고, 화면을 다 만든 뒤에야 사용자가 발견했다. ② code-implementer가 하루에 사고 3건을 냈다. 디렉터리 전체에 `biome check --write`를 돌려 무관한 파일 56개를 바꿨고, `rm -i` 별칭에 걸려 멈췄고, 대화형 마이그레이션 생성기가 멈추자 파일명을 미래 시각으로 지어냈다. 원복이 분류기에 막히자 메인 루프에 대신 실행을 요청하기도 했다. ③ LLM 호출 실측(31초)에 재시도를 더하면 Vercel `maxDuration` 60초를 넘는다는 사실이 구현 중에야 드러났다. ④ Next.js segment config에 상수를 import할 수 없다. ⑤ 평가 결과 JSON을 저장소에 써서 format 검사가 깨졌다. ⑥ IP rate limit 도입 후 E2E 컨텍스트들이 같은 키를 나눠 써서 한도에 걸렸다.
+- 반영:
+  - `product-design-author` 1.4.0: WIREFRAMES 템플릿 §2에 필수 행 `W-0 공통 레이아웃(앱 셸)`, §4에 명세 블록(변형 기본/몰입/셸 없음 · 전역 헤더 · 푸터 · 로그인 상태 표시)을 추가했다. 셸이 없는 제품도 "셸 없음 — 이유"로 남긴다. design-guide §3 규칙, §7 자체 점검("모든 W-n이 셸 변형에 속하는가"), §8 갱신 모드(기존 문서에 W-0 추가 제안), §9 역문서화(반복 영역을 W-0으로 추출)를 넣고, SKILL 역문서화 2단계 범위 제안에도 넣었다.
+  - `product-trd-author` 1.7.0: trd-guide §6 기반 작업 기준에 앱 셸을 추가했다(화면 둘 이상이면 별도 B-n, 관련 문서 W-0, 디자인 시스템 B-n Out of scope에 경계 표시). §7에 외부 호출 지연 예산 점검 항목을 추가했다.
+  - `feature-frd-author` 1.11.0: 절차 4와 완료 기준에 지연 예산(`p95 × (1 + 재시도) + 처리 ≤ 실행 한도`)을 넣었다. 넘거나 측정 전이면 데드라인·재시도 조건을 CTR로 두고, 측정 Task를 메모한다.
+  - `feature-plan-author` 1.8.0: 절차 3에 "함께 두는 Task"를 추가했다. ⑴ 실측 전 지연 가정이 있으면 앞쪽에 측정 Task. ⑵ 클라이언트 식별 키로 상태를 공유하는 기능(rate limit·쿼터)이면 E2E fixture 격리 Task.
+  - `code-implementer` 금지 사항 5개: 포맷·자동 수정은 바꾼 파일만 · 임시/평가 산출물은 저장소 밖 + `command rm -f` · 대화형 명령 금지(`< /dev/null`), 시각 기반 파일명은 `date`로 생성 · 자기가 띄운 PID만 종료 · 막힌 명령은 대리 실행 요청 대신 blocked.
+  - devoks-core: nextjs preset Pitfall 1행. 상세는 `plugins/devoks-core/CHANGELOG.md` 2.10.2.
+  - (추가 요청 7·8 — 앱 셸 누락의 근본 원인 ③ "구현·검증이 디자인 파일을 못 봄")
+    - `code-implementer`: tools에 `mcp__pencil__*`를 추가하고, "Figma 디자인이 걸린 태스크"를 "디자인 소스가 걸린 태스크"(Figma / Pencil)로 일반화했다. Pencil 절은 `get_app_state`로 열린 파일 확인 → `read_skill` → `execute` 읽기 전용(W-n PC·모바일 변형 + W-0 셸 프레임) 순서다. 열람할 수 없으면 blocked. 문서가 SSOT이고, 프레임에는 있는데 명세에 없는 요소는 범위 밖이면 "명세 누락 후보"로 보고한다.
+    - `feature-workflow-runner` 1.14.0: `task-delegation.md` 입력 계약에 `design`(화면 Task이고 디자인 파일이 있으면 필수 — 경로와 프레임 이름만 넘기고 바이트는 에이전트가 읽는다)을 추가했다. `post-implementation-checklist.md` 4번은 "UI 시각 품질 확인 · 디자인 대조"로 바꿨다. W-n 화면 기능이면 권장 기본값이고, 미루면 PLAN §1에 사유와 담당 Task를 남긴다. Pencil 소스는 스크린샷을 나란히 놓고 육안으로 대조한다.
+    - `feature-plan-author`: "함께 두는 Task" ⑶ — 화면 기능이면 DoD에 디자인 대조를 넣고 Task 설명에 프레임 이름을 적는다. `feature-frd-author`: 절차 5에서 디자인 파일을 열람할 수 있으면 프레임에는 있는데 W-n 명세에 없는 요소를 AC 후보나 "WIREFRAMES 갱신 검토"로 보고한다.
+    - `docs/mcp-setup-guide.md`: Pencil MCP 의존 행에 `code-implementer`를 추가했다.
+- 검증: `claude plugin validate --strict`(sdlc·core) 통과. 변경 SKILL 5개와 agent의 frontmatter를 `ruby -ryaml`로 파싱했다(`argument-hint` String 유지). Next.js segment config의 정적 분석 요건은 Context7(공식 문서·TS 플러그인 `config.ts`)로 확인했다. description·트리거는 바뀌지 않아 스킬 품질 동적 eval은 실행하지 않았다(권장 항목).
+- 의도적 미반영(7·8): `browser-visual-diff`의 Pencil 소스 지원(8-b)은 기능 확장이고 라이브 검증이 필요해 ROADMAP "UI 작업 분리 검토"의 하위 작업으로 등록했다. Polish 단계 분리 결정도 그 항목에 미결로 남겼다. Pencil 읽기 절차는 Pencil MCP와 열린 `.pen`이 필요해 이번에 헤드리스로 실행 검증하지 못했다.
+- 의도적 미반영: ⑤의 "eval 스킬" 쪽은 반영하지 않았다. 하네스에 eval 스킬이 없고(2026-10-21 eval 체계 폐기) code-implementer 지침에만 넣었다. 금지 항목은 사용자 환경 사례(`rm -i` 별칭, `next-server`)를 일반화했고, test-writer에는 아직 적용하지 않았다(사고 보고 없음). careerstack 쪽 문서(W-0·B-10)는 그 세션이 이미 처리했다. README·README.ko·marketplace는 바꾸지 않았다(이름·description·카탈로그 불변).
+
 ## **setup-project-convention 대상 루트 고정 + 홈 디렉토리 가드** (2026-11-19, `devoks-core` `2.10.0 → 2.10.1`)
 - 배경: 점검해 보니 `~/.claude/refs/`에 `code-review`·`engineering-principles`·`git-convention`·`workflow.md` 4개(mtime 2026-07-08)가 있었다. git 이력의 과거 refs 버전과 바이트 단위로 같았다. 원인은 레거시 `sync-context.sh`(2026-06-16 ~ 07-09, `1ac291e`에서 폐기)였다. 대상이 `${CLAUDE_PROJECT_DIR:-.}/.claude`라서 홈에서 연 세션이 user scope에 사본을 썼다. 현재 setup 커맨드·preset-manage·훅은 홈에 쓰지 않는다. 다만 커맨드가 `.claude/...` 상대 경로만 적고 루트를 정하지 않아 같은 사고가 날 수 있었다.
 - 반영: `setup-project-convention`에 0단계 "대상 루트 확정"(훅과 같은 `${CLAUDE_PROJECT_DIR:-$PWD}` 기준, `$HOME`이거나 프로젝트 시그널이 없으면 중단·확인)과 Rules "`~/.claude/`에 쓰지 않음"을 추가했다. `setup-preset-manage` 1단계에도 같은 가드를 넣었다. provenance가 없을 때 타는 "스냅샷 없는 프로젝트" 경로가 사본을 갱신하고 provenance를 만들기 때문에, 홈에서 실행하면 잔재를 갱신 대상으로 잡을 수 있었다. 로컬 잔재 4개와 빈 `~/.claude/rules/`는 삭제했다(전역 `CLAUDE.md`·`settings.json`에서 참조 없음 확인).

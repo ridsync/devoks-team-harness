@@ -19,7 +19,7 @@
 | 공통 예외 ② — 사용자가 직접 실행을 명시 요청 | 메인 루프 직접 |
 | 공통 예외 ③ — **스펙 미완결**(§12 3기준 #1 위반) — `file:` 미정·`traces:` AC/CTR/EDGE 본문이 FRD에 없음·구현 방식이 §1 Approach와 충돌·blocked 해소 결정이 아직 `context`에 없음 | **`size`와 무관하게** 메인 루프 직접 — 사용자 확인·스펙 확정 후 재라우팅. 위임 전에 스펙을 닫는다 |
 
-- **MCP 도구는 위임을 막지 않는다** — 에이전트는 `ToolSearch`로 MCP 스키마를 로드해 쓴다(`code-implementer`는 Figma MCP를, `acceptance-test-runner`는 Chrome DevTools MCP를 이렇게 쓴다). 오히려 Figma design context·스크린샷, CodeGraph verbatim 소스처럼 **반환 바이트가 큰 도구일수록 위임의 컨텍스트 격리 이득이 크다** — 이런 태스크를 메인 루프로 되돌리는 것은 위임의 목적과 역행한다. 단, 필요한 MCP가 미설치이거나 `ToolSearch` 로드에 실패하면 에이전트는 추측으로 진행하지 말고 `blocked`를 반환한다(라우팅 사전 판단이 아니라 **런타임 안전판**). 메인 루프가 설치를 안내하거나 직접 인수한다.
+- **MCP 도구는 위임을 막지 않는다** — 에이전트는 `ToolSearch`로 MCP 스키마를 로드해 쓴다(`code-implementer`는 Figma·Pencil MCP를, `acceptance-test-runner`는 Chrome DevTools MCP를 이렇게 쓴다). 오히려 Figma design context·스크린샷, CodeGraph verbatim 소스처럼 **반환 바이트가 큰 도구일수록 위임의 컨텍스트 격리 이득이 크다** — 이런 태스크를 메인 루프로 되돌리는 것은 위임의 목적과 역행한다. 단, 필요한 MCP가 미설치이거나 `ToolSearch` 로드에 실패하면 에이전트는 추측으로 진행하지 말고 `blocked`를 반환한다(라우팅 사전 판단이 아니라 **런타임 안전판**). 메인 루프가 설치를 안내하거나 직접 인수한다.
 - 직접 구현 시에도 절차(읽기 전 변경 금지·재사용 우선·`test:` 마커 준수(부여 기준 SSOT: `task-pr-splitting.md`)·검증 후 `[x]`·인계 노트 기록)는 동일하다 — 공통 예외나 `L` 분해 불가로 메인 루프가 직접 구현하는 Task도 `test: required`면 테스트를 동반한다(`size: S`는 정의상 `test: skip`이므로 이 조항의 대상이 아니다).
 - **런타임 보정(size)**: `M`으로 위임했는데 실제 스코프가 `L`이었다면 에이전트가 blocked(스코프 초과)로 반환하고, 메인 루프가 인수하거나 재분해한다.
 - **런타임 보정(test)**: `test:` 마커가 없는 Task(구버전 PLAN)는 `required`로 간주한다. `test: skip`인데 구현 중 실제로 로직(분기·상태·계약 검증)이 드러나면 마커를 맹목적으로 따르지 말고 최소 테스트를 작성한 뒤, done 리포트의 인계 노트에 마커 불일치를 1줄 남긴다(차단하지 않음 — "애매하면 테스트 누락보다 과다 작성이 안전"과 같은 방향).
@@ -45,6 +45,9 @@
 | `plan` | ✅ | PLAN.md 절대 경로 — §1 Approach·§4 의존성 참조용 (필요 시 에이전트가 직접 Read) |
 | `frd` | ✅ | FRD.md 절대 경로 — `traces:`의 AC/CTR/EDGE 본문 확인, 테스트 설명에 AC ID를 박는 계약 이행용 |
 | `context` | 선택 | 메인 루프가 아는 힌트 — **인계 노트(윈도잉 적용, 아래)**·재사용할 유틸/패턴 경로·blocked 해소 결정·세션에서 합의된 제약 |
+| `design` | 조건부 — 화면 Task이고 디자인 파일이 있으면 ✅ | 디자인 소스 위치 — Figma URL(노드 ID 포함) 또는 `.pen` 경로 + 대상 프레임 이름(해당 W-n의 PC·모바일 변형, 셸 프레임 W-0). 출처는 FRD §6 → WIREFRAMES 인벤토리 `프레임` 열·frontmatter `design_file` 순 |
+
+- **화면 Task는 디자인 소스를 함께 넘긴다** — 넘기지 않으면 에이전트는 FRD에 인용된 W-n 문장만 보고 화면을 만들어, 문서에 옮겨지지 않은 디자인 요소(전역 헤더·푸터 등 반복 영역)가 빠진다(careerstack F-4 사례). 메인 루프는 경로·프레임 이름만 넘기고 스크린샷·구조를 직접 읽어 넘기지 않는다 — 큰 바이트는 에이전트 컨텍스트에서 읽는 것이 위임의 목적이다. Pencil은 에디터에 파일이 열려 있어야 읽히므로, HITL이면 위임 전에 대상 `.pen`이 열려 있는지 사용자에게 한 번 확인한다. 에이전트가 "디자인 열람 불가"로 blocked를 내면 파일을 열게 한 뒤 재위임하거나, 사용자가 디자인 없이 진행하기로 정하면 그 결정을 `context`에 적어 재위임한다.
 
 - **`context`로 파일 구성을 지시하지 않는다** — Task `file:`에 없는 새 파일 경로를 덧붙이거나 "함수마다 파일" 식의 분할을 지시하지 않는다. 파일 구성은 `file:`과 `.claude/rules/agent-principles.md` [Structure]·구조 슬롯(S1~S8)이 정하고, `code-implementer`는 `file:`·`context`가 이와 어긋나면 규칙을 따른다. 재사용할 기존 경로를 알려 주는 것은 괜찮다.
 

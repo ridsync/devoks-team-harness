@@ -4,7 +4,7 @@ description: "제품 PRD(+TRD)를 받아 기능 FRD 착수 전에 화면 설계�
 argument-hint: "[phase=<wireframe|visual> (default: wireframe)] [src=<PRD 경로> (default: <out>/PRD.md)] [out=<디렉터리> (default: docs/product)] [tool=<pencil|none> (default: pencil)]"
 metadata:
   author: ridsync
-  version: 1.3.1
+  version: 1.4.0
 ---
 
 # product-design-author — 제품 화면 설계 (와이어프레임 → 비주얼)
@@ -103,7 +103,7 @@ PRD + TRD(§2.1) ─▶ phase=wireframe ─▶ WIREFRAMES.md (+ <out>/design/wir
 
 문서 체인보다 디자인을 먼저 그린 프로젝트(이 스킬 도입 전 착수, 디자이너가 먼저 작업 등)를 SSOT 순서로 되돌린다. 캔버스를 **한 번** 읽어 문서 초안을 만들고, 확인이 끝나면 그 뒤로는 문서가 SSOT다(`tool-pencil.md` §6 금지 사항의 유일한 예외 — 1회 이관이지 상시 동기화가 아니다). 규칙: 가이드 §9.
 1. **읽기**: 어댑터(`tool-pencil.md` §7)로 프레임 목록·블록 순서·문구를 읽는다. 디자인 파일을 읽을 수 없으면(Pencil MCP 없음·파일 미오픈·비-HITL) 문서를 추측으로 쓰지 않고 멈춰 보고한다 — 재실행 방법(파일을 열고 HITL로 실행)을 남긴다.
-2. **초안 + 범위 제안 — 한 메시지로**(SKILL §1과 같은 형식): 프레임 → W-n 매핑 표(기존 프레임 이름·추적한 F-n/S-n·판정 `반영`/`dropped 후보`/`PRD 근거 없음`), PRD에는 있는데 프레임이 없는 화면(신규 W-n 후보), 프레임 이름 변경 여부(선택 — 기본은 유지하고 매핑만), 디자인 이후 생긴 결정 중 문서에 넣을 것을 묻는다.
+2. **초안 + 범위 제안 — 한 메시지로**(SKILL §1과 같은 형식): 프레임 → W-n 매핑 표(기존 프레임 이름·추적한 F-n/S-n·판정 `반영`/`dropped 후보`/`PRD 근거 없음`), 프레임 안의 반복 영역(Top Nav·Footer 등)을 뽑아낸 W-0 공통 레이아웃과 셸 변형 배정, PRD에는 있는데 프레임이 없는 화면(신규 W-n 후보), 프레임 이름 변경 여부(선택 — 기본은 유지하고 매핑만), 디자인 이후 생긴 결정 중 문서에 넣을 것을 묻는다.
 3. **작성**: 확인된 매핑으로 WIREFRAMES.md를 쓴다(§2 템플릿). 이미 그린 화면은 캔버스 내용을 옮기고, 새 W-n은 문서부터 쓴다. `tool≠none`이면 새 W-n만 그린 뒤 전체 프레임을 §2와 1:1 대조한다.
 4. **보고**: wireframe 보고 항목 + 매핑 결과(반영·dropped·PRD 근거 없음 수)·이름 변경 여부·"이후 SSOT는 WIREFRAMES.md". 하이파이 프레임도 있으면 `phase=visual` 역문서화(선택된 방향을 기존 결정으로 기록)를 다음 단계로 안내한다.
 - `phase=visual` 역문서화: `WIREFRAMES.md`가 있어야 한다(없으면 wireframe 역문서화부터). 결정 라운드·방향 시안 라운드는 건너뛰고, 이미 그린 하이파이의 방향을 `VD-n accepted (역문서화)`로, 모티프·에셋·인터랙티브 요소는 캔버스에서 보이는 것만 기록하고 대안·이유가 없는 항목은 `미확정`으로 둔다. §7 기준값은 시안 값을 읽어 채우고 대비율 판정은 그대로 한다.

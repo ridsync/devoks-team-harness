@@ -669,6 +669,7 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 | 기존 코드베이스에 axe 게이트를 처음부터 "위반 0건"으로 켬 | 누적 위반이 한꺼번에 터져 CI가 막히고 결국 게이트를 끄게 됨 | 기존 위반은 화면별 기준선(허용 rule id 목록)으로 고정하고 신규 위반만 실패 처리, 손대는 화면부터 기준선을 줄인다 |
 | Biome과 ESLint(또는 Oxlint)를 함께 켬 | 같은 위반 중복 보고, 포맷 규칙 충돌로 저장할 때마다 diff 발생 | lint/format 도구는 Project Decisions에서 고른 하나만 설치·실행 |
 | Tailwind v4 토큰을 `tailwind.config.js`와 `@theme` 양쪽에 중복 정의 | 토큰 drift | v4는 `@theme` CSS 블록이 SSOT, config 파일에 재정의 금지 |
+| 라우트 segment config(`export const maxDuration`·`revalidate`·`runtime` 등)에 import한 상수나 식(`60 * 10`)을 씀 | 빌드가 정적 분석으로 값을 읽지 못해 설정이 무시되거나 오류("must be statically analyzable") | 숫자·문자열 리터럴로 쓰고, 코드의 공유 상수(예: 전체 데드라인 예산)와 같은 값인지는 테스트로 고정 |
 | 테스트 전용 라우트를 프로덕션 빌드에 노출 | 예기치 못한 진입점 노출 | 라우트 가드 또는 빌드 분기로 제외 |
 | Contract 위반 시 `typeof` 가드로 조용히 처리 | 에러 은폐 | `*OrThrow` 헬퍼 사용 |
 | 반복 트리거 조작에서 입력마다 즉시 저장/요청 | 저사양 기기에서 I/O 큐 적체 → 터치 반응 지연 | state는 즉시 반영, I/O는 debounce로 코얼레싱 |

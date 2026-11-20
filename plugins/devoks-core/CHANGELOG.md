@@ -13,6 +13,11 @@
 
 ---
 
+## 2.10.2 — 2026-11-20
+
+### 복사 산출물
+- `conventions/nextjs/project-convention.md` › Pitfalls: 추가 — 라우트 segment config(`maxDuration`·`revalidate`·`runtime` 등)에 import한 상수나 식을 쓰는 실수. 값은 정적 분석이 가능해야 하므로(Next.js 문서 "must be statically analyzable") 리터럴로 쓰고, 공유 상수와 같은 값인지는 테스트로 고정한다. careerstack F-4에서 데드라인 예산 상수를 `maxDuration`에 import하려다 발견했다
+
 ## 2.10.1 — 2026-11-19
 
 ### 스킬·커맨드·훅
