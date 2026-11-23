@@ -43,6 +43,21 @@
 - **Functions:** ≤50 lines (target), **100 lines max** (hard limit).
 - **Files:** ≤500 lines (target), **1000 lines max** (hard limit).
 
+### Complexity Gate
+
+`.claude/rules/agent-principles.md` [Code Smells]와 위 Code Size 중 기계로 잴 수 있는 것만 Ruff로 막는다. 숫자는 대리지표라 경계에서 오탐이 나므로 **극단값만 실패**시키고, target(≤50줄)과 책임 분리 판단은 리뷰에 남긴다. 실제 규칙과 값은 Project Decisions의 **Complexity Gate**에 확정한다(`lint.select`에 규칙 추가).
+
+| 대상 | Ruff 규칙 (설정) | 기본 제안 |
+|------|-----------------|----------|
+| 함수 길이 | `PLR0915` too-many-statements (`lint.pylint.max-statements`) | 50 (Ruff 기본값). Ruff에는 함수 줄 수 규칙이 없어 문장 수로 대신한다 |
+| 복잡도 | `C901` (`lint.mccabe.max-complexity`) | 극단값만 막으려면 15 안팎(기본값 10은 이 용도로는 빡빡하다) |
+| 매개변수 수 | `PLR0913` too-many-arguments (`lint.pylint.max-args`) | 5 (Ruff 기본값) — 넘으면 Pydantic 모델이나 dataclass로 묶는다 |
+| 전역 재할당 | `PLW0603` global-statement | 켬 |
+
+- **피할 수 없는 위반은 그 줄에서만, 사유와 함께 끈다** — `# noqa: PLR0913  <사유>`. 파일 단위 `per-file-ignores`로 끄지 않는다.
+- **기존 코드베이스는 기준선을 고정한다** — 도입 시점의 위반은 별도 리팩터링 작업으로 남기고, 게이트는 새 위반만 실패시킨다(도구의 기준선 기능이나 변경 파일 한정 실행).
+- **분기 망라성은 타입으로 강제한다** — `Enum`·`Literal` 판별값의 `match`는 마지막 `case _:`에서 `typing.assert_never(value)`를 호출해, 새 값이 추가되면 mypy가 실패하게 한다.
+
 ### Module Structure & Shared Placement
 
 파일 묶음·하위 디렉터리·배치 단계·공개면·승격/강등의 판정 기준은 `.claude/rules/agent-principles.md`의 [Structure]와 DRY가 SSOT다. 이 절은 그 기준을 이 스택에 적용할 때의 고려사항만 적고, 실제 디렉터리·세그먼트·경로는 **Project Decisions의 구조 슬롯(S1~S8)**에 확정한다. 아래 Package Structure는 제네릭 예시다.
@@ -448,6 +463,7 @@ async def get_db_session() -> AsyncIterator[AsyncSession]:
 - **Migration 정책:** [예: `alembic/` 디렉토리, PR마다 revision 포함 필수]
 - **Auth 전략:** [예: JWT Bearer / 세션 쿠키 중 택1]
 - **비동기 워커:** [예: Celery + Redis 사용 여부, 미사용이면 "미사용"]
+- **Complexity Gate:** [예: Ruff `PLR0915`(max-statements 50)·`C901`(max-complexity 15)·`PLR0913`(max-args 5)·`PLW0603` select / 기존 코드는 기준선 고정 후 신규 위반만 실패 — 기준: Coding Style "Complexity Gate"]
 - **Sensitive Files:** [예: `.env`, `*.pem`, `alembic.ini`의 DB 접속 정보]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

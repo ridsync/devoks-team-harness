@@ -28,7 +28,7 @@ Shared development principles for individuals, teams, and AI agents.
 ## [State & Data] Handle State Changes Safely
 
 8. **Explicit State** — Do not hide current state (progress, decisions, context). Record and share it explicitly.
-9. **Immutability First** — Keep state and data immutable by default. Mutate only when necessary to reduce side effects.
+9. **Immutability First** — Keep state and data immutable by default. Mutate only when necessary to reduce side effects. The enforced form for agents is "Contain mutation" in [Code Smells] of `.claude/rules/agent-principles.md`.
 10. **Idempotent Actions** — Design actions so that running them multiple times does not break the outcome. Make retries and automation safe.
 11. **Statelessness** — Favor stateless components and APIs where possible. Easier to scale, test, and reason about.
 

@@ -70,6 +70,21 @@ lint 도구는 하나만 둔다. 둘을 겹치면 같은 위반이 중복 보고
 - **Functions:** ≤50 lines (target), **100 lines max** (hard limit).
 - **Files:** ≤500 lines (target), **1000 lines max** (hard limit).
 
+### Complexity Gate
+
+`.claude/rules/agent-principles.md` [Code Smells]와 위 Code Size 중 기계로 잴 수 있는 것만 lint로 막는다. 숫자는 대리지표라 경계에서 오탐이 나므로 **hard limit와 극단값만 `error`**로 두고, target(≤50줄)과 책임 분리 판단은 리뷰에 남긴다. 실제 규칙과 값은 Project Decisions의 **Complexity Gate**에 확정한다.
+
+| 대상 | Biome | ESLint | 기본 제안 |
+|------|-------|--------|----------|
+| 함수 길이 | `complexity/noExcessiveLinesPerFunction` (`maxLines`) | `max-lines-per-function` | 100 (Code Size hard limit) |
+| 인지 복잡도 | `complexity/noExcessiveCognitiveComplexity` | `sonarjs/cognitive-complexity` (`eslint-plugin-sonarjs`) | 15 (Biome 기본값) |
+| 매개변수 수 | `complexity/useMaxParams` | `max-params` | 4 (Biome 기본값) — 넘으면 options 객체 하나로 받는다 |
+| 매개변수 재할당 | `style/noParameterAssign` | `no-param-reassign` | 켬 |
+
+- **피할 수 없는 위반은 그 줄에서만, 사유와 함께 끈다** — `// biome-ignore lint/complexity/useMaxParams: <사유>` / `// eslint-disable-next-line max-params -- <사유>`. 파일·디렉터리 단위로 끄지 않는다.
+- **기존 코드베이스는 기준선을 고정한다** — 도입 시점의 위반은 별도 리팩터링 작업으로 남기고, 게이트는 새 위반만 실패시킨다(도구의 기준선 기능이나 변경 파일 한정 실행).
+- **분기 망라성은 타입으로 강제한다** — 판별값별 상수 맵은 `satisfies Record<Union, ...>`로, `switch`는 `default`에서 `const unreachable: never = value`로 새 케이스를 컴파일 에러로 만든다. ESLint를 쓰면 typescript-eslint `switch-exhaustiveness-check`를 켤 수 있다. Biome `useExhaustiveSwitchCases`는 nursery 규칙이라 게이트로 쓰지 않는다.
+
 ### Module Structure & Shared Placement
 
 파일 묶음·하위 디렉터리·배치 단계·공개면·승격/강등의 판정 기준은 `.claude/rules/agent-principles.md`의 [Structure]와 DRY가 SSOT다. 이 절은 그 기준을 이 스택에 적용할 때의 고려사항만 적고, 실제 디렉터리·세그먼트·경로는 **Project Decisions의 구조 슬롯(S1~S8)**에 확정한다.
@@ -605,6 +620,7 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 - **Design System SSOT:** [예: `components/ui/`(shadcn/ui) + `@theme` 토큰]
 - **접근성 기준·게이트:** [예: WCAG 2.1 AA — 신규 화면은 axe 위반 0건 / 기존 화면은 기준선 고정 후 신규 위반만 실패. TRD §2.1 접근성 보장과 일치시킨다]
 - **Routing SSOT:** [예: `src/routes.tsx`]
+- **Complexity Gate:** [예: Biome `noExcessiveLinesPerFunction`(maxLines 100)·`noExcessiveCognitiveComplexity`(15)·`useMaxParams`(4)·`noParameterAssign` 모두 error / 기존 코드는 기준선 고정 후 신규 위반만 실패 — 기준: Coding Style "Complexity Gate"]
 - **Sensitive Files:** [예: `.env*`, `*.pem`]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

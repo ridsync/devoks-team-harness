@@ -26,6 +26,17 @@ These criteria are stack- and layout-agnostic. The concrete directories, segment
 - **One public surface per module boundary** — Expose a module only through the boundary defined in S4. Do not import another module's internals, do not import your own module's public entry from inside the module, and keep import cycles at zero.
 - **Promotion is a contract** — Code moved to a shared level gets a usage comment, tests, and explicit exports, and changing it means checking every caller. Demote it (inline back) when only one caller remains or callers need their own branches.
 
+## [Code Smells] Avoid While Writing
+
+Do not introduce these code smells (Fowler, *Refactoring* 2nd ed.). Smells already judged elsewhere stay there: duplication (DRY), speculative generality and middle men (YAGNI), oversized functions and classes (project convention Code Size), divergent change, shotgun surgery and insider trading ([Structure]), explanatory comments (project Comment Rules). Each item is a judgment, not a metric — when a fix would add more structure than it removes, keep the code.
+
+- **Names reveal intent** — A name states what the code does, including side effects (`saveDraftAndNotify`, not `handleDraft`). Never use a bare generic word (`data`, `info`, `item`, `handle`, `process`, `manager`, `util`) as the whole name. If a name needs a comment to be understood, rename instead.
+- **Few parameters, no behavior flags** — Values that always travel together (date range, coordinates, address, page and size) become one type once they recur across signatures or fields. A boolean argument that switches what a function does means two functions — split them (same test as DRY's caller-specific branches). When a function still needs many inputs, take one named options object instead of a long positional list.
+- **Domain types where mixing hurts** — Give a dedicated type only to values whose mix-up is a real bug: different ID kinds passed side by side, money and units, and state. Model state as a discriminated union (sealed class, enum with associated values) instead of optional fields valid only in some states plus a status string. Plain strings and numbers stay plain when nothing can be confused.
+- **One place per decision** — When the same discriminant (type, status, role) is branched on in a second place, replace the branches with a lookup table keyed by that value or with polymorphism. Keep branching exhaustive by type (`satisfies Record<Union, ...>`, a `never` check, `when`/`switch` over a sealed type without `default`) so a new case fails to compile instead of falling through.
+- **Contain mutation** — Do not reassign parameters or mutate arguments and objects passed in; return new values. Mutable state shared across modules lives only in the project's designated state SSOT (store, context, repository) and changes through its own operations — no other module-level mutable variables. Local mutation inside one function is fine.
+- **Behavior lives with its data** — A function that mostly works on another module's data, or reaches through several objects to get it from outside their owner, moves to (or asks) the module that owns that data. Plain reads of DTO or response fields are not this smell.
+
 ## [Pre-Work] Checklist Before Starting
 
 1. **Read Before Touch** — Never suggest modifications without first reading the relevant code. Always read before acting.

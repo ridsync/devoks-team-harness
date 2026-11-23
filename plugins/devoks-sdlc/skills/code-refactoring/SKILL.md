@@ -4,7 +4,7 @@ description: "지정된 파일/폴더/모듈을 대상으로 현황 파악 → �
 argument-hint: "target=<파일|폴더|모듈 경로> [goal=<개선 목표>] [constraints=<제외 범위·동작 불변 요구 등>]"
 metadata:
   author: ridsync
-  version: 1.2.0
+  version: 1.3.0
 ---
 
 # code-refactoring — 코드 리팩토링 (구조·책임·계약 품질 개선)
@@ -36,7 +36,7 @@ UI 개선이 아닌 **구조·책임·계약·도메인 품질** 개선에 집�
 | 슬롯 | 의미 | 입력 방법 |
 |------|------|----------|
 | `target` | 리팩토링 대상 파일/폴더/모듈 경로 | `target` 인자 또는 Phase 0 확인 (필수) |
-| `goal` | 개선하려는 품질 방향(파일 크기 분할, Fail-Fast 적용, Feature/Provider 분리, SSOT 정리 등) | `goal` 인자 또는 Phase 0 확인 (선택, 없으면 `.claude/CLAUDE.md`·`.claude/rules/agent-principles.md` 우선순위 기준 위반 항목 전체 점검) |
+| `goal` | 개선하려는 품질 방향(파일 크기 분할, Fail-Fast 적용, 계층·모듈 경계 정리, SSOT 정리, 코드 냄새 개선 등) | `goal` 인자 또는 Phase 0 확인 (선택, 없으면 `.claude/CLAUDE.md`·`.claude/rules/agent-principles.md` 우선순위 기준 위반 항목 전체 점검) |
 | `constraints` | 제외 범위, 동작 불변 요구 등 | `constraints` 인자 또는 Phase 0 확인 (선택) |
 
 ---
@@ -67,13 +67,12 @@ Phase 0에서 확정된 `target`·`goal`·`constraints`로 아래 절차를 **�
 
 - [ ] 리팩토링 대상·목표·제약 조건 확정 (모호하면 재질문)
 - [ ] 대상 파일 및 직접 의존 모듈 탐색 완료
-- [ ] `.claude/CLAUDE.md` 및 `.claude/refs/engineering-principles.md` 기준 위반 항목 도출 (코드 크기, 네이밍, 계층, 사이드이펙트)
-- [ ] `.claude/rules/` 및 `.claude/refs/` 규칙 파일 기준 위반 항목 도출
+- [ ] 기준 문서(`agent-principles.md`·`project-convention.md`·`code-review.md`·`CLAUDE.md` — 목록은 `references/refactoring-execution.md` §2)로 위반 항목 도출, 항목마다 근거 기준 병기
 - [ ] 수정/생성/삭제 파일 목록 및 개선 방향 작성 후 사용자 승인 (구조 방향 전환이 있으면 ADR 기록 제안 포함)
 - [ ] Critical: SSOT/Contract/Fail-Fast 위반 수정
-- [ ] High: 1000자 초과 분할, 계층 재배치, 사이드이펙트 분리
-- [ ] Medium: 네이밍 개선, 주석 3종(프로젝트 기본 주석/Rationale/Provider Header) 보완(불필요한 주석 제거 포함)
-- [ ] Low: import 정렬, console 정리, 미사용 코드 제거
+- [ ] High: convention Code Size 상한 초과 분할(책임 기준), 계층·모듈 경계 재배치, 사이드이펙트 분리
+- [ ] Medium: 코드 냄새를 리팩터링 기법에 대응시켜 개선(`.claude/refs/code-review.md` Code Smells 신호표), 네이밍·주석을 convention Naming·Comment Rules에 맞춤(불필요한 주석 제거 포함)
+- [ ] Low: import 정렬, 로깅 정리(convention 기준), 미사용 코드 제거
 - [ ] 동작 불변 검증 — 기존 테스트 있으면 `test-run-triage`로 회귀 확인, 없으면 `test-author` 보강 제안
 - [ ] 프로젝트의 린트 스크립트(예: `npm run lint`, `pnpm lint`) 확인, 린트 오류 수정
 - [ ] 프로젝트의 포맷 스크립트(예: `npm run format`, `pnpm format`) 확인·적용 (없으면 생략하고 명시)

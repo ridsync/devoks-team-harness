@@ -34,6 +34,21 @@
 - **Functions:** ≤50 lines (target), **100 lines max** (hard limit).
 - **Files:** ≤500 lines (target), **1000 lines max** (hard limit).
 
+### Complexity Gate
+
+`.claude/rules/agent-principles.md` [Code Smells]와 위 Code Size 중 기계로 잴 수 있는 것만 정적 분석으로 막는다. 숫자는 대리지표라 경계에서 오탐이 나므로 **hard limit와 극단값만 `error`**로 두고, target(≤50줄)과 책임 분리 판단은 리뷰에 남긴다. SwiftLint를 도입하면 아래 metrics 규칙을 쓰고, 실제 규칙과 값은 Project Decisions의 **Complexity Gate**에 확정한다.
+
+| 대상 | SwiftLint 규칙 | 기본 제안 |
+|------|---------------|----------|
+| 함수 길이 | `function_body_length` | warning 50 / error 100 (SwiftLint 기본값 = Code Size target / hard limit) |
+| 순환 복잡도 | `cyclomatic_complexity` | warning 10 / error 20 (SwiftLint 기본값) |
+| 매개변수 수 | `function_parameter_count` | warning 5 / error 8 (SwiftLint 기본값, 기본값 매개변수 제외) |
+
+- Swift 매개변수는 재할당할 수 없으므로 재할당 규칙은 필요 없다. 가변 상태는 전역 `var`·`static var`로 두지 않고 지정된 상태 소유자(`@Observable` 모델·저장소)에 둔다.
+- **피할 수 없는 위반은 그 줄에서만, 사유와 함께 끈다** — 바로 위에 사유 주석을 남기고 `// swiftlint:disable:next <rule>`. 파일 단위 `disable`로 끄지 않는다.
+- **기존 코드베이스는 기준선을 고정한다** — 도입 시점의 위반은 별도 리팩터링 작업으로 남기고, 게이트는 새 위반만 실패시킨다(도구의 기준선 기능이나 변경 파일 한정 실행).
+- **분기 망라성은 컴파일러로 강제한다** — 자기 모듈 enum에 대한 `switch`에는 `default`를 두지 않는다. 새 case가 추가되면 컴파일 에러가 난다. 외부 모듈의 non-frozen enum만 `@unknown default`를 쓴다.
+
 ### Module Structure & Shared Placement
 
 파일 묶음·하위 디렉터리·배치 단계·공개면·승격/강등의 판정 기준은 `.claude/rules/agent-principles.md`의 [Structure]와 DRY가 SSOT다. 이 절은 그 기준을 이 스택에 적용할 때의 고려사항만 적고, 실제 디렉터리·세그먼트·경로는 **Project Decisions의 구조 슬롯(S1~S8)**에 확정한다. 아래 File Organization은 제네릭 예시다.
@@ -286,6 +301,7 @@ func shouldReorderStock(remainingQty: Int, thresholdQty: Int) throws -> Bool {
 - **Navigation SSOT:** [예: `Sources/App/Navigation/`]
 - **Persistence SSOT:** [예: `Sources/App/Data/`]
 - **Design Guideline SSOT:** [예: `docs/DESIGN.md`]
+- **Complexity Gate:** [예: SwiftLint `function_body_length`(50/100)·`cyclomatic_complexity`(10/20)·`function_parameter_count`(5/8) 기본값 유지 / 도입 안 함 — 이유 — 기준: Coding Style "Complexity Gate"]
 - **Sensitive Files:** [예: `GoogleService-Info.plist`, `*.mobileprovision`, signing config]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

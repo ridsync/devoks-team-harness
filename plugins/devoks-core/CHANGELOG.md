@@ -13,6 +13,16 @@
 
 ---
 
+## 2.11.0 — 2026-11-23
+
+### 복사 산출물
+- `rules/agent-principles.md` › [Code Smells] Avoid While Writing: 추가 — 생성 단계에서 만들지 않을 코드 냄새 6개 원칙을 넣었다(Fowler 『리팩터링』 2판 24종 중 기존 규칙이 다루지 않는 9종을 6개로 묶음). 이름은 의도를 드러냄 / 매개변수는 적게, 동작 플래그 인자 금지 / 섞이면 사고 나는 값만 도메인 타입으로 / 같은 판별값 분기는 한 곳에서 망라성까지 / 변이는 지정 state SSOT 안에서만 / 동작은 데이터 곁에. 이미 다른 규칙이 판정하는 냄새(DRY·YAGNI·Code Size·[Structure]·Comment Rules)는 그 규칙으로 넘기고, 각 항목은 지표가 아닌 판단이라고 명시했다. 원칙에 "생기지 않게"가 없어서 구현 단계에 냄새를 막을 근거가 없었다. 불변성은 참조용 `engineering-principles.md`에만 있어 실질적으로 적용되지 않았다
+- `refs/code-review.md` › §5 Code Quality: 변경 — "Code smells나 anti-patterns가 있는가?"를 Code Smells 신호표 참조로 바꿨다. 복잡도 항목에는 "lint 게이트가 있으면 그 결과 우선·중복 기재 금지, 수동 리뷰는 책임 기준"을 덧붙였다. 기준 없는 한 줄이라 판정이 실행마다 달랐다
+- `refs/code-review.md` › §5 Code Smells: 추가 — 냄새 7행(탐지 신호·권장 리팩터링 기법명·기본 심각도)을 넣었다. 다른 기준이 판정하는 냄새를 어디로 보내는지, 지적하지 않는 냄새(반복문·데이터 클래스·상속 포기)와 그 이유, 고치는 쪽이 구조를 더 늘리면 지적하지 않는다는 오탐 가드를 함께 적었다
+- `refs/engineering-principles.md` › 9. Immutability First: 변경 — 에이전트에게 실제로 적용되는 형태는 agent-principles [Code Smells] "Contain mutation"이라는 참조 1문장을 추가했다
+- `conventions/{react-web,nextjs,react-native,python-fastapi,android,ios}/project-convention.md` › Coding Style › Complexity Gate: 추가 — [Code Smells]와 Code Size 중 기계로 잴 수 있는 것(함수 길이·인지/순환 복잡도·매개변수 수·매개변수 재할당/전역 재할당)을 스택별 lint 규칙으로 막는 장치를 넣었다. Biome·ESLint / Ruff / detekt / SwiftLint 규칙명과 기본값은 공식 문서로 확인했다. 숫자는 대리지표라 hard limit와 극단값만 실패시키고, target과 책임 분리 판단은 리뷰에 남긴다. suppress는 그 줄에서만 사유와 함께 허용하고, 기존 코드베이스는 기준선을 고정해 새 위반만 실패시킨다. 분기 망라성(TS `satisfies Record`·`never`, Python `assert_never`, Kotlin `when` 식, Swift `switch` 무 `default`)을 함께 적었다. Biome `useExhaustiveSwitchCases`는 nursery라 게이트에서 뺐다. Android·iOS는 lint 도구가 스택에 없어 "도입하면" 조건으로 적었고, 도입하지 않는 프로젝트는 슬롯에 이유를 남긴다
+- `conventions/*/project-convention.md` › Project Decisions: 추가 — `Complexity Gate` 슬롯(규칙·값·기준선 방식). 장치는 preset에 두고 값은 setup에서 확정한다는 원칙을 따랐다
+
 ## 2.10.3 — 2026-11-20
 
 ### 스킬·커맨드·훅

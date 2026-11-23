@@ -9,6 +9,23 @@
 
 ---
 
+## **코드 냄새 방지 2단계 — preset Complexity Gate + 구현·리뷰·리팩토링 연결** (2026-11-23, `devoks-sdlc` `3.26.0 → 3.27.0`, `devoks-core` 2.11.0 — 1단계와 같은 미배포 릴리스에 포함)
+- 배경: 1단계에서 생성 원칙([Code Smells])과 리뷰 신호표를 만들었다. 하지만 기계로 막는 장치가 없었고, 구현·리뷰·리팩토링 절차가 그 기준을 실제로 부르지 않았다. 리팩토링 스킬의 "1000자 초과 분할"은 줄 단위 Code Size와 어긋난 오기였다.
+- 반영:
+  - devoks-core: preset 6종에 Coding Style "Complexity Gate" 절과 Project Decisions `Complexity Gate` 슬롯을 추가했다. 상세는 `plugins/devoks-core/CHANGELOG.md` 2.11.0.
+  - `code-implementer`: 6단계 리턴 직전 diff 훑기에 [Code Smells] 점검을 추가했다. lint가 잡는 항목은 lint 결과를 따르고, 고치면 Task 범위를 넘는 경우는 인계 노트에 남긴다.
+  - `code-review` 2.4.0: `review-execution.md` §3에 "코드 냄새 판정"을 추가했다(신호표 기준, Lean 유형과 겹치는 냄새는 Lean으로만 기재, lint 위반은 §2로 대신).
+  - `code-refactoring` 1.3.0: 현황 점검에 [Code Smells]·신호표를 추가하고, 계획을 "냄새 → 리팩터링 기법"으로 쓰게 했다. 우선순위 Medium에 코드 냄새를 넣었다(신호표 기본 심각도가 High면 High).
+  - `code-refactoring` 1.3.0 (같은 날 후속): `refactoring-execution.md`를 **절차만 두는 문서**로 정리했다. 이 문서는 초기 구성(`e5a0f5c`, 2026-06-15) 때부터 convention 수준의 기준을 직접 적고 있었다. 코드 크기 "500자/1000자"는 같은 커밋 preset의 `500 lines/1000 lines`를 옮기다 생긴 오기였다. 네이밍 "3단어", 주석 3종(`[WHY]`·Provider Header), `createDebugger`·Feature/Provider·`require*OrThrow`는 react-web 계열 패턴인데 Python·Android·iOS 프로젝트에도 그대로 지시되고 있었다. 계층 순서(Business→IO→Config)는 근거 문서가 없었다. sdlc에서 기준 값을 다시 적은 곳은 이 문서뿐이었다. 리뷰 쪽은 이미 참조형이었다. 정리 내용: §2는 기준 문서 표(agent-principles / project-convention / code-review / CLAUDE.md)로 바꾸고, 우선순위 표는 등급 틀만 남겼다("convention Code Size 상한 초과"처럼 참조로). §4 주석 상세와 Rules의 크기·네이밍·주석·계층 규칙은 삭제했다. "분할은 책임 기준으로" 1항목을 추가하고, 실행 예시는 스택 중립으로 바꿨다. SKILL 체크리스트와 `goal` 예시도 맞췄다. `review-execution.md`의 "약 1000줄 초과"는 diff 크기(PR 분할 권고) 기준이라 그대로 두었다.
+- 검증: `claude plugin validate --strict`(core·sdlc). 변경 SKILL frontmatter `ruby -ryaml` 파싱. lint 규칙명·기본값은 Context7 공식 문서로 확인했다 — Biome(`useMaxParams` 4·`noExcessiveCognitiveComplexity` 15·`noExcessiveLinesPerFunction`·`style/noParameterAssign`·`useExhaustiveSwitchCases` nursery·suppression 문법), Ruff(`max-args` 5·`max-complexity` 10·`max-statements` 50), detekt(`LongParameterList` 5·`CognitiveComplexMethod` 15 기본 비활성), SwiftLint(`function_body_length` 50/100·`cyclomatic_complexity` 10/20·`function_parameter_count` 5/8). ESLint core·typescript-eslint·sonarjs 규칙명은 별도 조회하지 않았다(널리 쓰이는 안정 규칙명).
+- 의도적 미반영: 실제 프로젝트에서 게이트 오탐률·[Code Smells] 생성 억제 효과는 측정하지 않았다(설치 프로젝트에서 써 보며 확인). 테스트는 냄새를 잡지 못해 가드레일에서 제외했다(리팩토링 안전망 역할만). `code-reviewer` 에이전트 본문은 `review-execution.md`를 읽는 구조라 바꾸지 않았다. description·트리거가 바뀌지 않아 스킬 동적 eval은 실행하지 않았다(권장 항목). README·README.ko·marketplace는 바꾸지 않았다.
+
+## **코드 냄새(code smell) 방지 1단계 — 생성 원칙 [Code Smells] + 리뷰 신호표** (2026-11-23, `devoks-core` `2.10.3 → 2.11.0`)
+- 배경: Fowler 『리팩터링』 2판 3장의 냄새 24종을 하네스와 대조했다. 11종은 기존 규칙이 이미 다룬다. DRY/Lean `merge`, YAGNI/Lean `yagni`·`inline`, Code Size/Lean `split`, [Structure], Comment Rules가 그것이다. 중복 코드는 겉모양이 아니라 지식 단위로 판정한다는 기존 결정을 유지한다. 4종은 제외했다. 반복문은 취향 문제이고, 데이터 클래스는 DTO·스키마 패턴과 충돌하며, 상속 포기와 메시지 체인은 프레임워크 상속·DTO 조회 오탐이 크다. 나머지 9종(이름·매개변수·데이터 뭉치·기본형 집착·임시 필드·반복 switch·전역/가변 데이터·기능 편애)은 생성 규칙도 리뷰 기준도 없었다. 리뷰의 "Code smells가 있는가?"는 기준 없는 한 줄이었다.
+- 반영: devoks-core 2.11.0. `agent-principles.md`에 [Code Smells] 6개 원칙을 추가했다(항상 로드되는 생성 규칙). 절 이름은 출처(Fowler "Bad Smells in Code")에 맞춰 Code Smells로 정했다. "design smell"은 다른 분류 체계(Suryanarayana 등)를 가리키는 용어라 혼동될 수 있다. `refs/code-review.md` §5에 Code Smells 신호표 7행과 오탐 가드를 추가했다. 불변성을 agent-principles로 옮기면서 `engineering-principles.md`에 참조를 남겼다. 상세는 `plugins/devoks-core/CHANGELOG.md` 2.11.0.
+- 검증: `claude plugin validate ./plugins/devoks-core --strict`.
+- 의도적 미반영: 2단계(preset 복잡도 lint 게이트 슬롯, code-implementer·review-execution·code-refactoring 연결)는 바로 위 항목에서 같은 날 반영했다. 복제 탐지 도구(jscpd)는 지식 단위 DRY와 판정 기준이 달라 게이트로 두지 않는다. README·README.ko·marketplace는 바꾸지 않았다(이름·description·카탈로그 불변).
+
 ## **하이파이 → 명세 이관 누락 방지 + 역문서화 모드 폐지(일반 작성 입력 규칙으로 흡수) — 문서가 SSOT, 프레임은 시각 참고** (2026-11-20, `devoks-sdlc` `3.25.0 → 3.26.0`, `devoks-core` `2.10.2 → 2.10.3`)
 - 배경: careerstack 개선 요청 9번(7·8번의 상류 문제). F-4 랜딩·미리보기가 `wireframes.pen` 하이파이(스택 카드·큰 % 숫자·4경로 압축 목록·앰버 잠금 카드)와 다르게 구현됐다(경로마다 큰 카드 4장). 원인은 셋이다. ① WIREFRAMES 역문서화가 하이파이를 "대조 대상 아님, VISUAL 역문서화는 후속"으로 넘겼고, 그 후속을 맡은 작업이 없었다. ② frd-author 착수 점검 ③(강조 화면 하이파이)이 "권장·막지 않음"이라 기록 없이 지나갔다. FRD는 하이파이를 §6.3에 경로로만 걸었고 시각 QA는 담당 없이 §10 "후속"으로 미뤘다. ③ 그래서 구현은 lo-fi 문장과 토큰만으로 화면을 조립했다.
 - 반영:
