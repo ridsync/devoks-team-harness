@@ -4,7 +4,7 @@ description: FRD(기능 요구서) 초안을 받아 정련된 FRD를 완성하�
 argument-hint: "[frd=<초안 경로|본문> (default: 대화 초안)] [out=<디렉터리> (default: 워크스페이스)]"
 metadata:
   author: ridsync
-  version: 1.15.0
+  version: 1.16.0
 ---
 
 # feature-workflow-runner
@@ -74,15 +74,15 @@ FRD 초안 → **정련 FRD → PLAN(작업 분해) → 태스크 단계 실행 
 3. 수치·세팅·상태전이를 §5 Contract(`CTR-xxx`)로 빼고, Edge Case를 §8(`EDGE-xxx`)로 정리한다. 요구가 **기존 데이터의 특정 필드/형태**에 의존하면 실환경에 그 형태가 실제로 존재하는지 확인하는 EDGE를, **상태 확정·I/O를 유발하는 반복 트리거 조작**(`.claude/refs/interaction-integrity.md` §1 적용 대상)을 포함하면 연타 시 기대 동작 EDGE를 반드시 추가한다(판정·기재 기준은 `devoks-sdlc:feature-frd-author` 절차 4와 동일).
 4. §6 Resources(참고 코드·외부 문서·시안·API)와 §7 Constraints(위험/의존 제약·기술 제약)를 채운다(제품 TRD가 있으면 frd-author 절차 5대로 참조). PR 분리 여부·개수는 이 단계에서 정하지 않는다(PLAN 단계 — `references/task-pr-splitting.md`).
 5. **§4 설계 스펙** — 제품 TRD가 있으면 그 구조 안에서(frd-author 절차 6). 복잡도 임계 초과 시 코드 패턴을 먼저 탐색(기존 상태관리·훅·유틸·모델)하고 **설계안을 제안·확인**한 뒤 컴포넌트 구조·패턴(`DSN`)·모듈 배치를 채운다. 단순 기능은 §4.1만 간결히. → `references/design-spec.md`
-6. **누락 슬롯은 한 번에 모아 사용자에게 확인**한다(추측 금지 — 요구는 묻고, 설계는 제안 후 확인). 검증되지 않은 가정·보류 질문은 §10에 남긴다. 여기서 모아 묻는 것은 슬롯·정책과 Success·Non-goals 제안값이고, 의도 수준 공백(Outcome·User·방향)은 frd-author Phase 0 게이트가 맡는다. 확정되면 `<out>/FRD.md` 작성.
+6. **누락 슬롯은 한 번에 모아 사용자에게 확인**한다(추측 금지 — 요구는 묻고, 설계는 제안 후 확인). **AC 리뷰(EARS 원문+한국어 풀이, 20개 초과면 별도 메시지)를 보여 주고 명시 승인을 받은 뒤** 쓴다(형식·승인 규칙: `references/ac-review.md`). 검증되지 않은 가정·보류 질문은 §10에 남긴다. 여기서 모아 묻는 것은 슬롯·정책과 Success·Non-goals 제안값이고, 의도 수준 공백(Outcome·User·방향)은 frd-author Phase 0 게이트가 맡는다. 확정되면 `<out>/FRD.md` 작성.
 
-완료 기준: §1에 대상 사용자·Success·Non-goals(최소 1개)가 있고 §10이 채워짐(없으면 "없음"). 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 기존 데이터 의존 요구·반복 트리거 조작 요구는 각각 해당 EDGE가 최소 1개 있음. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능. `FRD.md` 작성 시 frontmatter `status: draft → review`, FEATURES 시드 입력이면 FRD `feature:` 기입 + 백로그 행 `📝 frd`. → `references/progress-tracking.md`
+완료 기준: §1에 대상 사용자·Success·Non-goals(최소 1개)가 있고 §10이 채워짐(없으면 "없음"). 모든 REQ가 검증 가능한 AC를 갖고, 측정값은 CTR로, 예외는 EDGE로 분리됨. 기존 데이터 의존 요구·반복 트리거 조작 요구는 각각 해당 EDGE가 최소 1개 있음. 복잡도 임계 초과 기능은 §4 설계 스펙(컴포넌트/패턴/배치)이 채워지고 확인됨. ID 체계(`REQ`/`AC`/`CTR`/`EDGE`/`DSN`)가 일관되어 다음 단계(PLAN)의 `traces`로 바로 인용 가능. `FRD.md` 작성 시 frontmatter `status` — AC 승인 받았으면 `approved`, 아니면 `review`(§9 "AC별 검증 방법" 표·Success↔AC 연결 포함), FEATURES 시드 입력이면 FRD `feature:` 기입 + 백로그 행 `📝 frd`. → `references/progress-tracking.md`
 
 ## Phase 2 — PLAN 작성
 
 `<out>/FRD.md` 를 `assets/PLAN.template.md` 형식의 작업 분해로 변환한다.
 
-0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태). → `references/progress-tracking.md`
+0. **FRD 승인 처리** — `FRD.md` 로드 시 frontmatter `status`가 `review`이면 `approved`로 갱신(FRD 최종 상태)하고 PLAN §1에 "FRD AC 사용자 미검토" 한 줄을 남긴다(이미 `approved`면 해당 없음). → `references/progress-tracking.md`
 1. Approach·PR 분리 방침을 1~2문장으로 적는다(§1). Resource Check(§2)는 FRD §6에서 가져온다.
 2. 요구사항을 Task로 쪼갠다: 단일·검증가능·증분. 각 Task에 `TASK-ID`, (가능하면) `[P]`, `size`(S/M/L — 실행 라우팅 신호, 애매하면 M, `L`은 분해 재검토), `test`(required/skip — 테스트 필요 여부, 애매하면 required), `file:`, `traces:` 부여. → `references/task-pr-splitting.md`
 3. Task를 **PR 그룹**으로 묶는다 — 기본값 PR 1개. FRD의 메모는 참고일 뿐, `task-pr-splitting.md` 기준으로 이 단계에서 직접 재판단한다. 기본값이 명확하면 묻지 말고 진행하고, **애매할 때만 AskUserQuestion 단일선택**(`[PR 1개 (권장)]` / `[독립 가치·위험 단위로 분리]`; HITL 전용 — 비-HITL 경로에선 기본값 PR 1개). 분리 시 §1에 근거 1줄. → `references/task-pr-splitting.md`

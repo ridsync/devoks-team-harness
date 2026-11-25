@@ -12,12 +12,12 @@
 
 ## 승인 상태 전환 (FRD → PLAN)
 
-Phase 경계에서 FRD·PLAN frontmatter `status`를 **자동**으로 갱신한다. 별도 확인 프롬프트는 추가하지 않는다(기존 "확정 후 문서 작성" 절차에 편승).
+Phase 경계에서 PLAN frontmatter `status`는 **자동**으로 갱신한다. **FRD는 예외다** — FRD의 `approved`는 사용자가 AC 리뷰 표(`ac-review.md`)를 명시 승인할 때만 Phase 1에서 붙는다. 승인 질문은 별도 프롬프트가 아니라 기존 "확정 후 문서 작성" 확인(절차 7)에 AC 표를 얹어서 받는다. 비-HITL·리뷰 보류는 `review`로 남고 Phase 2 착수 때 자동 승격하되 PLAN §1에 "FRD AC 사용자 미검토"를 남긴다(파이프라인은 막지 않는다).
 
 | 문서 | 시점 | 전환 |
 |------|------|------|
-| **FRD.md** | Phase 1 완료 — `FRD.md` 작성 시 | `draft` → `review` |
-| **FRD.md** | Phase 2 착수 — PLAN 작성 시작 시 | `review` → `approved` (FRD 최종 상태) |
+| **FRD.md** | Phase 1 완료 — `FRD.md` 작성 시 | HITL + AC 명시 승인 → `draft` → `approved` / 그 외 → `draft` → `review` |
+| **FRD.md** | Phase 2 착수 — PLAN 작성 시작 시 | `review`이면 → `approved` (FRD 최종 상태, PLAN §1에 미검토 표기) |
 | **PLAN.md** | Phase 2 완료 — `PLAN.md` 작성 시 | `draft` → `approved` |
 | **PLAN.md** | Phase 3 첫 Task 착수 시 | `approved` → `in-progress` |
 | **PLAN.md** | 모든 Task `[x]` + DoD 충족 시 | `in-progress` → `done` |
