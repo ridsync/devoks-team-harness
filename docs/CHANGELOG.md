@@ -9,6 +9,12 @@
 
 ---
 
+## **React preset 메모이제이션 기준 정정 + React Compiler 슬롯** (2026-11-25, `devoks-core` `2.11.0 → 2.12.0`)
+- 배경: 설치 프로젝트(Next.js) 세션이 nextjs·react-web preset의 메모이제이션 문구가 모순·공백이라고 보고했다. "context value는 `useMemo`로"(무조건)·"`useCallback`: 이벤트 핸들러"가 습관적 사용을 유도했고, `memo`와 쓰지 않는 기준이 없었으며, Pitfall도 `useMemo`를 기본 해법처럼 읽혔다. 해당 프로젝트 실측(useMemo 0·memo 0·useCallback 1)으로 코드 문제가 아니라 문서 공백이었다. 두 번째 설치 프로젝트(React Web, ESLint)도 같은 분석을 보고했다. 이 프로젝트는 `eslint-plugin-react-hooks`를 `plugins`에 등록만 해서 hooks 규칙이 전부 꺼져 있었다(`recommended-latest` 규칙을 warn으로 돌린 1회 측정에서 `exhaustive-deps` 126건 등).
+- 반영: devoks-core 2.12.0. react-web·nextjs preset에 Performance "메모이제이션" 절(목적 2가지·도구별 사용/미사용 표·규칙)과 "React Compiler" 하위 절을 추가하고, Context·Performance 목록·Pitfall 문구를 교정했다. Project Decisions에 `React Compiler` 슬롯을 추가했다. 두 번째 보고를 받아 hooks 규칙 활성화를 요구하는 문구(ESLint는 recommended spread 필요, Biome은 react 도메인으로 기본 활성)와 `Hooks lint` 슬롯을 추가했다. 상세는 `plugins/devoks-core/CHANGELOG.md` 2.12.0.
+- 검증: `claude plugin validate ./plugins/devoks-core --strict`. 공식 문서 확인 — React `useMemo` 레퍼런스("performance optimization, not a semantic guarantee", Compiler가 수동 `useMemo` 필요를 줄임), React Compiler 설치 문서(ESLint compiler 규칙은 `eslint-plugin-react-hooks` `recommended-latest` preset), Biome `useReactCompiler`(nursery, v2.5.8+, 실험적). 요청 측은 "Biome에는 compiler lint 규칙이 없다"고 보고했으나 Biome 문서로 nursery 규칙 존재를 확인해 "있지만 실험적이라 게이트 불가"로 정정해 반영했다.
+- 의도적 미반영: 두 번째 보고의 금지 조항 제안은 넣지 않았다. 상수 `useMemo(…, [])`와 memo 비교자 prop 누락은 "기본은 쓰지 않는다 + 쓰는 경우 표"가 이미 배제하는 프로젝트 국소 오용이다. 렌더 중 컴포넌트 정의는 hooks lint(`react-hooks/static-components`)가 잡는다. react-native preset의 "`useCallback`·`useMemo` 분리를 검토" 문구는 이번 요청 범위 밖이라 그대로 두었다(후속 판단). `react-compiler-healthcheck`는 현행 공식 설치 문서에서 확인하지 못해 도입 순서에 넣지 않았다. Vite 쪽 컴파일러 연결 방법은 버전 의존이 커서 공식 설치 문서 참조로만 두었다. README·README.ko·marketplace는 바꾸지 않았다(이름·description·카탈로그 불변).
+
 ## **FRD AC 리뷰 체크포인트 — 작성한 AC를 사용자가 표로 보고 승인, AC별 검증 방법·Success 연결 추가** (2026-11-25, `devoks-sdlc` `3.27.0 → 3.28.0`)
 - 배경: PRD·FRD 작성 절차의 성공 기준·검증 방법을 비판적으로 점검했다. ① 작성된 AC 목록을 사용자가 통째로 보는 지점이 없었다(frd-author 절차 7은 누락 슬롯·Success/Non-goals 제안만 확인). ② FRD `review → approved`가 PLAN 착수 시 자동이라 사용자 승인 없이 최종 상태가 됐다(PRD는 사용자 명시 시에만 전환 — 비대칭). ③ AC별 검증 방법 칸이 없어 §9 Testing Strategy가 일반론에 그쳤고, `verify-acceptance-test` 대상 AC는 사후에 다시 골라야 했다. ④ Success→AC 추적이 없었다(PRD는 "모든 FR은 G/S로 역추적"). 인터뷰 단계에 AC·검증 방법을 묻는 안은 기각했다 — AC는 Contract·Edge·화면 상태에서 파생돼 작성 전엔 추상 답만 나오고, 질문 피로가 늘며, 오류 비용은 작성 후 표 리뷰가 훨씬 싸다.
 - 반영:

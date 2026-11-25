@@ -13,6 +13,18 @@
 
 ---
 
+## 2.12.0 — 2026-11-25
+
+### 복사 산출물
+- `conventions/{react-web,nextjs}/project-convention.md` › Performance › 메모이제이션: 추가 — `useMemo`·`useCallback`·`memo`의 목적(비싼 재계산 방지 / 참조 동일성이 의미 있는 곳의 리렌더·effect 재실행 방지)과 도구별 쓰는/쓰지 않는 경우 표, 규칙(측정 먼저·구조로 먼저·`memo`는 props 안정화와 한 묶음·deps 검사 비활성 금지·메모이제이션에 의미를 기대지 않음·Zustand selector 우선과 `useShallow`)을 넣었다. 기존 문구가 "context value는 무조건 useMemo", "이벤트 핸들러는 useCallback"처럼 습관적 사용을 유도했고 `memo`·사용하지 않는 기준이 없었다. DOM 요소에 직접 주는 핸들러의 `useCallback`은 효과가 없다
+- `conventions/{react-web,nextjs}/project-convention.md` › Performance › React Compiler: 추가 — 선택 도입(기본 미사용), 켠 프로젝트의 수동 메모이제이션 축소 기준, 빌드 비용(Babel 경유), bail-out 검출 수단(ESLint `eslint-plugin-react-hooks` compiler 규칙 `recommended-latest` / Biome `nursery/useReactCompiler` v2.5.8+ — nursery라 게이트 금지), 시범 → 전체 도입 순서
+- `conventions/{react-web,nextjs}/project-convention.md` › Performance 목록: 변경 — `useMemo: context value, 비용 높은 계산`·`useCallback: 이벤트 핸들러` 두 줄을 "메모이제이션 기준을 통과할 때만" 참조로 바꿨다
+- `conventions/{react-web,nextjs}/project-convention.md` › Component Pattern › Context / Provider: 변경 — "`useMemo`로 context value 감싸기"를 value가 객체·배열·함수일 때만으로 좁혔다(원시값 하나면 불필요)
+- `conventions/{react-web,nextjs}/project-convention.md` › Pitfalls: 변경·추가 — "파생 값 → 계산 또는 `useMemo`"를 "렌더 중 계산, 비용이 측정되면 그때 `useMemo`"로 바꾸고, 습관적 메모이제이션 행을 추가했다
+- `conventions/{react-web,nextjs}/project-convention.md` › Project Decisions: 추가 — `React Compiler` 슬롯(사용 여부·범위·사유·bail-out 검출 수단)
+- `conventions/{react-web,nextjs}/project-convention.md` › Performance › 메모이제이션: 변경 — "deps 검사를 끄지 않는다"를 "hooks 규칙을 켜고 끄지 않는다"로 바꿨다. ESLint는 `eslint-plugin-react-hooks`를 `plugins`에 등록만 하면 켜지는 규칙이 0개라 recommended spread가 필요하고, Biome은 react 도메인 recommended로 기본 활성이다. 설치 프로젝트에서 플러그인 등록만 된 채 hooks 규칙이 전부 꺼져 있던 사례가 있었다
+- `conventions/{react-web,nextjs}/project-convention.md` › Project Decisions: 추가 — `Hooks lint` 슬롯(rules-of-hooks·exhaustive-deps 레벨, compiler 계열 규칙 사용 여부, 기존 위반 기준선 방식)
+
 ## 2.11.0 — 2026-11-23
 
 ### 복사 산출물

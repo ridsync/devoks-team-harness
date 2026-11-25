@@ -193,7 +193,7 @@ export const useToolbar = () => useToolbarOrThrow();
 
 - Context는 Auth/Theme처럼 provider 경계가 실제로 필요한 cross-cutting 값에만 사용한다. 화면/도메인 상태를 Context로 끌어올리지 않는다.
 - `createContext<T | null>(null)` + `useXxxOrThrow()` 패턴 (Contract: missing provider → throw). `null` 체크가 타입을 `T`로 좁혀 주므로 사용부에 `!` 단언이 필요 없다.
-- `useMemo`로 context value 감싸기 (불필요한 re-render 방지)
+- context value가 객체·배열·함수면 `useMemo`로 감싼다 — Provider가 리렌더될 때마다 새 참조가 되어 모든 소비자가 리렌더된다. 원시값 하나면 불필요하다(기준: Performance "메모이제이션").
 
 ### Store (Zustand)
 
@@ -369,12 +369,37 @@ const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
 
 ## Performance
 
-- `useMemo`: context value, 비용 높은 계산
-- `useCallback`: 이벤트 핸들러 (불필요한 re-render 방지)
 - Zustand selector 구독으로 불필요한 리렌더 차단
+- `useMemo`·`useCallback`·`memo`는 아래 "메모이제이션" 기준을 통과할 때만 쓴다
 - Viewport-based lazy rendering (`useInViewport` 훅)
 - Dynamic import: 대형 페이지/컴포넌트 지연 로딩
 - motion 애니메이션은 `layout`/`AnimatePresence` 남용 시 리렌더 비용이 커질 수 있어 목록 규모에 따라 사용 범위를 제한한다
+
+### 메모이제이션 (`useMemo`·`useCallback`·`memo`)
+
+**기본은 쓰지 않는다.** 목적은 두 가지뿐이다 — (A) 비싼 재계산 방지, (B) 참조 동일성이 의미 있는 곳(`memo` 자식 props·effect/훅 deps·Context value)의 리렌더·effect 재실행 방지. 둘 다 아니면 deps 관리 비용과 가독성 저하만 남는다.
+
+| 도구 | 쓰는 경우 | 쓰지 않는 경우 |
+|------|----------|---------------|
+| `useMemo` | (A) 큰 배열 정렬·필터·변환처럼 측정상 비싼 계산 / (B) Context value 객체, `memo` 자식·effect·훅 deps로 들어가는 객체·배열 | 문자열 조합·단순 산술·작은 배열 `map`, 원시값 |
+| `useCallback` | `memo` 자식에 넘기는 핸들러, effect·훅 deps에 들어가는 함수, Context value에 담는 함수 | DOM 요소에 직접 주는 핸들러(`<button onClick>`) — 참조가 바뀌어도 막을 리렌더가 없다 |
+| `memo` | 같은 props로 자주 리렌더되는 무거운 자식(긴 목록 행·차트·모션 블록) | 부모와 함께 props가 바뀌는 컴포넌트, 가벼운 컴포넌트, `children`·인라인 객체 props를 받는 컴포넌트(매번 새 참조라 무력) |
+
+- **측정이 먼저:** React DevTools Profiler·브라우저 성능 트레이스로 비용을 확인한 뒤 넣는다. "혹시 몰라서"는 근거가 아니다.
+- **구조로 먼저 푼다:** state를 쓰는 곳 가까이 내리기, `children` 합성으로 리렌더 범위 좁히기.
+- **`memo`는 props 안정화와 한 묶음:** 객체·배열·함수 props를 `useMemo`/`useCallback`으로 안정화하지 않으면 `memo`는 아무것도 막지 못한다.
+- **hooks 규칙을 켜고 끄지 않는다:** Biome은 React 의존성이 있으면 react 도메인 recommended(`useHookAtTopLevel`·`useExhaustiveDependencies`)가 기본으로 켜진다. ESLint는 `eslint-plugin-react-hooks`를 `plugins`에 등록만 하면 켜지는 규칙이 없으므로 recommended 설정을 spread한다. 레벨은 Project Decisions **Hooks lint**에 적고, 위반을 suppress해 캐시를 고정하지 않는다.
+- **메모이제이션에 의미를 기대지 않는다:** `useMemo`는 성능 최적화일 뿐 의미 보장이 아니어서 React가 특정 사유로 캐시를 버릴 수 있다(공식 문서: "performance optimization, not a semantic guarantee"). "한 번만 실행"이 필요하면 ref·서버 멱등성으로 보장한다.
+- **Zustand는 selector가 첫 수단:** 필요한 조각만 구독하고, 객체·배열을 새로 만들어 반환하는 selector는 `useShallow`로 감싼다.
+
+#### React Compiler (선택 — 기본 미사용)
+
+켜면 컴파일러가 컴포넌트·훅을 자동 메모이제이션한다. 사용 여부와 사유는 Project Decisions **React Compiler** 슬롯에 적는다.
+
+- **켠 프로젝트의 수동 메모이제이션:** 위 표의 수동 `useMemo`·`useCallback`·`memo`를 새로 쓰지 않는다. 컴파일러가 다루지 못하는 경우(컴파일을 포기한 컴포넌트, effect deps의 참조 동일성을 명시적으로 고정해야 하는 경우)에만 둔다.
+- **빌드:** 빌드 도구 연결은 공식 설치 문서(react.dev `learn/react-compiler/installation`)의 Vite 절을 따른다. Babel 플러그인(`babel-plugin-react-compiler`)을 경유하므로 개발·빌드 변환 시간이 늘어난다.
+- **컴파일 포기(bail-out) 검출:** Rules of React 위반이 있으면 컴파일러는 그 컴포넌트를 조용히 건너뛰므로 lint로 드러낸다. ESLint는 `eslint-plugin-react-hooks`의 compiler 규칙(`recommended-latest` preset), Biome은 `nursery/useReactCompiler`(v2.5.8+)다. Biome 규칙은 nursery(실험적, 동작이 바뀔 수 있음)라 CI 게이트로 쓰지 않는다 — Biome 단독 프로젝트에서 컴파일러를 켜면 bail-out 검출이 실험 규칙에만 기댄다는 점을 결정 사유에 함께 적는다.
+- **도입 순서:** 메모이제이션 대상 코드·상호작용 화면이 적으면 이득이 작다. 켤 때는 일부 범위 시범 → 전체 순으로 넓힌다.
 
 ### 반복 입력 대응 (적용 대상일 때만)
 
@@ -594,7 +619,8 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 | `apiClient.get<Dto>()` 제네릭을 런타임 보장으로 오해 | 서버 응답 형태가 바뀌어도 컴파일은 통과, 런타임에 `undefined` 접근 | 치명 응답은 zod로 파싱, 타입은 `z.infer`로 얻음 |
 | `as`·`!`로 타입 오류 침묵 | 컴파일러가 잡던 버그가 런타임으로 이동 | `*OrThrow`·타입 가드·zod로 좁힘 |
 | `useForm<T>` 단일 제네릭 + `.default()` 스키마 | `zodResolver` 입력/출력 타입 충돌 | 제네릭 생략 또는 input/context/output 3개 명시 |
-| 파생 가능한 값을 state로 중복 보관 | 동기화 drift, stale UI | 계산으로 유지하거나 `useMemo` 사용 |
+| 파생 가능한 값을 state로 중복 보관 | 동기화 drift, stale UI | 렌더 중 계산으로 유지한다(계산 비용이 측정되면 그때 `useMemo` — Performance "메모이제이션") |
+| `useMemo`·`useCallback`·`memo`를 습관적으로 추가 | deps 관리 비용·가독성 저하. 안정화되지 않은 props 때문에 `memo`가 무력하고, DOM 핸들러의 `useCallback`은 효과가 없다 | Performance "메모이제이션" 표의 쓰는 경우에 해당할 때만 추가 |
 | 서버 응답을 Zustand store에 그대로 복제 | TanStack Query 캐시와 store가 따로 놀아 stale drift | 서버 상태는 TanStack Query만 SSOT로 사용 |
 | shadcn/ui(Radix) 컴포넌트를 happy-dom에서 그대로 테스트 | `ResizeObserver is not defined` 등으로 실패 | test setup에서 `ResizeObserver`/`matchMedia` mock 등록 |
 | Vitest(happy-dom)에서 axe-core 실행 | `TypeError: Cannot set property isConnected ... which has only a getter`로 실패(happy-dom#978 미해결). jsdom으로 바꿔도 레이아웃이 없어 `color-contrast`는 판정 불가 | axe는 Playwright(실제 브라우저)에서만 실행 |
@@ -613,6 +639,8 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 아래는 preset 주입 후 반드시 프로젝트 실정에 맞게 채운다.
 
 - **Lint/Format:** [Biome 단독 / ESLint + Prettier 중 택1 — 고른 이유("Lint/Format 선택" 기준) 한 줄]
+- **React Compiler:** [미사용 / 사용(annotation 시범 / 전체) — 사유 한 줄. 사용 시 bail-out 검출 수단(ESLint `react-hooks` compiler 규칙 / Biome `nursery/useReactCompiler`) — 기준: Performance "React Compiler"]
+- **Hooks lint:** [예: `rules-of-hooks`(Biome `useHookAtTopLevel`) error · `exhaustive-deps`(Biome `useExhaustiveDependencies`) 최소 warn / compiler 계열 규칙(ESLint `recommended-latest`) 사용 여부·레벨 / 기존 위반이 있는 규칙은 기준선 고정 후 신규 위반만 실패 — 기준: Performance "메모이제이션"]
 - **State SSOT:** [예: Zustand store는 `src/store/`, Context Provider 순서는 `src/App.tsx` 순서를 따름]
 - **API Layer SSOT:** [예: `src/api/`, axios 인스턴스는 `src/api/apiClient.ts`]
 - **API 응답 검증 수준:** [예: 결제·권한 응답만 zod 파싱, 나머지는 DTO 타입만]
