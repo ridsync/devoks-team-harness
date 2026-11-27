@@ -17,7 +17,7 @@
 - **Styling:** NativeWind v4 (Tailwind CSS v3.4 문법 기반) + 공용 디자인 토큰
 - **Animation:** Reanimated v4 + `react-native-worklets` (New Architecture 필수 — SDK 55 기준 항상 충족)
 - **Lint/Format:** Biome 단독(format + lint) 기본 / ESLint(`eslint-config-expo`) + Prettier 대안 — 둘 중 하나만 쓴다(아래 "Lint/Format 선택")
-- **Test:** Jest + React Native Testing Library
+- **Test:** Jest + React Native Testing Library (단위·컴포넌트) / MSW (네트워크 mock) / Maestro 또는 Detox (E2E — TRD §2.2에서 선택)
 
 ### Lint/Format 선택 (Biome / ESLint)
 
@@ -258,6 +258,8 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 - hook, store, permission flow, navigation guard, offline/online 전환 같은 모바일 특화 시나리오를 포함한다.
 - TanStack Query 사용 컴포넌트는 테스트마다 새 `QueryClient`를 주입해 캐시 격리
 - 네이티브 모듈 mock은 최소화하되, 플랫폼 경계 contract는 테스트로 드러낸다.
+- **네트워크 mock:** API를 호출하는 화면·훅은 api 모듈을 함수 단위로 mock하지 않고 MSW(`msw/node`)로 네트워크 경계에서 가로챈다. 정의하지 않은 요청은 `onUnhandledRequest: 'error'`로 실패시키고, 테스트마다 `server.resetHandlers()`로 격리한다
+- **E2E:** 실제 앱 바이너리(시뮬레이터·에뮬레이터·기기)에서 핵심 사용자 흐름을 검증한다. 도구는 TRD §2.2에서 고른다 — Maestro(YAML 흐름, Expo 빌드에 별도 네이티브 설정 없이 붙음)가 기본 제안이고, 애니메이션·네트워크·브리지 동기화(gray-box)가 필요하면 Detox. 대상 흐름·실행 시점·게이트는 Project Decisions **Test/E2E**를 따른다
 - 실제 기기/시뮬레이터 검증이 필요한 항목은 PR 설명에 명시한다.
 
 ---
@@ -409,6 +411,7 @@ export const useCartStore = create<CartState>(...);
 - **Native Modules:** [예: `android/app/...`, `ios/...`]
 - **Design Guideline SSOT:** [예: `docs/DESIGN.md`, NativeWind 토큰 설정]
 - **Complexity Gate:** [예: Biome `noExcessiveLinesPerFunction`(maxLines 100)·`noExcessiveCognitiveComplexity`(15)·`useMaxParams`(4)·`noParameterAssign` 모두 error / 기존 코드는 기준선 고정 후 신규 위반만 실패 — 기준: Coding Style "Complexity Gate"]
+- **Test/E2E:** [도구는 TRD §2.2를 따른다(다르면 이유) — E2E: Maestro / Detox / 미도입 / E2E 대상 흐름(예: 온보딩·로그인 등 핵심 흐름 N개)과 실행 환경(시뮬레이터·에뮬레이터·실기기·클라우드) / 실행 시점(예: 단위는 PR마다, E2E는 릴리스 빌드 전) / 게이트(예: 단위 실패 시 머지 차단 / 미강제 — 사유)]
 - **Sensitive Files:** [예: `.env*`, `GoogleService-Info.plist`, `google-services.json`]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

@@ -13,7 +13,7 @@
 - **Async:** Swift Concurrency (`async/await`, `Task`)
 - **Dependency Management:** Swift Package Manager
 - **Storage:** SwiftData + Keychain
-- **Test:** XCTest
+- **Test:** Swift Testing (신규 단위 테스트) + XCTest (기존 테스트·XCUITest·성능)
 
 ---
 
@@ -158,7 +158,9 @@ extension EnvironmentValues {
 
 ## Testing
 
-- **Framework:** XCTest
+- **Framework:** 신규 단위 테스트는 Swift Testing(`@Test`·`#expect`), UI 테스트(XCUITest)와 성능 테스트는 XCTest. 두 프레임워크는 한 타깃에 공존한다 — 기존 XCTest를 일괄 이관하지 않고, 수정하는 파일부터 옮긴다
+- **대역:** HTTP는 `URLProtocol` stub으로 네트워크 경계에서 대체한다(`URLSession`을 직접 mock하지 않는다)
+- **E2E:** 핵심 사용자 흐름은 XCUITest 또는 Maestro로 검증한다 — 도구는 TRD §2.2, 대상 흐름·실행 시점·게이트는 Project Decisions **Test/E2E**를 따른다
 - ViewModel, mapper, permission/deeplink branch, persistence contract를 우선 테스트한다.
 - unit test / UI test / snapshot test 역할을 분리한다.
 - flaky UI test를 줄이기 위해 네트워크/시간/기기 상태 의존을 fake/mock으로 격리한다.
@@ -302,6 +304,7 @@ func shouldReorderStock(remainingQty: Int, thresholdQty: Int) throws -> Bool {
 - **Persistence SSOT:** [예: `Sources/App/Data/`]
 - **Design Guideline SSOT:** [예: `docs/DESIGN.md`]
 - **Complexity Gate:** [예: SwiftLint `function_body_length`(50/100)·`cyclomatic_complexity`(10/20)·`function_parameter_count`(5/8) 기본값 유지 / 도입 안 함 — 이유 — 기준: Coding Style "Complexity Gate"]
+- **Test/E2E:** [도구는 TRD §2.2를 따른다(다르면 이유) — E2E: XCUITest / Maestro / 미도입 / E2E 대상 흐름과 실행 환경(시뮬레이터 기종·OS 버전) / 실행 시점 / 게이트(예: 단위 실패 시 머지 차단, UI 테스트는 릴리스 전 / 미강제 — 사유)]
 - **Sensitive Files:** [예: `GoogleService-Info.plist`, `*.mobileprovision`, signing config]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

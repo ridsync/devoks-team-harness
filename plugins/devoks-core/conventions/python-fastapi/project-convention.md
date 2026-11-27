@@ -464,6 +464,7 @@ async def get_db_session() -> AsyncIterator[AsyncSession]:
 - **Auth 전략:** [예: JWT Bearer / 세션 쿠키 중 택1]
 - **비동기 워커:** [예: Celery + Redis 사용 여부, 미사용이면 "미사용"]
 - **Complexity Gate:** [예: Ruff `PLR0915`(max-statements 50)·`C901`(max-complexity 15)·`PLR0913`(max-args 5)·`PLW0603` select / 기존 코드는 기준선 고정 후 신규 위반만 실패 — 기준: Coding Style "Complexity Gate"]
+- **Test/E2E:** [도구는 TRD §2.2를 따른다(다르면 이유) / 통합 테스트 범위(예: 실제 DB(테스트 컨테이너·전용 스키마) 사용 여부, 외부 API는 `respx`) / 실행 시점(예: PR마다) / 게이트(예: 실패 시 머지 차단 / 미강제 — 사유)]
 - **Sensitive Files:** [예: `.env`, `*.pem`, `alembic.ini`의 DB 접속 정보]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

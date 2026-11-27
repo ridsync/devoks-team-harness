@@ -13,7 +13,7 @@
 - **DI:** Hilt
 - **Async:** Coroutines + Flow
 - **Storage:** Room + DataStore
-- **Test:** JUnit5 + Turbine + Compose UI Test
+- **Test:** JUnit4 + Turbine + Compose UI Test (+ Robolectric·MockK)
 
 ---
 
@@ -153,7 +153,10 @@ object ProductModule {
 
 ## Testing
 
-- **Framework:** JUnit5 + Turbine(Flow 테스트) + Compose UI Test
+- **Framework:** JUnit4 + Turbine(Flow 테스트) + Compose UI Test — Compose 테스트 규칙(`ui-test-junit4`의 `createComposeRule`)과 Robolectric runner가 JUnit4 기반이다. JUnit5(Jupiter)는 서드파티 `android-junit5` 플러그인이 있어야 Android·Compose 테스트에 쓸 수 있으므로, 도입하려면 TRD §2.2에서 결정한다
+- **로컬(JVM) 실행:** Android 프레임워크·Compose UI에 의존하는 테스트를 기기 없이 돌릴 때는 Robolectric을 쓴다. 시스템 UI(edge-to-edge 등)처럼 시뮬레이션으로 재현되지 않는 동작은 `androidTest/`(기기)에 둔다
+- **대역:** fake 우선, 상호작용 검증이 꼭 필요할 때만 MockK. HTTP는 OkHttp `MockWebServer`로 네트워크 경계에서 대체한다
+- **E2E:** 앱 경계를 넘는 핵심 사용자 흐름은 Compose UI Test(`androidTest/`) 또는 Maestro로 검증한다 — 도구는 TRD §2.2, 대상 흐름·실행 시점·게이트는 Project Decisions **Test/E2E**를 따른다
 - ViewModel, UseCase, Repository contract, Mapper, permission branch를 우선 테스트한다.
 - unit test(`test/`) / instrumentation test(`androidTest/`) 경계를 명확히 한다.
 - flaky 테스트를 줄이기 위해 time/network/device 의존을 fake/mock으로 격리한다.
@@ -299,6 +302,7 @@ object ProductModule { /* ... */ }
 - **Navigation SSOT:** [예: `app/src/main/java/.../navigation/`]
 - **Storage SSOT:** [예: `app/src/main/java/.../data/`]
 - **Complexity Gate:** [예: detekt `LongMethod`(100)·`CognitiveComplexMethod`(15)·`LongParameterList`(5, 기본값 매개변수 제외) + baseline 파일 / 도입 안 함 — 이유 — 기준: Coding Style "Complexity Gate"]
+- **Test/E2E:** [도구는 TRD §2.2를 따른다(다르면 이유) — JUnit4 / JUnit5(`android-junit5`) · E2E: Compose UI Test / Maestro / 미도입 / E2E 대상 흐름과 실행 환경(에뮬레이터·실기기·Firebase Test Lab 등) / 실행 시점 / 게이트(예: `test` 실패 시 머지 차단, `connectedAndroidTest`는 릴리스 전 / 미강제 — 사유)]
 - **Sensitive Files:** [예: `keystore.properties`, `*.jks`, `local.properties`]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

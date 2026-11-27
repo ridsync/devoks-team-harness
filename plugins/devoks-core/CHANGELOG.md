@@ -13,6 +13,15 @@
 
 ---
 
+## 2.13.0 — 2026-11-27
+
+### 복사 산출물
+- `conventions/{react-web,nextjs}/project-convention.md` › Stack·Testing: 추가 — MSW(네트워크 경계 mock: `onUnhandledRequest: 'error'`·테스트마다 `resetHandlers`, 핸들러는 S8 위치), Playwright E2E 역할(핵심 사용자 흐름 — 대상·시점·게이트는 `Test/E2E` 슬롯), Vitest Browser Mode 선택 항목(happy-dom으로 믿을 수 없는 레이아웃·observer 의존 컴포넌트 — 도입은 TRD §2.2). 기존엔 Playwright가 접근성 검사·async Server Component 용도로만 있었고 네트워크 mock 기준이 없었다
+- `conventions/react-native/project-convention.md` › Stack·Testing: 추가 — MSW(`msw/node`) 네트워크 mock, E2E(Maestro 기본 제안 / gray-box 동기화가 필요하면 Detox — 선택은 TRD §2.2). 기존엔 E2E 항목이 없었다
+- `conventions/android/project-convention.md` › Stack·Testing: 변경 — `JUnit5`를 `JUnit4`로 정정했다. Compose 테스트 규칙(`ui-test-junit4`)과 Robolectric runner가 JUnit4 기반이고 JUnit5는 서드파티 `android-junit5` 플러그인이 필요하다. Robolectric(로컬 JVM)·대역(fake 우선, MockK, `MockWebServer`)·E2E(Compose UI Test / Maestro) 항목을 추가했다
+- `conventions/ios/project-convention.md` › Stack·Testing: 변경 — XCTest 단독을 "신규 단위 테스트는 Swift Testing, UI(XCUITest)·성능은 XCTest, 공존·일괄 이관 금지"로 바꿨다(Apple 마이그레이션 가이드). `URLProtocol` stub 대역과 E2E(XCUITest / Maestro) 항목을 추가했다
+- `conventions/*/project-convention.md`(6종) › Project Decisions: 추가 — `Test/E2E` 슬롯(TRD §2.2 도구 준수·E2E 대상 흐름·실행 환경·실행 시점·게이트 또는 미강제 사유). 강제 여부는 하네스가 정하지 않고 프로젝트 초기화 때 이 슬롯에서 확정한다
+
 ## 2.12.0 — 2026-11-25
 
 ### 복사 산출물

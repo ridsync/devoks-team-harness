@@ -16,7 +16,7 @@
 - **Forms:** react-hook-form + zod(`zodResolver`) — 같은 zod 스키마를 Server Action에서 다시 파싱
 - **i18n:** next-intl (App Router·Server Component 지원 라이브러리 — 다른 것을 고르면 Project Decisions에 적는다)
 - **Lint/Format:** Biome 단독(format + lint, `linter.domains.next` 활성) 기본 / ESLint(flat config, `eslint-config-next`) + Prettier 대안 — 둘 중 하나만 쓴다(아래 "Lint/Format 선택"). 접근성 lint는 Biome `a11y` 그룹 또는 ESLint `eslint-plugin-jsx-a11y`
-- **Test:** Vitest + @testing-library/react + happy-dom (단위·동기 컴포넌트) / Playwright + `@axe-core/playwright` (E2E·async Server Component·접근성 자동검사)
+- **Test:** Vitest + @testing-library/react + happy-dom (단위·동기 컴포넌트) / MSW (네트워크 mock) / Playwright + `@axe-core/playwright` (E2E·async Server Component·접근성 자동검사)
 
 - Next.js 16부터 `next lint`가 제거되고 `next build`가 lint를 돌리지 않는다 — 어느 lint 도구든 CI에 직접 넣는다.
 - Next.js 16에서 `middleware` 파일 규약은 `proxy`로 이름이 바뀌었고 기본 런타임이 Node.js다(공식 문서 `file-conventions/proxy` Version history). 기존 `middleware.ts`는 codemod로 옮긴다.
@@ -492,7 +492,7 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 
 ## Testing
 
-- **Framework:** Vitest + @testing-library/react + happy-dom (서비스·DAL·동기 컴포넌트) / Playwright (async Server Component·라우트 흐름)
+- **Framework:** Vitest + @testing-library/react + happy-dom (서비스·DAL·동기 컴포넌트) / MSW (네트워크 mock) / Playwright (async Server Component·라우트 흐름·E2E)
 - **async Server Component는 Vitest로 렌더 테스트하지 않는다** — Next.js 공식 Vitest 가이드가 미지원을 명시하고 E2E를 권장한다. 데이터 로직은 서비스·DAL 단위 테스트로, 화면은 Playwright로 나눈다
 - `server-only` 패키지는 `react-server` 조건 밖에서 import되면 오류를 던진다(Vitest는 이 조건으로 해석하지 않는다) — 서버 계층을 Vitest로 테스트할 때는 test setup에서 `server-only`를 빈 모듈로 mock한다
 - **위치:** 소스 파일과 같은 디렉토리 (colocated, `*.test.ts` / 컴포넌트는 `*.test.tsx`)
@@ -501,6 +501,9 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 - Provider 의존 컴포넌트 테스트 시: 최소 mock, 실 Provider 우선
 - shadcn/ui(Radix 기반) 컴포넌트 테스트 시 `ResizeObserver`/`matchMedia` 등 happy-dom 미구현 API를 test setup에서 mock 처리 (Pitfalls 참고)
 - TanStack Query 사용 컴포넌트는 테스트마다 새 `QueryClient`를 주입해 캐시 격리
+- **네트워크 mock:** 외부 API를 호출하는 서비스·클라이언트 컴포넌트·훅은 `fetch`·api 모듈을 함수 단위로 mock하지 않고 MSW로 네트워크 경계에서 가로챈다 — 실제 요청 경로(직렬화·헤더·에러 응답 처리)가 함께 검증된다. 핸들러는 S8 위치에 두고, `server.listen({ onUnhandledRequest: 'error' })`로 정의하지 않은 요청을 실패시키며, 테스트마다 `server.resetHandlers()`로 격리한다
+- **실제 브라우저 컴포넌트 테스트(선택):** 레이아웃·`ResizeObserver`·실제 이벤트에 의존해 happy-dom 결과를 믿을 수 없는 컴포넌트는 Vitest Browser Mode(Playwright provider)로 돌릴 수 있다 — 도입 여부는 TRD §2.2 테스트 도구에서 정한다
+- **E2E:** Playwright로 핵심 사용자 흐름을 실제 브라우저에서 검증한다 — 대상 흐름·실행 시점·게이트는 Project Decisions **Test/E2E**를 따른다. 단위·컴포넌트 테스트로 검증되는 분기를 E2E에서 반복하지 않는다
 - **접근성 자동검사:** axe는 실제 브라우저(Playwright)에서만 돌린다 — 주요 라우트마다 `new AxeBuilder({ page }).withTags([...]).analyze()`의 `violations`가 0건임을 단언한다. 태그는 TRD §2.1 접근성 보장의 WCAG 수준을 따른다(예: 2.1 AA → `wcag2a`·`wcag2aa`·`wcag21a`·`wcag21aa`). 모달·드롭다운처럼 열린 상태가 따로 있는 UI는 그 상태로 만든 뒤 스캔한다
 - axe 자동검사는 일부 기준만 잡는다 — 키보드 조작·포커스 순서·스크린리더 낭독은 코드리뷰 체크리스트와 UI 셀프체크로 보완한다
 
@@ -733,6 +736,7 @@ export function useToolbarOrThrow(): ToolbarContextValue {
 - **Design System SSOT:** [예: `components/ui/`(shadcn/ui) + `@theme` 토큰]
 - **접근성 기준·게이트:** [예: WCAG 2.1 AA — 신규 화면은 axe 위반 0건 / 기존 화면은 기준선 고정 후 신규 위반만 실패. TRD §2.1 접근성 보장과 일치시킨다]
 - **Complexity Gate:** [예: Biome `noExcessiveLinesPerFunction`(maxLines 100)·`noExcessiveCognitiveComplexity`(15)·`useMaxParams`(4)·`noParameterAssign` 모두 error / 기존 코드는 기준선 고정 후 신규 위반만 실패 — 기준: Coding Style "Complexity Gate"]
+- **Test/E2E:** [도구는 TRD §2.2를 따른다(다르면 이유) / E2E 대상 흐름(예: 로그인·결제 등 핵심 흐름 N개 + async Server Component 화면) / 실행 시점(예: 단위는 PR마다, E2E는 PR 또는 배포 전) / 게이트(예: 단위 실패 시 머지 차단·E2E는 배포 차단 / 미강제 — 사유). 접근성 게이트는 위 "접근성 기준·게이트"]
 - **Sensitive Files:** [예: `.env*`, `*.pem`]
 
 **구조 슬롯 (S1~S8)** — 판정 기준은 `.claude/rules/agent-principles.md` [Structure]·DRY. setup에서 코드베이스 실측(기존 프로젝트)이나 아래 예시(신규 프로젝트)로 제안·확인해 채운다. 정하지 못한 슬롯은 `미확정`으로 두면 에이전트는 기준만 적용하고 구조를 지어내지 않는다.

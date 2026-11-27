@@ -35,7 +35,7 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
     - `setup-project-convention` 감지: RN 프로젝트에도 `android/`·`ios/`가 있어 네이티브로 오추천될 수 있음 → `package.json`에 `react-native`가 있으면 RN 우선 규칙 추가.
     - refs `scope` 다중값 지원은 2026-11-17 완료(쉼표 구분 목록 — `web-security.md`를 `react-web`·`nextjs`가 공유). 남은 일: `refs/mobile-security.md`(OWASP MASVS/MASTG 기반)를 `scope: android, ios, react-native`로 추가.
     - `refs/code-review.md` 파일 패턴 표(`*.jsx`/`*.tsx`만 존재)에 `*.kt`·`*.swift`·`AndroidManifest.xml`·`Info.plist`/`*.entitlements` 행 추가. lint/type 선행검증에 Android Lint·detekt·ktlint·SwiftLint·컴파일 검사.
-    - `test-author`/`test-run-triage`: Gradle(JUnit5, `test/` vs `androidTest/`)·`xcodebuild test`/`swift test` 감지, JUnit XML·`.xcresult` 파싱, 플래키 "기기·에뮬레이터" 범주.
+    - `test-author`/`test-run-triage`: Gradle(JUnit4·JUnit5, `test/` vs `androidTest/`)·`xcodebuild test`/`swift test` 감지, JUnit XML·`.xcresult` 파싱, 플래키 "기기·에뮬레이터" 범주.
     - `code-security-review`: Gradle·SwiftPM 의존성 audit(도구 실측 후 선정).
     - `new-smoke-test-draft` 휴리스틱: Compose Navigation(`NavHost`·`composable(`)·iOS `NavigationStack`/`navigationDestination` 누락분 추가. `verify-data-flow` 계측 예시에 `Log.d`/Timber·`os.Logger` + `adb logcat`/`simctl … log stream` 수집.
     - `new-ui-draft`: iOS는 Figma 플러그인의 `figma:figma-swiftui` 라우팅, `DESIGN.md` 토큰 → Material3 Theme/Asset Catalog 매핑.
