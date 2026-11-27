@@ -144,12 +144,12 @@ issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으�
 - **추적:** 각 테스트는 `REQ-xxx`/`AC-xxx`/`CTR-xxx`에 매핑 — 상세: `references/traceability.md`
 
 ### AC별 검증 방법
-> 사용자가 승인한 AC 리뷰 표(`references/ac-review.md`)에서 옮긴다. 검증 방법 4종: `자동테스트` / `실동작`(`verify-acceptance-test`) / `수동` / `출시 후 계측`. PLAN `test:` 마커와 `verify-acceptance-test`의 `ac=` 입력이 이 표에서 나온다.
+> 사용자가 승인한 AC 리뷰 표(`references/ac-review.md`)에서 옮긴다. 검증 방법 4종: `테스트 코드`(단위·통합·E2E) / `에이전트 확인`(`verify-acceptance-test`) / `사람 확인` / `출시 후 계측`. PLAN `test:` 마커와 `verify-acceptance-test`의 `ac=` 입력이 이 표에서 나온다.
 
 | AC | 검증 방법 | Success 연결 |
 |----|-----------|--------------|
-| AC-001-1 | 자동테스트 | S1 |
-| AC-001-3 | 자동테스트 | — |
+| AC-001-1 | 테스트 코드 | S1 |
+| AC-001-3 | 테스트 코드 | — |
 
 연결 불가 Success: <S-n — 사유. 없으면 "없음">
 

@@ -9,6 +9,12 @@
 
 ---
 
+## **AC 검증 방법 값 개명 — `테스트 코드` / `에이전트 확인` / `사람 확인` / `출시 후 계측`** (2026-11-27, `devoks-sdlc` `3.29.0 → 3.29.1`)
+- 배경: `자동테스트`가 단위·통합만 가리켜 TRD §2.2·preset `Test/E2E` 슬롯으로 들어온 E2E가 어느 값에 속하는지 비어 있었다. `실동작`도 에이전트가 자동 수행하므로 "자동"으로는 둘이 구분되지 않았고, `수동`은 "사람이 직접 확인"이라는 뜻이 직관적이지 않았다. 구분 기준을 "코드로 남는가 / 누가 확인하는가 / 운영 측정이 필요한가"로 정리해 사용자가 이름을 확정했다.
+- 반영: `feature-workflow-runner` 1.16.1 — `references/ac-review.md` 값 정의·예시·분포 열, `assets/FRD.template.md` §9 안내·예시 행. `테스트 코드`는 단위·통합·E2E를 포함한다. `feature-frd-author/evals/evals.json` 기대 출력 문구 동기화.
+- 검증: `claude plugin validate ./plugins/devoks-sdlc --strict`, evals JSON 파싱, 구 값(`자동테스트`·`` `실동작` ``·`` `수동` ``) 잔존 0 grep.
+- 의도적 미반영: 검증 체인 단계명 "실동작 검증"(`verify-acceptance-test` 스킬·post-implementation-checklist·workflow-map·orchestration·README 다이어그램)은 AC 검증 방법 값이 아니라 단계 이름이라 바꾸지 않았다. 값을 이름으로 읽는 소비자(PLAN `test:` 마커·`verify-acceptance-test` `ac=`)가 없어 다른 스킬 수정은 불필요했다. README·README.ko·marketplace 비대상(이름·description 불변). 문서 값 개명이라 동적 eval은 실행하지 않았다.
+
 ## **테스트 도구 권장 체계 — TRD §2.2 테스트 도구 + preset 플랫폼별 기본값 + `Test/E2E` 슬롯** (2026-11-27, `devoks-core` `2.12.0 → 2.13.0`, `devoks-sdlc` `3.28.0 → 3.29.0`)
 - 배경: 프로젝트 테스트 환경(Vitest·React Testing Library·MSW·Playwright)을 권장·강제하는 수단이 있는지 점검했다. preset에 러너는 적혀 있었지만 MSW는 없었고(`test-author` 품질 기준에 "MSW류 선호"만 있음), Playwright는 접근성 검사·async Server Component 용도로만 있었으며, 기술 도입 단계(TRD)에 테스트 도구를 고르는 자리가 없었다. 웹 4종은 공식 문서·State of JS 2025 기준으로 권장할 만한 주류 선택임을 확인했다. 점검 중 android preset의 `JUnit5 + Compose UI Test`가 공식 Compose 테스트 API(JUnit4 기반)와 맞지 않음을 발견했다. 원칙은 사용자 결정대로 "하네스는 권장, 강제는 프로젝트 초기화 때 프로젝트가 결정"이다.
 - 반영:
