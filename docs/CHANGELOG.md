@@ -9,6 +9,16 @@
 
 ---
 
+## **테스트 레벨별 작성 위치 확정 — 신규 E2E는 별도 `test: e2e` Task로 `test-writer`가 작성** (2026-11-27, `devoks-sdlc` `3.30.0 → 3.31.0`)
+- 배경: `테스트 코드` 검증 방법이 E2E를 포함하게 됐지만, E2E를 누가 쓰는지 정해져 있지 않았다(`test-author` 범위는 단위·통합뿐). 구현 Task에서 모든 레벨을 같이 쓰는 안과 리뷰 뒤 테스트 단계를 따로 두는 안을 비교했다. 결론은 레벨마다 위치가 다르다는 것이다(사용자 확정). 단위·통합은 계약을 가장 잘 아는 구현 시점에 쓴다. 뒤로 미루면 구현에 맞춰 테스트를 쓰게 되어 구현 버그가 정답처럼 굳는다. 신규 E2E는 사용자 흐름 단위라서 흐름을 이루는 Task가 모두 끝나야 실행할 수 있다. 개별 구현 Task 안에서는 구조적으로 쓸 수 없다. 리뷰 뒤 테스트 단계는 피드백이 늦고 구현 추종 위험이 있어 기각했다.
+- 반영:
+  - `feature-workflow-runner` 1.18.0: `task-pr-splitting.md`에 `test` 마커 값 `e2e`, 「테스트 레벨별 작성 위치」 표, 「E2E Task — 생성 기준」을 추가했다. 생성 조건은 세 가지다. 프로젝트가 E2E 도구를 쓰고(`Test/E2E` 슬롯 또는 설정 감지), 대상 AC가 §9 `테스트 코드`인 흐름 AC이며, Task가 흐름 구현 Task 전부에 의존하는 위치에 있다. 형식은 `size: M`이다. E2E 도구가 없으면 PLAN §1에 미사용 1줄을 남긴다. `task-delegation.md`에는 `test: e2e`를 `size`와 무관하게 `test-writer`에 위임하는 라우팅과 「E2E Task 위임」(입력, 리포트, E2E가 드러낸 버그는 수정 Task로 처리)을 추가했다. `traceability.md`에는 §9 `테스트 코드` AC ↔ 테스트 AC ID 연결 점검 스크립트를 넣었다(미연결은 보고만 하고 차단하지 않음). PLAN 템플릿 형식과 DoD, SKILL Phase 2·3·4에도 반영했다.
+  - `feature-plan-author` 1.11.0·`feature-plan-executor` 1.10.0: `e2e` 마커, E2E Task 자기점검(도구가 있는데 흐름 AC에 E2E Task가 없으면 누락), 라우팅, 마무리 연결 점검을 넣었다.
+  - `test-author` 3.1.0·`test-writer`: 범위를 단위·통합·E2E로 넓혔다. `test-authoring-execution.md`에 「E2E 작성(`level=e2e`)」을 추가했다(AC 입력 블랙박스, 흐름당 정상 1개 + 핵심 실패 경로, role/label 선택자, fixture 격리, 도구·환경이 없으면 blocked, dev server는 임의로 띄우지 않음). Phase 0에서 E2E 도구가 없으면 도구 결정을 먼저 안내한다. description 트리거에 "E2E 테스트 작성"을 추가했다.
+  - `code-implementer`: 구현 Task의 신규 테스트를 단위·통합으로 한정했다. 변경으로 깨진 기존 테스트(E2E 포함)는 그 Task에서 고치고, E2E를 실행할 수 없으면 인계 노트에 "E2E 영향 가능"을 남긴다.
+- 검증: `claude plugin validate ./plugins/devoks-sdlc --strict`, 변경 SKILL·agent frontmatter `ruby -ryaml` 파싱, evals JSON 파싱. `test-author` eval 4번(E2E 도구가 없을 때 작성하지 않고 도구 결정을 안내)을 `claude --plugin-dir <로컬> -p`로 Vitest만 있는 임시 프로젝트에서 헤드리스 실행해 assertion 3개를 모두 통과했다.
+- 의도적 미반영: `devoks-sdlc-orchestration` pipeline은 아직 모든 Task를 `code-implementer`에 위임하므로 `test: e2e` 라우팅이 없다. 실험 플러그인이고 크로스-플러그인 호출도 미검증이라 이번 범위에서 제외하고 `docs/ROADMAP.md` 「테스트 레벨 분리 후속」에 등록했다. `feature-plan-author`의 E2E Task 생성은 동적 eval을 실행하지 않았다(실제 PLAN 작성 흐름은 FRD·convention 입력이 커서 같은 ROADMAP 항목에서 라이브 검증). README·README.ko·marketplace는 바꾸지 않았다(이름·카탈로그 불변).
+
 ## **AC 검증 방법 §9 표를 검증 스킬들이 실제로 읽도록 연결 + 실동작·데이터 흐름 리포트 심각도 SSOT 정렬** (2026-11-27, `devoks-sdlc` `3.29.1 → 3.30.0`)
 - 배경: 직전 개명 후 검증 스킬 전반을 점검했다. FRD 템플릿은 "PLAN `test:` 마커와 `verify-acceptance-test`의 `ac=` 입력이 §9 표에서 나온다"고 적었지만, 실제로 표를 읽는 소비자가 없었다. `test:` 마커 기준(`task-pr-splitting.md`), post-implementation-checklist 5번 조건, `verify-acceptance-test` Phase 0이 모두 "UI 조작+상태 영속" 같은 자체 판단으로 대상을 다시 골랐다. 값을 제안하는 기준도 없었고, `사람 확인` AC가 어디로 보고되는지도 정해져 있지 않았다. 옛 용어("수동 확인")도 남아 있었다.
 - 반영:

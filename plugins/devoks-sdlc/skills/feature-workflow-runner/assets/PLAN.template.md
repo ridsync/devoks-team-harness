@@ -26,11 +26,11 @@ issue:              # 선택 — 연결 GitHub 이슈 URL 또는 번호 (없으�
 - [ ] 시안 export / 세팅 키 확인
 
 ## 3. Tasks
-> 형식: `- [ ] TASK-ID [P?] 설명 — size: <S|M|L> — test: <required|skip> — file: <경로> — traces: <REQ/AC/CTR/EDGE>`
+> 형식: `- [ ] TASK-ID [P?] 설명 — size: <S|M|L> — test: <required|skip|e2e> — file: <경로> — traces: <REQ/AC/CTR/EDGE>`
 > `traces`에 `DSN-xxx`(설계 결정)도 인용 가능 — 참조용이며 커버리지 누락 0 강제 대상은 아니다(`references/traceability.md`).
 > `[P]` = 선행 Task에 의존하지 않아 병렬 착수 가능. 상태 추적: `references/progress-tracking.md`
 > `size` = 실행 라우팅 신호(S 직접 / M 위임 / L 분해 재검토) — 부여 기준: `references/task-pr-splitting.md`, 라우팅: `references/task-delegation.md`. `S`는 판단이 개입하지 않는 초소형(`test: skip`)만 — 경계선이면 `M`.
-> `test` = 테스트 필요 여부(required 기본값 / skip) — 부여 기준: `references/task-pr-splitting.md`. `code-implementer`는 사용자 확인 없이 이 마커를 그대로 따른다.
+> `test` = 테스트 필요 여부(required 기본값 / skip / e2e — 신규 E2E만 쓰는 별도 Task, `test-writer` 위임) — 부여 기준: `references/task-pr-splitting.md`. `code-implementer`는 사용자 확인 없이 이 마커를 그대로 따른다.
 
 ### PR1 — <핵심 작업>
 - [ ] `TASK-001` 공유 타입/상수 정의 — size: S — test: skip — file: `<경로>` — traces: CTR-001
@@ -56,4 +56,5 @@ flowchart TD
 - [ ] 모든 Task 완료
 - [ ] 모든 `REQ`/`AC`/`CTR`/`EDGE` 가 Task `traces`로 커버됨 (누락 0)
 - [ ] 핵심 비즈니스 로직 테스트 통과(정상/경계/실패, 안티패턴 없음 — 기준: `skills/test-author/references/test-quality-bar.md`)
+- [ ] FRD §9 `테스트 코드` AC가 테스트에 AC ID로 연결됨(미연결 0 또는 사유 기록 — `references/traceability.md`)
 - [ ] Edge case 처리 확인

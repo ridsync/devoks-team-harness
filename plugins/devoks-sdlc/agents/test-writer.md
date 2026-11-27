@@ -1,6 +1,6 @@
 ---
 name: test-writer
-description: "(agent-internal — 스킬 전용, 사용자 요청으로 직접 호출 금지) test-author 스킬의 Phase 1(테스트 환경 감지·대상 분석·케이스 설계·테스트 작성·자기검증)을 subagent 컨텍스트에서 수행하고 done|blocked 리포트만 리턴하는 에이전트. 대상 코드·기존 테스트 다독과 자기검증 실행 로그를 subagent 컨텍스트에 격리해 메인 루프 컨텍스트 소모를 방지한다. test-author 스킬의 Phase 0에서 확정된 target을 전제로 하므로 그 스킬(또는 오케스트레이터·new-ui-draft 등 위임 계약을 갖춘 호출자)에서만 위임받는다. 프로덕션 코드 수정 금지, 사용자 질문 금지."
+description: "(agent-internal — 스킬 전용, 사용자 요청으로 직접 호출 금지) test-author 스킬의 Phase 1(테스트 환경 감지·대상 분석·케이스 설계·테스트 작성·자기검증)을 subagent 컨텍스트에서 수행하고 done|blocked 리포트만 리턴하는 에이전트. 대상 코드·기존 테스트 다독과 자기검증 실행 로그를 subagent 컨텍스트에 격리해 메인 루프 컨텍스트 소모를 방지한다. test-author 스킬의 Phase 0에서 확정된 target을 전제로 하므로 그 스킬(또는 feature-plan-executor·feature-workflow-runner의 `test: e2e` Task·오케스트레이터·new-ui-draft 등 위임 계약을 갖춘 호출자)에서만 위임받는다. 프로덕션 코드 수정 금지, 사용자 질문 금지."
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: sonnet
 ---
@@ -21,7 +21,7 @@ model: sonnet
 |---------|------|------|
 | `target` | ✅ | 테스트 대상 파일/모듈/심볼 경로 — 호출자가 이미 확정함 |
 | `plan` / `frd` | 선택 | PLAN.md/FRD.md 절대경로 (있으면) |
-| `context` | 선택 | 버그 수정 신호 등 추가 힌트 (있으면) |
+| `context` | 선택 | 버그 수정 신호, `level=e2e`(E2E 작성) 등 추가 힌트 (있으면) |
 
 ---
 

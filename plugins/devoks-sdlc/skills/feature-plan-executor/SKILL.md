@@ -4,7 +4,7 @@ description: PLAN.md(작업 분해)를 받아 각 태스크를 의존성 순서�
 argument-hint: "[plan=<PLAN.md 경로> (default: 최근 PLAN)] [pr=<PR 그룹> (default: 전체)] [task=<TASK-ID> (default: 전체)]"
 metadata:
   author: ridsync
-  version: 1.9.0
+  version: 1.10.0
 ---
 
 # plan-executor — 태스크 단계 실행 (Phase 3)
@@ -32,14 +32,14 @@ PLAN.md를 SSOT로 태스크를 의존성 순서대로 실행하고 진행을 �
 1. **상태 로드** — PLAN.md를 읽어 `[x]`/`[ ]` Task와 §4 의존성 그래프를 파악. 세션 Task/Todo를 PLAN 상태에 맞춘다. PLAN `status`가 아직 `draft`이면 `approved`로 보정. → `../feature-workflow-runner/references/progress-tracking.md`
 2. **다음 Task 선택** — **선행이 모두 `[x]`인 미완 Task**를 고른다. `[P]` Task는 함께 진행 가능. (`pr`/`task` 인자 있으면 그 범위로 한정.)
 3. **브랜치·이슈 사전체크 (최초 1회)** — 첫 구현 착수 **직전**에 현재 브랜치·연결 이슈를 확인하고, 브랜치명·이슈 초안을 제안한 뒤 사용자 확인 후 적용한다(모드 `full`; 선택지는 AskUserQuestion 단일선택 — `branch-issue-precheck.md` §4). → `../feature-workflow-runner/references/branch-issue-precheck.md`
-4. **라우팅 → 구현·검증** — Task의 `size` 마커를 기계적으로 적용한다: `S`는 메인 루프 직접, `M`(및 마커 없음)은 `code-implementer` 위임(기본 경로), `L`은 분해 재검토(못 쪼개면 §1에 기록된 사유로 갈림 — 판단 축(설계 변경·인터페이스 파급)은 직접, 스펙 닫힘 축(관심사가 얽혔지만 각각의 스펙은 확정됨)은 위임), 공통 예외(③ 스펙 미완결·① tools 밖 도구·② 사용자 직접 요청)는 직접. 위임 전 공통 예외 ③(스펙 미완결)을 점검한다. 위임 시 Task 블록 원문·`plan`·`frd` 경로·`context`(인계 노트 윈도잉 적용)를 주입하면, 에이전트가 코드 읽기→기존 패턴 재사용 구현→테스트/린트/포맷 검증까지 수행하고 done|blocked 리포트를 리턴한다. **한 번에 한 태스크만**(`[P]`는 선택 순서의 자유일 뿐 동시 fan-out 아님). → `../feature-workflow-runner/references/task-delegation.md`
+4. **라우팅 → 구현·검증** — Task의 `size` 마커를 기계적으로 적용한다: `S`는 메인 루프 직접, `M`(및 마커 없음)은 `code-implementer` 위임(기본 경로), `L`은 분해 재검토(못 쪼개면 §1에 기록된 사유로 갈림 — 판단 축(설계 변경·인터페이스 파급)은 직접, 스펙 닫힘 축(관심사가 얽혔지만 각각의 스펙은 확정됨)은 위임), 공통 예외(③ 스펙 미완결·① tools 밖 도구·② 사용자 직접 요청)는 직접, `test: e2e` Task는 `size`와 무관하게 `test-writer` 위임(입력·리포트·버그 처리: `task-delegation.md` 「E2E Task 위임」). 위임 전 공통 예외 ③(스펙 미완결)을 점검한다. 위임 시 Task 블록 원문·`plan`·`frd` 경로·`context`(인계 노트 윈도잉 적용)를 주입하면, 에이전트가 코드 읽기→기존 패턴 재사용 구현→테스트/린트/포맷 검증까지 수행하고 done|blocked 리포트를 리턴한다. **한 번에 한 태스크만**(`[P]`는 선택 순서의 자유일 뿐 동시 fan-out 아님). → `../feature-workflow-runner/references/task-delegation.md`
 5. **리포트 처리** — `done`이면 검증 근거(실행 명령·**종료코드**·출력 **tail 1줄 원문**·포맷 실행 여부·`test: required` Task 시 테스트 파일·케이스명)를 확인하고(다섯 가지 중 하나라도 빠지면 done 아님; 의심 시 동일 명령 재실행) **인계 노트를 윈도잉 규칙에 맞게 수집해 다음 위임의 `context`에 주입**한다. `blocked`이면 스펙 문제는 사용자 확인 후 결정을 `context`에 덧붙여 재위임, 기계적 문제는 직접 해소 후 재위임, 스코프 초과(사실상 `L`)는 메인 루프가 인수하거나 재분해.
 6. **진행 갱신 (메인 루프가 수행)** — **검증 근거(명령·종료코드·tail 1줄 원문) 확인 후에만** PLAN `- [ ]` → `- [x]`, 첫 착수 시 frontmatter `status: approved → in-progress`. 실패·blocked이면 `[x]`로 바꾸지 않고 막힌 이유 명시. 에이전트는 PLAN·FRD를 수정하지 않는다.
 7. **반복** — 다음 Task로(위임 단계부터). 모든 Task 완료 시 마무리(아래).
 
 ## 마무리
 
-- DoD 각 항목 점검 후 `[x]`: 커버리지 누락 0 재점검(`../feature-workflow-runner/references/traceability.md`), 핵심 테스트 통과 확인, Edge case 확인.
+- DoD 각 항목 점검 후 `[x]`: 커버리지 누락 0 재점검(`../feature-workflow-runner/references/traceability.md`), §9 `테스트 코드` AC ↔ 테스트 연결 점검(같은 문서 — 미연결은 보고), 핵심 테스트 통과 확인, Edge case 확인.
 - 모든 Task `[x]` + DoD 충족 시 `status: done`.
 - PLAN의 FRD frontmatter에 `feature:`가 있으면 FEATURES.md 행을 첫 착수 시 `🚧 in-progress`, PLAN `done` 시 `✅ done`으로 바꾼다. 규칙: `../feature-workflow-runner/references/progress-tracking.md` "제품 백로그 상태 동기화".
 - 미완 Task·임시 코드·추후 작업(커밋/PR 포함)을 명시적으로 보고(은폐 금지). 각 done 리포트의 **미확인·리스크** 항목("없음" 제외)도 Task별로 모아 함께 보고한다(`../feature-workflow-runner/references/task-delegation.md`).

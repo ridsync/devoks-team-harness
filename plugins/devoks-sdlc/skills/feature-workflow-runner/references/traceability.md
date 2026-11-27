@@ -42,6 +42,22 @@ comm -23 /tmp/frd_ids.txt /tmp/plan_ids.txt
 
 마지막 명령 출력이 비어 있어야 "누락 0"이다. 출력이 있으면 그 ID들을 담당할 Task를 추가한다.
 
+## `테스트 코드` AC ↔ 테스트 연결 점검 (구현 완료 시)
+
+`traces` 커버리지는 "배정됐는가"만 본다. FRD §9에서 검증 방법이 `테스트 코드`인 AC는 실제 테스트에 AC ID가 박혀 있는지까지 본다(테스트 설명에 AC ID를 박는 계약 — `ears-acceptance-criteria.md`).
+
+```bash
+# §9 표에서 검증 방법이 `테스트 코드`인 AC
+grep -E '^\| *AC-[0-9]+-[0-9]+ *\| *테스트 코드' FRD.md | grep -oE 'AC-[0-9]+-[0-9]+' | sort -u > /tmp/tc_ids.txt
+# 테스트 파일이 참조하는 AC ID — <테스트 파일 패턴>은 프로젝트에서 감지한 값(예: '\.(test|spec)\.[jt]sx?$')
+git ls-files | grep -E '<테스트 파일 패턴>' | xargs grep -ohE 'AC-[0-9]+-[0-9]+' | sort -u > /tmp/test_ids.txt
+# 테스트에 연결되지 않은 `테스트 코드` AC
+comm -23 /tmp/tc_ids.txt /tmp/test_ids.txt
+```
+
+- 출력이 있으면 완료 보고에 "테스트 미연결 AC: <목록>"으로 올리고, 보강(`devoks-sdlc:test-author`) 또는 사유 기록 중 하나를 사용자와 정한다. 차단하지 않는다.
+- §9 표가 없는 FRD(도입 이전 문서)는 이 점검을 생략한다.
+
 ## 미룬 일의 담당 ID (후속 표기 규칙)
 
 FRD·PLAN·WIREFRAMES·VISUAL에서 일을 이번 범위 밖으로 미룰 때(`후속`·`추후`·`다음 단계`·`별도 진행` 등)는 **그 일을 맡을 ID를 같은 줄에 적는다** — `TASK-n`(이 PLAN), `F-n`·`B-n`(FEATURES — 기존 항목의 범위 추가도 된다). 맡을 항목이 아직 없으면 "FEATURES 등재 필요: <무엇>"으로 완료 보고에 올린다(FEATURES는 `product-prd-author`·`product-trd-author`만 고친다).

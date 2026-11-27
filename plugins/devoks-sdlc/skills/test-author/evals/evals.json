@@ -37,6 +37,18 @@
         { "text": "수정 전 재현 실패 테스트를 먼저 작성하는 순서를 따른다" },
         { "text": "프로덕션 코드를 직접 수정하지 않고 발견 사실만 보고한다" }
       ]
+    },
+    {
+      "id": 4,
+      "name": "e2e-without-tool-guides-decision",
+      "prompt": "AC-004-1(장바구니 담기 → 결제 → 주문 완료 화면) 흐름을 E2E 테스트로 작성해줘. FRD는 docs/workspace/order-20261120/FRD.md 야. 참고로 이 프로젝트는 Vitest만 쓰고 Playwright·Cypress 같은 E2E 도구는 설치돼 있지 않아.",
+      "expected_output": "요청이 E2E이므로 Phase 0에서 level=e2e로 판단한다. 프로젝트에 E2E 도구가 없다는 사실을 근거로 E2E 테스트를 작성하지 않고, E2E 도구 결정(TRD §2.2·Test/E2E 슬롯)이 먼저라고 안내한다. 도구를 임의로 설치하거나 Vitest 단위 테스트로 E2E를 흉내 내지 않는다(흐름 일부를 통합 테스트로 커버하는 대안은 제안만 할 수 있다).",
+      "files": [],
+      "assertions": [
+        { "text": "E2E 도구가 없어서 E2E 테스트를 작성하지 않는다고 밝힌다" },
+        { "text": "E2E 도구 결정(TRD 또는 Test/E2E 슬롯)이 먼저라고 안내한다" },
+        { "text": "E2E 도구를 임의로 설치하거나 단위 테스트로 E2E를 대체 작성하지 않는다" }
+      ]
     }
   ]
 }

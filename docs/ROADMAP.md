@@ -153,6 +153,11 @@ DevOKs 하네스의 플러그인 구조·내용 개선 후보를 모아두는 �
 
 ## 품질 / 유지보수
 
+- [ ] **테스트 레벨 분리 후속 (2026-11-27 `devoks-sdlc` 3.31.0에서 발견)**
+  - `devoks-sdlc-orchestration` pipeline에 `test: e2e` 라우팅이 없음 — 지금은 모든 Task를 `code-implementer`에 위임하므로, E2E Task가 들어오면 `test-writer` 위임과 E2E 실행 환경(allowlist·서버 기동)을 정책에 추가해야 한다. 기준은 `task-delegation.md` 「E2E Task 위임」.
+  - `feature-plan-author`의 E2E Task 생성(조건·위치·자기점검)을 실제 FRD·convention 입력으로 라이브 검증(동적 eval 미실행).
+  - 우선순위: 중(orchestration 실사용 시 높음).
+
 - [ ] **제품 문서 체인 후속 (2026-11-02 화면 설계 단계 검증에서 발견)**
   - `product-design-author` Pencil 실작도 라이브 검증 — 에디터에 `.pen`을 연 HITL 세션에서 `read_skill` → 프레임 작성 → §2 대조까지. `execute`의 `filePath`로 열린 파일 없이 작성 가능한지도 확인(가능하면 비-HITL 작도 경로가 생긴다).
   - Figma 어댑터 `references/tool-figma.md` — 사용자 결정으로 보류(Pencil 우선). 추가 시 `tool` 슬롯 값만 늘리고 SSOT 형식은 유지.
