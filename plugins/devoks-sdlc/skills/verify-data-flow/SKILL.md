@@ -4,7 +4,7 @@ description: 데이터가 입력·계산·저장·재사용 전 과정에서 유
 argument-hint: "target=<데이터/필드> spec=<기준 문서 경로> flow=<실행 시나리오> env=browser|server|db|cli"
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.0.1
 ---
 
 # verify-data-flow — 데이터 흐름 정합성 검증

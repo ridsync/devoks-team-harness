@@ -4,7 +4,7 @@ description: FRD의 AC(Acceptance Criteria) 중 UI 조작과 상태 영속이 �
 argument-hint: "ac=<AC-ID 목록> [frd=<FRD.md 경로>] route=<진입 라우트> persistence=<영속 조회 방법>"
 metadata:
   author: ridsync
-  version: 1.0.0
+  version: 1.2.0
 ---
 # verify-acceptance-test — 실동작 인수 검증
 
@@ -26,8 +26,8 @@ MCP는 플러그인이 번들하지 않으며(`devoks-browser` 2.0.0~), `devoks-
 ## 적용 범위 — 웹앱 전용
 
 이 스킬은 Chrome(9269 attach)에서 조작할 수 있는 **웹앱**만 검증한다. React Native·Android·iOS 네이티브 앱은
-기기 구동 도구가 없어 대상이 아니다 — 그런 요청이면 이 스킬을 실행하지 않고 **수동 확인이 필요하다고 안내**한 뒤
-AC·기대 동작을 수동 확인 체크리스트로 정리해 준다(추측으로 Chrome에서 흉내 내지 않는다). 모바일 검증 능력은
+기기 구동 도구가 없어 대상이 아니다 — 그런 요청이면 이 스킬을 실행하지 않고 **사람 확인이 필요하다고 안내**한 뒤
+AC·기대 동작을 사람 확인 체크리스트로 정리해 준다(추측으로 Chrome에서 흉내 내지 않는다). 모바일 검증 능력은
 `docs/ROADMAP.md`의 "Android·iOS 네이티브 확장" P2에서 별도로 다룬다.
 
 ## 호출 방법
@@ -90,7 +90,9 @@ AC·기대 동작을 수동 확인 체크리스트로 정리해 준다(추측으
 목적: **어떤 AC를, 어떤 시나리오로, 무엇을 기대하며 확인할지**를 1회 합의한다.
 
 1. `$ARGUMENTS`에서 슬롯 파싱.
-2. `<FRDSource>`가 있으면 Read해 AC(EARS)·Contract(CTR)·Edge(EDGE) 중 **UI 조작 + 상태 영속이 걸린 항목만** 선별한다. 순수 로직/타입/설정값만 다루는 AC는 대상에서 제외한다(유닛테스트가 이미 충분히 커버).
+2. `<FRDSource>`가 있으면 Read해 대상 AC를 정한다.
+  - **§9 "AC별 검증 방법" 표가 있으면 그 표가 SSOT다** — 검증 방법이 `에이전트 확인`인 AC를 대상으로 삼고, 시나리오 도출에 필요한 Contract(CTR)·Edge(EDGE)를 함께 읽는다. 사용자가 `ac=`로 다른 값(`테스트 코드` 등)의 AC를 지정하면 실행은 하되 리포트에 "§9 검증 방법과 다름: <AC> — <값>"을 남긴다(표 갱신 여부는 사용자 판단). `사람 확인`·`출시 후 계측` AC는 대상이 아니다.
+  - **§9 표가 없으면**(도입 이전 FRD) AC(EARS)·CTR·EDGE 중 **UI 조작 + 상태 영속이 걸린 항목만** 선별한다. 순수 로직/타입/설정값만 다루는 AC는 대상에서 제외한다(테스트 코드가 이미 충분히 커버).
 3. `<FRDSource>`가 활성 작업공간 안에 있으면 그 부모의 `verification/`·`captures/`를 각각 `<WorkspaceVerificationDir>`·`<WorkspaceCapturesDir>`로 정한다. 도출할 수 없으면 미충족 슬롯과 함께 경로를 1회 확인한다.
 4. 미충족 슬롯을 1회 확인:
   - "검증할 AC ID, 진입 라우트, 사전 상태 세팅 방법, 영속 상태 조회 방법(예: DB API, 콘솔 evaluate_script)을 알려주세요."
@@ -125,7 +127,7 @@ Phase 0에서 확정된 시나리오 표로 `acceptance-test-runner` 에이전�
 ## Phase 5 — 검증 리포트
 
 `references/report-template.md` 템플릿으로 리포트를 작성한다(에이전트가 Phase 1~4 결과로 초안을 만들고,
-메인 루프가 그대로 수령·출력한 뒤 `<WorkspaceVerificationDir>/<대상>-verify-acceptance-test-result.md`에 저장한다. `<WorkspaceVerificationDir>`는 `<FRDSource>`가 속한 활성 작업공간의 `verification/`이며, FRD 경로로 도출할 수 없으면 Phase 0에서 1회 확인한다. 실패 시점 스크린샷은 같은 작업공간의 `captures/`에 저장한다.
+메인 루프가 수령해 **커버리지 줄**(Phase 0 선별 결과 — §9 `에이전트 확인` 중 실행 수·미실행 사유·§9 밖 지정 AC)을 채워 출력한 뒤 `<WorkspaceVerificationDir>/<대상>-verify-acceptance-test-result.md`에 저장한다. `<WorkspaceVerificationDir>`는 `<FRDSource>`가 속한 활성 작업공간의 `verification/`이며, FRD 경로로 도출할 수 없으면 Phase 0에서 1회 확인한다. 실패 시점 스크린샷은 같은 작업공간의 `captures/`에 저장한다.
 
 ---
 

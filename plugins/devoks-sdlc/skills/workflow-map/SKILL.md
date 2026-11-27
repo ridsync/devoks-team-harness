@@ -3,7 +3,7 @@ name: workflow-map
 description: DevOKs SDLC 작업의 전체 흐름(단계 순서)과 각 단계의 진입 스킬·커맨드를 한 장의 표로 보여준다. 파이프라인(준비→제품·기술·화면 설계(선택)→요구정의→작업분해→구현→검증체인→커밋/PR)과 순서 없는 단발 작업을 구분해 제시한다. "워크플로우 맵", "SDLC 흐름 보여줘", "스킬 표", "어떤 스킬 써야 해", "다음 단계 뭐야", "작업 순서 알려줘", "스킬 목록 정리해줘" 같은 조회성 요청에서 사용한다. 표를 출력할 뿐 어떤 단계도 실행하지 않는다 — 실제 실행은 표에 적힌 각 스킬을 직접 호출한다.
 metadata:
   author: ridsync
-  version: 1.7.2
+  version: 1.7.3
 ---
 # workflow-map — SDLC 워크플로우 흐름 맵
 
@@ -86,7 +86,7 @@ HITL(사용자 주도) 작업 중 **"지금 어디쯤이고 다음에 뭘 부르
 | 2   | 코드 리뷰                | `/devoks-sdlc:code-review mode=diff-branch`                                                                                                                                    | 항상                                          |
 | 3   | 데이터 흐름 정합성           | `/devoks-sdlc:verify-data-flow`                                                                                                                                                | 입력→계산→저장→재로드 흐름이 있을 때                       |
 | 4   | UI 시각 품질             | `/devoks-browser:browser-visual-diff`                                                                                                                                          | UI 컴포넌트/스타일링 변경이 있을 때 — react-web·nextjs 한정(RN·네이티브는 육안) |
-| 5   | 브라우저 실동작             | `/devoks-sdlc:verify-acceptance-test`                                                                                                                                          | AC에 UI 조작+상태 영속이 걸려 있을 때(react-web·nextjs 한정, RN·네이티브는 수동 확인) — **커밋 직전 최종 게이트** |
+| 5   | 브라우저 실동작             | `/devoks-sdlc:verify-acceptance-test`                                                                                                                                          | FRD §9 검증 방법이 `에이전트 확인`인 AC가 있을 때(react-web·nextjs 한정, RN·네이티브는 사람 확인) — **커밋 직전 최종 게이트** |
 | 옵션  | 테스트 스위트 회귀           | `/devoks-sdlc:test-run-triage`                                                                                                                                                 | 전체 스위트 회귀를 따로 확인할 때                         |
 | 옵션  | 프로젝트 전용 스모크 테스트 (참고) | 프로젝트별 상이 — 예: `aware-react-app`의 `verify-app-smoke-test`(`.claude/skills/verify-app-smoke-test/SKILL.md`). 아직 없다면 `/devoks-sdlc:new-smoke-test-draft`로 화면 목록을 스캔해 초안을 생성할 수 있다 | 해당 프로젝트가 배포 전 스모크 테스트 스킬을 자체 보유(또는 생성)할 때만  |
 

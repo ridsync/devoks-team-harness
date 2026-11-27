@@ -28,7 +28,7 @@
 | 2 | 코드 리뷰 | `devoks-sdlc:code-review` (`mode=diff-branch`) | 항상 | Critical/High 보안 이슈 발견 시 이 스킬이 자체적으로 `code-security-review` 실행을 권장 문구로 제시한다(기존 에스컬레이션 로직 재사용 — 여기서 중복 안내하지 않는다). 정적 분석이라 비용이 낮고, 여기서 구조적 문제가 나오면 이후의 비용이 큰 라이브 검증(3~5번)에 들인 노력이 낭비되므로 앞쪽에 둔다 |
 | 3 | 데이터 흐름 정합성 검증 | `devoks-sdlc:verify-data-flow` | 조건부 — 입력→계산→저장→재로드 흐름(폼 제출, 영속화, 상태 동기화 등)이 있는 변경일 때만 | 단순 UI/설정 변경 등 데이터 흐름이 없으면 생략. 여기서 발견되는 불일치도 후속 수정을 유발할 수 있어 최종 확인(5번)보다 앞에 둔다 |
 | 4 | UI 시각 품질 확인 · 디자인 대조 | Figma: `devoks-browser:browser-visual-diff`(react-web·nextjs 한정) / Pencil(`.pen`): 대상 프레임 스크린샷(Pencil MCP)과 라이브 렌더 스크린샷(`devoks-browser:browser-devtools`)을 나란히 육안 대조 / 디자인 파일 없음: 육안 확인 | 조건부 — UI 컴포넌트/스타일링 변경이 포함된 태스크가 있을 때. **WIREFRAMES W-n이 연결된 화면 기능이고 디자인 파일이 있으면 기본 선택으로 제시한다**(권장 표시) — 리뷰·요구 검증·axe는 명세 밖 누락(문서에 안 옮겨진 반복 영역 등)을 결함으로 보지 않아, 디자인 대조가 그 누락을 잡는 유일한 단계다(careerstack F-4). 이번에 하지 않으면 PLAN §1에 사유와 담당 Task(후속 Task ID 또는 FEATURES 항목)를 남긴다 | 대조는 셸 프레임(W-0)을 포함한 PC·모바일 변형 전부다. 프레임에는 있는데 구현에 없는 요소는 "명세 누락"과 "구현 누락"으로 나눠 보고한다 — 앞의 것은 WIREFRAMES·FRD 갱신 검토 대상이다. Pencil 소스의 자동 diff(`browser-visual-diff` 확장)는 `docs/ROADMAP.md`에서 추적한다. UI 다듬기를 별도 단계로 고정할지는 `docs/ROADMAP.md`의 "UI 작업 분리 검토" 항목에서 별도 결정 중 — 그 결정 전까지는 조건부 제안으로만 둔다. `browser-visual-diff` 자체가 Phase 5(미세 조정)에서 레이아웃 상수·토큰 적용 코드를 직접 고치므로, 그 변경까지 반영된 코드를 5번이 최종 확인하도록 5번보다 앞에 둔다 |
-| 5 | 브라우저 실동작 검증 | `devoks-sdlc:verify-acceptance-test` | 조건부 — 배정된 Task의 AC가 UI 조작+상태 영속(폼 제출 후 화면 반영, 완료 처리 후 배지 표시 등)을 포함할 때만(react-web·nextjs 한정 — 아래 「환경별 적용」) | chrome-devtools-attach MCP 등록 전제(Chrome 9269 attach, `/devoks-core:setup-mcp` Step 6). 유닛테스트가 이미 충분히 커버하는 순수 로직 AC는 대상에서 제외. **커밋 직전 최종 게이트**로 둔다 — 2~4번(코드 리뷰·데이터 흐름 검증·UI 시각 품질)이 유발할 수 있는 후속 코드 변경이 모두 반영된 뒤의 코드를 대상으로 실행해야 검증 결과가 실제로 커밋될 코드와 일치한다. 영속 대조가 다층 계측을 요구한다고 판단되면 이 항목의 리포트가 항목 3과의 재확인 조합을 제안한다 |
+| 5 | 브라우저 실동작 검증 | `devoks-sdlc:verify-acceptance-test` | 조건부 — FRD §9 "AC별 검증 방법"에 `에이전트 확인` AC가 있을 때만(§9 표가 없는 FRD는 AC가 UI 조작+상태 영속 — 폼 제출 후 화면 반영, 완료 처리 후 배지 표시 등 — 을 포함하는지로 판단. react-web·nextjs 한정 — 아래 「환경별 적용」) | chrome-devtools-attach MCP 등록 전제(Chrome 9269 attach, `/devoks-core:setup-mcp` Step 6). 유닛테스트가 이미 충분히 커버하는 순수 로직 AC는 대상에서 제외. **커밋 직전 최종 게이트**로 둔다 — 2~4번(코드 리뷰·데이터 흐름 검증·UI 시각 품질)이 유발할 수 있는 후속 코드 변경이 모두 반영된 뒤의 코드를 대상으로 실행해야 검증 결과가 실제로 커밋될 코드와 일치한다. 영속 대조가 다층 계측을 요구한다고 판단되면 이 항목의 리포트가 항목 3과의 재확인 조합을 제안한다 |
 | 6 | 테스트 스위트 회귀 확인 | `devoks-sdlc:test-run-triage` | 조건부 — 태스크 단위 테스트는 이미 실행했지만 전체 스위트 회귀를 별도로 확인하고 싶을 때 | 태스크 실행 중 이미 관련 테스트를 통과시켰다면 전체 스위트는 선택 |
 | 7 | 커밋 | `devoks-git:git-commit-msg` | 항상(사용자 확인 후) | Conventional Commits 규칙 적용 |
 | 8 | PR 생성 | `devoks-git:git-pull-request` | 항상(사용자 확인 후, 커밋 이후) | PR 그룹 경계는 PLAN §3에 이미 기록됨 |
@@ -50,11 +50,12 @@
 | preset | 3. 데이터 흐름 | 4. UI 시각 품질 | 5. 실동작 검증 |
 |--------|---------------|----------------|---------------|
 | `react-web` · `nextjs` | `verify-data-flow` (`env=browser` 가능) | Figma: `devoks-browser:browser-visual-diff` / Pencil: 프레임·라이브 렌더 스크린샷 나란히 대조 | `devoks-sdlc:verify-acceptance-test` |
-| `react-native` | 서버·DB 구간만 `verify-data-flow`(`env=server`/`db`). 앱 쪽 JS 콘솔·상태는 `devoks-rn:metro-devtools-attach`로 직접 확인 — `env=browser` 제안 금지 | 육안 확인(스크린샷은 `devoks-rn:metro-devtools-attach`) — `browser-visual-diff` 제안 금지 | **자동 도구 없음** — 수동 확인 안내, `verify-acceptance-test` 제안 금지 |
-| `android` · `ios` | 서버·DB 구간만 `verify-data-flow`, 앱 쪽은 수동 확인 | 육안 확인 | **자동 도구 없음** — 수동 확인 안내 |
+| `react-native` | 서버·DB 구간만 `verify-data-flow`(`env=server`/`db`). 앱 쪽 JS 콘솔·상태는 `devoks-rn:metro-devtools-attach`로 직접 확인 — `env=browser` 제안 금지 | 육안 확인(스크린샷은 `devoks-rn:metro-devtools-attach`) — `browser-visual-diff` 제안 금지 | **에이전트 도구 없음** — 사람 확인 안내, `verify-acceptance-test` 제안 금지 |
+| `android` · `ios` | 서버·DB 구간만 `verify-data-flow`, 앱 쪽은 사람 확인 | 육안 확인 | **에이전트 도구 없음** — 사람 확인 안내 |
 
-- "자동 도구 없음" 칸은 AskUserQuestion 옵션으로 만들지 않는다 — 실행할 수 없는 스킬을 권하게 된다. 대신 **리포트에
-  "수동 확인 필요: <AC 목록>" 한 줄**로 남긴다.
+- "에이전트 도구 없음" 칸은 AskUserQuestion 옵션으로 만들지 않는다 — 실행할 수 없는 스킬을 권하게 된다. 대신 **리포트에
+  "사람 확인 필요: <AC 목록>" 한 줄**로 남긴다.
+- **"사람 확인 필요" 목록은 환경과 무관하게** FRD §9에서 검증 방법이 `사람 확인`인 AC를 모두 포함한다(웹에서도 자동화 불가 AC가 있을 수 있다). 해당 AC가 없으면 줄을 생략한다.
 - 이 분기는 **안내 수준**이다. RN·네이티브용 자동 검증 능력(모바일 acceptance runner·기기 구동 드라이버 등)은 아직
   없으며 `docs/ROADMAP.md`의 "Android·iOS 네이티브 확장" P2에서 다룬다. 능력이 생기면 위 표의 해당 칸을 갱신한다.
 

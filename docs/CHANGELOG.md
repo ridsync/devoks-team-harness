@@ -9,6 +9,16 @@
 
 ---
 
+## **AC 검증 방법 §9 표를 검증 스킬들이 실제로 읽도록 연결 + 실동작·데이터 흐름 리포트 심각도 SSOT 정렬** (2026-11-27, `devoks-sdlc` `3.29.1 → 3.30.0`)
+- 배경: 직전 개명 후 검증 스킬 전반을 점검했다. FRD 템플릿은 "PLAN `test:` 마커와 `verify-acceptance-test`의 `ac=` 입력이 §9 표에서 나온다"고 적었지만, 실제로 표를 읽는 소비자가 없었다. `test:` 마커 기준(`task-pr-splitting.md`), post-implementation-checklist 5번 조건, `verify-acceptance-test` Phase 0이 모두 "UI 조작+상태 영속" 같은 자체 판단으로 대상을 다시 골랐다. 값을 제안하는 기준도 없었고, `사람 확인` AC가 어디로 보고되는지도 정해져 있지 않았다. 옛 용어("수동 확인")도 남아 있었다.
+- 반영:
+  - `feature-workflow-runner` 1.17.0: `ac-review.md`에 값 제안 기준(웹이면 `에이전트 확인`, 네이티브면 `사람 확인`)과 값별 소비처를 추가했다. `task-pr-splitting.md`의 `test` 마커에는 "`traces:`에 `테스트 코드` AC가 있으면 `required`" 규칙을 표 기준보다 우선하도록 넣었다. `post-implementation-checklist.md` 5번 조건은 §9 `에이전트 확인`을 기준으로 바꾸고 §9가 없으면 기존 기준으로 판단하게 했다. 환경별 표의 "수동"은 "사람 확인"으로 바꾸고, "사람 확인 필요" 목록에 환경과 무관하게 §9 `사람 확인` AC를 포함시켰다.
+  - `verify-acceptance-test` 1.1.0: Phase 0이 §9 표를 SSOT로 삼아 `에이전트 확인` AC를 대상으로 고른다. `ac=`로 다른 값을 지정하면 실행은 하되 불일치를 리포트에 남긴다. §9가 없는 FRD는 기존 선별 기준으로 판단한다. 네이티브 안내 문구를 "사람 확인"으로 바꿨다. evals에는 3번 문구를 동기화하고 4번(§9 기반 대상 선별)을 새로 추가했다.
+  - `workflow-map` 1.7.3: 5번 행 조건과 용어를 동기화했다.
+  - `verify-requirements`의 장점 가운데 두 가지를 `verify-acceptance-test`(→ 1.2.0)에 가져왔다. **심각도 체계**: 리포트 등급이 `Critical/Major/Minor`였는데, post-implementation-checklist 안전 인터록은 **Critical/High**로 커밋을 멈춘다. 그래서 `Major` FAIL은 인터록을 통과했다(인터록이 작동하지 않는 버그). SSOT(`code-review.md` §8) 4단계로 맞추고, 실동작 검증용 기준(FAIL은 최소 High)을 report-template에 두었다. `acceptance-test-runner` 출력에 빠져 있던 발견 사항 절도 추가했다. **커버리지 줄**: §9 `에이전트 확인` AC 중 몇 개를 실행했는지, 미실행 사유, §9 밖에서 지정된 AC를 메인 루프가 리포트 머리에 채운다. 인터록 대상인 `verify-data-flow` report-template(→ 1.0.1)도 같은 `Major/Minor` 문제가 있어 함께 정정했다(불일치는 최소 High).
+- 검증: `claude plugin validate ./plugins/devoks-sdlc --strict`, 변경 SKILL·agent frontmatter `ruby -ryaml` 파싱, evals JSON 파싱, 인터록 대상 템플릿의 `Major/Minor` 잔존 0 grep. agent 본문 변경은 출력 형식 절뿐이고 경로 참조가 바뀌지 않아 클린 환경 스모크는 생략했다. eval 4번은 `claude --plugin-dir <로컬 devoks-sdlc> -p`(plan 모드)로 헤드리스 실행했다. §9 기준으로 AC-002-1만 시나리오 표에 넣고 AC-001-1·AC-003-1을 §9 값으로 제외해 assertion 2개를 모두 통과했다.
+- 의도적 미반영: `테스트 코드`에 E2E가 포함되지만 `test-author`의 범위가 단위·통합뿐이라, E2E 작성 주체(`code-implementer`·`test-author`)를 정하는 일은 후속 과제로 남겼다. `verify-requirements`의 FRD ID 체계 정렬은 별도로 논의한다. `verify-requirements`의 3단계 판정·보완 범위 선택·사전 체크리스트·구현 위치 추적은 도입 가치가 낮아 보류했다(§9 표가 사전 단계를 대신하고, UI/영속 열과 환경 갭 판정이 이미 있다). `new-smoke-test-draft` 템플릿의 `Major/Minor`는 검증 체인 밖(대상 프로젝트용 스킬 초안 생성)이라 그대로 두었다. 검증 체인 단계명 "실동작 검증"과 orchestration 문서는 단계 이름이라 바꾸지 않았다.
+
 ## **AC 검증 방법 값 개명 — `테스트 코드` / `에이전트 확인` / `사람 확인` / `출시 후 계측`** (2026-11-27, `devoks-sdlc` `3.29.0 → 3.29.1`)
 - 배경: `자동테스트`가 단위·통합만 가리켜 TRD §2.2·preset `Test/E2E` 슬롯으로 들어온 E2E가 어느 값에 속하는지 비어 있었다. `실동작`도 에이전트가 자동 수행하므로 "자동"으로는 둘이 구분되지 않았고, `수동`은 "사람이 직접 확인"이라는 뜻이 직관적이지 않았다. 구분 기준을 "코드로 남는가 / 누가 확인하는가 / 운영 측정이 필요한가"로 정리해 사용자가 이름을 확정했다.
 - 반영: `feature-workflow-runner` 1.16.1 — `references/ac-review.md` 값 정의·예시·분포 열, `assets/FRD.template.md` §9 안내·예시 행. `테스트 코드`는 단위·통합·E2E를 포함한다. `feature-frd-author/evals/evals.json` 기대 출력 문구 동기화.
