@@ -434,6 +434,8 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 - **네트워크 mock:** API를 호출하는 컴포넌트·훅은 `fetch`·api 모듈을 함수 단위로 mock하지 않고 MSW로 네트워크 경계에서 가로챈다 — 실제 요청 경로(직렬화·헤더·에러 응답 처리)가 함께 검증된다. 핸들러는 S8 위치에 두고, `server.listen({ onUnhandledRequest: 'error' })`로 정의하지 않은 요청을 실패시키며, 테스트마다 `server.resetHandlers()`로 격리한다
 - **실제 브라우저 컴포넌트 테스트(선택):** 레이아웃·`ResizeObserver`·실제 이벤트에 의존해 happy-dom 결과를 믿을 수 없는 컴포넌트는 Vitest Browser Mode(Playwright provider)로 돌릴 수 있다 — 도입 여부는 TRD §2.2 테스트 도구에서 정한다
 - **E2E:** Playwright로 핵심 사용자 흐름을 실제 브라우저에서 검증한다 — 대상 흐름·실행 시점·게이트는 Project Decisions **Test/E2E**를 따른다. 단위·컴포넌트 테스트로 검증되는 분기를 E2E에서 반복하지 않는다
+- **E2E 런타임 오류:** 시나리오 중 `page.on('pageerror')`(미처리 예외)와 `page.on('console')`의 `error` 타입 메시지를 수집해, 기대값이 맞아도 실패로 처리한다 — 화면은 맞는데 콘솔에 오류가 쌓이는 회귀를 놓치지 않는다
+- **시각 회귀(선택):** UI 외형 변화를 기준 이미지와 비교하려면 Playwright 스크린샷 비교 또는 Chromatic류를 쓴다 — 도입 여부는 TRD §2.2에서 정하고, 기준 이미지는 검토 후에만 갱신한다(일괄 `--update` 금지)
 - **접근성 자동검사:** axe는 실제 브라우저(Playwright)에서만 돌린다 — 주요 라우트마다 `new AxeBuilder({ page }).withTags([...]).analyze()`의 `violations`가 0건임을 단언한다. 태그는 TRD §2.1 접근성 보장의 WCAG 수준을 따른다(예: 2.1 AA → `wcag2a`·`wcag2aa`·`wcag21a`·`wcag21aa`). 모달·드롭다운처럼 열린 상태가 따로 있는 UI는 그 상태로 만든 뒤 스캔한다
 - axe 자동검사는 일부 기준만 잡는다 — 키보드 조작·포커스 순서·스크린리더 낭독은 코드리뷰 체크리스트와 UI 셀프체크로 보완한다
 

@@ -504,6 +504,10 @@ I/O를 코얼레싱하는 경우 공통으로 지킨다.
 - **네트워크 mock:** 외부 API를 호출하는 서비스·클라이언트 컴포넌트·훅은 `fetch`·api 모듈을 함수 단위로 mock하지 않고 MSW로 네트워크 경계에서 가로챈다 — 실제 요청 경로(직렬화·헤더·에러 응답 처리)가 함께 검증된다. 핸들러는 S8 위치에 두고, `server.listen({ onUnhandledRequest: 'error' })`로 정의하지 않은 요청을 실패시키며, 테스트마다 `server.resetHandlers()`로 격리한다
 - **실제 브라우저 컴포넌트 테스트(선택):** 레이아웃·`ResizeObserver`·실제 이벤트에 의존해 happy-dom 결과를 믿을 수 없는 컴포넌트는 Vitest Browser Mode(Playwright provider)로 돌릴 수 있다 — 도입 여부는 TRD §2.2 테스트 도구에서 정한다
 - **E2E:** Playwright로 핵심 사용자 흐름을 실제 브라우저에서 검증한다 — 대상 흐름·실행 시점·게이트는 Project Decisions **Test/E2E**를 따른다. 단위·컴포넌트 테스트로 검증되는 분기를 E2E에서 반복하지 않는다
+- **하이드레이션:** 서버 렌더 HTML이 보인 뒤 이벤트 리스너가 붙기 전에 조작하면 클릭이 무시되고 입력이 지워진다(Playwright 공식 Navigations › Hydration). 해법은 제품 코드에서 **하이드레이션이 끝날 때까지 상호작용 컨트롤을 비활성(disabled)으로 두는 것**이다 — 그러면 Playwright의 auto-wait(enabled 대기)가 자연히 기다린다. 테스트에 고정 대기(`waitForTimeout`)를 넣어 덮지 않는다. 하이드레이션 불일치 경고도 아래 런타임 오류로 실패 처리한다
+- **E2E 런타임 오류:** 시나리오 중 `page.on('pageerror')`(미처리 예외)와 `page.on('console')`의 `error` 타입 메시지를 수집해, 기대값이 맞아도 실패로 처리한다 — 화면은 맞는데 콘솔에 오류가 쌓이는 회귀를 놓치지 않는다
+- **시각 회귀(선택):** UI 외형 변화를 기준 이미지와 비교하려면 Playwright 스크린샷 비교 또는 Chromatic류를 쓴다 — 도입 여부는 TRD §2.2에서 정하고, 기준 이미지는 검토 후에만 갱신한다(일괄 `--update` 금지)
+- **Route Handler:** `route.ts`의 핸들러는 Web `Request`를 받아 `Response`를 반환하는 함수다 — 서버를 띄우지 않고 `new Request(url, init)`로 직접 호출해 상태 코드·본문·오류 형식(problem+json 등)을 검증한다. 도메인 규칙은 서비스·DAL 단위 테스트가 맡고, 핸들러 테스트는 입력 파싱·인가·오류 변환에 집중한다. `next/headers`의 `cookies()`·`headers()` 같은 요청 범위 API에 의존하는 핸들러는 직접 호출이 단위 러너에서 동작하는지 먼저 확인하고, 안 되면 요청 데이터를 `request` 인자에서 읽게 하거나 E2E로 넘긴다
 - **접근성 자동검사:** axe는 실제 브라우저(Playwright)에서만 돌린다 — 주요 라우트마다 `new AxeBuilder({ page }).withTags([...]).analyze()`의 `violations`가 0건임을 단언한다. 태그는 TRD §2.1 접근성 보장의 WCAG 수준을 따른다(예: 2.1 AA → `wcag2a`·`wcag2aa`·`wcag21a`·`wcag21aa`). 모달·드롭다운처럼 열린 상태가 따로 있는 UI는 그 상태로 만든 뒤 스캔한다
 - axe 자동검사는 일부 기준만 잡는다 — 키보드 조작·포커스 순서·스크린리더 낭독은 코드리뷰 체크리스트와 UI 셀프체크로 보완한다
 

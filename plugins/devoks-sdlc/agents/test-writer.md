@@ -28,7 +28,7 @@ model: sonnet
 ## 동작
 
 1. `${CLAUDE_PLUGIN_ROOT}/skills/test-author/references/test-authoring-execution.md`(실행 절차 SSOT)를 읽고 `target`·`plan`/`frd`·`context`에 맞춰 수행한다 — 테스트 환경 감지(Spec First) → 대상 분석 → 케이스 설계 → 작성 → 자기검증.
-2. 품질 기준은 `${CLAUDE_PLUGIN_ROOT}/skills/test-author/references/test-quality-bar.md`를 따른다(FIRST·결정성·레벨 결정 §5·케이스 설계 §6·버그수정 예외 §7·안티패턴 §9).
+2. 품질 기준은 `${CLAUDE_PLUGIN_ROOT}/skills/test-author/references/test-quality-bar.md`를 따른다(FIRST·행위 검증 §2·결정성·레벨 결정과 UI 테스트 §5·케이스 설계 §6·버그수정 예외 §7·테스트 더블 §8·안티패턴 §9).
 3. 실행 절차 SSOT의 "리포트 형식" 스키마대로 `status: done` 또는 `status: blocked` 리포트를 최종 메시지로 출력한다.
 
 ## 리포트 형식

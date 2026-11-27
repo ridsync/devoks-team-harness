@@ -13,6 +13,12 @@
 
 ---
 
+## 2.14.0 — 2026-11-27
+
+### 복사 산출물
+- `conventions/nextjs/project-convention.md` › Testing: 추가 — 하이드레이션(조작 유실 원인과 공식 해법: 하이드레이션 전 컨트롤 disabled → Playwright auto-wait, 고정 대기 금지), Route Handler 테스트(`new Request`로 직접 호출 — 입력 파싱·인가·오류 변환 검증, 요청 범위 API 의존 핸들러는 동작 확인 후 우회). `devoks-sdlc` test-quality-bar에 "API는 in-process 호출"·"상호작용 가능 상태 대기" 공통 원칙을 넣으면서 Next.js 구체 방법을 preset에 두었다
+- `conventions/{react-web,nextjs}/project-convention.md` › Testing: 추가 — E2E 런타임 오류(`pageerror`·console `error` 수집 → 실패 처리), 시각 회귀 선택 항목(도입은 TRD §2.2, 기준 이미지 검토 후 갱신)
+
 ## 2.13.0 — 2026-11-27
 
 ### 복사 산출물

@@ -4,7 +4,7 @@ description: "대상 코드·모듈의 자동화 테스트(단위·통합·E2E)�
 argument-hint: "[target=<파일|모듈|심볼 경로> (default: 직전 변경 범위)] [plan=<PLAN.md 경로>] [frd=<FRD.md 경로>] [context=<추가 힌트>]"
 metadata:
   author: ridsync
-  version: 3.1.0
+  version: 3.2.0
 ---
 
 # test-author — 테스트 작성/확장
